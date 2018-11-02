@@ -11,6 +11,20 @@ root@proxy:~# cat /etc/issue
 Ubuntu 16.04.2 LTS \n \l
 ```
 
+* Download some system packages
+```shell
+apt-get update && apt-get install -y --no-install-recommends \
+	  wget \
+	  make \
+	  g++ \
+	  nginx \
+	  && rm -rf /var/lib/apt/lists/* \
+	  && apt-get clean
+wget --no-check-certificate https://deb.nodesource.com/setup_8.x \
+	  && chmod +x setup_8.x && ./setup_8.x \
+	  && apt-get install -y nodejs
+```
+
 ## Build & Start
 ### 1. Git clone opensds-dashboard code.
 ```shell
