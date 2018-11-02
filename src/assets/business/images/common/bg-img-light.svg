@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="751px" height="514px" viewBox="0 0 751 514" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 51.2 (57519) - http://www.bohemiancoding.com/sketch -->
+    <title>Group 11</title>
+    <desc>Created with Sketch.</desc>
+    <defs>
+        <linearGradient x1="58.4006548%" y1="19.168905%" x2="7.53407595%" y2="31.166061%" id="linearGradient-1">
+            <stop stop-color="#33446F" offset="0%"></stop>
+            <stop stop-color="#29334D" offset="100%"></stop>
+        </linearGradient>
+        <linearGradient x1="77.3186726%" y1="16.4238972%" x2="-48.8536068%" y2="38.3797288%" id="linearGradient-2">
+            <stop stop-color="#3F517F" offset="0%"></stop>
+            <stop stop-color="#2D3B5E" offset="100%"></stop>
+        </linearGradient>
+        <linearGradient x1="66.5102044%" y1="23.6988317%" x2="62.6479393%" y2="100%" id="linearGradient-3">
+            <stop stop-color="#394A7A" offset="0%"></stop>
+            <stop stop-color="#2E3B5D" offset="100%"></stop>
+        </linearGradient>
+    </defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Storage-Device-Copy-8" transform="translate(-615.000000, 0.000000)" fill-rule="nonzero">
+            <g id="bg" transform="translate(0.000000, -27.000000)">
+                <g id="Group-11" transform="translate(615.000000, 4.000000)">
+                    <polygon id="Path-111" fill="url(#linearGradient-1)" opacity="0.699999988" points="552.476562 23 772 517.453125 772 23"></polygon>
+                    <polygon id="Path-101" fill="url(#linearGradient-2)" opacity="0.300000012" points="628.304688 9.046875 786.75 690.742188 786.75 9.046875"></polygon>
+                    <polygon id="Path-112" fill="url(#linearGradient-3)" opacity="0.55" points="0.34765625 23 758.484375 130.265625 758.484375 0.19921875"></polygon>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

@@ -53,7 +53,7 @@
             </div>
             <div class="ui-grid-col-10">
                 <div class="ui-grid ui-grid-responsive ui-grid-pad ui-fluid secondary-form">
-                    <form [formGroup]="repPolicy" [grid]="{label: 'ui-g-2', content:'ui-g-5'}" [errorMessage]="errorMessage">
+                    <form [formGroup]="repPolicy" [grid]="{label: 'ui-g-3', content:'ui-g-5'}" [errorMessage]="errorMessage">
                         <div class="ui-grid-col-6">
                             <form-item label="{{label.replicationLabel.type}}" [required]="true">
                                 <p-dropdown [style]="{'min-width':150}" formControlName="repType" [options]="replicationTypeOptions"></p-dropdown>
@@ -99,22 +99,30 @@
             <div class="ui-grid-col-10">
                 <div class="ui-grid ui-grid-responsive ui-grid-pad ui-fluid secondary-form">
                     <form [formGroup]="snapPolicy" [grid]="{label: 'ui-g-2', content:'ui-g-3'}" [errorMessage]="errorMessage">
-                        <form-item label="{{label.snapshotLabel.Schedule}}" [required]="true">
+                        <form-item label="{{label.snapshotLabel.automatic}}" [required]="true">
+                            <p-checkbox binary="true" label="Enable" formControlName="autoSnapshot"></p-checkbox>
+                        </form-item>
+                        <form-item *ngIf="snapPolicy.controls['autoSnapshot'].value" label="{{label.snapshotLabel.Schedule}}" [required]="true">
                             <p-dropdown [style]="{'min-width':150}" formControlName="Schedule"  [options]="snapSchedule"></p-dropdown>
                         </form-item>
-                        <form-item label="{{label.snapshotLabel.executionTime}}" [required]="true">
-                            <div class="create-profile-snap-col-6 input-text-vertical-align" >
+                        <form-item *ngIf="snapPolicy.controls['autoSnapshot'].value" label="{{label.snapshotLabel.executionTime}}" [required]="true">
+                            <div class="create-profile-snap-col-12 input-text-vertical-align" >
                                 <input pInputText type="time" formControlName="datetime" />
                             </div>
                         </form-item>
                         <form-item label="{{label.snapshotLabel.Retention}}" [required]="true">
-                            <div class="create-profile-snap-col-8 input-text-vertical-align">
+                            <div class="create-profile-snap-col-12 input-text-vertical-align">
                                 <p-dropdown [style]="{'min-width':200}"  formControlName="retentionOptions" [options]="snapshotRetentionOptions"></p-dropdown>
                                 <div class="create-profile-snap-policy">
                                     <input *ngIf="snapPolicy.controls['retentionOptions'].value ==='Quantity'" min="1" step="1" pInputText type="number" formControlName="snapNum"/>
                                     <input *ngIf="snapPolicy.controls['retentionOptions'].value !=='Quantity'" pInputText type="number" formControlName="duration"/>
                                 </div>
                                 <span *ngIf="snapPolicy.controls['retentionOptions'].value !=='Quantity'">{{I18N.keyID['sds_profile_nuit_days']}}</span>
+                            </div>
+                        </form-item>
+                        <form-item label="{{label.snapshotLabel.destination}}" [required]="false">
+                            <div class="create-profile-snap-col-12 input-text-vertical-align" >
+                                <input pInputText type="text" formControlName="snapshotDestination" placeholder="Bucket name" />
                             </div>
                         </form-item>
                     </form>

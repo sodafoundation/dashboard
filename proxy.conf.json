@@ -1,10 +1,14 @@
 {
+    "/v1beta": {
+        "target": "http://139.159.150.240:50040",
+        "secure": false
+    },
     "/v1": {
-        "target": "http://139.159.241.166:5001",
+        "target": "http://139.159.150.240:8089",
         "secure": false
     },
     "/v3": {
-        "target": "http://139.159.241.166:5000/identity",
+        "target": "http://139.159.150.240/identity",
         "secure": false
     }
 }

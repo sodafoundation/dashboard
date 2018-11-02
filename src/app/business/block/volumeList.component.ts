@@ -46,6 +46,12 @@ export class VolumeListComponent implements OnInit {
             value: null
         }
     ];
+    snapProfileOptions = [
+        {
+            label: 'Select Profile',
+            value: null
+        }
+    ];
     azOption=[{label:"Secondary",value:"secondary"}];
     selectedVolumes = [];
     volumes = [];
@@ -54,6 +60,7 @@ export class VolumeListComponent implements OnInit {
     label = {
         name: this.I18N.keyID['sds_block_volume_name'],
         volume:  this.I18N.keyID['sds_block_volume_title'],
+        profile: this.I18N.keyID['sds_block_volume_profile'],
         description:  this.I18N.keyID['sds_block_volume_descri']
     };
     snapshotFormGroup;
@@ -82,6 +89,7 @@ export class VolumeListComponent implements OnInit {
     ) {
         this.snapshotFormGroup = this.fb.group({
             "name": ["", Validators.required],
+            "profile": [""],
             "description": ["", Validators.maxLength(200)]
         });
         this.modifyFormGroup = this.fb.group({
@@ -220,6 +228,12 @@ export class VolumeListComponent implements OnInit {
                     label: profile.name,
                     value: profile.id
                 });
+                if(profile.snapshotProperties.topology.bucket){
+                    this.snapProfileOptions.push({
+                        label: profile.name,
+                        value: profile.id
+                    });
+                }
             });
 
             this.getVolumes();
@@ -253,6 +267,9 @@ export class VolumeListComponent implements OnInit {
             name: this.snapshotFormGroup.value.name,
             volumeId: this.selectedVolume.id,
             description: this.snapshotFormGroup.value.description
+        }
+        if(this.snapshotFormGroup.value.profile){
+            param['profileId'] = this.snapshotFormGroup.value.profile
         }
         this.SnapshotService.createSnapshot(param).subscribe((res) => {
             this.createSnapshotDisplay = false;

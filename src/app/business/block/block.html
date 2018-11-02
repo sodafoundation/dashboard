@@ -1,5 +1,12 @@
+<div style="margin-bottom: 20px;">Unified management of cloud resources.</div>
 <p-tabView styleClass="ui-tabview-large">
-    <p-tabPanel header="{{I18N.keyID['sds_block_volume_title']}}">
+    <p-tabPanel header="Bucket" [selected]="fromBuckets">
+        <div class="content-header">
+            <p>{{I18N.keyID['sds_block_volumesGroup_descrip']}}</p>
+        </div>
+        <bucket-list ></bucket-list>
+    </p-tabPanel>
+    <p-tabPanel header="{{I18N.keyID['sds_block_volume_title']}}" [selected]="fromVolume">
         <div class="content-header">
             <p>{{I18N.keyID['sds_block_volumes_descrip']}}</p>
         </div>
@@ -11,4 +18,5 @@
         </div>
         <volume-group-list #volumeGroupList></volume-group-list>
     </p-tabPanel>
+    
 </p-tabView>

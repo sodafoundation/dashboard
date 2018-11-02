@@ -1,80 +1,100 @@
-<div class="home-font-color-class" *ngIf="showAdminStatis">
-    <div>
-        <header>
-            <h2 class="header-h2-title-font">{{I18N.keyID["sds_home_overvew"]}}</h2>
-            <p class="header-p-text">{{I18N.keyID["sds_home_update"]}}</p>
-        </header>
-        <div class="ui-inputgroup">
-            <div class="ui-g-12 ui-md-5">
-                <div class="img-item-div-height" style="padding: 2em 0;">
-                    <div class="img-item-div statisBg" style="margin-top:-2em;">
-                        <div class="ui-g-12 ui-md-6">
-                            <img-item [item]="items[0]"></img-item>
-                        </div>
-                        <div class="ui-g-12 ui-md-6">
-                            <img-item [item]="items[1]"></img-item>
-                        </div>
-                        <div class="ui-helper-clearfix"></div>
-                    </div>
-                    <div class="user-img-item-margin img-item-div statisBg">
-                        <div class="ui-g-12 ui-md-6">
-                            <img-item [item]="items[2]"></img-item>
-                        </div>
-                        <div class="ui-g-12 ui-md-6">
-                            <img-item [item]="items[3]"></img-item>
-                        </div>
-                        <div class="ui-helper-clearfix"></div>
-                    </div>
-                    <div class="ui-helper-clearfix"></div>
+<div class="home-font-color-class ui-home-container" *ngIf="showAdminStatis">
+    <div class="ui-home-backend-container">
+        <div #svgCon>
+            <svg width="240" height="64" xmlns="http://www.w3.org/2000/svg" viewBox="0,0,240,64" [ngStyle]="{'transform': 'scale('+ scaleX +', '+ scaleY +')'}">
+                <g>
+                    <title>Layer 1</title>
+                    <path #path d="m10.5,31.5c0,-14.91713 49.00276,-27 109.49999,-27c60.49723,0 109.49999,12.08287 109.49999,27c0,14.91713 -49.00276,27 -109.49999,27c-60.49723,0 -109.49999,-12.08287 -109.49999,-27z" stroke-opacity="null" stroke-linecap="null" stroke-linejoin="null" stroke-width="null" fill-opacity="null" fill="none"/>
+                </g>
+            </svg>
+            <div class="cloud-center" (click)="showRegister()">
+                <div class="ui-home-backend-add">+</div>
+            </div>
+            <div #cloud_aws class="cloud" (click)="showBackendsDeatil(cloud_type[0])">
+                <div class="ui-home-backend-count">{{allBackends_count.aws}}</div>
+                <div class="ui-home-backend-logo">
+                    <img src="assets/business/images/common/aws.svg" />
                 </div>
             </div>
-
-            <div class="ui-g-12 ui-md-5">
-                <div class="img-item-div-height img-item-div statisBg">
-                    <div>
-                        <img-item [item]="items[4]"></img-item>
-                    </div>
-                    <div class="home-img-item-margin">
-                        <img-item [item]="items[5]"></img-item>
-                    </div>
-                    <div class="home-img-item-margin">
-                        <img-item [item]="items[6]"></img-item>
-                    </div>
+            <div #cloud_hw class="cloud" (click)="showBackendsDeatil(cloud_type[1])">
+                <div class="ui-home-backend-count">{{allBackends_count.huaweipri}}</div>
+                <div class="ui-home-backend-logo">
+                    <img src="assets/business/images/common/azure.svg" width="42" />
+                </div>
+            </div>            
+            <div #cloud_hw_p class="cloud" (click)="showBackendsDeatil(cloud_type[2])">
+                <div class="ui-home-backend-count">{{allBackends_count.huaweipub}}</div>
+                <div class="ui-home-backend-logo">
+                    <img src="assets/business/images/common/huawei.svg" width="32" />
                 </div>
             </div>
-
-            <!-- <div class="ui-g-12 ui-md-4">
-                <div class="img-item-div-height img-item-div statisBg">
-                    <div>
-                        <img-item [item]="items[7]"></img-item>
-                    </div>
-                    <div class="home-img-item-margin">
-                        <img-item [item]="items[8]"></img-item>
-                    </div>
-                </div>
-            </div> -->
-            <div class="ui-helper-clearfix"></div>
+        </div>
+        <div class="bg" #circleCon>
+            <svg width="240" height="64" xmlns="http://www.w3.org/2000/svg" [ngStyle]="{'transform': 'scale('+ scaleX +', '+ scaleY +')'}">
+                <use xlink:href="assets/business/images/common/opensds.svg#ic_cloud_circle" />
+            </svg>
         </div>
     </div>
-    <hr>
-    <div>
-        <h2 class="header-h2-title-font">{{I18N.keyID["Capacity"]}}</h2>
-        <div class="ui-inputgroup"></div>
-        <div class="ui-g-12 ui-md-4">
-            <div class="capacity-secondary">{{I18N.keyID["sds_home_block_capacity"]}}</div>
-            <p class="capacity-secondary">{{I18N.keyID["sds_home_update"]}}</p>
-            <div>
-                <p-chart [options]="option" type="doughnut" [data]="chartDatas"></p-chart>
-            </div>
+    <div style="display:flex;">
+        <div style="flex:1;padding:20px;">
+            <p-card title="Resource" styleClass="ui-card-shadow">
+                <div class="ui-home-card">
+                    <div class="ui-home-card-count">
+                        <div class="ui-home-card-num">{{counts.volumesCount}}</div>
+                        <div class="ui-home-card-img volume"></div>
+                        <div class="ui-home-card-text">Volumes</div>
+                    </div>
+                    <div class="ui-home-card-count">
+                        <div class="ui-home-card-num">{{counts.bucketsCount}}</div>
+                        <div class="ui-home-card-img bucket"></div>
+                        <div class="ui-home-card-text">Buckets</div>
+                    </div>
+                    <div class="ui-home-card-count">
+                        <div class="ui-home-card-num">0</div>
+                        <div class="ui-home-card-img file"></div>
+                        <div class="ui-home-card-text">Filesystems</div>
+                    </div>
+                </div>
+            </p-card>
         </div>
-        <div class="ui-g-12 ui-md-2"></div>
-        <div class="ui-g-12 ui-md-4">
-            <div class="capacity-secondary">{{I18N.keyID["sds_home_top5"]}}</div>
-            <p class="capacity-secondary">{{I18N.keyID["sds_home_update"]}}</p>
-            <p-chart [options]="chartBarOpion" type="bar" [data]="chartDatasbar"></p-chart>
+        <div style="flex:1;padding:20px;">
+            <p-card title="Dataflow Capacity" styleClass="ui-card-shadow" >
+                <div class="ui-home-card">
+                    <p-chart type="line" [responsiveHeight] = "120" [options]='lineOption' [data]="lineData"></p-chart>
+                </div>
+            </p-card>
         </div>
-        <div class="ui-helper-clearfix"></div>
+        <div style="flex:1;padding:20px;">
+            <p-card title="Dataflow Quantity" styleClass="ui-card-shadow">
+                <div class="ui-home-card">
+                    <div class="ui-home-card-count">
+                        <div class="ui-home-card-num">{{counts.migrationCount}}</div>
+                        <div class="ui-home-card-img migration"></div>
+                        <div class="ui-home-card-text">Migrations</div>
+                    </div>
+                    <div class="ui-home-card-count">
+                        <div class="ui-home-card-num">1</div>
+                        <div class="ui-home-card-img replication"></div>
+                        <div class="ui-home-card-text">Replications</div>
+                    </div>
+                </div>
+            </p-card>
+        </div>
     </div>
+    <p-dialog  header="Modify" [(visible)]="modifyBackendshow" [width]="600" modal="modal">
+        <form [grid]="{label: 'ui-g-3', content:'ui-g-20'}" [formGroup]="modifyBackendForm" [errorMessage]="errorMessage">
+            <form-item label="Access Key" [required]="true">
+                <input type="text" pInputText formControlName="ak" />
+            </form-item>
+            <form-item label="Secret Key" [required]="true">
+                <input type="text" pInputText formControlName="sk" />
+            </form-item>
+        </form>
+        <p-footer>
+            <button type="button" pButton (click)="modifyBackend()"  label="{{I18N.keyID['ok']}}"></button>
+            <button type="button" pButton (click)="modifyBackendshow = false"  label="{{I18N.keyID['cancel']}}"></button>
+        </p-footer>
+    </p-dialog>
 </div>
 
 <div class="home-font-color-class" *ngIf="!showAdminStatis">
@@ -123,3 +143,45 @@
             <div class="ui-helper-clearfix"></div>
         </div>
 </div>
+<p-home-dialog header="Register Storage Backend" [(visible)]="showRgister" [width]="510" [height]="790" modal="modal" [style]="{'opacity':'0.95','right':'46px','top':'80px','background':'rgb(44,63,97)'}" >
+        <form [grid]="{label: 'ui-g-5', content:'ui-g-20'}" [formGroup]="backendForm" [errorMessage]="errorMessage">
+            <form-item label="Name" >
+                <input id="name" type="text" name="name" formControlName="name"  pInputText />
+            </form-item>
+            <form-item label="Type" >
+                <p-dropdown [style]="{'min-width':'220px'}" placeholder="Please select" formControlName="type" [options]="allTypes"  ></p-dropdown>
+            </form-item>
+            <form-item label="Region" >
+                <input id="region" type="text" name="region"  formControlName="region"  pInputText />
+            </form-item>
+            <form-item label="Endpoint" >
+                <input id="endpoint" type="text" name="endpoint"  formControlName="endpoint"  pInputText />
+            </form-item>
+            <form-item label="Bucket" >
+                <input id="bucket" type="text" name="bucket" formControlName="bucket"  placeholder="Bucket name" pInputText />
+            </form-item>
+            <form-item label="Access Key" >
+                <input id="accessKey" type="text" name="accessKey" formControlName="ak"  pInputText />
+            </form-item>
+            <form-item label="Secret Key" >
+                <input id="secretKey" type="text" name="secretKey" formControlName="sk"  pInputText />
+            </form-item>
+        </form>
+        <div style="margin-top:100px;">
+            <button type="button" class="ui-button-secondary" pButton (click)="createBackend()" label="{{I18N.keyID['ok']}}" ></button>
+        </div>
+</p-home-dialog>
+<p-home-dialog header="Storage Backends" [(visible)]="showBackends" [width]="710" [height]="790" modal="modal" [style]="{'opacity':'0.8','right':'46px','top':'80px','background':'rgb(44,63,97)'}" >
+    <p-dataTable id="home-backend-detail" [value]="typeDetail" [rows]="10">
+        <p-column field="name" header="{{I18N.keyID['sds_block_volume_name']}}" ></p-column>
+        <p-column field="typeName" header="Type" ></p-column>
+        <p-column field="bucketName" header="Bucket"></p-column>
+        <p-column header="{{I18N.keyID['sds_block_volume_operation']}}" [style]="{'width':'140px'}">
+            <ng-template pTemplate="body" let-backend="rowData" let-i="rowIndex">
+                <a (click)="configModify(backend)" style="margin-right:10px;" >Modify</a>
+                <a (click)="deleteBackend(backend)">Delete</a>
+            </ng-template>
+        </p-column>
+    </p-dataTable>
+</p-home-dialog>
+<p-confirmDialog></p-confirmDialog>

@@ -39,7 +39,9 @@
             <form-item label="{{label.name}}" [required]="true">
                 <input type="text" pInputText formControlName="name" value="{{snapshotProperty.name}}"/>
             </form-item>
-
+            <form-item label="Profile" [required]="false">
+                <p-dropdown [style]="{'min-width':'220px'}" placeholder="Please select" [options]="snapProfileOptions" formControlName="profile"></p-dropdown>
+            </form-item>
             <form-item label="{{label.description}}" [required]="false">
                 <textarea [rows]="5" [cols]="30" pInputTextarea formControlName="description" value="{{snapshotProperty.description}}"></textarea>
             </form-item>

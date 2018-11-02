@@ -68,7 +68,7 @@ export class FormItem implements OnInit, AfterViewInit, AfterContentChecked {
     constructor( private el: ElementRef, private injector: Injector){}
 
     ngOnInit(): void{
-        //栅格样式
+       
         this.formInstance = this.injector.get(Form);
     
         if( !this.formInstance ){
@@ -108,7 +108,7 @@ export class FormItem implements OnInit, AfterViewInit, AfterContentChecked {
         this.updateFormCtrl();
     }
 
-    //显示第一个错误
+    
     updateFormCtrl(): void {
         let firstErrorCtrl = this.formctrls.filter( item => {
             let formCtrl = item.formCtrl;

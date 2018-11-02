@@ -49,14 +49,14 @@ export class ProfileCardComponent implements OnInit {
     set cardData(data: any) {
         this.data = data;
         this.policys = [];
-        if(data.extras){
-            if(data.extras[':provisionPolicy'].ioConnectivityLoS.maxIOPS){
+        if(data){
+            if(data['provisioningProperties'].ioConnectivity.maxIOPS){
                 this.policys.push("QoS");
             }
-            if(data.extras[':snapshotPolicy']){
+            if(data['snapshotProperties'].retention && Object.keys(data['snapshotProperties'].retention).length !== 0){
                 this.policys.push("Snapshot");
             }
-            if(data.extras[':replicationPolicy']){
+            if(data['replicationProperties'].dataProtection && Object.keys(data['replicationProperties'].dataProtection).length !== 0){
                 this.policys.push("Replication");
             }
         }
@@ -127,11 +127,6 @@ export class ProfileCardComponent implements OnInit {
                             "rgba(224, 224, 224, .5)",
                             "#438bd3"
                         ]
-                        // hoverBackgroundColor: [
-                        //     "#FF6384",
-                        //     "#36A2EB",
-                        //     "#FFCE56"
-                        // ]
                     }]
             };
         });
@@ -141,7 +136,7 @@ export class ProfileCardComponent implements OnInit {
         let SumCapacity: number = 0;
         let arrLength = pools.length;
         for (let i = 0; i < arrLength; i++) {
-            if(this.data.extras && this.data.extras[":provisionPolicy"].ioConnectivityLoS.accessProtocol.toLowerCase() == pools[i].extras.ioConnectivity.accessProtocol &&  this.data.extras[":provisionPolicy"].dataStorageLoS.provisioningPolicy == pools[i].extras.dataStorage.provisioningPolicy){
+            if(this.data && this.data["provisioningProperties"].ioConnectivity.accessProtocol.toLowerCase() == pools[i].extras.ioConnectivity.accessProtocol &&  this.data["provisioningProperties"].dataStorage.provisioningPolicy == pools[i].extras.dataStorage.provisioningPolicy){
                 if (FreeOrTotal === 'free') {
                     SumCapacity += pools[i].freeCapacity;
                 } else {

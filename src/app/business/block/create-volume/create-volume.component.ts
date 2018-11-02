@@ -160,7 +160,7 @@ export class CreateVolumeComponent implements OnInit {
 
   createVolume(param){
     this.VolumeService.createVolume(param).subscribe((res) => {
-      this.router.navigate(['/block']);
+      this.router.navigate(['/block',"fromVolume"]);
     });
   }
   createVolumeAndReplication(volParam,repParam){

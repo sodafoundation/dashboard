@@ -57,20 +57,25 @@ export class HttpService extends Http {
 
     presetURL(url, options){
         // Configure token option
-        if( localStorage['auth-token'] ){
+        if( localStorage['auth-token'] && options && options.headers  ){
+            options.headers.set('X-Auth-Token', localStorage['auth-token']);
+        }else if(localStorage['auth-token']){
             !options && (options = {})
             !options.headers && (options['headers'] = new Headers());
             options.headers.set('X-Auth-Token', localStorage['auth-token']);
-            
+            if(url.includes("v1/s3")){
+                options.headers.set("Content-Type", "application/xml");
+            }else{
+                options.headers.set("Content-Type", "application/json");
+            } 
         }
-
         // Configure "project_id" for url
         if(url.includes('{project_id}')){
             let project_id = localStorage['current-tenant'].split("|")[1];
-            url = url.replace('{project_id}',project_id);
-            
+            url = url.replace('{project_id}',project_id); 
+        }else if(url.includes('{tenantId}')){
+            url = url.replace('{tenantId}','adminTenantId');
         }
-
         return [url, options];
     }
 

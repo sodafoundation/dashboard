@@ -3,6 +3,8 @@ import { FormControl, FormGroup, FormBuilder, Validators, ValidatorFn, AbstractC
 import { VolumeService,SnapshotService } from './../../volume.service';
 import { ConfirmationService,ConfirmDialogModule} from '../../../../components/common/api';
 import { I18NService, MsgBoxService, Utils } from 'app/shared/api';
+import { DropMenuModule} from './../../../../components/common/api';
+import { ProfileService } from './../../../profile/profile.service';
 
 @Component({
   selector: 'app-snapshot-list',
@@ -42,16 +44,19 @@ export class SnapshotListComponent implements OnInit {
     key: 'VolumeId',
     value: null
   }
+  snapProfileOptions = [];
   constructor(
     private VolumeService: VolumeService,
     private SnapshotService: SnapshotService,
     private fb: FormBuilder,
     private confirmationService:ConfirmationService,
     public I18N:I18NService,
-    private msg: MsgBoxService
+    private msg: MsgBoxService,
+    private ProfileService:ProfileService
   ) {
     this.snapshotFormGroup = this.fb.group({
       "name": ["", Validators.required],
+      "profile":[""],
       "description": ["", Validators.maxLength(200)]
     });
 
@@ -72,9 +77,23 @@ export class SnapshotListComponent implements OnInit {
       key: 'VolumeId',
       value: this.volumeId
     };
+    this.getProfiles();
     this.getSnapshots(this.param);
   }
 
+  getProfiles() {
+    this.ProfileService.getProfiles().subscribe((res) => {
+        let profiles = res.json();
+        profiles.forEach(profile => {
+            if(profile.snapshotProperties.topology.bucket){
+                this.snapProfileOptions.push({
+                    label: profile.name,
+                    value: profile.id
+                });
+            }
+        });
+    });
+  }
   getVolumeById(volumeId){
     this.VolumeService.getVolumeById(volumeId).subscribe((res) => {
       this.volume = res.json();
@@ -86,6 +105,9 @@ export class SnapshotListComponent implements OnInit {
       name: this.snapshotFormGroup.value.name,
       volumeId: this.volumeId,
       description: this.snapshotFormGroup.value.description
+    }
+    if(this.snapshotFormGroup.value.profile){
+        param['profileId'] = this.snapshotFormGroup.value.profile
     }
     this.SnapshotService.createSnapshot(param).subscribe((res) => {
       this.getSnapshots(

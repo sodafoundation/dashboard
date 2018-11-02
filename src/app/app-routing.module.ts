@@ -4,7 +4,6 @@ import { Routes, RouterModule } from '@angular/router';
 const routes: Routes = [
     {path: '', redirectTo: '/home', pathMatch: 'full'},
     {path: 'home', loadChildren: './business/home/home.module#HomeModule'},
-    {path: 'service', loadChildren: './business/service/service.module#ServiceModule'},
     {path: 'block', loadChildren: './business/block/block.module#BlockModule'},
     {path: 'createVolume', loadChildren: './business/block/create-volume/create-volume.module#CreateVolumeModule'},
     {path: 'volumeDetails/:volumeId', loadChildren: './business/block/volume-detail/volume-detail.module#VolumeDetailModule'},
@@ -16,6 +15,8 @@ const routes: Routes = [
     {path: 'identity', loadChildren: './business/identity/identity.module#IdentityModule'},
     {path: 'volumeGroupDetails/:groupId', loadChildren: './business/block/volume-group-detail/volume-group-detail.module#VolumeGroupDetailModule'},
     {path: 'block/:fromRoute', loadChildren: './business/block/block.module#BlockModule'},
+    {path: 'dataflow', loadChildren: './business/dataflow/dataflow.module#DataflowModule'},
+    {path: 'bucketDetail/:bucketId', loadChildren: './business/block/bucket-detail/bucket-detail.module#BucketDetailModule'},
 ];
 
 @NgModule({
