@@ -21,23 +21,10 @@ all:build
 build:dashboard
 .PHONY: build
 
-dashboard:package
+dashboard:
 	chmod +x ./image_builder.sh \
 	  && ./image_builder.sh
 .PHONY: dashboard
-
-package:
-	apt-get update && apt-get install -y --no-install-recommends \
-	  wget \
-	  make \
-	  g++ \
-	  nginx \
-	  && rm -rf /var/lib/apt/lists/* \
-	  && apt-get clean
-	wget --no-check-certificate https://deb.nodesource.com/setup_8.x \
-	  && chmod +x setup_8.x && ./setup_8.x \
-	  && apt-get install -y nodejs
-.PHONY: package
 
 docker:
 	docker build . -t $(IMAGE):$(VERSION)
