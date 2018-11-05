@@ -35,7 +35,7 @@
         </p-dataTable>
         <p-dialog styleClass="upload-dialog"  header="Upload" [(visible)]="uploadDisplay" [width]="600" modal="modal">
             <div class="a-upload">
-                <input type="file" [(ngModel)]="files" placeholder="Select File" (change)="selectedFileOnChanged($event)" />
+                <input type="file" placeholder="Select File" (change)="selectedFileOnChanged($event)" />
                 <span>Select File</span>
             </div>
             <span class="file-name">{{selectFile ? selectFile.name : ''}}</span>

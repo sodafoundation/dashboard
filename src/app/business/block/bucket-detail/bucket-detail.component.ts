@@ -128,6 +128,7 @@ export class BucketDetailComponent implements OnInit {
       let file = event.target.files[0];
       this.selectFile = file;
       this.showErrorMsg = false;
+      this.files = file;
     }
   }
 
