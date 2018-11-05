@@ -9,21 +9,25 @@
         </div>
         <div class="padding-class"style="clear:both;">
             <span class="label-class">Access Protocol:</span>
-            <span>{{data.extras && data.extras[':provisionPolicy'].ioConnectivityLoS.accessProtocol}}</span>
+            <span>{{data['provisioningProperties'].ioConnectivity && data['provisioningProperties'].ioConnectivity.accessProtocol}}</span>
         </div>
         <div class="padding-class">
             <span class="label-class">Provisioning Type:</span>
-            <span>{{data.extras && data.extras[':provisionPolicy'].dataStorageLoS.provisioningPolicy}}</span>
+            <span>{{data['provisioningProperties'].dataStorage && data['provisioningProperties'].dataStorage.provisioningPolicy}}</span>
         </div>
-
-        <div class="padding-class item-flex" *ngIf="data.extras && policys">
-            <div (mouseenter)="showSuspensionFrame($event)" (mouseleave)="showSuspensionFrame($event)" *ngFor="let policy of policys; index as i" class="position-relative mouse-cursor">
-                <div style="width:114px" class="fa fa-check icon-color-class margin-right-class">
-                    <span class="font-color-class">{{policy}}</span>
+        <div class="padding-class">
+            <span class="label-class">bucketName:</span>
+            <span>{{data.snapshotProperties.topology.bucket ? data.snapshotProperties.topology.bucket :'--'}}</span>
+        </div>
+        <div class="padding-class item-flex">
+            <div *ngIf="data && policys.length !== 0" class="item-flex">
+                <div (mouseenter)="showSuspensionFrame($event)" (mouseleave)="showSuspensionFrame($event)" *ngFor="let policy of policys; index as i" class="position-relative mouse-cursor">
+                    <div style="width:114px" class="fa fa-check icon-color-class margin-right-class">
+                        <span class="font-color-class">{{policy}}</span>
+                    </div>
+                    <app-suspension-frame [policy]="[policy,data]" [ngStyle]="{'display':i === index && isHover ? 'block' : 'none'}"></app-suspension-frame>
                 </div>
-                <app-suspension-frame [policy]="[policy,data.extras]" [ngStyle]="{'display':i === index && isHover ? 'block' : 'none'}"></app-suspension-frame>
             </div>
-
         </div>
     </div>
     <div class="ui-g-12 ui-md-5">

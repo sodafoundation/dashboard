@@ -6,6 +6,8 @@ import { I18NService, Consts, ParamStorService } from 'app/shared/api';
 import { I18nPluralPipe } from '@angular/common';
 import { MenuItem, SelectItem } from './components/common/api';
 
+let d3 = window["d3"];
+
 @Component({
     selector: 'app-root',
     templateUrl: './app.component.html',
@@ -28,6 +30,8 @@ export class AppComponent implements OnInit, AfterViewInit{
 
     currentTenant: string="";
 
+    isHomePage: boolean = true;
+
     showLoginAnimation: boolean=false;
 
     showLogoutAnimation: boolean=false;
@@ -48,7 +52,7 @@ export class AppComponent implements OnInit, AfterViewInit{
     menuItems_tenant = [
         {
             "title": "Home",
-            "description": "Resources statistics",
+            "description": "Resource statistics",
             "routerLink": "/home"
         },
         {
@@ -61,27 +65,27 @@ export class AppComponent implements OnInit, AfterViewInit{
     menuItems_admin = [
         {
             "title": "Home",
-            "description": "Resources statistics",
+            "description": "Resource statistics",
             "routerLink": "/home"
         },
         {
-            "title": "Volume",
-            "description": "Block storage resources",
+            "title": "Resource",
+            "description": "Volumes / Buckets",
             "routerLink": "/block"
         },
-        // {
-        //     "title": "Multi-Cloud Service",
-        //     "description": "5 replications, 1 migrations",
-        //     "routerLink": "/cloud"
-        // },
+        {
+            "title": "Dataflow",
+            "description": "Through migration / replication capability.",
+            "routerLink": "/dataflow"
+        },
         {
             "title": "Profile",
             "description": "Block profiles",
             "routerLink": "/profile"
         },
         {
-            "title": "Resource",
-            "description": "Regions, availability zones and storages",
+            "title": "Infrastructure",
+            "description": "Regions, availability zones and storage",
             "routerLink": "/resource"
         },
         {
@@ -103,7 +107,16 @@ export class AppComponent implements OnInit, AfterViewInit{
         private paramStor: ParamStorService,
         public I18N: I18NService
     ){}
-    
+
+    // 波浪动画参数
+    svg_height = 150;
+    svg_width = 2000;
+    wave_data = [[],[]];
+    area = d3.area().y0(this.svg_height).curve(d3.curveBasis);   //curve会进行平滑处理
+    svg_paths = [];
+    max = 800;  //控制速度
+    d;
+
     ngOnInit() {
         let currentUserInfo = this.paramStor.CURRENT_USER();
         if(currentUserInfo != undefined && currentUserInfo != ""){
@@ -119,6 +132,18 @@ export class AppComponent implements OnInit, AfterViewInit{
             this.isLogin = false;
             this.hideLoginForm = false;
         }
+
+        //波浪动画
+        for (var i=0; i<this.max; i++) {
+            var r = i / this.max * 4;
+            this.wave_data[0].push(r*1.5);   //波浪一
+            this.wave_data[1].push(r + 1);   //波浪二（+1代表偏移π）
+        }
+        this.d = this.svg_width/(this.wave_data[0].length-1);
+        this.svg_paths.push(d3.select('#svg_wave_1'));
+        this.svg_paths.push(d3.select('#svg_wave_2'));
+
+        this.renderWave();
     }
     checkTimeOut(){
         this.currentTime = new Date().getTime(); //update current time
@@ -309,6 +334,7 @@ export class AppComponent implements OnInit, AfterViewInit{
 
                 if(this.username == "admin"){
                     this.menuItems = this.menuItems_admin;
+                    this.isHomePage = true;
                     this.dropMenuItems = [
                         { 
                             label: "Switch Region", 
@@ -321,6 +347,7 @@ export class AppComponent implements OnInit, AfterViewInit{
                     ];
                 }else{
                     this.menuItems = this.menuItems_tenant;
+                    this.isHomePage = false;
                     this.dropMenuItems = [
                         { 
                             label: "Switch Region", 
@@ -338,7 +365,7 @@ export class AppComponent implements OnInit, AfterViewInit{
                 }
 
                 this.isLogin = true;
-                this.router.navigateByUrl("home");
+                this.router.navigateByUrl("/home");
                 this.activeItem = this.menuItems[0];
 
                 // annimation for after login
@@ -395,6 +422,11 @@ export class AppComponent implements OnInit, AfterViewInit{
 
     menuItemClick(event, item) {
         this.activeItem = item;
+        if(item.routerLink == "/home" && this.username === "admin"){
+            this.isHomePage = true;
+        }else{
+            this.isHomePage = false;
+        }
     }
 
     supportCurrentBrowser(){
@@ -441,5 +473,32 @@ export class AppComponent implements OnInit, AfterViewInit{
         } else {
             return browserVersionArr[1];
         }
+    }
+
+    area_generator(data) {
+        let that = this;
+        var wave_height = 0.45; 
+        var area_data = data.map( function(y,i) {
+          return [i * that.d, that.svg_height*(1 - (wave_height*Math.sin(y*Math.PI) + 2)/3)];
+        } );
+        return function() {
+          return that.area(area_data);
+        };
+    }
+    renderWave() {
+        let that = this;
+        this.svg_paths.forEach(function(svg_path,i){
+          svg_path.attr('d', that.area_generator(that.wave_data[i]));
+          that.wave_data[i] = that.getNextData(that.wave_data[i]);
+        });
+        
+        setTimeout(function(){
+            that.renderWave();
+        }, 1000/60);
+    }
+    getNextData(data) {
+        var r = data.slice(1);
+        r.push(data[0]);
+        return r;
     }
 }

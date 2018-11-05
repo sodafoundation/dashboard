@@ -31,10 +31,10 @@
         
         <ul class="topbar-menu">
             <li *ngFor="let menuItem of menuItems">
-                <a href="#" [routerLink]="menuItem.routerLink" [ngClass]="{'active-item':menuItem==activeItem}" (click)="menuItemClick($event, menuItem)">
+                <a href="#" [routerLink]="[menuItem.routerLink]" [ngClass]="{'active-item':menuItem==activeItem}" (click)="menuItemClick($event, menuItem)">
                     <h1>{{menuItem.title}}</h1>
                     <p>{{menuItem.description}}</p>
-                </a>
+                </a> 
             </li>
         </ul>
 
@@ -44,8 +44,18 @@
     </div>
 
     <div id="layout-content">
-        <div class="content-work">
+        <div [ngClass]="{'content-home':isHomePage}">
+            <div *ngIf="isHomePage" style="float:right;">
+                <a style="font-size: .16rem; cursor: pointer; display: block; padding: 2px 10px; border: 1px solid #34507b;" (click)="menuItemClick($event, menuItems[4])" [routerLink]="['/resource']"  title="Overview">Overview</a>
+            </div>
             <router-outlet></router-outlet>
         </div>
     </div>
+</div>
+
+<div style="position: fixed; left: 0; bottom: -10px; right:0; z-index: -1;">
+    <svg width="100%" height="150">
+        <path id="svg_wave_1" fill="rgba(90, 102, 140, 0.4)"></path>
+        <path id="svg_wave_2" fill="rgba(60, 142, 225, 0.6)"></path>
+    </svg> 
 </div>

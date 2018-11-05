@@ -65,15 +65,24 @@ export class StorageComponent implements OnInit{
             let reqPool: any = { params:{} };
             this.http.get("/v1beta/"+ project_id +"/pools", reqPool).subscribe((poolRES) => {
                 let reqDock: any = { params:{} };
-                this.http.get("/v1beta/"+ project_id +"/docks", reqDock).subscribe((dockRES) => {
-                    dockRES.json().forEach(ele => {
+                let p1 = this.http.get("/v1beta/"+ project_id +"/docks", reqDock).toPromise();
+                let p2 = this.http.get("/v1/"+ project_id +"/backends").toPromise();
+                Promise.all([p1,p2]).then((result)=>{
+                    let dockRES = result[0].json();
+                    let backends = result[1].json().backends;
+                    dockRES.forEach(ele => {
                         let zone = poolRES.json().filter((pool)=>{
                             return pool.dockId == ele.id;
                         })[0].availabilityZone;
-                        let [name,ip,status,description,region,az] = [ele.name, ele.endpoint.split(":")[0], "Enabled", ele.description, "default_region", zone];
-                        this.storages.push({name,ip,status,description,region,az});
-                    })
-                    console.log(this.storages);
+                        let [name,ip,status,description,region,az,type] = [ele.name, ele.endpoint.split(":")[0], "Enabled", ele.description, "default_region", zone,"opensds"];
+                        this.storages.push({name,ip,status,description,region,az,type});
+                    });
+                    backends.forEach(ele => {
+                        let [name,ip,status,description,region,az,type] = [ele.name, ele.endpoint, "Enabled", ele.description ? ele.description: "--" , ele.region, "--",ele.type];
+                        this.storages.push({name,ip,status,description,region,az,type});
+                    });
+                }).catch(function(e){
+                    console.log(e);
                 })
             })
         })

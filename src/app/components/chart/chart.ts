@@ -7,7 +7,7 @@ declare var Chart: any;
     selector: 'p-chart',
     template: `
         <div style="position:relative" [style.width]="responsive ? null : width" [style.height]="responsive ? null : height">
-            <canvas [attr.width]="responsive ? null : width" [attr.height]="responsive ? null : height" (click)="onCanvasClick($event)"></canvas>
+            <canvas [attr.width]="responsive ? null : width" [attr.height]="responsive ? responsiveHeight ? responsiveHeight : null : height" (click)="onCanvasClick($event)"></canvas>
         </div>
     `
 })
@@ -22,6 +22,8 @@ export class UIChart implements AfterViewInit, OnDestroy {
     @Input() height: string;
 
     @Input() responsive: boolean = true;
+    
+    @Input() responsiveHeight:string;
     
     @Output() onDataSelect: EventEmitter<any> = new EventEmitter();
 

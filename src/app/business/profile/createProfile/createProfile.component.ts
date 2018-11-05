@@ -83,11 +83,11 @@ export class CreateProfileComponent implements OnInit {
         }
     ];
 
-    //用户自定义key、value，用于双向数据绑定
+   
     customizationKey = '';
     customizationValue = '';
 
-    //用户自定义项，用于
+    
     customizationItems = [];
 
     replicationTypeOptions = [
@@ -301,9 +301,11 @@ export class CreateProfileComponent implements OnInit {
                 Consistency: this.I18N.keyID['sds_profile_rep_consis']
             },
             snapshotLabel: {
+                automatic: this.I18N.keyID['sds_profile_snap_auto'],
                 Schedule: this.I18N.keyID['sds_profile_snap_sche'],
                 executionTime:this.I18N.keyID['sds_profile_snap_exetime'],
-                Retention: this.I18N.keyID['sds_profile_snap_reten']
+                Retention: this.I18N.keyID['sds_profile_snap_reten'],
+                destination: this.I18N.keyID['sds_profile_snap_dest']
             }
         };
 
@@ -322,19 +324,21 @@ export class CreateProfileComponent implements OnInit {
         this.repPolicy = this.fb.group({
             "repType": new FormControl("mirror", Validators.required),
             "repMode": new FormControl(this.replicationModeOptions[0].value, Validators.required),
-            "repPeriod": new FormControl(60, Validators.required),
+            "repPeriod": new FormControl('60', Validators.required),
             "repBandwidth": new FormControl(10, Validators.required),
             "repRGO": new FormControl(this.replicationRGOOptions[0].value, Validators.required),
             "repRTO": new FormControl(this.replicationRTOOptions[0].value, Validators.required),
-            "repRPO": new FormControl(0, Validators.required),
+            "repRPO": new FormControl('0', Validators.required),
             "repCons": new FormControl([])
         });
         this.snapPolicy = this.fb.group({
+            "autoSnapshot": new FormControl(true),
             "Schedule": new FormControl(this.snapSchedule[0].value, Validators.required),
             "datetime": new FormControl("00:00", Validators.required),
             "snapNum": new FormControl(1, Validators.required),
             "duration": new FormControl(0, Validators.required),
-            "retentionOptions": new FormControl(this.snapshotRetentionOptions[0].value)
+            "retentionOptions": new FormControl(this.snapshotRetentionOptions[0].value),
+            "snapshotDestination": new FormControl('')
         });
         this.paramData= {
             extras:{protocol:this.profileform.value.protocol},
@@ -374,22 +378,22 @@ export class CreateProfileComponent implements OnInit {
                 }
                 return;
             }
-            this.param.extras[":provisionPolicy"]= {
-                "ioConnectivityLoS": {
-                    "maxIOPS": this.qosPolicy.value.maxIOPS,
-                    "maxBWS": this.qosPolicy.value.maxBWS,
+            this.param["provisioningProperties"]= {
+                "ioConnectivity": {
+                    "maxIOPS": Number(this.qosPolicy.value.maxIOPS),
+                    "maxBWS": Number(this.qosPolicy.value.maxBWS),
                     "accessProtocol": value.protocol
                 }, 
-                "dataStorageLoS": {
+                "dataStorage": {
                     "provisioningPolicy": value.storageType
                 }
             }
         }else{
-            this.param.extras[":provisionPolicy"]= {
-                "ioConnectivityLoS": {
+            this.param["provisioningProperties"]= {
+                "ioConnectivity": {
                     "accessProtocol": value.protocol
                 }, 
-                "dataStorageLoS": {
+                "dataStorage": {
                     "provisioningPolicy": value.storageType
                 }
             }
@@ -402,18 +406,18 @@ export class CreateProfileComponent implements OnInit {
                 return;
             }
             this.param.extras["replicationType"]= "ArrayBased";
-            this.param.extras[":replicationPolicy"]={
-                "dataProtectionLoS": {
-                    "replicaTypes": this.repPolicy.value.repType,
-                    "recoveryGeographicObject": this.repPolicy.value.repRGO,
-                    "recoveryPointObjective": this.repPolicy.value.repRPO,
+            this.param["replicationProperties"]={
+                "dataProtection": {
+                    "replicaType": this.repPolicy.value.repType,
+                    "recoveryGeographicObjective": this.repPolicy.value.repRGO,
+                    "recoveryPointObjectiveTime": this.repPolicy.value.repRPO,
                     "recoveryTimeObjective": this.repPolicy.value.repRTO,
                 },
                 "replicaInfos": {
                     "replicaUpdateMode": this.repPolicy.value.repMode,
                     "consistencyEnabled": this.repPolicy.value.repCons.length==0 ? false:true,
                     "replicationPeriod": this.repPolicy.value.repPeriod,
-                    "replicationBandwidth": this.repPolicy.value.repBandwidth
+                    "replicationBandwidth": Number(this.repPolicy.value.repBandwidth)
                 }
             }
         }
@@ -427,13 +431,20 @@ export class CreateProfileComponent implements OnInit {
             let reten = this.snapPolicy.value.retentionOptions === "Quantity" ? {
                     "number": this.snapPolicy.value.snapNum,
                 }:{"duration": this.snapPolicy.value.duration}
-            this.param.extras[":snapshotPolicy"]= {
-                "schedule": {
-                    "datetime": "1970-01-01T"+this.snapPolicy.value.datetime+":00",
-                    "occurrence": this.snapPolicy.value.Schedule //Monthly, Weekly, Daily, Hourly
-                },
-                "retention": reten
-            }
+            if(!this.snapPolicy.value.autoSnapshot){
+                this.param["snapshotProperties"]= {
+                    "retention": reten
+                }
+            }else{
+                this.param["snapshotProperties"]= {
+                    "schedule": {
+                        "datetime": "1970-01-01T"+this.snapPolicy.value.datetime+":00",
+                        "occurrence": this.snapPolicy.value.Schedule //Monthly, Weekly, Daily, Hourly
+                    },
+                    "retention": reten
+                }
+            };
+            this.param["snapshotProperties"]["topology"] = {"bucket":this.snapPolicy.value.snapshotDestination};
         }
         if (this.customizationItems.length > 0) {
             let arrLength = this.customizationItems.length;

@@ -7,7 +7,6 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { SharedModule } from './shared/shared.module';
 import { DropMenuModule, SelectButtonModule, ButtonModule, InputTextModule } from './components/common/api';
-// import { AppService } from './app.service';
 import { LocationStrategy, HashLocationStrategy } from '@angular/common';
 
 import { MessagesModule } from './components/messages/messages';
@@ -30,7 +29,6 @@ import { MessagesModule } from './components/messages/messages';
     InputTextModule
   ],
   providers: [
-    // AppService,
       { provide: LocationStrategy, useClass: HashLocationStrategy }
   ],
   bootstrap: [AppComponent]
