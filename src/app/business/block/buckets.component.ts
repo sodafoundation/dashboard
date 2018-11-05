@@ -325,16 +325,35 @@ export class BucketsComponent implements OnInit{
         this.getTypes();
     }
     deleteBucket(bucket){
-        let msg = "<div>Are you sure you want to delete the Bucket ?</div><h3>[ "+ bucket.name +" ]</h3>";
-        let header ="Delete";
-        let acceptLabel = "Delete";
-        let warming = true;
-        this.confirmDialog([msg,header,acceptLabel,warming,"delete"], bucket)
+        this.http.get(`v1/{project_id}/plans?bucketname=${bucket.name}`).subscribe((res)=>{
+            let plans = res.json().plans ? res.json().plans : [];
+            let planNames = plans.map((item)=> item.name);
+            if(plans.length === 0){
+                let msg = "<div>Are you sure you want to delete the Bucket ?</div><h3>[ "+ bucket.name +" ]</h3>";
+                let header ="Delete";
+                let acceptLabel = "Delete";
+                let warming = true;
+                this.confirmDialog([msg,header,acceptLabel,warming,"delete"], bucket);
+            }else{
+                let msg = `<div>The bucket has created the following migration task, 
+                and removing the bucket will remove the migration task at the same time.</div>
+                <h5>[${planNames}]</h5>
+                <div>Are you sure you want to delete the Bucket?</div>
+                <h3>[${bucket.name}]</h3>
+                `;
+                let header ="Delete";
+                let acceptLabel = "Delete";
+                let warming = true;
+                this.confirmDialog([msg,header,acceptLabel,warming,"delete"], bucket,plans);
+            }
+        });
+
+        
     }
     configLife(bucket){
         this.showLife = true;
     }
-    confirmDialog([msg,header,acceptLabel,warming=true,func], bucket){
+    confirmDialog([msg,header,acceptLabel,warming=true,func], bucket,plans?){
         this.confirmationService.confirm({
             message: msg,
             header: header,
@@ -343,6 +362,11 @@ export class BucketsComponent implements OnInit{
             accept: ()=>{
                 try {
                     let name = bucket.name;
+                    if(plans){
+                        plans.forEach(element => {
+                            this.http.delete(`v1/{project_id}/plans/${element.id}`).subscribe();
+                        });
+                    }
                     this.BucketService.deleteBucket(name).subscribe((res) => {
                         this.getBuckets();
                     },
