@@ -27,7 +27,7 @@ export { DataTableModule } from '../datatable/datatable';
 export { SplitButtonModule } from '../splitbutton/splitbutton';
 export { DropMenuModule } from '../dropmenu/dropmenu';
 export { DialogModule } from '../dialog/dialog';
-export { HomeDialogModule } from '../homeDialog/homeDialog';
+export { HomeDialogModule } from '../homedialog/homedialog';
 export { DropdownModule } from '../dropdown/dropdown';
 export { PasswordModule } from '../password/password';
 export { CardModule } from '../card/card';
