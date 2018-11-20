@@ -4,7 +4,7 @@
 </div>
 <p-tabView styleClass="ui-tabview-large">
     <p-tabPanel header="{{'Migrations('+migrationsCount+')'}}">
-        <migration-list (changeNumber)="getCount()"></migration-list>
+        <migration-list (changeNumber)="getCount($event)"></migration-list>
     </p-tabPanel>
     <p-tabPanel header="Replications(1)" [selected]="fromGroup">
         <replication-list ></replication-list>

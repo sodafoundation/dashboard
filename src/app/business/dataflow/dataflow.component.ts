@@ -45,15 +45,10 @@ export class DataflowComponent implements OnInit{
         private migrationService:MigrationService
     ){}
 
-   
-    ngOnInit() {
-        this.getCount();
-       
-    }
-    getCount(){
-        this.migrationService.getMigrations().subscribe(res=>{
-            this.migrationsCount = res.json().plans ? res.json().plans.length : 0;
-        })
+    ngOnInit() {}
+
+    getCount(e){
+        this.migrationsCount = e;
     }
 
 }

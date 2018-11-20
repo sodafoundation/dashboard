@@ -33,6 +33,7 @@ export class BucketDetailComponent implements OnInit {
   showBackend = false;
   allTypes = [];
   backendsOption = [];
+  uploadPartArr = [];
   selectBackend:any;
   bucket;
   showCreateFolder = false;
@@ -154,39 +155,43 @@ export class BucketDetailComponent implements OnInit {
       if(end > this.selectFile['size']) {
         end = this.selectFile['size'];
       }
-      proArr.push(this.uploadload(this.selectFile, index, start, end,uploadId,options));
+      
+      proArr.push({'index': index, 'start': start, 'end': end});
       start = end;
       index++;
-      if ( index>=totalSlices ){
-        // thrid step put all
-        Promise.all(proArr).then(result=>{
-          console.log(result);
-          let x2js = new X2JS();
-          let partArr = [];
-          result.forEach(item =>{
-            let jsonObj = x2js.xml_str2json(item['_body']);
-            partArr.push(jsonObj);
-          });
-          let marltipart = '<CompleteMultipartUpload>';
-          partArr.forEach(item =>{
-            marltipart +=`<Part>
-                  <PartNumber>${item.UploadPartResult.PartNumber}</PartNumber>
-                 <ETag>${item.UploadPartResult.ETag}</ETag>
-                 </Part>`
-          });
-          marltipart += '</CompleteMultipartUpload>';
-          this.BucketService.uploadFile(this.bucketId+'/'+ this.selectFile.name+'?uploadId='+uploadId,marltipart,options).subscribe((res) => {
-            this.getAlldir();
-          });
+    }
+
+    this.uploadload(0, proArr, this.selectFile, uploadId, options); 
+  }
+
+  uploadload(i, chunks, blob, uploadId, options) {
+    let chunk;  
+    chunk =blob.slice(chunks[i].start, chunks[i].end);
+    console.log('files='+ blob.size);
+    console.log(chunk);
+    this.BucketService.uploadFile(`${this.bucketId}/${blob.name}?partNumber=${i+1}&uploadId=${uploadId}`,chunk,options).subscribe((data)=>{
+      let x2js = new X2JS();
+      let jsonObj = x2js.xml_str2json(data['_body']);
+      this.uploadPartArr.push(jsonObj);
+      
+      if(i < (chunks.length - 1)){
+        this.uploadload(i+1, chunks, blob, uploadId, options);
+      }else{
+        let marltipart = '<CompleteMultipartUpload>';
+        this.uploadPartArr.forEach(item =>{
+          marltipart +=`<Part>
+                <PartNumber>${item.UploadPartResult.PartNumber}</PartNumber>
+               <ETag>${item.UploadPartResult.ETag}</ETag>
+               </Part>`
+        });
+        marltipart += '</CompleteMultipartUpload>';
+        this.BucketService.uploadFile(this.bucketId+'/'+ blob.name+'?uploadId='+uploadId,marltipart,options).subscribe((res) => {
+          this.getAlldir();
         });
       }
-    }
+    });
   }
-  uploadload(blob, index, start, end,uploadId,options) {
-    let chunk;  
-    chunk =blob.slice(start,end);
-    return this.BucketService.uploadFile(`${this.bucketId}/${blob.name}?partNumber=${index+1}&uploadId=${uploadId}`,chunk,options).toPromise();
-  }
+
   uploadFile() {
     if(!this.files){
       this.showErrorMsg = true;
@@ -209,7 +214,7 @@ export class BucketDetailComponent implements OnInit {
     };
     if(this.selectFile['size'] > Consts.BYTES_PER_CHUNK){
       //first step get uploadId
-      this.BucketService.uploadFile(this.bucketId+'/'+ this.selectFile.name + "?uploads",options).subscribe((res) => {
+      this.BucketService.uploadFile(this.bucketId+'/'+ this.selectFile.name + "?uploads", '', options).subscribe((res) => {
         let str = res['_body'];
         let x2js = new X2JS();
         let jsonObj = x2js.xml_str2json(str);
@@ -218,12 +223,12 @@ export class BucketDetailComponent implements OnInit {
         this.uploadDisplay = false;
         this.uploadPart(uploadId,options);
       });
-      return;
+    }else{
+      this.BucketService.uploadFile(this.bucketId+'/'+ this.selectFile.name, this.selectFile, options).subscribe((res) => {
+        this.uploadDisplay = false;
+        this.getAlldir();
+      });
     }
-    this.BucketService.uploadFile(this.bucketId+'/'+ this.selectFile.name,this.selectFile,options).subscribe((res) => {
-      this.uploadDisplay = false;
-      this.getAlldir();
-    });
   }
 
   downloadFile(file) {
