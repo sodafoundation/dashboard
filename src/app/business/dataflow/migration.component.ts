@@ -71,7 +71,7 @@ export class MigrationListComponent implements OnInit {
             "excute":[true]
         });
     }
-    @Output() changeNumber = new EventEmitter<boolean>();
+    @Output() changeNumber = new EventEmitter<string>();
 
     ngOnInit() {
         this.allMigrations = []
@@ -150,8 +150,8 @@ export class MigrationListComponent implements OnInit {
         this.allMigrations = [];
         this.allMigrationForCheck = [];
         this.MigrationService.getMigrations().subscribe((res) => {
-            this.changeNumber.emit(true);
             let AllMigrations = res.json().plans ? res.json().plans :[];
+            this.changeNumber.emit(AllMigrations.length);
             this.http.get('v1/{project_id}/jobs').subscribe((res)=>{
                 let jobs = res.json().jobs ? res.json().jobs : [];
                 let jobsObj = {};
@@ -169,8 +169,6 @@ export class MigrationListComponent implements OnInit {
                 });
                 this.allMigrations = AllMigrations;
             });
-
-            
         });
     }
 

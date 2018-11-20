@@ -52,10 +52,12 @@ cp -R opensds/dashboard/dist/* /var/www/html/
 ```shell
 vi /etc/nginx/sites-available/default 
 ```
-Configure proxy, points to the resource server and the authentication server respectively.
+Configure proxy, points to the resource server, multi-cloud server and the authentication server respectively.
+Parameter 'client_max_body_size' configuration supports uploaded file size.
 Such as: 
 * Keystone server `http://1.1.1.0:5000`
 * Resource server `http://1.1.1.0:50040`
+* Multi-cloud server `http://1.1.1.0:8089`
 ```shell
 location /v3/ {
     proxy_pass http://1.1.1.0:5000/v3/;
@@ -63,6 +65,11 @@ location /v3/ {
 
 location /v1beta/ {
     proxy_pass http://1.1.1.0:50040/v1beta/;
+}
+
+location /v1/ {
+    proxy_pass http://1.1.1.0:8089/v1/;
+	client_max_body_size 10240m;
 }
 ```
 
