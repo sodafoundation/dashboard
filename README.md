@@ -14,7 +14,7 @@ Ubuntu 16.04.2 LTS \n \l
 
 ### 2. Nginx installation
 ```shell
-sudo apt-get install nginx
+sudo apt-get install -y nginx
 ```
 
 ### 3. NodeJS installation, NPM will be installed with nodejs.
@@ -33,13 +33,13 @@ sudo npm install -g @angular/cli@1.7.4
 # Build & Start
 ### 1. Git clone dashboard code.
 ```shell
-git clone https://github.com/opensds/opensds.git
+git clone https://github.com/opensds/opensds-dashboard.git
 ```
 
 ### 2. Build opensds dashboard.
 After the build work finished, the files in the `dist` folder should be copied to the folder ` /var/www/html/`.
 ```shell
-cd opensds/dashboard
+cd opensds-dashboard
 sudo npm install
 sudo ng build --prod
 ```
