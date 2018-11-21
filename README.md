@@ -33,19 +33,19 @@ sudo npm install -g @angular/cli@1.7.4
 # Build & Start
 ### 1. Git clone dashboard code.
 ```shell
-git clone https://github.com/opensds/opensds.git
+git clone https://github.com/opensds/opensds-dashboard.git
 ```
 
 ### 2. Build opensds dashboard.
 After the build work finished, the files in the `dist` folder should be copied to the folder ` /var/www/html/`.
 ```shell
-cd opensds/dashboard
+cd opensds-dashboard
 sudo npm install
 sudo ng build --prod
 ```
 
 ```shell
-cp -R opensds/dashboard/dist/* /var/www/html/
+cp -R opensds-dashboard/dist/* /var/www/html/
 ```
 
 ### 3. Set nginx default config.
@@ -69,7 +69,7 @@ location /v1beta/ {
 
 location /v1/ {
     proxy_pass http://1.1.1.0:8089/v1/;
-	client_max_body_size 10240m;
+    client_max_body_size 10240m;
 }
 ```
 
