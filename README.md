@@ -14,7 +14,7 @@ Ubuntu 16.04.2 LTS \n \l
 
 ### 2. Nginx installation
 ```shell
-sudo apt-get install nginx
+sudo apt-get install -y nginx
 ```
 
 ### 3. NodeJS installation, NPM will be installed with nodejs.
