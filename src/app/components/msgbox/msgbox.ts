@@ -17,7 +17,7 @@ export class Safe{
     <p-dialog [header]="config.header" [isMsgBox]="true" [modal]="true" [(visible)]="config.visible" [width]="config.width" [height]="config.height" (onOk)="config.ok()">
         <div class="msgbox">
             <div>
-                <i [ngClass]="{'fa ':true, 'fa-info-circle': config.type=='info', 'error fa-times-circle': config.type=='error', 'success fa-info-circle': config.type=='success'}" [class]="config.icon" ></i>
+                <i [ngClass]="{'fa ':true, 'fa-info-circle': config.type=='info', 'fa-times-circle': config.type=='error', 'fa-check-circle': config.type=='success'}" ></i>
             </div>
             <div>
                 <h3 *ngIf="config.type=='success' || config.type=='error'" [ngClass]="config.type + '-title'">{{config.title}}</h3>

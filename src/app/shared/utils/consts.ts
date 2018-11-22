@@ -31,7 +31,7 @@ export const Consts = {
      */
     BUCKET_BACKND : new Map<string,string>(),
     BUCKET_TYPE:new Map<string,string>(),
-    BYTES_PER_CHUNK : 1024 * 1024 * 50,
+    BYTES_PER_CHUNK : 1024 * 1024 * 16,
     TIMEOUT: 30 * 60 * 1000,
     CLOUD_TYPE:['aws-s3','azure-blob','hw-obs'],
     TYPE_SVG:{

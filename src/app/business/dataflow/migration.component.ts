@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewContainerRef, ViewChild, Directive, ElementRef, HostBinding, HostListener,EventEmitter, Output } from '@angular/core';
 import { Router } from '@angular/router';
-import { I18NService, Utils ,Consts} from 'app/shared/api';
+import { I18NService, MsgBoxService, Utils ,Consts} from 'app/shared/api';
 import { FormControl, FormGroup, FormBuilder, Validators, ValidatorFn, AbstractControl } from '@angular/forms';
 import { AppService } from 'app/app.service';
 import { I18nPluralPipe } from '@angular/common';
@@ -16,7 +16,7 @@ declare let X2JS:any;
 @Component({
     selector: 'migration-list',
     templateUrl: 'migration.html',
-    providers: [ConfirmationService],
+    providers: [ConfirmationService, MsgBoxService],
     styleUrls: [],
     animations: []
 })
@@ -44,13 +44,14 @@ export class MigrationListComponent implements OnInit {
     engineOption = [];
     rule = "";
     excutingTime;
-    job: any;
+    plan: any;
     errorMessage:Object;
     allMigrationForCheck=[];
     constructor(
         public I18N: I18NService,
         private router: Router,
         private confirmationService: ConfirmationService,
+        private msg: MsgBoxService,
         private fb: FormBuilder,
         private MigrationService: MigrationService,
         private BucketService:BucketService,
@@ -152,23 +153,15 @@ export class MigrationListComponent implements OnInit {
         this.MigrationService.getMigrations().subscribe((res) => {
             let AllMigrations = res.json().plans ? res.json().plans :[];
             this.changeNumber.emit(AllMigrations.length);
-            this.http.get('v1/{project_id}/jobs').subscribe((res)=>{
-                let jobs = res.json().jobs ? res.json().jobs : [];
-                let jobsObj = {};
-                jobs.forEach(element => {
-                    jobsObj[element.planId] = element;
-                });
-                AllMigrations.forEach((item,index)=>{
-                    item.srctype = Consts.TYPE_SVG[Consts.BUCKET_TYPE.get(item.sourceConn.bucketName)];
-                    item.desttype = Consts.TYPE_SVG[Consts.BUCKET_TYPE.get(item.destConn.bucketName)];
-                    item.srcBucket = item.sourceConn.bucketName;
-                    item.destBucket = item.destConn.bucketName;
-                    item.job = jobsObj[item.id];
-                    item.status = jobsObj[item.id] ? jobsObj[item.id].status : 'waiting';
-                    this.allMigrationForCheck.push(item.name);
-                });
-                this.allMigrations = AllMigrations;
+
+            AllMigrations.forEach((item,index)=>{
+                item.srctype = Consts.TYPE_SVG[Consts.BUCKET_TYPE.get(item.sourceConn.bucketName)];
+                item.desttype = Consts.TYPE_SVG[Consts.BUCKET_TYPE.get(item.destConn.bucketName)];
+                item.srcBucket = item.sourceConn.bucketName;
+                item.destBucket = item.destConn.bucketName;
+                this.allMigrationForCheck.push(item.name);
             });
+            this.allMigrations = AllMigrations;
         });
     }
 
@@ -203,7 +196,7 @@ export class MigrationListComponent implements OnInit {
             });
         }else{
             let date = new Date(this.createMigrationForm.value.excuteTime);
-            let tigger = `00 ${date.getMinutes()} ${date.getHours()} ${date.getDate()} ${date.getMonth()} ${date.getDay()}`;
+            let tigger = `00 ${date.getUTCMinutes()} ${date.getUTCHours()} ${date.getUTCDate()} ${date.getUTCMonth() + 1} ${date.getUTCDay()}`;
             let policy={
                 "name":"cron test",
                 "tenant":"all",
@@ -225,7 +218,7 @@ export class MigrationListComponent implements OnInit {
     }
 
     onRowExpand(evt) {
-        this.job = evt.data.job;
+        this.plan = evt.data;
     }
 
     deleteMigrate(migrate){
@@ -250,11 +243,19 @@ export class MigrationListComponent implements OnInit {
         }
     }
     remigration(migration){
-        let msg = "<div>Are you sure you want to Remigrate ?</div><h3>[ "+ migration.name +" ]</h3>";
-        let header ="Remigrate";
-        let acceptLabel = "Remigrate";
-        let warming = true;
-        this.confirmDialog([msg,header,acceptLabel,warming,"Remigrate"], migration)
+        this.http.get('v1/{project_id}/jobs?planName='+migration.name).subscribe((res)=>{
+            let job = res.json().jobs ? res.json().jobs :[];
+            let curJob = job[job.length - 1];
+            if(curJob && curJob.status == "running"){
+                this.msg.info("The migration task is in progress.");
+            }else{
+                let msg = "<div>Are you sure you want to Remigrate ?</div><h3>[ "+ migration.name +" ]</h3>";
+                let header ="Remigrate";
+                let acceptLabel = "Remigrate";
+                let warming = true;
+                this.confirmDialog([msg,header,acceptLabel,warming,"Remigrate"], migration)
+            }
+        })        
     }
     confirmDialog([msg,header,acceptLabel,warming=true,func], migrate){
         this.confirmationService.confirm({

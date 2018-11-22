@@ -146,10 +146,10 @@
 .ui-dialog .ui-dialog-content .msgbox .fa {
     font-size: .48rem;
     color: #438bd3;
-    &.error{
+    &.fa-times-circle{
         color: #FF8833;
     }
-    &.success{
+    &.fa-check-circle{
         color: #3DCCA6;
     }
 }
