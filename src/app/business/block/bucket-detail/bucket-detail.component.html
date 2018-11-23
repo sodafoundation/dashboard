@@ -8,7 +8,7 @@
     <div class="content-header">
         <div class="table-toolbar">
             <div class="left">
-                <button class="ui-button-secondary" pButton type="button" label="Upload" (click)="configUpload()"></button>
+                <button class="ui-button-secondary" [disabled]="isUpload" pButton type="button" label="Upload" (click)="configUpload()"></button>
                 <button pButton type="button" [disabled]="true"  label="Create Folder" (click)="showDialog('fromFolder')" ></button>
                 <button pButton type="button" [disabled]="selectedDir.length === 0" (click)="deleteMultiDir()" label="{{I18N.keyID['sds_block_volume_delete']}}"></button>
             </div>
