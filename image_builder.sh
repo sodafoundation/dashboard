@@ -41,7 +41,7 @@ cat > /etc/nginx/sites-available/default <<EOF
 
         location /v1/ {
             proxy_pass http://127.0.0.1:8089/v1/;
-        	client_max_body_size 10240m;
+            client_max_body_size 10240m;
         }
     }
 EOF
