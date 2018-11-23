@@ -23,18 +23,17 @@
     </p-column>
     <p-column field="name" header="Name" >
     </p-column>
-    <p-column field="status" header="Status" ></p-column>
     <p-column field="srcBucket" header="Source Bucket"></p-column>
     <p-column field="destBucket" header="Destination Bucket"></p-column>
     <p-column *ngIf="false" field="rule" header="Rules"></p-column>
     <p-column header="{{I18N.keyID['sds_block_volume_operation']}}" [style]="{'width': '166px'}">
         <ng-template pTemplate="body" let-migrate="rowData" let-i="rowIndex">
             <a (click)="deleteMigrate(migrate)">Delete</a>
-            <a *ngIf="migrate.status ==='succeed' || migrate.status === 'waiting'" (click)="remigration(migrate)">Remigrate</a>
+            <a (click)="remigration(migrate)">Execute</a>
         </ng-template>
     </p-column>
     <ng-template pTemplate="rowexpansion">
-        <migration-detail [job]="job"></migration-detail>
+        <migration-detail [plan]="plan"></migration-detail>
     </ng-template>
 </p-dataTable>
 <p-dialog styleClass="create-migrate-dialog" header="Migrate" [(visible)]="createMigrateShow" [width]="650" modal="modal">

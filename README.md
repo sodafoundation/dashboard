@@ -45,7 +45,7 @@ sudo ng build --prod
 ```
 
 ```shell
-cp -R opensds/dashboard/dist/* /var/www/html/
+cp -R opensds-dashboard/dist/* /var/www/html/
 ```
 
 ### 3. Set nginx default config.
@@ -69,7 +69,7 @@ location /v1beta/ {
 
 location /v1/ {
     proxy_pass http://1.1.1.0:8089/v1/;
-	client_max_body_size 10240m;
+    client_max_body_size 10240m;
 }
 ```
 
