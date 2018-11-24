@@ -101,7 +101,7 @@ export class BucketDetailComponent implements OnInit {
     this.BucketService.getTypes().subscribe((res) => {
         res.json().types.forEach(element => {
             this.allTypes.push({
-                label: element.name,
+                label: Consts.CLOUD_TYPE_NAME[element.name],
                 value: element.name
             })
         });

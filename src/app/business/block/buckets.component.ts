@@ -215,7 +215,7 @@ export class BucketsComponent implements OnInit{
         this.BucketService.getTypes().subscribe((res) => {
             res.json().types.forEach(element => {
                 this.allTypes.push({
-                    label: element.name,
+                    label: Consts.CLOUD_TYPE_NAME[element.name],
                     value: element.name
                 })
             });
@@ -251,7 +251,7 @@ export class BucketsComponent implements OnInit{
             });
         }else{
             let date = new Date(this.migrationForm.value.excuteTime);
-            let tigger = `00 ${date.getMinutes()} ${date.getHours()} ${date.getDate()} ${date.getMonth()} ${date.getDay()}`;
+            let tigger = `00 ${date.getUTCMinutes()} ${date.getUTCHours()} ${date.getUTCDate()} ${date.getUTCMonth() + 1} ${date.getUTCDay()}`;
             let policy={
                 "name":"cron test",
                 "tenant":"all",
@@ -287,12 +287,10 @@ export class BucketsComponent implements OnInit{
         this.allBackends = [];
         this.BucketService.getBckends().subscribe((res) => {
             res.json().forEach(element => {
-                if(element.type != "5"){
-                    this.allBackends.push({
-                        label: element.name,
-                        value: element.name
-                    })
-                }
+                this.allBackends.push({
+                    label: element.name,
+                    value: element.name
+                })
             });
         });
     }

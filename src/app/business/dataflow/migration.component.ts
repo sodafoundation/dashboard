@@ -249,9 +249,9 @@ export class MigrationListComponent implements OnInit {
             if(curJob && curJob.status == "running"){
                 this.msg.info("The migration task is in progress.");
             }else{
-                let msg = "<div>Are you sure you want to Remigrate ?</div><h3>[ "+ migration.name +" ]</h3>";
-                let header ="Remigrate";
-                let acceptLabel = "Remigrate";
+                let msg = "<div>Are you sure you want to execute it immediately?</div><h3>[ "+ migration.name +" ]</h3>";
+                let header ="Execute";
+                let acceptLabel = "Execute";
                 let warming = true;
                 this.confirmDialog([msg,header,acceptLabel,warming,"Remigrate"], migration)
             }
