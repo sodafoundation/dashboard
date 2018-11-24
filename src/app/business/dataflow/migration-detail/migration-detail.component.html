@@ -21,8 +21,8 @@
                     <div *ngIf = "false"><span>Analysis Cluster:</span></div>
                 </div>
                 <div class="ui-grid-col-7 ui-text-adapt">
-                    <div><span>{{migrationInstance.passedsize}}</span></div>
-                    <div><span>{{migrationInstance.passednum}}</span></div>
+                    <div><span>{{migrationInstance.passedsize}}</span><span *ngIf="migrationInstance.status == 'failed'||migrationInstance.status == 'running'"> / {{migrationInstance.totalsize}}</span></div>
+                    <div><span>{{migrationInstance.passednum}}</span><span *ngIf="migrationInstance.status == 'failed'||migrationInstance.status == 'running'"> / {{migrationInstance.objectnum}}</span></div>
                     <div  *ngIf = "false"><span>{{migrationInstance.ana_status}}</span></div>
                 </div>
             </div>

@@ -1617,6 +1617,14 @@ a {
 .ui-home-card-count{
     display:table-cell;
     padding:10px 20px;
+    &.gray{
+        filter:progid:DXImageTransform.Microsoft.BasicImage(grayscale=1); 
+        -webkit-filter:grayscale(100%);
+        .ui-home-card-num,
+        .ui-home-card-text{
+            color: #999999;
+        }
+    }
 }
 .ui-home-card-num{
     font-size: 36px; 
@@ -1685,8 +1693,8 @@ a {
             width: 175px;
             height: 160px;
             position: absolute;
-            left: calc(48% - 87px);
-            top: calc(45% - 140px);
+            left:  calc(48% - 100px);
+            top: calc(0% - 90px);
             background-image: url('assets/business/images/common/cloud-opensds.png'); 
             background-size: contain;
             background-repeat: no-repeat;
@@ -1771,8 +1779,8 @@ a {
             background: #438bd3;
             color: #fff;
             position: absolute;
-            right: -32px;
-            bottom: -12px;
+            left: calc(48% + 100px);
+            top: calc(0% + 15px);
             cursor: pointer;
             text-align: center;
             line-height: 48px;

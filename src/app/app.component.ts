@@ -56,9 +56,14 @@ export class AppComponent implements OnInit, AfterViewInit {
             "routerLink": "/home"
         },
         {
-            "title": "Volume",
-            "description": "Block storage resources",
+            "title": "Resource",
+            "description": "Volumes / Buckets",
             "routerLink": "/block"
+        },
+        {
+            "title": "Dataflow",
+            "description": "Through migration / replication capability.",
+            "routerLink": "/dataflow"
         }
     ]
 
