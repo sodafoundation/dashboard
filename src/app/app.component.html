@@ -45,9 +45,6 @@
 
     <div id="layout-content">
         <div [ngClass]="{'content-home':isHomePage}">
-            <div *ngIf="isHomePage" style="float:right;">
-                <a style="font-size: .16rem; cursor: pointer; display: block; padding: 2px 10px; border: 1px solid #34507b;" (click)="menuItemClick($event, menuItems[4])" [routerLink]="['/resource']"  title="Overview">Overview</a>
-            </div>
             <router-outlet></router-outlet>
         </div>
     </div>
