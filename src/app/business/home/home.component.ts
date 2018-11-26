@@ -15,16 +15,6 @@ declare let X2JS:any;
     ]
 })
 export class HomeComponent implements OnInit {
-    items = [];
-    chartDatas;
-    chartDatasbar;
-    option;
-    chartBarOpion;
-    profileOptions = [];
-    lineData_nums;
-    lineData_capacity;
-    showAdminStatis = true;
-    tenants =[];
     lineData ={};
     lineOption = {};
     showRgister = false;
@@ -82,14 +72,10 @@ export class HomeComponent implements OnInit {
         "sk":{required: "Secret Key is required."}
     };
     ngOnInit() {
-        if(this.paramStor.CURRENT_USER().split("|")[0] == "admin"){
-            this.showAdminStatis = true;
-            this.getCounts();
-            this.getType();
-        }else{
-            this.showAdminStatis = false;
-            this.getTenantCountData();
-        }
+        
+        this.getCounts();
+        this.getType();
+        
         this.backendForm = this.fb.group({
             "name":['', {validators:[Validators.required,Utils.isExisted(this.allBackendNameForCheck)]}],
             "type":['',{validators:[Validators.required]}],
@@ -103,98 +89,8 @@ export class HomeComponent implements OnInit {
             "ak":['',{validators:[Validators.required], updateOn:'change'}],
             "sk":['',{validators:[Validators.required], updateOn:'change'}],
         });
-        this.items = [
-            {
-                countNum: 0,
-                label: this.I18N.keyID["sds_home_tenants"]
-            },
-            {
-                countNum:0,
-                label: this.I18N.keyID["sds_home_users"]
-            },
-            {
-                countNum: 0,
-                label: this.I18N.keyID["sds_home_storages"]
-            },
-            {
-                countNum: 0,
-                label: this.I18N.keyID["sds_home_pools"]
-            },
-            {
-                countNum: 0,
-                label: this.I18N.keyID["sds_home_volumes"]
-            },
-            {
-                countNum: 0,
-                label:this.I18N.keyID["sds_home_snapshots"]
-            },
-            {
-                countNum: 0,
-                label: this.I18N.keyID["sds_home_replications"]
-            },
-            {
-                countNum: 0,
-                label: "Cross-Region Replications"
-            },
-            {
-                countNum: 0,
-                label: "Cross-Region Migrations"
-            }
-        ];
-
         
-        this.option = {
-            cutoutPercentage: 80,
-            title: {
-                display: false,
-                text: 'My Title',
-                fontSize: 12
-            },
-            legend: {
-                labels: {
-                    boxWidth: 12
-                },
-                display: true,
-                position: 'right',
-                fontSize: 12
-            }
-        };
-        this.chartBarOpion= {
-            scales: {
-                yAxes: [{
-                    ticks: {
-                        min: 0,
-                    }
-                }]
-            },
-            legend: {
-                display: false
-            }
-        }
 
-        this.lineData_capacity = {
-            labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
-            datasets: [
-                {
-                    label: 'Capacity(GB)',
-                    data: [10, 11, 20, 160, 156, 195, 200],
-                    fill: false,
-                    borderColor: '#4bc0c0'
-                }
-            ]
-        }
-
-        this.lineData_nums = {
-            labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
-            datasets: [
-                {
-                    label: 'Volumes',
-                    data: [10, 23, 40, 38, 86, 107, 190],
-                    fill: false,
-                    borderColor: '#565656'
-                }
-            ]
-        }
         this.lineOption = {
             title: {
                 display: false,
@@ -220,34 +116,33 @@ export class HomeComponent implements OnInit {
                 }
             ]
         }
+
         let that = this;
-        if(this.showAdminStatis){
-            document.body.addEventListener('mousemove',function(e){
-                let initPos = 350;
-                let svgConW = that.svgCon.nativeElement.offsetWidth, svgConH = that.svgCon.nativeElement.offsetHeight;
-                let winW = document.documentElement.offsetWidth, winH = document.documentElement.offsetHeight;
-                let disX = 10, disY = 1;
-                let moveX = e.pageX * disX / (winW-320)*0.5, moveY = e.pageY * disY / winH;
-                that.scaleX = svgConW/240; 
-                that.scaleY = 5;
-    
-                let clouds = [that.c_AWS.nativeElement, that.c_HW.nativeElement, that.c_HWP.nativeElement];
-                clouds.forEach((item, index) => {
-                  let totalLength = that.path.nativeElement.getTotalLength();
-                  let point = totalLength/clouds.length * (index+1) + moveX + initPos;
-                      if(point > totalLength) point = point - totalLength;
-                      if(point < 0) point = totalLength - point;
-                  
-                  let pos = that.path.nativeElement.getPointAtLength(point);
-                  item.style.left = (pos.x*that.scaleX - item.offsetWidth*0.5) +"px";
-                  item.style.top = (pos.y*that.scaleY + svgConH*(1 - that.scaleY)*0.5 - item.offsetHeight*0.6) +"px";
-                  item.style.display = "block";
-                }) 
-            });
-            this.initBucket2backendAnd2Type();
-        }
-        
+        document.body.addEventListener('mousemove',function(e){
+            let initPos = 350;
+            let svgConW = that.svgCon.nativeElement.offsetWidth, svgConH = that.svgCon.nativeElement.offsetHeight;
+            let winW = document.documentElement.offsetWidth, winH = document.documentElement.offsetHeight;
+            let disX = 10, disY = 1;
+            let moveX = e.pageX * disX / (winW-320)*0.5, moveY = e.pageY * disY / winH;
+            that.scaleX = svgConW/240; 
+            that.scaleY = 5;
+
+            let clouds = [that.c_AWS.nativeElement, that.c_HW.nativeElement, that.c_HWP.nativeElement];
+            clouds.forEach((item, index) => {
+                let totalLength = that.path.nativeElement.getTotalLength();
+                let point = totalLength/clouds.length * (index+1) + moveX + initPos;
+                    if(point > totalLength) point = point - totalLength;
+                    if(point < 0) point = totalLength - point;
+                
+                let pos = that.path.nativeElement.getPointAtLength(point);
+                item.style.left = (pos.x*that.scaleX - item.offsetWidth*0.5) +"px";
+                item.style.top = (pos.y*that.scaleY + svgConH*(1 - that.scaleY)*0.5 - item.offsetHeight*0.6) +"px";
+                item.style.display = "block";
+            }) 
+        });
+        this.initBucket2backendAnd2Type();
     }
+
     initBucket2backendAnd2Type(){
         this.http.get('v1/s3').subscribe((res)=>{
             let str = res['_body'];
@@ -339,146 +234,13 @@ export class HomeComponent implements OnInit {
             this.modifyBackendshow = false;
         });
     }
-    getProfiles() {
-        this.profileService.getProfiles().subscribe((res) => {
-            let profiles = res.json();
-            profiles.forEach(profile => {
-                this.profileOptions.push({
-                    name: profile.name,
-                    id: profile.id,
-                    capacity: 0
-                })
-            });
-        });
-    }
 
-    listTenants() {
-        let request: any = { params:{} };
-        request.params = {
-            "domain_id": "default"
-        }
-
-        this.http.get("/v3/projects", request).subscribe((res) => {
-
-            this.items[0].countNum = res.json().projects.length;
-            this.tenants = res.json().projects;
-            this.tenants.forEach((item, i)=>{
-                if(item.name == "admin"){
-                    this.getAllvolumes(item.id, this.tenants.length - 1);
-                    this.getAllSnapshots(item.id);
-                    this.getAllReplications(item.id);
-                    this.getAllPools(item.id);
-                    this.getAllDocks(item.id);
-                }
-            });
-
-
-        });
-    }
-    listUsers(){
-        let request: any = { params:{} };
-        request.params = {
-            "domain_id": "default"
-        }
-        this.http.get("/v3/users", request).subscribe((res) => {
-            this.items[1].countNum = res.json().users.length;
-        });
-    }
-    getAllvolumes(projectId, index?){
-        let url = 'v1beta/'+projectId+'/block/volumes';
-        this.http.get(url).subscribe((res)=>{
-            this.items[4].countNum = this.items[4].countNum + res.json().length;
-
-            if(this.showAdminStatis){
-                res.json().forEach(volume => {
-                    this.profileOptions.forEach(profile => {
-                        if(volume.profileId == profile.id){
-                            profile.capacity = profile.capacity + volume.size;
-                        }
-                    });
-                });
-
-                if(index == (this.tenants.length-1)){
-                    let [chartData, chartLabel] = [[],[]];
-                    this.profileOptions.forEach(ele=>{
-                        chartData.push(ele.capacity);
-                        chartLabel.push(ele.name);
-                    });
-
-                    this.chartDatasbar = {
-                        labels: chartLabel,
-                        datasets: [{
-                            label:"Used Capacity (GB)",
-                            backgroundColor: '#42A5F5',
-                            data: [chartData]
-                        }]
-                    }
-                }
-            }
-        });
-    }
-    getAllSnapshots(projectId){
-        let url = 'v1beta/'+projectId+'/block/snapshots';
-        this.http.get(url).subscribe((res)=>{
-            this.items[5].countNum = this.items[5].countNum + res.json().length;
-        });
-    }
-    getAllReplications(projectId){
-        let url = 'v1beta/'+projectId+'/block/replications';
-        this.http.get(url).subscribe((res)=>{
-            if(res.json()){
-                this.items[6].countNum = this.items[6].countNum + res.json().length;
-            }
-        });
-    }
-    getAllPools(projectId){
-        let url = 'v1beta/'+projectId+'/pools';
-        this.http.get(url).subscribe((res)=>{
-            this.items[3].countNum = this.items[3].countNum + res.json().length;
-
-            let [storCapacityTotal, storCapacityFree]=[0,0];
-            res.json().forEach(element => {
-                storCapacityTotal = storCapacityTotal + element.totalCapacity;
-                storCapacityFree = storCapacityFree + element.freeCapacity;
-            });
-
-            this.chartDatas = {
-                labels: [this.I18N.keyID["sds_home_used_capacity"] + " (GB)",this.I18N.keyID["sds_home_free_capacity"] + " (GB)"],
-                datasets: [
-                    {
-                        label: 'high_capacity',
-                        data: [(storCapacityTotal-storCapacityFree), storCapacityFree],
-                        backgroundColor: [
-                            "#438bd3",
-                            "rgba(224, 224, 224, .5)"
-                        ]
-                    }]
-            };
-        });
-    }
-    getAllDocks(projectId){
-        let url = 'v1beta/'+projectId+'/docks';
-        this.http.get(url).subscribe((res)=>{
-            this.items[2].countNum = this.items[2].countNum + res.json().length;
-        });
-    }
-    getCountData(){
-        this.getProfiles();
-        this.listTenants();
-        this.listUsers();
-    }
-
-    getTenantCountData(){
-        let tenantId = this.paramStor.CURRENT_TENANT().split("|")[1];
-        this.getAllvolumes(tenantId);
-        this.getAllSnapshots(tenantId);
-        this.getAllReplications(tenantId);
-    }
     showBackendsDeatil(type){
         this.showBackends = true;
         this.selectedType = type;
         this.typeDetail = this.Allbackends[type] ? this.Allbackends[type]:[];
     }
+
     deleteBackend(backend){
         if(backend.canDelete){
             let msg = "<div>you can't delete the backend with bucket</h3>";
@@ -494,6 +256,7 @@ export class HomeComponent implements OnInit {
             this.confirmDialog([msg,header,acceptLabel,warming,backend])
         }
     }
+
     confirmDialog([msg,header,acceptLabel,warming=true,backend]){
         this.ConfirmationService.confirm({
             message: msg,

@@ -1888,3 +1888,42 @@ a {
     display: inline-block;
     overflow: auto;
 }
+
+.infras-content{
+    margin-top: -0.3rem;
+}
+
+.ui-tabview-special.ui-tabview {
+    .ui-tabview-panel{
+        padding: 0;
+    }
+    .ui-tabview-nav {
+        border: none;
+        li{
+            margin-right: 0;
+            padding:  0;
+            a{
+                padding: 0 0.2rem;
+                font-size: 0.16rem;
+                line-height: 0.3rem;
+                background: #eee;
+                border-top: 1px solid #ddd;
+                border-bottom: 1px solid #ddd;
+            }
+            &:first-child a{
+                border-left: 1px solid #ddd;
+                border-radius: .2rem 0 0 .2rem;
+            }
+            &:last-child a{
+                border-right: 1px solid #ddd;
+                border-radius: 0 .2rem .2rem 0;
+            }
+            &.ui-tabview-selected{
+                border: none;
+                a{
+                    background: #438bd3;
+                }
+            }
+        }
+    }
+}

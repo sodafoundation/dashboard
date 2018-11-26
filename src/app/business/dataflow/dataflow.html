@@ -6,7 +6,7 @@
     <p-tabPanel header="{{'Migrations('+migrationsCount+')'}}">
         <migration-list (changeNumber)="getCount($event)"></migration-list>
     </p-tabPanel>
-    <p-tabPanel header="Replications(1)" [selected]="fromGroup">
+    <p-tabPanel header="Replications(0)" [disabled]="true">
         <replication-list ></replication-list>
     </p-tabPanel>
 </p-tabView>

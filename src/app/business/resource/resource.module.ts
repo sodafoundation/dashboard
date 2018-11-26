@@ -1,7 +1,8 @@
 import { NgModule, APP_INITIALIZER } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { ResourceComponent } from './resource.component';
 import { RouterModule } from '@angular/router';
-import { TabViewModule, ButtonModule } from '../../components/common/api';
+import { TabViewModule, ButtonModule, DataTableModule, InputTextModule } from './../../components/common/api';
 
 
 import { RegionModule } from './region/region.module';
@@ -21,8 +22,11 @@ let routers = [{
   ],
   imports: [
     RouterModule.forChild(routers),
+    CommonModule,
     TabViewModule,
     ButtonModule,
+    DataTableModule,
+    InputTextModule,
     RegionModule,
     ZoneModule,
     StorageModule
