@@ -1906,7 +1906,6 @@ a {
                 padding: 0 0.2rem;
                 font-size: 0.16rem;
                 line-height: 0.3rem;
-                background: #eee;
                 border-top: 1px solid #ddd;
                 border-bottom: 1px solid #ddd;
             }
@@ -1922,6 +1921,8 @@ a {
                 border: none;
                 a{
                     background: #438bd3;
+                    border-color: #438bd3;
+                    color: #fff;
                 }
             }
         }

@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Router,ActivatedRoute} from '@angular/router';
-import { I18NService, Utils ,HttpService,Consts} from 'app/shared/api';
+import { I18NService, Utils, MsgBoxService, HttpService, Consts} from 'app/shared/api';
 import { BucketService} from '../buckets.service';
 import { MenuItem ,ConfirmationService} from '../../../components/common/api';
 import { HttpClient } from '@angular/common/http';
@@ -16,7 +16,7 @@ declare let X2JS:any;
   styleUrls: [
 
   ],
-  providers: [ConfirmationService],
+  providers: [ConfirmationService, MsgBoxService],
 })
 export class BucketDetailComponent implements OnInit {
   isUpload = window['isUpload'];
@@ -53,6 +53,7 @@ export class BucketDetailComponent implements OnInit {
     private BucketService: BucketService,
     private confirmationService: ConfirmationService,
     private http: HttpService,
+    private msg: MsgBoxService,
     private fb:FormBuilder,
     private httpClient:HttpClient
   ) 
@@ -192,6 +193,10 @@ export class BucketDetailComponent implements OnInit {
           a.remove()
         }
       }
+    },
+    (error)=>{
+      console.log('error');
+      this.msg.error("The download failed. The network may be unstable. Please try again later.");
     });
   }
   showDialog(from){

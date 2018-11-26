@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewContainerRef, ViewChild, Directive, ElementRef, HostBinding, HostListener, AfterViewInit } from '@angular/core';
 import { Http } from '@angular/http';
 import { Router } from '@angular/router';
-import { I18NService, Consts, ParamStorService } from 'app/shared/api';
+import { I18NService, Consts, ParamStorService, MsgBoxService } from 'app/shared/api';
 import { I18nPluralPipe } from '@angular/common';
 import { MenuItem, SelectItem } from './components/common/api';
 
@@ -11,6 +11,7 @@ declare let X2JS: any;
 @Component({
     selector: 'app-root',
     templateUrl: './app.component.html',
+    providers: [MsgBoxService],
     styleUrls: []
 })
 export class AppComponent implements OnInit, AfterViewInit {
@@ -110,6 +111,7 @@ export class AppComponent implements OnInit, AfterViewInit {
         private http: Http,
         private router: Router,
         private paramStor: ParamStorService,
+        private msg: MsgBoxService,
         public I18N: I18NService
     ) { }
 
@@ -144,6 +146,10 @@ export class AppComponent implements OnInit, AfterViewInit {
                     if (cb) {
                         cb();
                     }
+                },
+                (error)=>{
+                    console.log('error');
+                    this.msg.error("Upload failed. The network may be unstable. Please try again later.");
                 });
             }
         }
@@ -190,11 +196,15 @@ export class AppComponent implements OnInit, AfterViewInit {
                     marltipart += '</CompleteMultipartUpload>';
                     this.http.put('/v1/s3/' + bucketId + '/' + blob.name + '?uploadId=' + uploadId, marltipart, options).subscribe((res) => {
                         window['isUpload'] = false;
+                        this.msg.error("Upload file ["+ blob.name +"] successfully.");
                         if (cb) {
                             cb();
                         }
                     });
                 }
+            },
+            (error)=>{
+                this.msg.error("Upload failed. The network may be unstable. Please try again later.");
             });
         }
         // Global upload end
