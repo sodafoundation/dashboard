@@ -1,6 +1,6 @@
 import { Router } from '@angular/router';
 import { Component, OnInit, ViewContainerRef, ViewChild, Directive, ElementRef, HostBinding, HostListener } from '@angular/core';
-import { I18NService, ParamStorService} from 'app/shared/api';
+import { I18NService, ParamStorService, Consts} from 'app/shared/api';
 import { Http } from '@angular/http';
 import { trigger, state, style, transition, animate} from '@angular/animations';
 import { I18nPluralPipe } from '@angular/common';
@@ -87,8 +87,6 @@ export class ResourceComponent implements OnInit{
                         
                         if(ele.storageType == "" || ele.storageType == "block"){
                             this.blockStorages.push({name,ip,status,description,region,az,type});
-                        }else{
-                            this.objectStorages.push({name,ip,status,description,region,az,type});
                         }
                         
                     });
@@ -117,6 +115,18 @@ export class ResourceComponent implements OnInit{
             this.tabPrimary = "block";
         }else{
             this.tabPrimary = "object";
+            this.http.get('v1/{project_id}/backends').subscribe((res)=>{
+                let backends = res.json().backends ? res.json().backends :[];
+                
+                this.objectStorages = backends.filter(element => {
+                    return element.type == "fusionstorage-object";
+                })
+
+                this.objectStorages.forEach(element => {
+                    element.type = Consts.CLOUD_TYPE_NAME[element.type];
+                    element['status'] = "Enable";
+                })
+            })
         }
     }
 
