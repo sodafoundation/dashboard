@@ -81,6 +81,7 @@ export class BucketDetailComponent implements OnInit {
     );
   }
   getAlldir(){
+    this.selectedDir = [];
     this.BucketService.getBucketById(this.bucketId).subscribe((res) => {
       let str = res._body;
       let x2js = new X2JS();
