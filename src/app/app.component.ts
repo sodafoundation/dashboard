@@ -143,13 +143,18 @@ export class AppComponent implements OnInit, AfterViewInit {
             } else {
                 this.http.put('/v1/s3/'+ bucketId + '/' + selectFile.name, selectFile, options).subscribe((res) => {
                     window['isUpload'] = false;
+                    this.msg.success("Upload file ["+ selectFile.name +"] successfully.");
                     if (cb) {
                         cb();
                     }
                 },
                 (error)=>{
                     console.log('error');
+                    window['isUpload'] = false;
                     this.msg.error("Upload failed. The network may be unstable. Please try again later.");
+                    if (cb) {
+                        cb();
+                    }
                 });
             }
         }
@@ -196,7 +201,7 @@ export class AppComponent implements OnInit, AfterViewInit {
                     marltipart += '</CompleteMultipartUpload>';
                     this.http.put('/v1/s3/' + bucketId + '/' + blob.name + '?uploadId=' + uploadId, marltipart, options).subscribe((res) => {
                         window['isUpload'] = false;
-                        this.msg.error("Upload file ["+ blob.name +"] successfully.");
+                        this.msg.success("Upload file ["+ blob.name +"] successfully.");
                         if (cb) {
                             cb();
                         }
@@ -204,7 +209,11 @@ export class AppComponent implements OnInit, AfterViewInit {
                 }
             },
             (error)=>{
+                window['isUpload'] = false;
                 this.msg.error("Upload failed. The network may be unstable. Please try again later.");
+                if (cb) {
+                    cb();
+                }
             });
         }
         // Global upload end
