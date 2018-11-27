@@ -32,7 +32,7 @@ cat > /etc/nginx/sites-available/default <<EOF
         index index.html index.htm index.nginx-debian.html;
         server_name _;
         location /v3/ {
-            proxy_pass http://127.0.0.1:5000/v3/;
+            proxy_pass http://127.0.0.1/identity/v3/;
         }
 
         location /v1beta/ {
