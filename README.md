@@ -55,12 +55,12 @@ vi /etc/nginx/sites-available/default
 Configure proxy, points to the resource server, multi-cloud server and the authentication server respectively.
 Parameter 'client_max_body_size' configuration supports uploaded file size.
 Such as: 
-* Keystone server `http://1.1.1.0:5000`
+* Keystone server `http://1.1.1.0/identity`
 * Resource server `http://1.1.1.0:50040`
 * Multi-cloud server `http://1.1.1.0:8089`
 ```shell
 location /v3/ {
-    proxy_pass http://1.1.1.0:5000/v3/;
+    proxy_pass http://1.1.1.0/identity/v3/;
 }
 
 location /v1beta/ {
