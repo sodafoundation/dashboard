@@ -139,6 +139,13 @@ export class AppComponent implements OnInit, AfterViewInit {
                     let uploadId = jsonObj.InitiateMultipartUploadResult.UploadId;
                     // second step part upload
                     window['uploadPart'](selectFile, uploadId, bucketId, options, cb);
+                },
+                (error)=>{
+                    window['isUpload'] = false;
+                    this.msg.error("Upload failed. The network may be unstable. Please try again later.");
+                    if (cb) {
+                        cb();
+                    }
                 });
             } else {
                 this.http.put('/v1/s3/'+ bucketId + '/' + selectFile.name, selectFile, options).subscribe((res) => {

@@ -85,7 +85,7 @@ export class ResourceComponent implements OnInit{
                         })[0].availabilityZone;
                         let [name,ip,status,description,region,az,type] = [ele.name, ele.endpoint.split(":")[0], "Enabled", ele.description, "default_region", zone, ele.storageType];
                         
-                        if(ele.storageType == "" || ele.storageType == "block"){
+                        if(!ele.storageType || ele.storageType == "" || ele.storageType == "block"){
                             this.blockStorages.push({name,ip,status,description,region,az,type});
                         }
                         
@@ -119,7 +119,7 @@ export class ResourceComponent implements OnInit{
                 let backends = res.json().backends ? res.json().backends :[];
                 
                 this.objectStorages = backends.filter(element => {
-                    return element.type == "fusionstorage-object";
+                    return element.type == "fusionstorage-object" || element.type == "ceph-s3";
                 })
 
                 this.objectStorages.forEach(element => {
