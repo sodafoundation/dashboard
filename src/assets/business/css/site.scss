@@ -1548,6 +1548,12 @@ a {
 .line-arrow-right.enabled::before{ 
     border-left-color: #438bd3; 
 }
+.line-arrow-right.failed{ 
+    background-color: #FF8833; 
+}
+.line-arrow-right.failed::before{ 
+    border-left-color: #FF8833; 
+}
 @mixin textadapt{
     font-size: 14px;
     & > div{

@@ -24,7 +24,7 @@ export class HomeComponent implements OnInit {
         aws:0,
         huaweipri:0,
         huaweipub:0,
-        huaweifs:0
+        localBKD:0
     }
     counts= {
         volumesCount:0,
@@ -194,7 +194,7 @@ export class HomeComponent implements OnInit {
         this.allBackends_count.aws = this.Allbackends[this.cloud_type[0]] ? this.Allbackends[Consts.CLOUD_TYPE[0]].length :0;
         this.allBackends_count.huaweipri = this.Allbackends[this.cloud_type[1]] ? this.Allbackends[Consts.CLOUD_TYPE[1]].length :0;
         this.allBackends_count.huaweipub = this.Allbackends[this.cloud_type[2]] ? this.Allbackends[Consts.CLOUD_TYPE[2]].length :0;
-        this.allBackends_count.huaweifs = this.Allbackends[this.cloud_type[3]] ? this.Allbackends[Consts.CLOUD_TYPE[3]].length :0;
+        this.allBackends_count.localBKD = this.Allbackends[this.cloud_type[3]] ? this.Allbackends[Consts.CLOUD_TYPE[3]].length :0 + this.Allbackends[this.cloud_type[4]] ? this.Allbackends[Consts.CLOUD_TYPE[4]].length :0;
     }
 
     getType(){
@@ -237,8 +237,16 @@ export class HomeComponent implements OnInit {
 
     showBackendsDeatil(type){
         this.showBackends = true;
-        this.selectedType = type;
-        this.typeDetail = this.Allbackends[type] ? this.Allbackends[type]:[];
+        
+        if(type){
+            this.selectedType = type;
+            this.typeDetail = this.Allbackends[type] ? this.Allbackends[type]:[];
+        }else{
+            this.selectedType = null;
+            let fs_arr = this.Allbackends['fusionstorage-object'] ? this.Allbackends['fusionstorage-object'] : [];
+            let ceph_arr = this.Allbackends['ceph-s3'] ? this.Allbackends['ceph-s3'] : [];
+            this.typeDetail = fs_arr.concat(ceph_arr);
+        }
     }
 
     deleteBackend(backend){
