@@ -39,7 +39,7 @@ export const Consts = {
         "hw-obs":"huawei.svg",
         "azure-blob":'azure.svg',
         "fusionstorage-object":"huawei.svg",
-        "ceph-s3": "redhat.svg"
+        "ceph-s3": "ceph.svg"
     },
     CLOUD_TYPE_NAME: {
         'aws-s3': 'AWS S3',

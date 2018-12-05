@@ -148,7 +148,7 @@ export class MigrationListComponent implements OnInit {
         // Bucket migration from CEPH to HW is not supported
         if(Consts.BUCKET_TYPE.get(this.createMigrationForm.value.srcBucket) == "ceph-s3"){
             this.destBuckets = this.destBuckets.filter( value => {
-                return Consts.BUCKET_TYPE.get(value.label) != "hw-obs";
+                return Consts.BUCKET_TYPE.get(value.label) != "hw-obs" && Consts.BUCKET_TYPE.get(value.label) != "fusionstorage-object";
             })
         }
         
