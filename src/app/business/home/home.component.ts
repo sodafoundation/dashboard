@@ -235,7 +235,7 @@ export class HomeComponent implements OnInit {
         });
     }
 
-    showBackendsDeatil(type){
+    showBackendsDeatil(type?){
         this.showBackends = true;
         
         if(type){
