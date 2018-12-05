@@ -116,11 +116,7 @@ export class ResourceComponent implements OnInit{
         }else{
             this.tabPrimary = "object";
             this.http.get('v1/{project_id}/backends').subscribe((res)=>{
-                let backends = res.json().backends ? res.json().backends :[];
-                
-                this.objectStorages = backends.filter(element => {
-                    return element.type == "fusionstorage-object" || element.type == "ceph-s3";
-                })
+                this.objectStorages = res.json().backends ? res.json().backends :[];
 
                 this.objectStorages.forEach(element => {
                     element.type = Consts.CLOUD_TYPE_NAME[element.type];
