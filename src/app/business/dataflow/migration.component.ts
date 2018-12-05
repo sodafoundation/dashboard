@@ -137,13 +137,20 @@ export class MigrationListComponent implements OnInit {
         this.destBuckets = [];
         this.engineOption = [];
         this.bucketOption.forEach((value,index)=>{
-           if(Consts.BUCKET_BACKND.get(value.label) !== Consts.BUCKET_BACKND.get(this.createMigrationForm.value.srcBucket)){ 
+            if(Consts.BUCKET_BACKND.get(value.label) !== Consts.BUCKET_BACKND.get(this.createMigrationForm.value.srcBucket)){ 
                 this.destBuckets.push({
                     label:value.label,
                     value:value.value
                 });
             }
         });
+
+        // Bucket migration from CEPH to HW is not supported
+        if(Consts.BUCKET_TYPE.get(this.createMigrationForm.value.srcBucket) == "ceph-s3"){
+            this.destBuckets = this.destBuckets.filter( value => {
+                return Consts.BUCKET_TYPE.get(value.label) != "hw-obs" && Consts.BUCKET_TYPE.get(value.label) != "fusionstorage-object";
+            })
+        }
         
     }
 

@@ -143,6 +143,13 @@ export class AppComponent implements OnInit, AfterViewInit {
                     // second step part upload
                     
                     window['uploadPart'](selectFile, uploadId, bucketId, options, cb);
+                },
+                (error)=>{
+                    window['isUpload'] = false;
+                    this.msg.error("Upload failed. The network may be unstable. Please try again later.");
+                    if (cb) {
+                        cb();
+                    }
                 });
             } else {
                 window['singleUpload'](selectFile, bucketId, options, cb);
