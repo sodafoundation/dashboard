@@ -167,11 +167,11 @@ export class AppComponent implements OnInit, AfterViewInit {
                 uploadNum = 0;
             },
             (error)=>{
-                this.showPrompt = false;
                 if(uploadNum < 5){
                     window['singleUpload'](selectFile, bucketId, options, cb);
                     uploadNum++;
                 }else{
+                    this.showPrompt = false;
                     uploadNum = 0;
                     console.log('error');
                     window['isUpload'] = false;
@@ -209,7 +209,6 @@ export class AppComponent implements OnInit, AfterViewInit {
             chunk = blob.slice(chunks[i].start, chunks[i].end);
 
             this.http.put('/v1/s3/' + bucketId + '/' + blob.name + '?partNumber=' + (i + 1) + '&uploadId=' + uploadId, chunk, options).subscribe((data) => {
-                this.showPrompt = false;
                 let x2js = new X2JS();
                 let jsonObj = x2js.xml_str2json(data['_body']);
                 window['uploadPartArr'].push(jsonObj);
@@ -229,11 +228,11 @@ export class AppComponent implements OnInit, AfterViewInit {
                 }
             },
             (error)=>{
-                this.showPrompt = false;
                 if(uploadNum < 5){
                     window['segmentUpload'](i, chunks, blob, uploadId, options, bucketId, cb);
                     uploadNum++;
                 }else{
+                    this.showPrompt = false;
                     uploadNum = 0;
                     window['isUpload'] = false;
                     this.http.delete('/v1/s3/' + selectFile.name + "?uploadId=" + uploadId).subscribe((data)=>{});
@@ -247,6 +246,7 @@ export class AppComponent implements OnInit, AfterViewInit {
         }
         window['CompleteMultipartUpload'] = (bucketId, blob, uploadId, marltipart, options, selectFile, cb) => {
             this.http.put('/v1/s3/' + bucketId + '/' + blob.name + '?uploadId=' + uploadId, marltipart, options).subscribe((res) => {
+                this.showPrompt = false;
                 window['isUpload'] = false;
                 this.msg.success("Upload file ["+ blob.name +"] successfully.");
                 if (cb) {
@@ -258,6 +258,7 @@ export class AppComponent implements OnInit, AfterViewInit {
                     window['CompleteMultipartUpload'](bucketId, blob, uploadId, marltipart, options, cb);
                     uploadNum++;
                 }else{
+                    this.showPrompt = false;
                     uploadNum = 0; 
                     this.http.delete('/v1/s3/' + selectFile.name + "?uploadId=" + uploadId).subscribe((data)=>{});
                 }
