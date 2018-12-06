@@ -7,7 +7,7 @@ before_script:
    - "sudo apt-get update && sudo apt-get install -y nginx make"
 
 script: # the build step
-   - sudo make
+   - make
 
 after_script:
-   - sudo make clean
+   - make clean

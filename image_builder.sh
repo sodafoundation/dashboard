@@ -22,26 +22,6 @@ npm install --unsafe-perm -g @angular/cli@1.7.4
 npm install --unsafe-perm
 ng build --prod
 
-cp -R ./dist/* /var/www/html/
+sudo mkdir /var/www/html/ -p
+sudo cp -R ./dist/* /var/www/html/
 
-cat > /etc/nginx/sites-available/default <<EOF
-    server {
-        listen 8088 default_server;
-        listen [::]:8088 default_server;
-        root /var/www/html;
-        index index.html index.htm index.nginx-debian.html;
-        server_name _;
-        location /v3/ {
-            proxy_pass http://127.0.0.1/identity/v3/;
-        }
-
-        location /v1beta/ {
-            proxy_pass http://127.0.0.1:50040/v1beta/;
-        }
-
-        location /v1/ {
-            proxy_pass http://127.0.0.1:8089/v1/;
-            client_max_body_size 10240m;
-        }
-    }
-EOF
