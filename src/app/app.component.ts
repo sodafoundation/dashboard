@@ -202,9 +202,9 @@ export class AppComponent implements OnInit, AfterViewInit {
             }
 
             window['uploadPartArr'] = [];
-            window['segmentUpload'](0, proArr, selectFile, uploadId, options, bucketId, selectFile, cb);
+            window['segmentUpload'](0, proArr, selectFile, uploadId, options, bucketId, cb);
         }
-        window['segmentUpload'] = (i, chunks, blob, uploadId, options, bucketId, selectFile, cb) => {
+        window['segmentUpload'] = (i, chunks, blob, uploadId, options, bucketId, cb) => {
             let chunk;
             chunk = blob.slice(chunks[i].start, chunks[i].end);
 
@@ -224,7 +224,7 @@ export class AppComponent implements OnInit, AfterViewInit {
                         </Part>`
                     });
                     marltipart += '</CompleteMultipartUpload>';
-                    window['CompleteMultipartUpload'](bucketId, blob, uploadId, marltipart, options, selectFile, cb);
+                    window['CompleteMultipartUpload'](bucketId, blob, uploadId, marltipart, options, cb);
                 }
             },
             (error)=>{
@@ -235,7 +235,7 @@ export class AppComponent implements OnInit, AfterViewInit {
                     this.showPrompt = false;
                     uploadNum = 0;
                     window['isUpload'] = false;
-                    this.http.delete('/v1/s3/' + selectFile.name + "?uploadId=" + uploadId).subscribe((data)=>{});
+                    this.http.delete('/v1/s3/' + blob.name + "?uploadId=" + uploadId).subscribe((data)=>{});
                     this.msg.error("Upload failed. The network may be unstable. Please try again later.");
                     if (cb) {
                         cb();
@@ -244,7 +244,7 @@ export class AppComponent implements OnInit, AfterViewInit {
                 
             });
         }
-        window['CompleteMultipartUpload'] = (bucketId, blob, uploadId, marltipart, options, selectFile, cb) => {
+        window['CompleteMultipartUpload'] = (bucketId, blob, uploadId, marltipart, options, cb) => {
             this.http.put('/v1/s3/' + bucketId + '/' + blob.name + '?uploadId=' + uploadId, marltipart, options).subscribe((res) => {
                 this.showPrompt = false;
                 window['isUpload'] = false;
@@ -260,7 +260,7 @@ export class AppComponent implements OnInit, AfterViewInit {
                 }else{
                     this.showPrompt = false;
                     uploadNum = 0; 
-                    this.http.delete('/v1/s3/' + selectFile.name + "?uploadId=" + uploadId).subscribe((data)=>{});
+                    this.http.delete('/v1/s3/' + blob.name + "?uploadId=" + uploadId).subscribe((data)=>{});
                 }
             });
         }
