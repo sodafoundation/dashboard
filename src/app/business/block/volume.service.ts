@@ -159,7 +159,7 @@ export class VolumeGroupService {
     ) { }
 
     project_id = this.paramStor.CURRENT_TENANT().split("|")[1];
-    volumeGroupUrl = 'v1beta/{project_id}/block/volumeGroup';
+    volumeGroupUrl = 'v1beta/{project_id}/block/volumeGroups';
     //create volume group
     createVolumeGroup(param){
         let url = this.volumeGroupUrl;
