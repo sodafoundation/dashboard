@@ -3,7 +3,7 @@ import { Http } from '@angular/http';
 import { Router } from '@angular/router';
 import { I18NService, Consts, ParamStorService, MsgBoxService } from 'app/shared/api';
 import { I18nPluralPipe } from '@angular/common';
-import { MenuItem, SelectItem } from './components/common/api';
+import { MenuItem, SelectItem} from './components/common/api';
 
 let d3 = window["d3"];
 declare let X2JS: any;
@@ -45,6 +45,8 @@ export class AppComponent implements OnInit, AfterViewInit {
     intervalRefreshToken: any;
     showErrorMsg: boolean = false;
     errorMsg: string = "";
+    showPrompt = false;
+    fileName: string = "";
 
     tenantItems = [];
 
@@ -128,8 +130,12 @@ export class AppComponent implements OnInit, AfterViewInit {
         // Global upload function
         window['uploadPartArr'] = [];
         window['isUpload'] = false;
+        let uploadNum = 0;
         window['startUpload'] = (selectFile, bucketId, options, cb) => {
             window['isUpload'] = true;
+            this.showPrompt =  true;
+            this.fileName = selectFile.name;
+            
             if (selectFile['size'] > Consts.BYTES_PER_CHUNK) {
                 //first step get uploadId
                 this.http.put('/v1/s3/'+ bucketId + '/' + selectFile.name + "?uploads", '', options).subscribe((res) => {
@@ -138,6 +144,7 @@ export class AppComponent implements OnInit, AfterViewInit {
                     let jsonObj = x2js.xml_str2json(str);
                     let uploadId = jsonObj.InitiateMultipartUploadResult.UploadId;
                     // second step part upload
+                    
                     window['uploadPart'](selectFile, uploadId, bucketId, options, cb);
                 },
                 (error)=>{
@@ -148,22 +155,35 @@ export class AppComponent implements OnInit, AfterViewInit {
                     }
                 });
             } else {
-                this.http.put('/v1/s3/'+ bucketId + '/' + selectFile.name, selectFile, options).subscribe((res) => {
-                    window['isUpload'] = false;
-                    this.msg.success("Upload file ["+ selectFile.name +"] successfully.");
-                    if (cb) {
-                        cb();
-                    }
-                },
-                (error)=>{
+                window['singleUpload'](selectFile, bucketId, options, cb);
+            }
+        }
+        window['singleUpload'] = (selectFile, bucketId, options, cb) => {
+            this.http.put('/v1/s3/'+ bucketId + '/' + selectFile.name, selectFile, options).subscribe((res) => {
+                this.showPrompt = false;
+                window['isUpload'] = false;
+                this.msg.success("Upload file ["+ selectFile.name +"] successfully.");
+                if (cb) {
+                    cb();
+                }
+                uploadNum = 0;
+            },
+            (error)=>{
+                if(uploadNum < 5){
+                    window['singleUpload'](selectFile, bucketId, options, cb);
+                    uploadNum++;
+                }else{
+                    this.showPrompt = false;
+                    uploadNum = 0;
                     console.log('error');
                     window['isUpload'] = false;
                     this.msg.error("Upload failed. The network may be unstable. Please try again later.");
                     if (cb) {
                         cb();
                     }
-                });
-            }
+                }
+                
+            });
         }
         window['uploadPart'] = (selectFile, uploadId, bucketId, options, cb) => {
             let totalSlices;
@@ -194,7 +214,7 @@ export class AppComponent implements OnInit, AfterViewInit {
                 let x2js = new X2JS();
                 let jsonObj = x2js.xml_str2json(data['_body']);
                 window['uploadPartArr'].push(jsonObj);
-
+                uploadNum = 0;
                 if (i < (chunks.length - 1)) {
                     window['segmentUpload'](i + 1, chunks, blob, uploadId, options, bucketId, cb);
                 } else {
@@ -206,20 +226,43 @@ export class AppComponent implements OnInit, AfterViewInit {
                         </Part>`
                     });
                     marltipart += '</CompleteMultipartUpload>';
-                    this.http.put('/v1/s3/' + bucketId + '/' + blob.name + '?uploadId=' + uploadId, marltipart, options).subscribe((res) => {
-                        window['isUpload'] = false;
-                        this.msg.success("Upload file ["+ blob.name +"] successfully.");
-                        if (cb) {
-                            cb();
-                        }
-                    });
+                    window['CompleteMultipartUpload'](bucketId, blob, uploadId, marltipart, options, cb);
                 }
             },
             (error)=>{
+                if(uploadNum < 5){
+                    window['segmentUpload'](i, chunks, blob, uploadId, options, bucketId, cb);
+                    uploadNum++;
+                }else{
+                    this.showPrompt = false;
+                    uploadNum = 0;
+                    window['isUpload'] = false;
+                    this.http.delete('/v1/s3/' + blob.name + "?uploadId=" + uploadId).subscribe((data)=>{});
+                    this.msg.error("Upload failed. The network may be unstable. Please try again later.");
+                    if (cb) {
+                        cb();
+                    }
+                }
+                
+            });
+        }
+        window['CompleteMultipartUpload'] = (bucketId, blob, uploadId, marltipart, options, cb) => {
+            this.http.put('/v1/s3/' + bucketId + '/' + blob.name + '?uploadId=' + uploadId, marltipart, options).subscribe((res) => {
+                this.showPrompt = false;
                 window['isUpload'] = false;
-                this.msg.error("Upload failed. The network may be unstable. Please try again later.");
+                this.msg.success("Upload file ["+ blob.name +"] successfully.");
                 if (cb) {
                     cb();
+                }
+            },
+            error =>{
+                if(uploadNum < 5){
+                    window['CompleteMultipartUpload'](bucketId, blob, uploadId, marltipart, options, cb);
+                    uploadNum++;
+                }else{
+                    this.showPrompt = false;
+                    uploadNum = 0; 
+                    this.http.delete('/v1/s3/' + blob.name + "?uploadId=" + uploadId).subscribe((data)=>{});
                 }
             });
         }

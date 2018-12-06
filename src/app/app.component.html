@@ -56,3 +56,7 @@
         <path id="svg_wave_2" fill="rgba(60, 142, 225, 0.6)"></path>
     </svg> 
 </div>
+
+<div *ngIf="showPrompt" style="padding:15px 20px; z-index: 99999; line-height:18px;position: fixed;bottom: 10px;left:10px;background:rgba(255,255,255,0.75); border-radius: 5px; box-shadow:0 0 10px rgba(0,0,0,0.3);">
+    <span>Uploading file [ {{fileName}} ]</span>
+</div> 

@@ -41,6 +41,7 @@ export class BucketDetailComponent implements OnInit {
   showCreateFolder = false;
   createFolderForm:FormGroup;
   showErrorMsg = false;
+  UPLOAD_UPPER_LIMIT = 1024*1024*1024*2;
   errorMessage = {
     "backend_type": { required: "Type is required." },
     "backend": { required: "Backend is required." }
@@ -170,11 +171,15 @@ export class BucketDetailComponent implements OnInit {
 
     this.uploadDisplay = false;
     this.isUpload = true;
-    window['startUpload'](this.selectFile, this.bucketId, options, ()=>{
+    if(this.selectFile['size'] > this.UPLOAD_UPPER_LIMIT){
+      this.msg.info("Uploading files larger than 2GB is not supported");
       this.isUpload = false;
-      this.getAlldir();
-    });
-
+    }else{
+      window['startUpload'](this.selectFile, this.bucketId, options, ()=>{
+        this.isUpload = false;
+        this.getAlldir();
+      });
+    }
   }
 
   downloadFile(file) {
