@@ -49,7 +49,6 @@ export class AppComponent implements OnInit, AfterViewInit {
     tenantItems = [];
 
     menuItems = [];
-    showPrompt = false;
 
     menuItems_tenant = [
         {
@@ -133,6 +132,10 @@ export class AppComponent implements OnInit, AfterViewInit {
         window['startUpload'] = (selectFile, bucketId, options, cb) => {
             window['isUpload'] = true;
             this.showPrompt =  true;
+<<<<<<< HEAD
+=======
+            this.fileName = selectFile.name;
+>>>>>>> a367f87888dd7fae24b5f69c9b0b5f10a3616ace
             
             if (selectFile['size'] > Consts.BYTES_PER_CHUNK) {
                 //first step get uploadId
