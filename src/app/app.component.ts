@@ -49,6 +49,7 @@ export class AppComponent implements OnInit, AfterViewInit {
     tenantItems = [];
 
     menuItems = [];
+    showPrompt = false;
 
     menuItems_tenant = [
         {
@@ -132,10 +133,6 @@ export class AppComponent implements OnInit, AfterViewInit {
         window['startUpload'] = (selectFile, bucketId, options, cb) => {
             window['isUpload'] = true;
             this.showPrompt =  true;
-<<<<<<< HEAD
-=======
-            this.fileName = selectFile.name;
->>>>>>> a367f87888dd7fae24b5f69c9b0b5f10a3616ace
             
             if (selectFile['size'] > Consts.BYTES_PER_CHUNK) {
                 //first step get uploadId
@@ -238,7 +235,7 @@ export class AppComponent implements OnInit, AfterViewInit {
                     this.showPrompt = false;
                     uploadNum = 0;
                     window['isUpload'] = false;
-                    this.http.delete('/v1/s3/' + blob.name + "?uploadId=" + uploadId).subscribe((data)=>{});
+                    this.http.delete('/v1/s3/' +bucketId + '/' +  blob.name + "?uploadId=" + uploadId).subscribe((data)=>{});
                     this.msg.error("Upload failed. The network may be unstable. Please try again later.");
                     if (cb) {
                         cb();
@@ -263,7 +260,7 @@ export class AppComponent implements OnInit, AfterViewInit {
                 }else{
                     this.showPrompt = false;
                     uploadNum = 0; 
-                    this.http.delete('/v1/s3/' + blob.name + "?uploadId=" + uploadId).subscribe((data)=>{});
+                    this.http.delete('/v1/s3/' +bucketId + '/' +  blob.name + "?uploadId=" + uploadId).subscribe((data)=>{});
                 }
             });
         }
