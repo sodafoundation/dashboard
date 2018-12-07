@@ -3,13 +3,13 @@
     "close":    "Close",
     "cancel":   "Cancel",
     "confirm":  "Confirm",
-    "warn": "警告",
+    "warn": "warning",
     "tip":  "Information",
     "success":  "Success",
     "error":  "Error",
-    "emptyTable":   "无数据",
-    "emptyData":    "无数据",
-    "totalRecords": "总条数",
-    "goto": "跳转"
+    "emptyTable":   "No data",
+    "emptyData":    "No data",
+    "totalRecords": "Total records",
+    "goto": "Jump"
 
 }

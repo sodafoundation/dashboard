@@ -18,7 +18,7 @@
         <p-column field="name" header="{{I18N.keyID['sds_block_volume_name']}}"></p-column>
         <p-column field="description" header="{{I18N.keyID['sds_block_volume_descri']}}"></p-column>
         <p-column field="status" header="{{I18N.keyID['sds_block_volume_status']}}"></p-column>
-        <p-column field="size" header="{{I18N.keyID['sds_home_capacity']}}"></p-column>
+        <p-column field="size" header="{{I18N.keyID['sds_home_capacity']}}" [style]="{'width':'80px'}"></p-column>
         <p-column field="createdAt" header="{{I18N.keyID['sds_block_volume_createat']}}"></p-column>
         <p-column header="{{I18N.keyID['sds_block_volume_operation']}}" [style]="{'width': '25%'}">
             <ng-template let-snapshot="rowData" pTemplate="body">
