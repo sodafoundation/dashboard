@@ -187,7 +187,6 @@ export class BucketDetailComponent implements OnInit {
       headers: {
         'X-Auth-Token': localStorage['auth-token']
       },
-      // params:{responseType: 'arraybuffer'}
       responseType: 'arraybuffer' as 'arraybuffer'
     }
     this.httpClient.get(`v1/s3/${this.bucketId}/${file.ObjectKey}`, options).subscribe((res)=>{
