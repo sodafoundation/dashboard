@@ -183,7 +183,14 @@ export class BucketDetailComponent implements OnInit {
   }
 
   downloadFile(file) {
-    this.httpClient.get(`v1/s3/${this.bucketId}/${file.ObjectKey}`, {responseType: 'arraybuffer'}).subscribe((res)=>{
+    let options = {
+      headers: {
+        'X-Auth-Token': localStorage['auth-token']
+      },
+      // params:{responseType: 'arraybuffer'}
+      responseType: 'arraybuffer' as 'arraybuffer'
+    }
+    this.httpClient.get(`v1/s3/${this.bucketId}/${file.ObjectKey}`, options).subscribe((res)=>{
       let blob = new Blob([res]);
       if (typeof window.navigator.msSaveBlob !== 'undefined') {  
           window.navigator.msSaveBlob(blob, file.ObjectKey);
