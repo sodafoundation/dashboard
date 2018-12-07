@@ -162,18 +162,12 @@ export class SnapshotListComponent implements OnInit {
   getSnapshots(filter?) {
     this.SnapshotService.getSnapshots(filter).subscribe((res) => {
       this.snapshots = res.json();
-      for(let i of this.snapshots){
-        let time = i.createdAt;
-        let hours = time.substr(11,2);
-        let minutes = time.substr(14,2);
-        let seconds = time.substr(17,2);
-        let nowTime = new Date(time);
-        let millSeconds = nowTime.setUTCHours(parseInt(hours),parseInt(minutes),parseInt(seconds));
-        i.createdAt = Utils.formatDate(new Date(millSeconds));
-      }
+
       this.snapshotPropertyDisplay = false;
 
       this.snapshots.map((item, index, arr)=>{
+        item.description = !item.description || item.description=='' ? '--' : item.description;
+        item.createdAt = item.createdAt.replace("T", " ");
         item.size = Utils.getDisplayGBCapacity(item.size);
       })
     });
