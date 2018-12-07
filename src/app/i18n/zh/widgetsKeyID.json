@@ -1,15 +1,15 @@
 {
     "ok":       "OK",
-    "close":    "关闭",
+    "close":    "Close",
     "cancel":   "Cancel",
-    "confirm":  "确认",
-    "warn": "警告",
-    "tip":  "提示",
-    "success":  "成功",
-    "error":  "錯誤",
-    "emptyTable":   "无数据",
-    "emptyData":    "无数据",
-    "totalRecords": "总条数",
-    "goto": "跳转"
+    "confirm":  "Confirm",
+    "warn": "warning",
+    "tip":  "Information",
+    "success":  "Success",
+    "error":  "Error",
+    "emptyTable":   "No data",
+    "emptyData":    "No data",
+    "totalRecords": "Total records",
+    "goto": "Jump"
 
 }
