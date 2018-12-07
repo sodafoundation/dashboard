@@ -237,7 +237,7 @@ export class AppComponent implements OnInit, AfterViewInit {
                     this.showPrompt = false;
                     uploadNum = 0;
                     window['isUpload'] = false;
-                    this.http.delete('/v1/s3/' + blob.name + "?uploadId=" + uploadId).subscribe((data)=>{});
+                    this.http.delete('/v1/s3/' +bucketId + '/' +  blob.name + "?uploadId=" + uploadId).subscribe((data)=>{});
                     this.msg.error("Upload failed. The network may be unstable. Please try again later.");
                     if (cb) {
                         cb();
@@ -262,7 +262,7 @@ export class AppComponent implements OnInit, AfterViewInit {
                 }else{
                     this.showPrompt = false;
                     uploadNum = 0; 
-                    this.http.delete('/v1/s3/' + blob.name + "?uploadId=" + uploadId).subscribe((data)=>{});
+                    this.http.delete('/v1/s3/' +bucketId + '/' +  blob.name + "?uploadId=" + uploadId).subscribe((data)=>{});
                 }
             });
         }
