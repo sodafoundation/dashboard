@@ -35,9 +35,9 @@ WORKDIR /opt/dashboard
 
 # Copy dashboard source code into container before running command.
 COPY ./ ./
-
 RUN chmod 755 ./image_builder.sh \
   && sudo ./image_builder.sh
 
+COPY entrypoint.sh ./
 # Define default command.
-CMD /usr/sbin/nginx -g "daemon off;"
+ENTRYPOINT /opt/dashboard/entrypoint.sh
