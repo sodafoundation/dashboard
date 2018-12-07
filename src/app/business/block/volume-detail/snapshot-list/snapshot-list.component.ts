@@ -167,7 +167,7 @@ export class SnapshotListComponent implements OnInit {
         let hours = time.substr(11,2);
         let minutes = time.substr(14,2);
         let seconds = time.substr(17,2);
-        let nowTime = new Date();
+        let nowTime = new Date(time);
         let millSeconds = nowTime.setUTCHours(parseInt(hours),parseInt(minutes),parseInt(seconds));
         i.createdAt = Utils.formatDate(new Date(millSeconds));
       }
