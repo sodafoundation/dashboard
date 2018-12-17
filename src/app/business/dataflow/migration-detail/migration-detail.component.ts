@@ -3,6 +3,7 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { I18NService, Utils ,Consts} from 'app/shared/api';
 import { MigrationService } from '../migration.service';
 import { Http } from '@angular/http';
+import { interval } from 'rxjs/observable/interval';
 
 @Component({
   selector: 'migration-detail',
@@ -14,6 +15,7 @@ import { Http } from '@angular/http';
 export class MigrationDetailComponent implements OnInit {
   @Input() plan;
 
+  detailInterval;
   migrationInstance = {
     "name": "--",
     "srcBucket": "--",
@@ -41,8 +43,16 @@ export class MigrationDetailComponent implements OnInit {
     private http: Http
   ) { }
 
-  ngOnInit() {
 
+  ngOnInit() {
+    this.getMigrationDetail(this.plan);
+    this.detailInterval = setInterval(()=>{
+      this.getMigrationDetail(this.plan);
+    },5000)
+    
+  }
+
+  getMigrationDetail(plan){
     this.http.get('v1/{project_id}/jobs?planName='+this.plan.name).subscribe((res)=>{
       let job = res.json().jobs ? res.json().jobs :[];
       
@@ -69,4 +79,9 @@ export class MigrationDetailComponent implements OnInit {
       }
     })
   }
+
+  ngOnDestroy() {
+    clearInterval(this.detailInterval);
+  }
+  
 }

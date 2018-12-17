@@ -27,6 +27,7 @@ export class SnapshotListComponent implements OnInit {
   snapshotFormGroup;
   createVolumeFormGroup;
   createVolumeDisplay: boolean = false;
+  isFromCloud = false;
 
   isCreate = false;
   isModify = false;
@@ -162,7 +163,6 @@ export class SnapshotListComponent implements OnInit {
   getSnapshots(filter?) {
     this.SnapshotService.getSnapshots(filter).subscribe((res) => {
       this.snapshots = res.json();
-
       this.snapshotPropertyDisplay = false;
 
       this.snapshots.map((item, index, arr)=>{
@@ -218,6 +218,7 @@ export class SnapshotListComponent implements OnInit {
   showCreateVolumeBasedonSnapshot(snapshot){
     this.createVolumeDisplay = true;
     this.selectedSnapshotId = snapshot.id;
+    this.isFromCloud = false;
   }
 
   createVolumeBasedonSnapshot(snapshot) {
@@ -227,7 +228,8 @@ export class SnapshotListComponent implements OnInit {
       size: this.volume.size,
       availabilityZone: this.volume.availabilityZone,
       profileId: this.volume.profileId,
-      snapshotId: this.selectedSnapshotId
+      snapshotId: this.selectedSnapshotId,
+      snapshotFromCloud: this.isFromCloud
     }
 
     if(this.createVolumeFormGroup.status == "VALID"){
@@ -241,6 +243,9 @@ export class SnapshotListComponent implements OnInit {
           this.createVolumeFormGroup.controls[i].markAsTouched();
       }
     }
+  }
+  fromCloud(){
+    this.isFromCloud = !this.isFromCloud;
   }
 
 }
