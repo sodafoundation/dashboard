@@ -11,7 +11,6 @@ import { MigrationService } from './migration.service';
 import { BucketService } from './../block/buckets.service';
 import { Http } from '@angular/http';
 import { ReactiveFormsModule, FormsModule} from '@angular/forms';
-import { interval } from 'rxjs/observable/interval';
 declare let X2JS:any;
 
 @Component({
