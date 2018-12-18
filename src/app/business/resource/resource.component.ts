@@ -80,13 +80,16 @@ export class ResourceComponent implements OnInit{
                 this.http.get("/v1beta/"+ project_id +"/docks", reqDock).subscribe((result)=>{
                     result.json().forEach(ele => {
 
-                        let zone = poolRES.json().filter((pool)=>{
+                        let pool = poolRES.json().filter((pool)=>{
                             return pool.dockId == ele.id;
-                        })[0].availabilityZone;
-                        let [name,ip,status,description,region,az,type] = [ele.name, ele.endpoint.split(":")[0], "Enabled", ele.description, "default_region", zone, ele.storageType];
+                        })
+                        if(pool && pool.length != 0){
+                            let zone = pool[0].availabilityZone;
+                            let [name,ip,status,description,region,az,type] = [ele.name, ele.endpoint.split(":")[0], "Enabled", ele.description, "default_region", zone, ele.storageType];
                         
-                        if(!ele.storageType || ele.storageType == "" || ele.storageType == "block"){
-                            this.blockStorages.push({name,ip,status,description,region,az,type});
+                            if(!ele.storageType || ele.storageType == "" || ele.storageType == "block"){
+                                this.blockStorages.push({name,ip,status,description,region,az,type});
+                            }
                         }
                         
                     });

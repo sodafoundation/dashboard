@@ -4,7 +4,7 @@ import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { VolumeDetailComponent } from './volume-detail.component';
 
-import { TabViewModule,ButtonModule, DataTableModule,DropdownModule, DropMenuModule, DialogModule, FormModule, InputTextModule, InputTextareaModule, ConfirmDialogModule ,ConfirmationService} from './../../../components/common/api';
+import { TabViewModule,ButtonModule, DataTableModule,DropdownModule, DropMenuModule, DialogModule, FormModule, InputTextModule, InputTextareaModule, ConfirmDialogModule ,ConfirmationService,CheckboxModule} from './../../../components/common/api';
 import { HttpService } from './../../../shared/service/Http.service';
 import { VolumeService,SnapshotService ,ReplicationService} from './../volume.service';
 import { SnapshotListComponent } from './snapshot-list/snapshot-list.component';
@@ -30,7 +30,8 @@ let routers = [{
     DialogModule,
     FormModule,
     ConfirmDialogModule,
-    DropdownModule
+    DropdownModule,
+    CheckboxModule
   ],
   declarations: [
     VolumeDetailComponent,
