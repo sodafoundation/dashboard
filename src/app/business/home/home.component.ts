@@ -2,7 +2,7 @@ import { Component, OnInit, ViewContainerRef, ViewChild, Directive, ElementRef, 
 import { ParamStorService, Utils } from 'app/shared/api';
 import { ProfileService } from 'app/business/profile/profile.service';
 import { Observable } from "rxjs/Rx";
-import { I18NService ,HttpService,Consts} from 'app/shared/api';
+import { I18NService ,HttpService, MsgBoxService, Consts} from 'app/shared/api';
 import { ReactiveFormsModule, FormsModule,FormControl, FormGroup, FormBuilder,Validators,ValidatorFn, AbstractControl } from '@angular/forms';
 import { MenuItem ,ConfirmationService,ConfirmDialogModule} from '../../components/common/api';
 import { Router } from '@angular/router';
@@ -59,6 +59,7 @@ export class HomeComponent implements OnInit {
         private fb:FormBuilder,
         private ConfirmationService:ConfirmationService,
         private router: Router,
+        private msg: MsgBoxService
     ) { 
         this.cloud_type = Consts.CLOUD_TYPE;
     }
@@ -251,11 +252,7 @@ export class HomeComponent implements OnInit {
 
     deleteBackend(backend){
         if(backend.canDelete){
-            let msg = "<div>you can't delete the backend with bucket</h3>";
-            let header ="Prompt ";
-            let acceptLabel = "Close";
-            let warming = true;
-            this.confirmDialog([msg,header,acceptLabel,warming,"close"])
+            this.msg.info("The backend cannot be deleted because buckets have already been created");
         }else{
             let msg = "<div>Are you sure you want to delete the selected backend?</div><h3>[ "+ backend.name +" ]</h3>";
             let header ="Delete ";

@@ -62,8 +62,10 @@
             <form-item label="{{label.description}}" [required]="false">
                 <textarea [rows]="3" [cols]="27" pInputTextarea formControlName="description" ></textarea>
             </form-item>
+            <div style="padding:20px 0">
+                <p-checkbox (onChange)="fromCloud()" name="fromCloud" value="true" label="Download snapshot from cloud."></p-checkbox>
+            </div>
         </form>
-
         <p-footer>
             <button type="button" pButton class="ui-button-secondary" (click)="createVolumeBasedonSnapshot()" label="{{I18N.keyID['ok']}}" ></button>
             <button type="button" pButton (click)="createVolumeDisplay=false" label="{{I18N.keyID['cancel']}}"></button>
