@@ -32,7 +32,7 @@ docker:
 
 clean:
 	service nginx stop
-	rm -rf /etc/nginx/sites-available/default /var/www/html/* ./dist warn=False
+	sudo rm -rf /etc/nginx/sites-available/default /var/www/html/* ./dist warn=False
 	npm uninstall --unsafe-perm
 	npm uninstall --unsafe-perm -g @angular/cli@1.7.4
 .PHONY: clean
