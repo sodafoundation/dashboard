@@ -39,5 +39,3 @@ cat > /etc/nginx/sites-available/default <<EOF
 EOF
 
 /usr/sbin/nginx -g "daemon off;"
-
-
