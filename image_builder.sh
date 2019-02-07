@@ -24,4 +24,3 @@ ng build --prod
 
 sudo mkdir /var/www/html/ -p
 sudo cp -R ./dist/* /var/www/html/
-
