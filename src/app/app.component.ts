@@ -15,6 +15,7 @@ declare let X2JS: any;
     styleUrls: []
 })
 export class AppComponent implements OnInit, AfterViewInit {
+    selectFileName: string;
     chromeBrowser: boolean = false;
 
     isLogin: boolean;
@@ -131,14 +132,19 @@ export class AppComponent implements OnInit, AfterViewInit {
         window['uploadPartArr'] = [];
         window['isUpload'] = false;
         let uploadNum = 0;
-        window['startUpload'] = (selectFile, bucketId, options, cb) => {
+        window['startUpload'] = (selectFile, bucketId, options,folderId, cb) => {
             window['isUpload'] = true;
             this.showPrompt =  true;
+            if(folderId !=""){
+                this.selectFileName= folderId + selectFile.name;
+            }else{
+                this.selectFileName = selectFile.name 
+            }
             this.fileName = selectFile.name;
             
             if (selectFile['size'] > Consts.BYTES_PER_CHUNK) {
                 //first step get uploadId
-                this.http.put('/v1/s3/'+ bucketId + '/' + selectFile.name + "?uploads", '', options).subscribe((res) => {
+                this.http.put('/v1/s3/'+ bucketId + '/' + this.selectFileName + "?uploads", '', options).subscribe((res) => {
                     let str = res['_body'];
                     let x2js = new X2JS();
                     let jsonObj = x2js.xml_str2json(str);
@@ -148,10 +154,17 @@ export class AppComponent implements OnInit, AfterViewInit {
                     window['uploadPart'](selectFile, uploadId, bucketId, options, cb);
                 },
                 (error)=>{
-                    window['isUpload'] = false;
-                    this.msg.error("Upload failed. The network may be unstable. Please try again later.");
-                    if (cb) {
-                        cb();
+                    if(uploadNum < 5){
+                        window['startUpload'] (selectFile, bucketId, options,folderId, cb);
+                        uploadNum++;
+                    }else{
+                        uploadNum = 0;
+                        this.showPrompt = false;
+                        window['isUpload'] = false;
+                        this.msg.error("Upload failed. The network may be unstable. Please try again later.");
+                        if (cb) {
+                            cb();
+                        }
                     }
                 });
             } else {
@@ -159,7 +172,7 @@ export class AppComponent implements OnInit, AfterViewInit {
             }
         }
         window['singleUpload'] = (selectFile, bucketId, options, cb) => {
-            this.http.put('/v1/s3/'+ bucketId + '/' + selectFile.name, selectFile, options).subscribe((res) => {
+            this.http.put('/v1/s3/'+ bucketId + '/' + this.selectFileName, selectFile, options).subscribe((res) => {
                 this.showPrompt = false;
                 window['isUpload'] = false;
                 this.msg.success("Upload file ["+ selectFile.name +"] successfully.");
@@ -210,7 +223,7 @@ export class AppComponent implements OnInit, AfterViewInit {
             let chunk;
             chunk = blob.slice(chunks[i].start, chunks[i].end);
 
-            this.http.put('/v1/s3/' + bucketId + '/' + blob.name + '?partNumber=' + (i + 1) + '&uploadId=' + uploadId, chunk, options).subscribe((data) => {
+            this.http.put('/v1/s3/' + bucketId + '/' + this.selectFileName + '?partNumber=' + (i + 1) + '&uploadId=' + uploadId, chunk, options).subscribe((data) => {
                 let x2js = new X2JS();
                 let jsonObj = x2js.xml_str2json(data['_body']);
                 window['uploadPartArr'].push(jsonObj);
@@ -237,7 +250,7 @@ export class AppComponent implements OnInit, AfterViewInit {
                     this.showPrompt = false;
                     uploadNum = 0;
                     window['isUpload'] = false;
-                    this.http.delete('/v1/s3/' +bucketId + '/' +  blob.name + "?uploadId=" + uploadId).subscribe((data)=>{});
+                    this.http.delete('/v1/s3/' +bucketId + '/' +  this.selectFileName + "?uploadId=" + uploadId).subscribe((data)=>{});
                     this.msg.error("Upload failed. The network may be unstable. Please try again later.");
                     if (cb) {
                         cb();
@@ -247,7 +260,7 @@ export class AppComponent implements OnInit, AfterViewInit {
             });
         }
         window['CompleteMultipartUpload'] = (bucketId, blob, uploadId, marltipart, options, cb) => {
-            this.http.put('/v1/s3/' + bucketId + '/' + blob.name + '?uploadId=' + uploadId, marltipart, options).subscribe((res) => {
+            this.http.put('/v1/s3/' + bucketId + '/' + this.selectFileName + '?uploadId=' + uploadId, marltipart, options).subscribe((res) => {
                 this.showPrompt = false;
                 window['isUpload'] = false;
                 this.msg.success("Upload file ["+ blob.name +"] successfully.");
@@ -262,7 +275,7 @@ export class AppComponent implements OnInit, AfterViewInit {
                 }else{
                     this.showPrompt = false;
                     uploadNum = 0; 
-                    this.http.delete('/v1/s3/' +bucketId + '/' +  blob.name + "?uploadId=" + uploadId).subscribe((data)=>{});
+                    this.http.delete('/v1/s3/' +bucketId + '/' +  this.selectFileName + "?uploadId=" + uploadId).subscribe((data)=>{});
                 }
             });
         }

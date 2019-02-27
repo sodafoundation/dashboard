@@ -1,6 +1,6 @@
 import { Router,ActivatedRoute } from '@angular/router';
 import { Component, OnInit, ViewContainerRef, ViewChild, Directive, ElementRef, HostBinding, HostListener } from '@angular/core';
-import { I18NService ,Consts,Utils} from 'app/shared/api';
+import { I18NService ,Consts,Utils,MsgBoxService} from 'app/shared/api';
 import { AppService } from 'app/app.service';
 import { trigger, state, style, transition, animate} from '@angular/animations';
 import { I18nPluralPipe } from '@angular/common';
@@ -79,6 +79,7 @@ export class BucketsComponent implements OnInit{
         private BucketService: BucketService,
         private MigrationService:MigrationService,
         private http:Http,
+        private msg: MsgBoxService
     ){
         this.errorMessage = {
             "name": { required: "Name is required.",isExisted:"Name is existing" },
@@ -323,30 +324,38 @@ export class BucketsComponent implements OnInit{
         this.getTypes();
     }
     deleteBucket(bucket){
-        this.http.get(`v1/{project_id}/plans?bucketname=${bucket.name}`).subscribe((res)=>{
-            let plans = res.json().plans ? res.json().plans : [];
-            let planNames = plans.map((item)=> item.name);
-            if(plans.length === 0){
-                let msg = "<div>Are you sure you want to delete the Bucket ?</div><h3>[ "+ bucket.name +" ]</h3>";
-                let header ="Delete";
-                let acceptLabel = "Delete";
-                let warming = true;
-                this.confirmDialog([msg,header,acceptLabel,warming,"delete"], bucket);
+        this.BucketService.getBucketById(bucket.name).subscribe((res) => {
+            let str = res._body;
+            let x2js = new X2JS();
+            let jsonObj = x2js.xml_str2json(str);
+            let alldir = jsonObj.ListObjectResponse.ListObjects ? jsonObj.ListObjectResponse.ListObjects :[] ;
+            if(alldir.length === 0){
+                this.http.get(`v1/{project_id}/plans?bucketname=${bucket.name}`).subscribe((res)=>{
+                    let plans = res.json().plans ? res.json().plans : [];
+                    let planNames = plans.map((item)=> item.name);
+                    if(plans.length === 0){
+                        let msg = "<div>Are you sure you want to delete the Bucket ?</div><h3>[ "+ bucket.name +" ]</h3>";
+                        let header ="Delete";
+                        let acceptLabel = "Delete";
+                        let warming = true;
+                        this.confirmDialog([msg,header,acceptLabel,warming,"delete"], bucket);
+                    }else{
+                        let msg = `<div>The bucket has created the following migration task, 
+                        and removing the bucket will remove the migration task at the same time.</div>
+                        <h5>[${planNames}]</h5>
+                        <div>Are you sure you want to delete the Bucket?</div>
+                        <h3>[${bucket.name}]</h3>
+                        `;
+                        let header ="Delete";
+                        let acceptLabel = "Delete";
+                        let warming = true;
+                        this.confirmDialog([msg,header,acceptLabel,warming,"delete"], bucket,plans);
+                    }
+                });
             }else{
-                let msg = `<div>The bucket has created the following migration task, 
-                and removing the bucket will remove the migration task at the same time.</div>
-                <h5>[${planNames}]</h5>
-                <div>Are you sure you want to delete the Bucket?</div>
-                <h3>[${bucket.name}]</h3>
-                `;
-                let header ="Delete";
-                let acceptLabel = "Delete";
-                let warming = true;
-                this.confirmDialog([msg,header,acceptLabel,warming,"delete"], bucket,plans);
+                this.msg.info("The backend cannot be deleted. please delete objects first");
             }
-        });
-
-        
+          });
     }
     configLife(bucket){
         this.showLife = true;

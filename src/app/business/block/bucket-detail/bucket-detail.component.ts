@@ -19,6 +19,10 @@ declare let X2JS:any;
   providers: [ConfirmationService, MsgBoxService],
 })
 export class BucketDetailComponent implements OnInit {
+  colon = ":";
+  folderShowErrorMsg = false;
+  folderId = "";
+  backetUrl;
   isUpload = window['isUpload'];
   selectFile;
   label;
@@ -44,7 +48,8 @@ export class BucketDetailComponent implements OnInit {
   UPLOAD_UPPER_LIMIT = 1024*1024*1024*2;
   errorMessage = {
     "backend_type": { required: "Type is required." },
-    "backend": { required: "Backend is required." }
+    "backend": { required: "Backend is required." },
+    "name": {required: "name is required."}
   };
   uploadForm :FormGroup;
   files;
@@ -73,13 +78,44 @@ export class BucketDetailComponent implements OnInit {
       this.bucketId = params.bucketId;
       this.items.push({
         label: this.bucketId,
-        url: ["bucketDetail", this.bucketId],
+        url: ["/" + this.bucketId],
       });
+      this.backetUrl = this.bucketId;
       this.getAlldir();
       this.allTypes = [];
       this.getTypes();
     }
     );
+  }
+  //Click on folder
+  folderLink(file){
+    let folderKey = file.ObjectKey;
+    if(this.folderId == ""){
+      this.folderId = folderKey;
+    }else{
+      this.folderId = this.folderId + folderKey;
+    }
+    this.items.push({
+      label: folderKey.slice(0,folderKey.lastIndexOf(this.colon)),
+      url: [this.colon + this.folderId],
+    })
+    this.getAlldir();
+  }
+  //Click on folder navigation
+  navigateClick(itemUrl){
+    this.items.forEach((item,index)=>{
+      if(item.url[0] == itemUrl[0]){
+        this.items = this.items.slice(0, index+1);
+      }
+    })
+    let newLength = this.items.length-1;
+    this.backetUrl = this.items[newLength].url[0].slice(1);
+    if(itemUrl[0].slice(1) == this.bucketId){
+      this.folderId = "";
+    }else{
+      this.folderId = this.backetUrl;
+    }
+    this.getAlldir();
   }
   getAlldir(){
     this.selectedDir = [];
@@ -93,10 +129,80 @@ export class BucketDetailComponent implements OnInit {
       }else if(Object.prototype.toString.call(alldir) === "[object Object]"){
           this.allDir = [alldir];
       }
+      //The depth of the clone
+      let backupAllDir = JSON.parse( JSON.stringify( this.allDir ) );;
+      //Data in folder
+      if(this.folderId !=""){
+        if(!this.folderId.endsWith(this.colon)){
+          this.folderId = this.folderId + this.colon;
+        }
+        this.allDir = this.allDir.filter(arr=>{
+          let folderContain = false;
+          if(arr.ObjectKey.substring(0,this.folderId.length) == this.folderId && arr.ObjectKey.length > this.folderId.length){
+            // The number of occurrences of ":" in the folder
+            let folderNum = (this.folderId.split(this.colon)).length-1;
+            let ObjectKeyNum = (arr.ObjectKey.split(this.colon)).length-1;
+            if(folderNum == ObjectKeyNum){
+              //Identify the file in the folder
+              folderContain = true;
+            }else if(ObjectKeyNum == folderNum + 1){
+              //Identify folders within folders
+              let lastNum = arr.ObjectKey.lastIndexOf(this.colon);
+              if(lastNum == arr.ObjectKey.length -1){
+                folderContain = true;
+              }
+            }
+          }
+          return folderContain;
+        })
+        this.allDir.forEach(val=>{
+          val.ObjectKey = val.ObjectKey.slice(this.folderId.length);
+        })
+      }else{
+        //Distinguish between folders and files at the first level
+        this.allDir = this.allDir.filter(item=>{
+          let folderIndex = false;
+          if(item.ObjectKey.indexOf(this.colon) !=-1){
+            let index;
+            index = item.ObjectKey.indexOf(this.colon,index);
+            //Distinguish between folders and files in folders
+            if(index == item.ObjectKey.length-1){
+              folderIndex = true;
+            }
+          }
+          return item.ObjectKey.indexOf(this.colon) ==-1 || folderIndex;
+        })
+      }
+      let folderArray = [];
       this.allDir.forEach(item=>{
         item.size = Utils.getDisplayCapacity(item.Size,2,'KB');
         item.lastModified = Utils.formatDate(item.LastModified);
-      });
+        if(item.ObjectKey.indexOf(this.colon) !=-1){
+          item.objectName = item.ObjectKey.slice(0,item.ObjectKey.lastIndexOf(this.colon));
+          item.newFolder = true;
+          item.disabled = false;
+          backupAllDir.forEach(arr=>{
+            if(this.folderId !=""){
+              let hasFolder = arr.ObjectKey.indexOf(this.folderId) !=-1 && arr.ObjectKey != this.folderId;
+              if( hasFolder){
+                let newArrKey = arr.ObjectKey.slice(this.folderId.length);
+                if(newArrKey.slice(0,item.ObjectKey.length) == item.ObjectKey && newArrKey != item.ObjectKey){
+                  item.disabled = true
+                }
+              }
+            }else{
+              let hasFile = arr.ObjectKey.indexOf(item.ObjectKey) !=-1 && arr.ObjectKey != item.ObjectKey;
+              if(hasFile && arr.ObjectKey.slice(0,item.ObjectKey.length) == item.ObjectKey){
+                item.disabled = true
+              }
+            }
+          })
+        }else{
+          item.objectName = item.ObjectKey;
+          item.newFolder = false;
+          item.disabled = false;
+        }
+      })
     });
   }
   getTypes() {
@@ -138,14 +244,25 @@ export class BucketDetailComponent implements OnInit {
     }
   }
 
-  configUpload(){
-    this.showErrorMsg = false;
-    this.uploadDisplay = true;
-    this.showBackend = false;
-    this.uploadForm.reset();
-    this.selectedSpecify = [];
-    this.files = '';
-    this.selectFile = '';
+  configUpload(from){
+    switch(from){
+      case 'fromFolder':
+        this.folderShowErrorMsg = false;
+        this.createFolderForm.reset();
+        this.showCreateFolder = true;
+        let user =document.getElementById("folder");
+        break;
+      case 'upload':
+        this.showErrorMsg = false;
+        this.uploadDisplay = true;
+        this.showBackend = false;
+        this.uploadForm.reset();
+        this.selectedSpecify = [];
+        this.files = '';
+        this.selectFile = '';
+      break;
+    }
+    
   }
 
   uploadFile() {
@@ -175,7 +292,7 @@ export class BucketDetailComponent implements OnInit {
       this.msg.info("Uploading files larger than 2GB is not supported");
       this.isUpload = false;
     }else{
-      window['startUpload'](this.selectFile, this.bucketId, options, ()=>{
+      window['startUpload'](this.selectFile, this.bucketId, options,this.folderId, ()=>{
         this.isUpload = false;
         this.getAlldir();
       });
@@ -189,7 +306,13 @@ export class BucketDetailComponent implements OnInit {
       },
       responseType: 'arraybuffer' as 'arraybuffer'
     }
-    this.httpClient.get(`v1/s3/${this.bucketId}/${file.ObjectKey}`, options).subscribe((res)=>{
+    let fileObjectKey;
+    if(this.folderId !=""){
+      fileObjectKey = this.folderId + file.ObjectKey;
+    }else{
+    	fileObjectKey = file.ObjectKey;
+    }
+    this.httpClient.get(`v1/s3/${this.bucketId}/${fileObjectKey}`, options).subscribe((res)=>{
       let blob = new Blob([res]);
       if (typeof window.navigator.msSaveBlob !== 'undefined') {  
           window.navigator.msSaveBlob(blob, file.ObjectKey);
@@ -219,6 +342,14 @@ export class BucketDetailComponent implements OnInit {
         break;
     }
   }
+  //Gets the name of the folder
+  folderNameOnChanged(folder){
+    if(folder.value.name){
+      let name = folder.value.name;
+      this.createFolderForm.value.name = name;
+      this.folderShowErrorMsg = false;
+    }
+  }
   createFolder(){
     if(!this.createFolderForm.valid){
       for(let i in this.createFolderForm.controls){
@@ -226,7 +357,18 @@ export class BucketDetailComponent implements OnInit {
       }
       return;
     }
-    this.BucketService.uploadFile(this.bucketId+'/test/').subscribe((res) => {
+    let folderFormName = this.createFolderForm.value.name;
+    if(folderFormName.indexOf("/") !=-1||folderFormName.indexOf(this.colon)!=-1){
+      this.folderShowErrorMsg = true;
+      return;
+    }
+    let folderName;
+    if(this.folderId !=""){
+      folderName = this.folderId + this.createFolderForm.value.name + this.colon;
+    }else{
+      folderName = this.createFolderForm.value.name + this.colon;
+    }
+    this.BucketService.uploadFile(this.bucketId+ '/' +folderName ).subscribe((res) => {
       this.showCreateFolder = false;
       this.getAlldir();
     });
@@ -257,6 +399,10 @@ export class BucketDetailComponent implements OnInit {
                 switch(func){
                   case "delete":
                     let objectKey = file.ObjectKey;
+                    //If you want to delete files from a folder, you must include the name of the folder
+                    if(this.folderId !=""){
+                      objectKey = this.folderId + objectKey;
+                    }
                     this.BucketService.deleteFile(`/${this.bucketId}/${objectKey}`).subscribe((res) => {
                         this.getAlldir();
                     });
@@ -264,6 +410,10 @@ export class BucketDetailComponent implements OnInit {
                   case "deleteMilti":
                    file.forEach(element => {
                       let objectKey = element.ObjectKey;
+                      //If you want to delete files from a folder, you must include the name of the folder
+                      if(this.folderId !=""){
+                        objectKey = this.folderId + objectKey;
+                      }
                       this.BucketService.deleteFile(`/${this.bucketId}/${objectKey}`).subscribe((res) => {
                         this.getAlldir();
                       });
