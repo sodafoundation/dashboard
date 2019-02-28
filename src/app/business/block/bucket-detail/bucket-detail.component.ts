@@ -19,7 +19,7 @@ declare let X2JS:any;
   providers: [ConfirmationService, MsgBoxService],
 })
 export class BucketDetailComponent implements OnInit {
-  colon = ":";
+  colon = "/";
   folderShowErrorMsg = false;
   folderId = "";
   backetUrl;
@@ -181,6 +181,7 @@ export class BucketDetailComponent implements OnInit {
           item.objectName = item.ObjectKey.slice(0,item.ObjectKey.lastIndexOf(this.colon));
           item.newFolder = true;
           item.disabled = false;
+          item.size = "--";
           backupAllDir.forEach(arr=>{
             if(this.folderId !=""){
               let hasFolder = arr.ObjectKey.indexOf(this.folderId) !=-1 && arr.ObjectKey != this.folderId;
@@ -381,7 +382,13 @@ export class BucketDetailComponent implements OnInit {
     this.confirmDialog([msg,header,acceptLabel,warming,"deleteMilti"],this.selectedDir);
   }
   deleteFile(file){
-    let msg = "<div>Are you sure you want to delete the File ?</div><h3>[ "+ file.ObjectKey +" ]</h3>";
+    let fileObjectKey;
+    if(file.ObjectKey.indexOf(this.colon) !=-1){
+      fileObjectKey = file.ObjectKey.slice(0,file.ObjectKey.length-1);
+    }else{
+      fileObjectKey = file.ObjectKey;
+    }
+    let msg = "<div>Are you sure you want to delete the File ?</div><h3>[ "+ fileObjectKey +" ]</h3>";
     let header ="Delete";
     let acceptLabel = "Delete";
     let warming = true;
