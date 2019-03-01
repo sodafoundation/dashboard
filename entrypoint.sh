@@ -16,7 +16,7 @@
 
 OPENSDS_HOST_IP=${OPENSDS_HOST_IP:-127.0.0.1}
 LISTEN_PORT=${LISTEN_PORT:-8088}
-cat > /etc/nginx/sites-available/default <<EOF
+cat > /etc/nginx/conf.d/default.conf <<EOF
     server {
         listen $LISTEN_PORT default_server;
         listen [::]:$LISTEN_PORT default_server;
@@ -38,4 +38,4 @@ cat > /etc/nginx/sites-available/default <<EOF
     }
 EOF
 
-/usr/sbin/nginx -g "daemon off;"
+/usr/sbin/nginx -g "pid /tmp/nginx.pid; daemon off;"
