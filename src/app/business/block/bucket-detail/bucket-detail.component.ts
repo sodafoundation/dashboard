@@ -25,6 +25,7 @@ export class BucketDetailComponent implements OnInit {
   backetUrl;
   isUpload = window['isUpload'];
   selectFile;
+  selectFileName;
   label;
   uploadFileDispaly:boolean = false;
   buketName:string="";
@@ -240,6 +241,7 @@ export class BucketDetailComponent implements OnInit {
     if(event.target.files[0]){
       let file = event.target.files[0];
       this.selectFile = file;
+      this.selectFileName = this.selectFile.name;
       this.showErrorMsg = false;
       this.files = file;
     }
@@ -261,6 +263,7 @@ export class BucketDetailComponent implements OnInit {
         this.selectedSpecify = [];
         this.files = '';
         this.selectFile = '';
+        this.selectFileName = '';
       break;
     }
     

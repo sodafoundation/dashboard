@@ -47,7 +47,7 @@
                 <input type="file" placeholder="Select File" (change)="selectedFileOnChanged($event)" />
                 <span>Select File</span>
             </div>
-            <span class="file-name">{{selectFile ? selectFile.name : ''}}</span>
+            <span class="file-name">{{selectFileName}}</span>
             <div class="ui-message-container" *ngIf="showErrorMsg">
                     <div class="ui-message ui-message-error ui-corner-all">
                         <i class="fa fa-exclamation-circle" ></i>
