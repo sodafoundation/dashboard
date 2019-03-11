@@ -1,0 +1,33 @@
+<div class="content-header">
+    <div style="font-size: 0.3rem;line-height: 50px;color: #657D95;">AK/SK Management</div>
+    <div style="color: #657D95;line-height: 20px;">Access Key ID/Secret Access Key (AK/SK) are used to access object storage services that are 
+        compatible with Amazan S3 interface. Replace them regularty and keep them secure. A maximum of 
+        two AK/SKs can be created for each user in one project.
+    </div>
+    <div class="table-toolbar" style="margin-top: 25px;">
+        <div class="left">
+            <button type="button" class="ui-button-secondary" [disabled]="canAddKey" pButton (click)="addKey()" label="Add Security Key" ></button>
+        </div>
+    </div>
+    <p-dataTable [value]="akSkDetail">
+        <p-column field="access" header="Access Key ID" ></p-column>
+        <p-column header="{{I18N.keyID['sds_block_volume_operation']}}" [style]="{'width':'140px'}">
+            <ng-template pTemplate="body" let-aksk="rowData" let-i="rowIndex">
+                <a (click)="DeleteKey(aksk)">Delete</a>
+            </ng-template>
+        </p-column>
+    </p-dataTable>
+    <p-dialog  header="create Security Key" [(visible)]="addAkSkFlag" [width]="800" modal="modal">
+        <div style="margin-bottom: 15px;">Access Key ID and Private access key create successfully.</div>
+        <div style="margin-bottom: 15px;">Please Download it right now if you will not get the Private access key again.</div>
+        <div style="border:1px solid rgb(197, 193, 193); border-radius: 2px; width:100%; height:90px;">
+            <P style="display: inline-block;">Access Key ID:</P>
+            <p style="display: inline-block;">{{createAkId}}</p>   
+        </div>
+        <p-footer>
+                <button type="submit" class="ui-button-secondary" pButton (click)="downloadAk(credentialId)" label="Download Access Key"></button>
+                <button type="button" pButton (click)="addAkSkFlag=false"  label="close"></button>
+        </p-footer> 
+    </p-dialog>
+    <p-confirmDialog></p-confirmDialog>  
+</div>
