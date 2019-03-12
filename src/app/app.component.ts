@@ -1,17 +1,19 @@
 import { Component, OnInit, ViewContainerRef, ViewChild, Directive, ElementRef, HostBinding, HostListener, AfterViewInit } from '@angular/core';
 import { Http } from '@angular/http';
 import { Router } from '@angular/router';
-import { I18NService, Consts, ParamStorService, MsgBoxService } from 'app/shared/api';
+import { I18NService, Consts, ParamStorService, MsgBoxService, Utils } from 'app/shared/api';
 import { I18nPluralPipe } from '@angular/common';
 import { MenuItem, SelectItem} from './components/common/api';
+import { akSkService } from './business/ak-sk/ak-sk.service';
 
 let d3 = window["d3"];
 declare let X2JS: any;
+let CryptoJS = require("crypto-js");
 
 @Component({
     selector: 'app-root',
     templateUrl: './app.component.html',
-    providers: [MsgBoxService],
+    providers: [MsgBoxService, akSkService],
     styleUrls: []
 })
 export class AppComponent implements OnInit, AfterViewInit {
@@ -50,6 +52,10 @@ export class AppComponent implements OnInit, AfterViewInit {
     fileName: string = "";
 
     tenantItems = [];
+    projectItemId;
+    userId;
+    SignatureKey = {};
+    akSkRouterLink = "/akSkManagement/";
 
     menuItems = [];
 
@@ -115,6 +121,7 @@ export class AppComponent implements OnInit, AfterViewInit {
         private router: Router,
         private paramStor: ParamStorService,
         private msg: MsgBoxService,
+        private akSkService: akSkService,
         public I18N: I18NService
     ) { }
 
@@ -281,6 +288,31 @@ export class AppComponent implements OnInit, AfterViewInit {
         }
         // Global upload end
 
+        //Query the AK/SK list
+        window['getAkSkList'] = (cb)=>{
+            let request: any = { params:{} };
+            request.params = {
+                "userId":this.userId,
+                "type":"ec2"
+            }
+            let options = {
+                headers: {
+                    'X-Auth-Token': localStorage['auth-token']
+                } 
+            }
+            this.akSkService.getAkSkList(request,options).subscribe(res=>{
+                let response = res.json();
+                let detailArr = [];
+                response.credentials.forEach(item=>{
+                    let accessKey = JSON.parse(item.blob);
+                    detailArr.push(accessKey);
+                })
+                window['getParameters'](detailArr);
+                if (cb) {
+                    cb();
+                }
+            })
+        }
         let currentUserInfo = this.paramStor.CURRENT_USER();
         if (currentUserInfo != undefined && currentUserInfo != "") {
             this.hideLoginForm = true;
@@ -307,6 +339,35 @@ export class AppComponent implements OnInit, AfterViewInit {
         this.svg_paths.push(d3.select('#svg_wave_2'));
 
         this.renderWave();
+        
+        window['getParameters'] = (detailArr)=>{
+            let secretAccessKey = detailArr[Math.round(Math.random()*(detailArr.length-1))];
+            this.SignatureKey['secretAccessKey'] = secretAccessKey.secret;
+            //System time is converted to UTC time
+            let offset = new Date().getTimezoneOffset()*60000;
+            let local = new Date().getTime();
+            let utc = local + offset;
+            let utcTime = Utils.formatDate(utc);
+            this.SignatureKey['dateStamp'] = utcTime.substr(0,4) + utcTime.substr(5,2) + utcTime.substr(8,2) + 'T' + utcTime.substr(11,2) + utcTime.substr(14,2)+
+            utcTime.substr(17,2) + 'Z';
+            this.SignatureKey['regionName'] = "default_region";
+            this.SignatureKey['serviceName'] = "s3";
+            this.SignatureKey['AccessKey'] = secretAccessKey.access;
+        }
+        //Calculation of the signature
+        window['getSignatureKey'] = ()=>{
+            let SignatureObject = {};
+            SignatureObject['kSigning'] = window['getkSigning'](this.SignatureKey['secretAccessKey'],this.SignatureKey['dateStamp'],this.SignatureKey['regionName'],this.SignatureKey['serviceName']);
+            SignatureObject['SignatureKey'] = this.SignatureKey;
+            return SignatureObject;
+        }
+        window['getkSigning'] = (key, dateStamp, regionName, serviceName)=>{
+            let kDate = CryptoJS.HmacSHA256(dateStamp, "OPENSDS" + key);
+            let kRegion = CryptoJS.HmacSHA256(regionName, kDate);
+            let kService = CryptoJS.HmacSHA256(serviceName, kRegion);
+            let kSigning = CryptoJS.HmacSHA256("sign_request", kService);
+            return kSigning;
+        } 
     }
     checkTimeOut() {
         this.currentTime = new Date().getTime(); //update current time
@@ -454,8 +515,11 @@ export class AppComponent implements OnInit, AfterViewInit {
             let projects = objRES.json().projects;
             let defaultProject = user.name != 'admin' ? projects[0] : projects.filter((project) => { return project.name == 'admin' })[0];
             let project = tenant === undefined ? defaultProject : tenant;
-
+            this.projectItemId = project.id;
+            this.userId = user.id;
             this.tenantItems = [];
+            this.akSkRouterLink = "/akSkManagement/";
+            this.akSkRouterLink += this.userId + "/" + this.projectItemId;
             projects.map(item => {
                 let tenantItemObj = {};
                 tenantItemObj["label"] = item.name;
@@ -501,6 +565,10 @@ export class AppComponent implements OnInit, AfterViewInit {
                         {
                             label: "Switch Region",
                             items: [{ label: "default_region", command: () => { } }]
+                        },{
+                            label: "AK/SK Management",
+                            routerLink: this.akSkRouterLink,
+                            command: ()=>{}
                         },
                         {
                             label: "Logout",
@@ -517,6 +585,11 @@ export class AppComponent implements OnInit, AfterViewInit {
                         {
                             label: "Switch Tenant",
                             items: this.tenantItems
+                        },
+                        {
+                            label: "AK/SK Management",
+                            routerLink: this.akSkRouterLink,
+                            command: ()=>{}
                         },
                         {
                             label: "Logout",

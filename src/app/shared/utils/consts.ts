@@ -46,6 +46,7 @@ export const Consts = {
         'azure-blob': "Azure Blob Storage",
         'hw-obs': "Huawei OBS",
         'fusionstorage-object': "FusionStorage Object",
-        'ceph-s3': "Ceph S3"
+        'ceph-s3': "Ceph S3",
+        'gcp-s3': "GCP Storage"
     }
 }
