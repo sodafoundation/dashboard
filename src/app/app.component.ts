@@ -288,6 +288,31 @@ export class AppComponent implements OnInit, AfterViewInit {
         }
         // Global upload end
 
+        //Query the AK/SK list
+        window['getAkSkList'] = (cb)=>{
+            let request: any = { params:{} };
+            request.params = {
+                "userId":this.userId,
+                "type":"ec2"
+            }
+            let options = {
+                headers: {
+                    'X-Auth-Token': localStorage['auth-token']
+                } 
+            }
+            this.akSkService.getAkSkList(request,options).subscribe(res=>{
+                let response = res.json();
+                let detailArr = [];
+                response.credentials.forEach(item=>{
+                    let accessKey = JSON.parse(item.blob);
+                    detailArr.push(accessKey);
+                })
+                window['getParameters'](detailArr);
+                if (cb) {
+                    cb();
+                }
+            })
+        }
         let currentUserInfo = this.paramStor.CURRENT_USER();
         if (currentUserInfo != undefined && currentUserInfo != "") {
             this.hideLoginForm = true;
@@ -314,28 +339,7 @@ export class AppComponent implements OnInit, AfterViewInit {
         this.svg_paths.push(d3.select('#svg_wave_2'));
 
         this.renderWave();
-        //Query the AK/SK list
-        window['getAkSkList'] = ()=>{
-            let request: any = { params:{} };
-            request.params = {
-                "userId":this.userId,
-                "type":"ec2"
-            }
-            let options = {
-                headers: {
-                    'X-Auth-Token': localStorage['auth-token']
-                } 
-            }
-            this.akSkService.getAkSkList(request,options).subscribe(res=>{
-                let response = res.json();
-                let detailArr = [];
-                response.credentials.forEach(item=>{
-                    let accessKey = JSON.parse(item.blob);
-                    detailArr.push(accessKey);
-                })
-                window['getParameters'](detailArr);
-            })
-        }
+        
         window['getParameters'] = (detailArr)=>{
             let secretAccessKey = detailArr[Math.round(Math.random()*(detailArr.length-1))];
             this.SignatureKey['secretAccessKey'] = secretAccessKey.secret;
