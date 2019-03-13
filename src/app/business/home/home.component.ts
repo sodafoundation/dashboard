@@ -17,7 +17,7 @@ declare let X2JS:any;
 export class HomeComponent implements OnInit {
     lineData ={};
     lineOption = {};
-    showRgister = false;
+    showRegisterFlag = false;
     allTypes = [];
     showBackends = false;
     allBackends_count={
@@ -236,7 +236,7 @@ export class HomeComponent implements OnInit {
         });
     }
 
-    showBackendsDeatil(type?){
+    showBackendsDetail(type?){
         this.showBackends = true;
         
         if(type){
@@ -278,7 +278,7 @@ export class HomeComponent implements OnInit {
                             this.http.get('v1/{project_id}/backends').subscribe((res)=>{
                                 let backends = res.json().backends ? res.json().backends :[];
                                 this.initBackendsAndNum(backends);
-                                this.showBackendsDeatil(this.selectedType);
+                                this.showBackendsDetail(this.selectedType);
                             });
                         });
                     }
@@ -325,7 +325,7 @@ export class HomeComponent implements OnInit {
         timeout:18000
         };
         this.http.post("v1/{project_id}/backends", param,options).subscribe((res) => {
-            this.showRgister = false;
+            this.showRegisterFlag = false;
             this.http.get('v1/{project_id}/backends').subscribe((res)=>{
                 let backends = res.json().backends ? res.json().backends :[];
                 this.initBackendsAndNum(backends);
@@ -333,7 +333,7 @@ export class HomeComponent implements OnInit {
         });
     }
     showRegister(){
-        this.showRgister = true;
+        this.showRegisterFlag = true;
         this.backendForm.reset();
         this.backendForm.controls['name'].setValidators([Validators.required,Utils.isExisted(this.allBackendNameForCheck)]);
     }
