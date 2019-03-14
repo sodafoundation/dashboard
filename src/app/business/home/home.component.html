@@ -107,25 +107,25 @@
 
 <p-home-dialog header="Register Storage Backend" [(visible)]="showRegisterFlag" [width]="510" [height]="790" modal="modal" [style]="{'opacity':'0.95','right':'46px','top':'80px','background':'rgb(44,63,97)'}" >
         <form [grid]="{label: 'ui-g-5', content:'ui-g-20'}" [formGroup]="backendForm" [errorMessage]="errorMessage">
-            <form-item label="Name" >
+            <form-item label="Name" [required]="true">
                 <input id="name" type="text" name="name" formControlName="name"  pInputText />
             </form-item>
-            <form-item label="Type" >
+            <form-item label="Type" [required]="true">
                 <p-dropdown [style]="{'min-width':'220px'}" placeholder="Please select" formControlName="type" [options]="allTypes"  ></p-dropdown>
             </form-item>
-            <form-item label="Region" >
+            <form-item label="Region" [required]="true">
                 <input id="region" type="text" name="region"  formControlName="region"  pInputText />
             </form-item>
-            <form-item label="Endpoint" >
+            <form-item label="Endpoint" [required]="true">
                 <input id="endpoint" type="text" name="endpoint"  formControlName="endpoint"  pInputText />
             </form-item>
-            <form-item label="Bucket" >
+            <form-item label="Bucket" [required]="true">
                 <input id="bucket" type="text" name="bucket" formControlName="bucket"  placeholder="Bucket name" pInputText />
             </form-item>
-            <form-item label="Access Key" >
+            <form-item label="Access Key" [required]="true">
                 <input id="accessKey" type="text" name="accessKey" formControlName="ak"  pInputText />
             </form-item>
-            <form-item label="Secret Key" >
+            <form-item label="Secret Key" [required]="true">
                 <input id="secretKey" type="text" name="secretKey" formControlName="sk"  pInputText />
             </form-item>
         </form>
