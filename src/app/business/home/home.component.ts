@@ -24,7 +24,8 @@ export class HomeComponent implements OnInit {
         aws:0,
         huaweipri:0,
         huaweipub:0,
-        localBKD:0
+        localBKD:0,
+        ibmcos:0
     }
     counts= {
         volumesCount:0,
@@ -45,6 +46,7 @@ export class HomeComponent implements OnInit {
     @ViewChild("path") path: ElementRef;
     @ViewChild("cloud_aws") c_AWS: ElementRef;
     @ViewChild("cloud_hw") c_HW: ElementRef;
+    @ViewChild("cloud_ibmcos") c_IBMCOS: ElementRef;
     @ViewChild("cloud_hw_p") c_HWP: ElementRef;
     @ViewChild("svgCon") svgCon: ElementRef;
     
@@ -128,7 +130,7 @@ export class HomeComponent implements OnInit {
             that.scaleX = svgConW/240; 
             that.scaleY = 5;
 
-            let clouds = [that.c_AWS.nativeElement, that.c_HW.nativeElement, that.c_HWP.nativeElement];
+            let clouds = [that.c_AWS.nativeElement, that.c_HW.nativeElement, that.c_HWP.nativeElement, that.c_IBMCOS.nativeElement];
             clouds.forEach((item, index) => {
                 let totalLength = that.path.nativeElement.getTotalLength();
                 let point = totalLength/clouds.length * (index+1) + moveX + initPos;
@@ -196,6 +198,7 @@ export class HomeComponent implements OnInit {
         this.allBackends_count.huaweipri = this.Allbackends[this.cloud_type[1]] ? this.Allbackends[Consts.CLOUD_TYPE[1]].length :0;
         this.allBackends_count.huaweipub = this.Allbackends[this.cloud_type[2]] ? this.Allbackends[Consts.CLOUD_TYPE[2]].length :0;
         this.allBackends_count.localBKD = this.Allbackends[this.cloud_type[3]] ? this.Allbackends[Consts.CLOUD_TYPE[3]].length :0 + this.Allbackends[this.cloud_type[4]] ? this.Allbackends[Consts.CLOUD_TYPE[4]].length :0;
+        this.allBackends_count.ibmcos = this.Allbackends[this.cloud_type[5]] ? this.Allbackends[Consts.CLOUD_TYPE[5]].length :0;
     }
 
     getType(){
