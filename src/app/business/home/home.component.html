@@ -8,22 +8,22 @@
                 </g>
             </svg>
             <div (click)="showRegister()" class="ui-home-backend-add">+</div>
-            <div (click)="showBackendsDeatil()" class="cloud-center" >
+            <div (click)="showBackendsDetail()" class="cloud-center" >
                 <div class="ui-home-backend-count">{{allBackends_count.localBKD}}</div>
             </div>
-            <div #cloud_aws class="cloud" (click)="showBackendsDeatil(cloud_type[0])">
+            <div #cloud_aws class="cloud" (click)="showBackendsDetail(cloud_type[0])">
                 <div class="ui-home-backend-count">{{allBackends_count.aws}}</div>
                 <div class="ui-home-backend-logo">
                     <img src="assets/business/images/common/aws.svg" />
                 </div>
             </div>
-            <div #cloud_hw class="cloud" (click)="showBackendsDeatil(cloud_type[1])">
+            <div #cloud_hw class="cloud" (click)="showBackendsDetail(cloud_type[1])">
                 <div class="ui-home-backend-count">{{allBackends_count.huaweipri}}</div>
                 <div class="ui-home-backend-logo">
                     <img src="assets/business/images/common/azure.svg" width="42" />
                 </div>
             </div>            
-            <div #cloud_hw_p class="cloud" (click)="showBackendsDeatil(cloud_type[2])">
+            <div #cloud_hw_p class="cloud" (click)="showBackendsDetail(cloud_type[2])">
                 <div class="ui-home-backend-count">{{allBackends_count.huaweipub}}</div>
                 <div class="ui-home-backend-logo">
                     <img src="assets/business/images/common/huawei.svg" width="32" />
@@ -101,7 +101,7 @@
 </div>
 
 
-<p-home-dialog header="Register Storage Backend" [(visible)]="showRgister" [width]="510" [height]="790" modal="modal" [style]="{'opacity':'0.95','right':'46px','top':'80px','background':'rgb(44,63,97)'}" >
+<p-home-dialog header="Register Storage Backend" [(visible)]="showRegisterFlag" [width]="510" [height]="790" modal="modal" [style]="{'opacity':'0.95','right':'46px','top':'80px','background':'rgb(44,63,97)'}" >
         <form [grid]="{label: 'ui-g-5', content:'ui-g-20'}" [formGroup]="backendForm" [errorMessage]="errorMessage">
             <form-item label="Name" >
                 <input id="name" type="text" name="name" formControlName="name"  pInputText />
