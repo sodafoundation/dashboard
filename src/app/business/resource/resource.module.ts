@@ -4,13 +4,6 @@ import { ResourceComponent } from './resource.component';
 import { RouterModule } from '@angular/router';
 import { TabViewModule, ButtonModule, DataTableModule, InputTextModule } from './../../components/common/api';
 
-
-import { RegionModule } from './region/region.module';
-
-import { ZoneModule } from './zone/zone.module';
-
-import { StorageModule } from './storage/storage.module';
-
 let routers = [{
   path: '',
   component: ResourceComponent
@@ -27,9 +20,6 @@ let routers = [{
     ButtonModule,
     DataTableModule,
     InputTextModule,
-    RegionModule,
-    ZoneModule,
-    StorageModule
   ],
   providers: []
 })

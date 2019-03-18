@@ -1,7 +1,7 @@
 <div>
     <div class="custom-breadcrumb">
         <span *ngFor="let item of items; index as i">
-          <a [ngClass]="{'font-color-class': i===0}" [routerLink]="[item.url]">{{item.label}}</a>
+          <a [ngClass]="{'font-color-class': i===0}" [routerLink]="[item.url,'fromVolume']">{{item.label}}</a>
           <span *ngIf="(i+1) !== items.length">></span>
         </span>
     </div>
