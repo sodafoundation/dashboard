@@ -70,6 +70,7 @@ export class CreateVolumeComponent implements OnInit {
         label: null,
         value: {id:null,profileName:null}
     };
+    allVolumeNameForCheck = [];
   constructor(
     private router: Router,
     private fb: FormBuilder,
@@ -83,7 +84,7 @@ export class CreateVolumeComponent implements OnInit {
   ngOnInit() {
     this.getAZ();
     this.getProfiles();
-
+    this.getAllVolumeNames();
     this.capacityUnit = [
       {
         label: 'GB', value: 'GB'
@@ -94,7 +95,7 @@ export class CreateVolumeComponent implements OnInit {
     ];
     this.volumeform = this.fb.group({
       'zone': new FormControl('', Validators.required),
-      'name0': new FormControl('', {validators:[Validators.required,Validators.pattern(this.validRule.name)]}),
+      'name0': new FormControl('', {validators:[Validators.required,Validators.pattern(this.validRule.name),Utils.isExisted(this.allVolumeNameForCheck)]}),
       'profileId0': new FormControl(this.defaultProfile, {validators:[Validators.required,this.checkProfile]}),
       'size0': new FormControl(1, Validators.required),
       'capacity0': new FormControl(''),
@@ -109,7 +110,15 @@ export class CreateVolumeComponent implements OnInit {
       this.createVolumes = this.getVolumesDataArray(this.volumeform.value);
       this.setRepForm();
   }
-
+  getAllVolumeNames(){
+    this.allVolumeNameForCheck = [];
+    this.VolumeService.getVolumes().subscribe((res)=>{
+        let volumes = res.json();
+            volumes.forEach(item=>{
+                this.allVolumeNameForCheck.push(item.name);
+            })
+    })
+  }
   addVolumeItem() {
     this.volumeItems.push(
       this.volumeItems[this.volumeItems.length-1] + 1
