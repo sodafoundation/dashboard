@@ -1721,11 +1721,9 @@ a {
             display: none;
 
             .ui-home-backend-logo{
-                width: 40px;
-                height: auto;
                 position: absolute;
-                left: 35%;
-                top: 40%;
+                left: 25%;
+                top: 10%;
             }
         }
         .cloud-hw-p{
@@ -1740,11 +1738,9 @@ a {
             background-position: center bottom;
             cursor: pointer;
             .ui-home-backend-logo{
-                width: 32px;
-                height: auto;
                 position: absolute;
-                left: 35%;
-                top: 35%;
+                left: 25%;
+                top: 10%;
             }
         }
         .cloud-hw{
@@ -1759,11 +1755,9 @@ a {
             background-position: center bottom;
             cursor: pointer;
             .ui-home-backend-logo{
-                width: 42px;
-                height: auto;
                 position: absolute;
-                left: 30%;
-                top: 30%;
+                left: 25%;
+                top: 10%;
             }
         }
         .ui-home-backend-count{
@@ -1778,6 +1772,11 @@ a {
             text-align: center;
             font-size: 1.6em;
         }
+        .ui-home-backend-name{
+            color: #ffffff;
+            padding-top: 76px;
+        }
+        
         .ui-home-backend-add{
             width: 48px;
             height: 48px;
