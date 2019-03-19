@@ -232,6 +232,7 @@ export class BucketDetailComponent implements OnInit {
     this.kDate + ",Signature=" + this.kSigning;
     options['headers'] = new Headers();
     options.headers.set('Authorization', this.Signature);
+    options.headers.set('X-Auth-Date', this.kDate);
     return options;  
   }
   getTypes() {
@@ -336,7 +337,8 @@ export class BucketDetailComponent implements OnInit {
       options = {
         headers: {
           'X-Auth-Token': localStorage['auth-token'],
-          'Authorization': this.Signature
+          'Authorization': this.Signature,
+          'X-Auth-Date': this.kDate
         },
         responseType: 'arraybuffer' as 'arraybuffer'
       }

@@ -57,6 +57,7 @@ export class AppComponent implements OnInit, AfterViewInit {
     SignatureKey = {};
     akSkRouterLink = "/akSkManagement/";
     Signature = "";
+    kDate = "";
 
     menuItems = [];
 
@@ -154,7 +155,8 @@ export class AppComponent implements OnInit, AfterViewInit {
                 //first step get uploadId
                 window['getAkSkList'](()=>{
                     this.getSignature();
-                    options.headers.set('Authorization', this.Signature); 
+                    options.headers.set('Authorization', this.Signature);
+                    options.headers.set('X-Auth-Date', this.kDate);
                     this.http.put('/v1/s3/'+ bucketId + '/' + this.selectFileName + "?uploads", '', options).subscribe((res) => {
                         let str = res['_body'];
                         let x2js = new X2JS();
@@ -187,6 +189,7 @@ export class AppComponent implements OnInit, AfterViewInit {
             window['getAkSkList'](()=>{
                 this.getSignature();
                 options.headers.set('Authorization', this.Signature);
+                options.headers.set('X-Auth-Date', this.kDate);
                 this.http.put('/v1/s3/'+ bucketId + '/' + this.selectFileName, selectFile, options).subscribe((res) => {
                     this.showPrompt = false;
                     window['isUpload'] = false;
@@ -350,6 +353,7 @@ export class AppComponent implements OnInit, AfterViewInit {
         this.renderWave();
         
         window['getParameters'] = (detailArr)=>{
+            this.SignatureKey = [];
             let secretAccessKey = detailArr[Math.round(Math.random()*(detailArr.length-1))];
             this.SignatureKey['secretAccessKey'] = secretAccessKey.secret;
             //System time is converted to UTC time
@@ -382,13 +386,13 @@ export class AppComponent implements OnInit, AfterViewInit {
     getSignature(){
         let SignatureObjectwindow = window['getSignatureKey']();
         let kAccessKey = SignatureObjectwindow.SignatureKey.AccessKey;
-        let kDate = SignatureObjectwindow.SignatureKey.dateStamp;
+        this.kDate = SignatureObjectwindow.SignatureKey.dateStamp;
         let kRegion = SignatureObjectwindow.SignatureKey.regionName;
         let kService = SignatureObjectwindow.SignatureKey.serviceName;
         let kSigning = SignatureObjectwindow.kSigning;
-        let Credential = kAccessKey + '/' + kDate.substr(0,8) + '/' + kRegion + '/' + kService + '/' + 'sign_request';
+        let Credential = kAccessKey + '/' + this.kDate.substr(0,8) + '/' + kRegion + '/' + kService + '/' + 'sign_request';
         this.Signature = 'OPENSDS-HMAC-SHA256' + ' Credential=' + Credential + ',SignedHeaders=host;X-Auth-Date:' + 
-        kDate + ",Signature=" + kSigning;
+        this.kDate + ",Signature=" + kSigning;
     }
     checkTimeOut() {
         this.currentTime = new Date().getTime(); //update current time

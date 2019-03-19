@@ -207,6 +207,7 @@ export class BucketsComponent implements OnInit{
         this.kDate + ",Signature=" + this.kSigning;
         options['headers'] = new Headers();
         options.headers.set('Authorization', this.Signature);
+        options.headers.set('X-Auth-Date', this.kDate);
         return options;  
     }
     initBucket2backendAnd2Type(){

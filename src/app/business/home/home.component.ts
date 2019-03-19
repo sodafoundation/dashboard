@@ -193,6 +193,7 @@ export class HomeComponent implements OnInit {
         kDate + ",Signature=" + kSigning;
         options['headers'] = new Headers();
         options.headers.set('Authorization', Signature);
+        options.headers.set('X-Auth-Date', kDate);
         return options;  
     }
 

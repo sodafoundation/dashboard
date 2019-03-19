@@ -108,6 +108,7 @@ export class MigrationListComponent implements OnInit {
             let options: any = {};
             options['headers'] = new Headers();
             options.headers.set('Authorization', Signature);
+            options.headers.set('X-Auth-Date', kDate);
             this.BucketService.getBuckets(options).subscribe((res) => {
                 let str = res._body;
                 let x2js = new X2JS();
