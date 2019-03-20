@@ -14,25 +14,37 @@
             <div #cloud_aws class="cloud" (click)="showBackendsDetail(cloud_type[0])">
                 <div class="ui-home-backend-count">{{allBackends_count.aws}}</div>
                 <div class="ui-home-backend-logo">
-                    <img src="assets/business/images/common/aws.svg" />
+                    <img src="assets/business/images/common/aws.svg" width="64px"/>
+                </div>
+                <div class="ui-home-backend-name">
+                    <span>Amazon S3</span>
                 </div>
             </div>
             <div #cloud_hw class="cloud" (click)="showBackendsDetail(cloud_type[1])">
                 <div class="ui-home-backend-count">{{allBackends_count.huaweipri}}</div>
                 <div class="ui-home-backend-logo">
-                    <img src="assets/business/images/common/azure.svg" width="42" />
+                    <img src="assets/business/images/common/azure.svg"  width="64px"/>
+                </div>
+                <div class="ui-home-backend-name">
+                    <span>Azure Storage</span>
                 </div>
             </div>            
             <div #cloud_hw_p class="cloud" (click)="showBackendsDetail(cloud_type[2])">
                 <div class="ui-home-backend-count">{{allBackends_count.huaweipub}}</div>
                 <div class="ui-home-backend-logo">
-                    <img src="assets/business/images/common/huawei.svg" width="32" />
+                    <img src="assets/business/images/common/huawei.svg"  width="64px"/>
+                </div>
+                <div class="ui-home-backend-name">
+                    <span>Huawei</span>
                 </div>
             </div>
             <div #cloud_ibmcos class="cloud" (click)="showBackendsDetail(cloud_type[5])">
                 <div class="ui-home-backend-count">{{allBackends_count.ibmcos}}</div>
                 <div class="ui-home-backend-logo">
-                    <img src="assets/business/images/common/ibmcos.svg" width="32" />
+                    <img src="assets/business/images/common/ibm.svg"  width="64px"/>
+                </div>
+                <div class="ui-home-backend-name">
+                    <span>IBM COS</span>
                 </div>
             </div>
         </div>
