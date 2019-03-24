@@ -341,6 +341,7 @@ export class AppComponent implements OnInit, AfterViewInit {
         this.renderWave();
         
         window['getParameters'] = (detailArr)=>{
+			this.SignatureKey = [];
             let secretAccessKey = detailArr[Math.round(Math.random()*(detailArr.length-1))];
             this.SignatureKey['secretAccessKey'] = secretAccessKey.secret;
             //System time is converted to UTC time
@@ -568,7 +569,9 @@ export class AppComponent implements OnInit, AfterViewInit {
                         },{
                             label: "AK/SK Management",
                             routerLink: this.akSkRouterLink,
-                            command: ()=>{}
+                            command: ()=>{
+                                this.isHomePage = false;
+                            }									
                         },
                         {
                             label: "Logout",
@@ -589,8 +592,10 @@ export class AppComponent implements OnInit, AfterViewInit {
                         {
                             label: "AK/SK Management",
                             routerLink: this.akSkRouterLink,
-                            command: ()=>{}
-                        },
+                            command: ()=>{
+                                this.isHomePage = false;
+                            }
+						},
                         {
                             label: "Logout",
                             command: () => { this.logout() }

@@ -20,7 +20,6 @@ declare let X2JS:any;
 })
 export class BucketDetailComponent implements OnInit {
   colon = "/";
-  folderShowErrorMsg = false;
   folderId = "";
   backetUrl;
   isUpload = window['isUpload'];
@@ -50,7 +49,10 @@ export class BucketDetailComponent implements OnInit {
   errorMessage = {
     "backend_type": { required: "Type is required." },
     "backend": { required: "Backend is required." },
-    "name": {required: "name is required."}
+    "name": {
+      required: "name is required.",
+      pattern: "Folder names cannot contain the following names/:"
+    }
   };
   uploadForm :FormGroup;
   files;
@@ -66,7 +68,7 @@ export class BucketDetailComponent implements OnInit {
   ) 
   {
     this.createFolderForm = this.fb.group({
-      "name": ['', Validators.required]
+      "name": ["",{validators:[Validators.required,Validators.pattern(/^((?!\/|:).)*$/)], updateOn:'change'}]
     });
     this.uploadForm = this.fb.group({
         "backend":["",{validators:[Validators.required], updateOn:'change'}],
@@ -250,7 +252,6 @@ export class BucketDetailComponent implements OnInit {
   configUpload(from){
     switch(from){
       case 'fromFolder':
-        this.folderShowErrorMsg = false;
         this.createFolderForm.reset();
         this.showCreateFolder = true;
         let user =document.getElementById("folder");
@@ -351,7 +352,6 @@ export class BucketDetailComponent implements OnInit {
     if(folder.value.name){
       let name = folder.value.name;
       this.createFolderForm.value.name = name;
-      this.folderShowErrorMsg = false;
     }
   }
   createFolder(){
@@ -359,11 +359,6 @@ export class BucketDetailComponent implements OnInit {
       for(let i in this.createFolderForm.controls){
           this.createFolderForm.controls[i].markAsTouched();
       }
-      return;
-    }
-    let folderFormName = this.createFolderForm.value.name;
-    if(folderFormName.indexOf("/") !=-1||folderFormName.indexOf(this.colon)!=-1){
-      this.folderShowErrorMsg = true;
       return;
     }
     let folderName;

@@ -77,14 +77,6 @@
             <form [grid]="{label: 'ui-g-3', content:'ui-g-20'}" [formGroup]="createFolderForm" [errorMessage]="errorMessage">
                 <form-item label="Folder Name" [required]="true">
                     <input id="folder" type="text" pInputText formControlName="name" (change)="folderNameOnChanged(createFolderForm)"/>
-                    <div class="ui-message-container" *ngIf="folderShowErrorMsg">
-                            <div class="ui-message ui-message-error ui-corner-all">
-                                <i class="fa fa-exclamation-circle" ></i>
-                                <span class="ui-message-error-text">
-                                        Folder names cannot contain the following names/:
-                                </span>
-                            </div>
-                        </div>
                 </form-item>
             </form>
             <p-footer>
