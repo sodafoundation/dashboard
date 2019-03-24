@@ -69,3 +69,5 @@ export class BucketService {
     return this.http.get('v1/{project_id}/backends?type=' + typeId);
   }
 }
+
+
