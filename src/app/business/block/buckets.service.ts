@@ -12,13 +12,13 @@ export class BucketService {
   url = 'v1/s3';
 
   //Create bucket
-  createBucket(name,param?,options?) {
-    return this.http.put(this.url+"/"+name,param,options);
+  createBucket(name,param?) {
+    return this.http.put(this.url+"/"+name,param);
   }
 
   //Upload file
-  uploadFile(bucketName,param?,options?) {
-    return this.http.put(this.url+`/${bucketName}`,param,options);
+  uploadFile(bucketName,param?,option?) {
+    return this.http.put(this.url+`/${bucketName}`, param,option);
   }
 
   //Save to db
@@ -33,20 +33,20 @@ export class BucketService {
   }
 
   //Delete Bucket
-  deleteBucket(name,options): Observable<any> {
+  deleteBucket(name): Observable<any> {
     let deleteUrl = this.url + '/' + name
-    return this.http.delete(deleteUrl,options);
+    return this.http.delete(deleteUrl);
   }
 
   //Search all Buckets
-  getBuckets(options): Observable<any> {
-    return this.http.get(this.url,options);
+  getBuckets(): Observable<any> {
+    return this.http.get(this.url);
   }
 
   //Search Bucket
-  getBucketById(id,options): Observable<any> {
+  getBucketById(id): Observable<any> {
     let url = this.url + '/' + id;
-    return this.http.get(url,options);
+    return this.http.get(url);
   }
 
   getBckends(): Observable<any> {
@@ -57,8 +57,8 @@ export class BucketService {
     return this.http.get('v1beta/{project_id}/file?bucket_id=' + bucketId);
   }
 
-  deleteFile(fileId,options) : Observable<any> {
-    return this.http.delete(this.url + fileId,options);
+  deleteFile(fileId) : Observable<any> {
+    return this.http.delete(this.url + fileId);
   }
 
   getTypes() : Observable<any> {
@@ -69,5 +69,3 @@ export class BucketService {
     return this.http.get('v1/{project_id}/backends?type=' + typeId);
   }
 }
-
-
