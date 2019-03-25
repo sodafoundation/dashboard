@@ -56,6 +56,8 @@ export class AppComponent implements OnInit, AfterViewInit {
     userId;
     SignatureKey = {};
     akSkRouterLink = "/akSkManagement/";
+    Signature = "";
+    kDate = "";
 
     menuItems = [];
 
@@ -151,59 +153,69 @@ export class AppComponent implements OnInit, AfterViewInit {
             
             if (selectFile['size'] > Consts.BYTES_PER_CHUNK) {
                 //first step get uploadId
-                this.http.put('/v1/s3/'+ bucketId + '/' + this.selectFileName + "?uploads", '', options).subscribe((res) => {
-                    let str = res['_body'];
-                    let x2js = new X2JS();
-                    let jsonObj = x2js.xml_str2json(str);
-                    let uploadId = jsonObj.InitiateMultipartUploadResult.UploadId;
-                    // second step part upload
-                    
-                    window['uploadPart'](selectFile, uploadId, bucketId, options, cb);
+                window['getAkSkList'](()=>{
+                    this.getSignature();
+                    options.headers.set('Authorization', this.Signature);
+                    options.headers.set('X-Auth-Date', this.kDate);
+                    this.http.put('/v1/s3/'+ bucketId + '/' + this.selectFileName + "?uploads", '', options).subscribe((res) => {
+                        let str = res['_body'];
+                        let x2js = new X2JS();
+                        let jsonObj = x2js.xml_str2json(str);
+                        let uploadId = jsonObj.InitiateMultipartUploadResult.UploadId;
+                        // second step part upload
+                        
+                        window['uploadPart'](selectFile, uploadId, bucketId, options, cb);
+                    },
+                    (error)=>{
+                        if(uploadNum < 5){
+                            window['startUpload'] (selectFile, bucketId, options,folderId, cb);
+                            uploadNum++;
+                        }else{
+                            uploadNum = 0;
+                            this.showPrompt = false;
+                            window['isUpload'] = false;
+                            this.msg.error("Upload failed. The network may be unstable. Please try again later.");
+                            if (cb) {
+                                cb();
+                            }
+                        }
+                    });
+                })
+            } else {
+                window['singleUpload'](selectFile, bucketId, options, cb);
+            }
+        }
+        window['singleUpload'] = (selectFile, bucketId, options, cb) => {
+            window['getAkSkList'](()=>{
+                this.getSignature();
+                options.headers.set('Authorization', this.Signature);
+                options.headers.set('X-Auth-Date', this.kDate);
+                this.http.put('/v1/s3/'+ bucketId + '/' + this.selectFileName, selectFile, options).subscribe((res) => {
+                    this.showPrompt = false;
+                    window['isUpload'] = false;
+                    this.msg.success("Upload file ["+ selectFile.name +"] successfully.");
+                    if (cb) {
+                        cb();
+                    }
+                    uploadNum = 0;
                 },
                 (error)=>{
                     if(uploadNum < 5){
-                        window['startUpload'] (selectFile, bucketId, options,folderId, cb);
+                        window['singleUpload'](selectFile, bucketId, options, cb);
                         uploadNum++;
                     }else{
-                        uploadNum = 0;
                         this.showPrompt = false;
+                        uploadNum = 0;
+                        console.log('error');
                         window['isUpload'] = false;
                         this.msg.error("Upload failed. The network may be unstable. Please try again later.");
                         if (cb) {
                             cb();
                         }
                     }
+                    
                 });
-            } else {
-                window['singleUpload'](selectFile, bucketId, options, cb);
-            }
-        }
-        window['singleUpload'] = (selectFile, bucketId, options, cb) => {
-            this.http.put('/v1/s3/'+ bucketId + '/' + this.selectFileName, selectFile, options).subscribe((res) => {
-                this.showPrompt = false;
-                window['isUpload'] = false;
-                this.msg.success("Upload file ["+ selectFile.name +"] successfully.");
-                if (cb) {
-                    cb();
-                }
-                uploadNum = 0;
-            },
-            (error)=>{
-                if(uploadNum < 5){
-                    window['singleUpload'](selectFile, bucketId, options, cb);
-                    uploadNum++;
-                }else{
-                    this.showPrompt = false;
-                    uploadNum = 0;
-                    console.log('error');
-                    window['isUpload'] = false;
-                    this.msg.error("Upload failed. The network may be unstable. Please try again later.");
-                    if (cb) {
-                        cb();
-                    }
-                }
-                
-            });
+            })
         }
         window['uploadPart'] = (selectFile, uploadId, bucketId, options, cb) => {
             let totalSlices;
@@ -341,7 +353,7 @@ export class AppComponent implements OnInit, AfterViewInit {
         this.renderWave();
         
         window['getParameters'] = (detailArr)=>{
-			this.SignatureKey = [];
+            this.SignatureKey = [];
             let secretAccessKey = detailArr[Math.round(Math.random()*(detailArr.length-1))];
             this.SignatureKey['secretAccessKey'] = secretAccessKey.secret;
             //System time is converted to UTC time
@@ -351,6 +363,7 @@ export class AppComponent implements OnInit, AfterViewInit {
             let utcTime = Utils.formatDate(utc);
             this.SignatureKey['dateStamp'] = utcTime.substr(0,4) + utcTime.substr(5,2) + utcTime.substr(8,2) + 'T' + utcTime.substr(11,2) + utcTime.substr(14,2)+
             utcTime.substr(17,2) + 'Z';
+            this.SignatureKey['dayDate'] = utcTime.substr(0,4) + utcTime.substr(5,2) + utcTime.substr(8,2);
             this.SignatureKey['regionName'] = "default_region";
             this.SignatureKey['serviceName'] = "s3";
             this.SignatureKey['AccessKey'] = secretAccessKey.access;
@@ -358,17 +371,30 @@ export class AppComponent implements OnInit, AfterViewInit {
         //Calculation of the signature
         window['getSignatureKey'] = ()=>{
             let SignatureObject = {};
-            SignatureObject['kSigning'] = window['getkSigning'](this.SignatureKey['secretAccessKey'],this.SignatureKey['dateStamp'],this.SignatureKey['regionName'],this.SignatureKey['serviceName']);
+            SignatureObject['kSigning'] = window['getkSigning'](this.SignatureKey['secretAccessKey'],this.SignatureKey['dayDate'],this.SignatureKey['regionName'],this.SignatureKey['serviceName'],this.SignatureKey['dateStamp']);
             SignatureObject['SignatureKey'] = this.SignatureKey;
             return SignatureObject;
         }
-        window['getkSigning'] = (key, dateStamp, regionName, serviceName)=>{
-            let kDate = CryptoJS.HmacSHA256(dateStamp, "OPENSDS" + key);
+        window['getkSigning'] = (key, dayDate, regionName, serviceName, dateStamp)=>{
+            let kDate = CryptoJS.HmacSHA256(dayDate, "OPENSDS" + key);
             let kRegion = CryptoJS.HmacSHA256(regionName, kDate);
             let kService = CryptoJS.HmacSHA256(serviceName, kRegion);
-            let kSigning = CryptoJS.HmacSHA256("sign_request", kService);
+            let signRequest = CryptoJS.HmacSHA256("sign_request", kService);
+            let kSigning = CryptoJS.HmacSHA256(dateStamp, signRequest);
             return kSigning;
         } 
+    }
+
+    //Request header with AK/SK authentication added
+    getSignature(){
+        let SignatureObjectwindow = window['getSignatureKey']();
+        let kAccessKey = SignatureObjectwindow.SignatureKey.AccessKey;
+        this.kDate = SignatureObjectwindow.SignatureKey.dateStamp;
+        let kRegion = SignatureObjectwindow.SignatureKey.regionName;
+        let kService = SignatureObjectwindow.SignatureKey.serviceName;
+        let kSigning = SignatureObjectwindow.kSigning;
+        let Credential = kAccessKey + '/' + this.kDate.substr(0,8) + '/' + kRegion + '/' + kService + '/' + 'sign_request';
+        this.Signature = 'OPENSDS-HMAC-SHA256' + ' Credential=' + Credential + ',SignedHeaders=host;x-auth-date;x-auth-token' + ",Signature=" + kSigning;
     }
     checkTimeOut() {
         this.currentTime = new Date().getTime(); //update current time
@@ -571,7 +597,7 @@ export class AppComponent implements OnInit, AfterViewInit {
                             routerLink: this.akSkRouterLink,
                             command: ()=>{
                                 this.isHomePage = false;
-                            }									
+                            }
                         },
                         {
                             label: "Logout",
@@ -595,7 +621,7 @@ export class AppComponent implements OnInit, AfterViewInit {
                             command: ()=>{
                                 this.isHomePage = false;
                             }
-						},
+                        },
                         {
                             label: "Logout",
                             command: () => { this.logout() }
