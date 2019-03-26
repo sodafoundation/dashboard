@@ -58,6 +58,8 @@ export class AppComponent implements OnInit, AfterViewInit {
     akSkRouterLink = "/akSkManagement/";
     Signature = "";
     kDate = "";
+    stringToSign = "";
+    canonicalString = "";
 
     menuItems = [];
 
@@ -380,11 +382,33 @@ export class AppComponent implements OnInit, AfterViewInit {
             let kRegion = CryptoJS.HmacSHA256(regionName, kDate);
             let kService = CryptoJS.HmacSHA256(serviceName, kRegion);
             let signRequest = CryptoJS.HmacSHA256("sign_request", kService);
-            let kSigning = CryptoJS.HmacSHA256(dateStamp, signRequest);
+            let kSigning = CryptoJS.HmacSHA256(this.stringToSign, signRequest);
             return kSigning;
-        } 
+        }
+        window['buildStringToSign'] = (cb)=>{
+            let authHeaderPrefix = "OPENSDS-HMAC-SHA256";
+            let requestDateTime = this.SignatureKey['dateStamp'];
+            let credentialString = this.SignatureKey['AccessKey'] + "/" + 
+            this.SignatureKey['dayDate'] + "/" + this.SignatureKey['regionName'] + "/" + this.SignatureKey['serviceName'] + "/" + "sign_request";
+            let canonical = CryptoJS.SHA256(this.canonicalString);
+            this.stringToSign = authHeaderPrefix + requestDateTime + "\n" + credentialString + "\n" + canonical;
+            if (cb) {
+                cb();
+            }
+        }
+        window['canonicalString'] = (requestMethod, url, body,cb)=>{
+            let canonicalHeaders = "x-auth-date:" + this.SignatureKey['dateStamp'];
+            let signedHeaders = "x-auth-date";
+            let hash = CryptoJS.SHA256(body);
+            this.canonicalString = requestMethod + "\n" + url + "\n" + canonicalHeaders + "\n" + signedHeaders + "\n" + hash;
+            window['buildStringToSign'](cb);
+            if (cb) {
+                cb();
+            }
+        }
     }
 
+    
     //Request header with AK/SK authentication added
     getSignature(){
         let SignatureObjectwindow = window['getSignatureKey']();

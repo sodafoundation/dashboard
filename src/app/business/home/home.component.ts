@@ -149,35 +149,42 @@ export class HomeComponent implements OnInit {
 
     initBucket2backendAnd2Type(){
         window['getAkSkList'](()=>{
-            let options: any = {};
-            this.getSignature(options);
-            this.http.get('v1/s3', options).subscribe((res)=>{
-                let str = res['_body'];
-                let x2js = new X2JS();
-                let jsonObj = x2js.xml_str2json(str);
-                let buckets = (jsonObj ? jsonObj.ListAllMyBucketsResult.Buckets:[]);
-                let allBuckets = [];
-                if(Object.prototype.toString.call(buckets) === "[object Array]"){
-                    allBuckets = buckets;
-                }else if(Object.prototype.toString.call(buckets) === "[object Object]"){
-                    allBuckets = [buckets];
-                }
-                this.counts.bucketsCount = allBuckets.length;
-                Consts.BUCKET_BACKND.clear();
-                Consts.BUCKET_TYPE.clear();
-                this.http.get('v1/{project_id}/backends').subscribe((res)=>{
-                    let backends = res.json().backends ? res.json().backends :[];
-                    let backendsObj = {};
-                    backends.forEach(element => {
-                        backendsObj[element.name]= element.type;
+            let requestMethod = "GET";
+            let url = 'v1/v3';
+            let body = "";
+            window['canonicalString']((requestMethod, url, body)=>{
+                let options: any = {};
+                let Referer = window.location.origin + window.location.pathname;
+                let userAgent = window.navigator.userAgent;
+                this.getSignature(options);
+                this.http.get('v1/s3', options).subscribe((res)=>{
+                    let str = res['_body'];
+                    let x2js = new X2JS();
+                    let jsonObj = x2js.xml_str2json(str);
+                    let buckets = (jsonObj ? jsonObj.ListAllMyBucketsResult.Buckets:[]);
+                    let allBuckets = [];
+                    if(Object.prototype.toString.call(buckets) === "[object Array]"){
+                        allBuckets = buckets;
+                    }else if(Object.prototype.toString.call(buckets) === "[object Object]"){
+                        allBuckets = [buckets];
+                    }
+                    this.counts.bucketsCount = allBuckets.length;
+                    Consts.BUCKET_BACKND.clear();
+                    Consts.BUCKET_TYPE.clear();
+                    this.http.get('v1/{project_id}/backends').subscribe((res)=>{
+                        let backends = res.json().backends ? res.json().backends :[];
+                        let backendsObj = {};
+                        backends.forEach(element => {
+                            backendsObj[element.name]= element.type;
+                        });
+                        allBuckets.forEach(item=>{
+                            Consts.BUCKET_BACKND.set(item.Name,item.LocationConstraint);
+                            Consts.BUCKET_TYPE.set(item.Name,backendsObj[item.LocationConstraint]);
+                        });
+                        this.initBackendsAndNum(backends);//must after Consts.BUCKET_BACKND.set
                     });
-                    allBuckets.forEach(item=>{
-                        Consts.BUCKET_BACKND.set(item.Name,item.LocationConstraint);
-                        Consts.BUCKET_TYPE.set(item.Name,backendsObj[item.LocationConstraint]);
-                    });
-                    this.initBackendsAndNum(backends);//must after Consts.BUCKET_BACKND.set
-                });
-            }); 
+                });  
+            });
         }) 
     }
     //Request header with AK/SK authentication added
