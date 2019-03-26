@@ -385,23 +385,20 @@ export class AppComponent implements OnInit, AfterViewInit {
             let kSigning = CryptoJS.HmacSHA256(this.stringToSign, signRequest);
             return kSigning;
         }
-        window['buildStringToSign'] = (cb)=>{
+        window['buildStringToSign'] = ()=>{
             let authHeaderPrefix = "OPENSDS-HMAC-SHA256";
             let requestDateTime = this.SignatureKey['dateStamp'];
             let credentialString = this.SignatureKey['AccessKey'] + "/" + 
             this.SignatureKey['dayDate'] + "/" + this.SignatureKey['regionName'] + "/" + this.SignatureKey['serviceName'] + "/" + "sign_request";
             let canonical = CryptoJS.SHA256(this.canonicalString);
             this.stringToSign = authHeaderPrefix + requestDateTime + "\n" + credentialString + "\n" + canonical;
-            if (cb) {
-                cb();
-            }
         }
         window['canonicalString'] = (requestMethod, url, body,cb)=>{
             let canonicalHeaders = "x-auth-date:" + this.SignatureKey['dateStamp'];
             let signedHeaders = "x-auth-date";
             let hash = CryptoJS.SHA256(body);
             this.canonicalString = requestMethod + "\n" + url + "\n" + canonicalHeaders + "\n" + signedHeaders + "\n" + hash;
-            window['buildStringToSign'](cb);
+            window['buildStringToSign']();
             if (cb) {
                 cb();
             }

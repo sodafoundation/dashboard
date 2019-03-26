@@ -152,7 +152,7 @@ export class HomeComponent implements OnInit {
             let requestMethod = "GET";
             let url = 'v1/v3';
             let body = "";
-            window['canonicalString']((requestMethod, url, body)=>{
+            window['canonicalString'](requestMethod, url, body, ()=>{
                 let options: any = {};
                 let Referer = window.location.origin + window.location.pathname;
                 let userAgent = window.navigator.userAgent;
