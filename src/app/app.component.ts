@@ -382,7 +382,9 @@ export class AppComponent implements OnInit, AfterViewInit {
             let kRegion = CryptoJS.HmacSHA256(regionName, kDate);
             let kService = CryptoJS.HmacSHA256(serviceName, kRegion);
             let signRequest = CryptoJS.HmacSHA256("sign_request", kService);
+            console.log("stringToSign is: " + this.stringToSign);
             let kSigning = CryptoJS.HmacSHA256(this.stringToSign, signRequest);
+            console.log("kSigning is: " + kSigning);
             return kSigning;
         }
         window['buildStringToSign'] = ()=>{
@@ -390,11 +392,13 @@ export class AppComponent implements OnInit, AfterViewInit {
             let requestDateTime = this.SignatureKey['dateStamp'];
             let credentialString = this.SignatureKey['AccessKey'] + "/" + 
             this.SignatureKey['dayDate'] + "/" + this.SignatureKey['regionName'] + "/" + this.SignatureKey['serviceName'] + "/" + "sign_request";
+            console.log("canonicalString is: " + this.canonicalString);
             let canonical = CryptoJS.SHA256(this.canonicalString);
-            this.stringToSign = authHeaderPrefix + requestDateTime + "\n" + credentialString + "\n" + canonical;
+            console.log("canonical is: " + canonical);
+            this.stringToSign = authHeaderPrefix + "\n" + requestDateTime + "\n" + credentialString + "\n" + canonical;
         }
         window['canonicalString'] = (requestMethod, url, body,cb)=>{
-            let canonicalHeaders = "x-auth-date:" + this.SignatureKey['dateStamp'];
+            let canonicalHeaders = "x-auth-date:" + this.SignatureKey['dateStamp'] + "\n";
             let signedHeaders = "x-auth-date";
             let hash = CryptoJS.SHA256(body);
             this.canonicalString = requestMethod + "\n" + url + "\n" + canonicalHeaders + "\n" + signedHeaders + "\n" + hash;
