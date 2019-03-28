@@ -97,8 +97,7 @@ export class MigrationListComponent implements OnInit {
         window['getAkSkList'](()=>{
             let requestMethod = "GET";
             let url = this.BucketService.url;
-            let body = "";
-            window['canonicalString'](requestMethod, url, body,()=>{
+            window['canonicalString'](requestMethod, url,()=>{
                 //Request header with AK/SK authentication added
                 let SignatureObjectwindow = window['getSignatureKey']();
                 let kAccessKey = SignatureObjectwindow.SignatureKey.AccessKey;

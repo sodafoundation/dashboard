@@ -158,8 +158,7 @@ export class AppComponent implements OnInit, AfterViewInit {
                 window['getAkSkList'](()=>{
                     let requestMethod = "PUT";
                     let url = uploadUrl + "?uploads";
-                    let body = "";
-                    window['canonicalString'](requestMethod, url, body,()=>{
+                    window['canonicalString'](requestMethod, url,()=>{
                         this.getSignature();
                         options.headers.set('Authorization', this.Signature);
                         options.headers.set('X-Auth-Date', this.kDate);
@@ -195,8 +194,7 @@ export class AppComponent implements OnInit, AfterViewInit {
             window['getAkSkList'](()=>{
                 let requestMethod = "PUT";
                 let url = uploadUrl;
-                let body = "";
-                window['canonicalString'](requestMethod, url, body,()=>{
+                window['canonicalString'](requestMethod, url,()=>{
                     this.getSignature();
                     options.headers.set('Authorization', this.Signature);
                     options.headers.set('X-Auth-Date', this.kDate);
@@ -255,8 +253,7 @@ export class AppComponent implements OnInit, AfterViewInit {
             window['getAkSkList'](()=>{
                 let requestMethod = "PUT";
                 let url = uploadUrl + '?partNumber=' + (i + 1) + '&uploadId=' + uploadId;
-                let body = "";
-                window['canonicalString'](requestMethod, url, body,()=>{
+                window['canonicalString'](requestMethod, url,()=>{
                     this.getSignature();
                     options.headers.set('Authorization', this.Signature);
                     options.headers.set('X-Auth-Date', this.kDate);
@@ -290,8 +287,7 @@ export class AppComponent implements OnInit, AfterViewInit {
                             window['getAkSkList'](()=>{
                                 let requestMethod = "DELETE";
                                 let url = uploadUrl + '?uploadId=' + uploadId;
-                                let body = "";
-                                window['canonicalString'](requestMethod, url, body,()=>{
+                                window['canonicalString'](requestMethod, url,()=>{
                                     this.http.delete("/" + uploadUrl + "?uploadId=" + uploadId, options).subscribe((data)=>{});
                                     this.msg.error("Upload failed. The network may be unstable. Please try again later.");
                                     if (cb) {
@@ -309,8 +305,7 @@ export class AppComponent implements OnInit, AfterViewInit {
             window['getAkSkList'](()=>{
                 let requestMethod = "PUT";
                 let url = uploadUrl + '?uploadId=' + uploadId;
-                let body = "";
-                window['canonicalString'](requestMethod, url, body,()=>{
+                window['canonicalString'](requestMethod, url,()=>{
                     this.getSignature();
                     options.headers.set('Authorization', this.Signature);
                     options.headers.set('X-Auth-Date', this.kDate);
@@ -332,8 +327,7 @@ export class AppComponent implements OnInit, AfterViewInit {
                             window['getAkSkList'](()=>{
                                 let requestMethod = "DELETE";
                                 let url = uploadUrl + '?uploadId=' + uploadId;
-                                let body = "";
-                                window['canonicalString'](requestMethod, url, body,()=>{
+                                window['canonicalString'](requestMethod, url,()=>{
                                     this.getSignature();
                                     options.headers.set('Authorization', this.Signature);
                                     options.headers.set('X-Auth-Date', this.kDate);
@@ -439,7 +433,8 @@ export class AppComponent implements OnInit, AfterViewInit {
             let canonical = CryptoJS.SHA256(this.canonicalString);
             this.stringToSign = authHeaderPrefix + "\n" + requestDateTime + "\n" + credentialString + "\n" + canonical;
         }
-        window['canonicalString'] = (requestMethod, url, body,cb)=>{
+        window['canonicalString'] = (requestMethod, url,cb)=>{
+            let body ="";
             let canonicalHeaders = "x-auth-date:" + this.SignatureKey['dateStamp'] + "\n";
             let signedHeaders = "x-auth-date";
             let hash = CryptoJS.SHA256(body);

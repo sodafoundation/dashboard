@@ -153,8 +153,7 @@ export class HomeComponent implements OnInit {
         window['getAkSkList'](()=>{
             let requestMethod = "GET";
             let url = this.BucketService.url;
-            let body = "";
-            window['canonicalString'](requestMethod, url, body, ()=>{
+            window['canonicalString'](requestMethod, url, ()=>{
                 let options: any = {};
                 let Referer = window.location.origin + window.location.pathname;
                 let userAgent = window.navigator.userAgent;
