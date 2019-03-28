@@ -5,7 +5,7 @@ import { ImgItemComponent } from './imgItem.component/imgItem.component';
 import { ProfileService } from 'app/business/profile/profile.service';
 import { HttpService } from 'app/shared/service/Http.service';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
-
+import { BucketService } from '../block/buckets.service';
 import { RouterModule } from '@angular/router';
 import { ButtonModule, ChartModule,CardModule } from '../../components/common/api';
 import { DataTableModule, DropMenuModule,HomeDialogModule, DialogModule, FormModule, InputTextModule, InputTextareaModule,
@@ -37,6 +37,6 @@ let routers = [{
     ConfirmDialogModule,
     DialogModule
   ],
-  providers: [HttpService, ProfileService,ConfirmationService]
+  providers: [HttpService, ProfileService,ConfirmationService,BucketService]
 })
 export class HomeModule { }
