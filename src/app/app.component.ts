@@ -9,8 +9,6 @@ import { akSkService } from './business/ak-sk/ak-sk.service';
 let d3 = window["d3"];
 declare let X2JS: any;
 let CryptoJS = require("crypto-js");
-let crypto = require("crypto-browserify");
-let urlJS = require("url");
 
 @Component({
     selector: 'app-root',
@@ -256,56 +254,55 @@ export class AppComponent implements OnInit, AfterViewInit {
             let uploadUrl = 'v1/s3/'+ bucketId + '/' + this.selectFileName;
             window['getAkSkList'](()=>{
                 let requestMethod = "PUT";
-                    let url = uploadUrl + '?partNumber=' + (i + 1) + '&uploadId=' + uploadId;
-                    let body = "";
-                    window['canonicalString'](requestMethod, url, body,()=>{
-                        this.getSignature();
-                        options.headers.set('Authorization', this.Signature);
-                        options.headers.set('X-Auth-Date', this.kDate);
-                        this.http.put("/"+ uploadUrl + '?partNumber=' + (i + 1) + '&uploadId=' + uploadId, chunk, options).subscribe((data) => {
-                            let x2js = new X2JS();
-                            let jsonObj = x2js.xml_str2json(data['_body']);
-                            window['uploadPartArr'].push(jsonObj);
+                let url = uploadUrl + '?partNumber=' + (i + 1) + '&uploadId=' + uploadId;
+                let body = "";
+                window['canonicalString'](requestMethod, url, body,()=>{
+                    this.getSignature();
+                    options.headers.set('Authorization', this.Signature);
+                    options.headers.set('X-Auth-Date', this.kDate);
+                    this.http.put("/"+ uploadUrl + '?partNumber=' + (i + 1) + '&uploadId=' + uploadId, chunk, options).subscribe((data) => {
+                        let x2js = new X2JS();
+                        let jsonObj = x2js.xml_str2json(data['_body']);
+                        window['uploadPartArr'].push(jsonObj);
+                        uploadNum = 0;
+                        if (i < (chunks.length - 1)) {
+                            window['segmentUpload'](i + 1, chunks, blob, uploadId, options, bucketId, cb);
+                        } else {
+                            let marltipart = '<CompleteMultipartUpload>';
+                            window['uploadPartArr'].forEach(item => {
+                                marltipart += `<Part>
+                                <PartNumber>${item.UploadPartResult.PartNumber}</PartNumber>
+                                <ETag>${item.UploadPartResult.ETag}</ETag>
+                                </Part>`
+                            });
+                            marltipart += '</CompleteMultipartUpload>';
+                            window['CompleteMultipartUpload'](bucketId, blob, uploadId, marltipart, options, cb);
+                        }
+                    },
+                    (error)=>{
+                        if(uploadNum < 5){
+                            window['segmentUpload'](i, chunks, blob, uploadId, options, bucketId, cb);
+                            uploadNum++;
+                        }else{
+                            this.showPrompt = false;
                             uploadNum = 0;
-                            if (i < (chunks.length - 1)) {
-                                window['segmentUpload'](i + 1, chunks, blob, uploadId, options, bucketId, cb);
-                            } else {
-                                let marltipart = '<CompleteMultipartUpload>';
-                                window['uploadPartArr'].forEach(item => {
-                                    marltipart += `<Part>
-                                    <PartNumber>${item.UploadPartResult.PartNumber}</PartNumber>
-                                    <ETag>${item.UploadPartResult.ETag}</ETag>
-                                    </Part>`
-                                });
-                                marltipart += '</CompleteMultipartUpload>';
-                                window['CompleteMultipartUpload'](bucketId, blob, uploadId, marltipart, options, cb);
-                            }
-                        },
-                        (error)=>{
-                            if(uploadNum < 5){
-                                window['segmentUpload'](i, chunks, blob, uploadId, options, bucketId, cb);
-                                uploadNum++;
-                            }else{
-                                this.showPrompt = false;
-                                uploadNum = 0;
-                                window['isUpload'] = false;
-                                window['getAkSkList'](()=>{
-                                    let requestMethod = "DELETE";
-                                    let url = uploadUrl + '?uploadId=' + uploadId;
-                                    let body = "";
-                                    window['canonicalString'](requestMethod, url, body,()=>{
-                                        this.http.delete("/" + uploadUrl + "?uploadId=" + uploadId, options).subscribe((data)=>{});
-                                        this.msg.error("Upload failed. The network may be unstable. Please try again later.");
-                                        if (cb) {
-                                            cb();
-                                        }
-                                    })
+                            window['isUpload'] = false;
+                            window['getAkSkList'](()=>{
+                                let requestMethod = "DELETE";
+                                let url = uploadUrl + '?uploadId=' + uploadId;
+                                let body = "";
+                                window['canonicalString'](requestMethod, url, body,()=>{
+                                    this.http.delete("/" + uploadUrl + "?uploadId=" + uploadId, options).subscribe((data)=>{});
+                                    this.msg.error("Upload failed. The network may be unstable. Please try again later.");
+                                    if (cb) {
+                                        cb();
+                                    }
                                 })
-                            } 
-                        });
-                    })
+                            })
+                        } 
+                    });
+                })
             })
-            
         }
         window['CompleteMultipartUpload'] = (bucketId, blob, uploadId, marltipart, options, cb) => {
             let uploadUrl = 'v1/s3/'+ bucketId + '/' + this.selectFileName;
@@ -431,9 +428,7 @@ export class AppComponent implements OnInit, AfterViewInit {
             let kRegion = CryptoJS.HmacSHA256(regionName, kDate);
             let kService = CryptoJS.HmacSHA256(serviceName, kRegion);
             let signRequest = CryptoJS.HmacSHA256("sign_request", kService);
-            console.log("stringToSign is: " + this.stringToSign);
             let kSigning = CryptoJS.HmacSHA256(this.stringToSign, signRequest);
-            console.log("kSigning is: " + kSigning);
             return kSigning;
         }
         window['buildStringToSign'] = ()=>{
@@ -441,15 +436,7 @@ export class AppComponent implements OnInit, AfterViewInit {
             let requestDateTime = this.SignatureKey['dateStamp'];
             let credentialString = this.SignatureKey['AccessKey'] + "/" + 
             this.SignatureKey['dayDate'] + "/" + this.SignatureKey['regionName'] + "/" + this.SignatureKey['serviceName'] + "/" + "sign_request";
-            let type = typeof this.canonicalString;
-            console.log("type is: " + type);
-            console.log("canonicalString is: " + this.canonicalString);
-            // let canonical = CryptoJS.SHA256(this.canonicalString);
-            // console.log("canonical is: " + canonical);
-
-            let canonical = window['hashHex'](this.canonicalString);
-            console.log("canonical is: " + canonical);
-
+            let canonical = CryptoJS.SHA256(this.canonicalString);
             this.stringToSign = authHeaderPrefix + "\n" + requestDateTime + "\n" + credentialString + "\n" + canonical;
         }
         window['canonicalString'] = (requestMethod, url, body,cb)=>{
@@ -462,8 +449,6 @@ export class AppComponent implements OnInit, AfterViewInit {
                 let query = url.substring(index+1,url.length);
                 url = url.substring(0,index);
                 rawQuery = window['parameter'](query,rawQuery)
-            }else{
-                rawQuery = "";  
             }
             url = encodeURI(url);
             this.canonicalString = requestMethod + "\n" + "/" + url + "" + "\n" + rawQuery + "\n" + canonicalHeaders + "\n" + signedHeaders + "\n" + hash;
@@ -472,12 +457,7 @@ export class AppComponent implements OnInit, AfterViewInit {
                 cb();
             }
         }
-        window['hashHex'] = (msg)=>{
-            var hash = crypto.createHash('sha256');
-            hash.update(msg);
-            return hash.digest('hex');
-            
-        }
+        //Canonical url parameter
         window['parameter'] = (param,rawQuery)=>{
            if(param.indexOf("&") != -1){
                 let paramArray = param.split("&").sort();
@@ -499,7 +479,6 @@ export class AppComponent implements OnInit, AfterViewInit {
         }
     }
 
-    
     //Request header with AK/SK authentication added
     getSignature(){
         let SignatureObjectwindow = window['getSignatureKey']();
