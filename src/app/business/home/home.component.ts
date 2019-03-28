@@ -7,6 +7,7 @@ import { ReactiveFormsModule, FormsModule,FormControl, FormGroup, FormBuilder,Va
 import { MenuItem ,ConfirmationService,ConfirmDialogModule} from '../../components/common/api';
 import { Router } from '@angular/router';
 import { Headers } from '@angular/http';
+import { BucketService} from '../block/buckets.service';
 
 declare let X2JS:any;
 @Component({
@@ -62,7 +63,8 @@ export class HomeComponent implements OnInit {
         private fb:FormBuilder,
         private ConfirmationService:ConfirmationService,
         private router: Router,
-        private msg: MsgBoxService
+        private msg: MsgBoxService,
+        private BucketService: BucketService,
     ) { 
         this.cloud_type = Consts.CLOUD_TYPE;
     }
@@ -150,14 +152,14 @@ export class HomeComponent implements OnInit {
     initBucket2backendAnd2Type(){
         window['getAkSkList'](()=>{
             let requestMethod = "GET";
-            let url = 'v1/v3';
+            let url = this.BucketService.url;
             let body = "";
             window['canonicalString'](requestMethod, url, body, ()=>{
                 let options: any = {};
                 let Referer = window.location.origin + window.location.pathname;
                 let userAgent = window.navigator.userAgent;
                 this.getSignature(options);
-                this.http.get('v1/s3', options).subscribe((res)=>{
+                this.BucketService.getBuckets(options).subscribe((res)=>{
                     let str = res['_body'];
                     let x2js = new X2JS();
                     let jsonObj = x2js.xml_str2json(str);

@@ -169,29 +169,34 @@ export class BucketsComponent implements OnInit{
         this.bucketOption = [];
         this.allBucketNameForCheck = [];
         window['getAkSkList'](()=>{
-            let options: any = {};
-            this.getSignature(options);
-            this.BucketService.getBuckets(options).subscribe((res) => {
-                let str = res._body;
-                let x2js = new X2JS();
-                let jsonObj = x2js.xml_str2json(str);
-                let buckets = (jsonObj ? jsonObj.ListAllMyBucketsResult.Buckets:[]);
-                if(Object.prototype.toString.call(buckets) === "[object Array]"){
-                    this.allBuckets = buckets;
-                }else if(Object.prototype.toString.call(buckets) === "[object Object]"){
-                    this.allBuckets = [buckets];
-                }
-                this.allBuckets.forEach(item=>{
-                    item.name =item.Name;
-                    this.allBucketNameForCheck.push(item.Name);
-                    item.createdAt = Utils.formatDate(item.CreationDate);
-                    this.bucketOption.push({
-                        label:item.name,
-                        value:item.name
+            let requestMethod = "GET";
+            let url = this.BucketService.url;
+            let body = "";
+            window['canonicalString'](requestMethod, url, body,()=>{
+                let options: any = {};
+                this.getSignature(options);
+                this.BucketService.getBuckets(options).subscribe((res) => {
+                    let str = res._body;
+                    let x2js = new X2JS();
+                    let jsonObj = x2js.xml_str2json(str);
+                    let buckets = (jsonObj ? jsonObj.ListAllMyBucketsResult.Buckets:[]);
+                    if(Object.prototype.toString.call(buckets) === "[object Array]"){
+                        this.allBuckets = buckets;
+                    }else if(Object.prototype.toString.call(buckets) === "[object Object]"){
+                        this.allBuckets = [buckets];
+                    }
+                    this.allBuckets.forEach(item=>{
+                        item.name =item.Name;
+                        this.allBucketNameForCheck.push(item.Name);
+                        item.createdAt = Utils.formatDate(item.CreationDate);
+                        this.bucketOption.push({
+                            label:item.name,
+                            value:item.name
+                        });
                     });
-                });
-                this.initBucket2backendAnd2Type();
-            }); 
+                    this.initBucket2backendAnd2Type();
+                }); 
+            })
         })
     }
     //Request header with AK/SK authentication added
@@ -211,33 +216,38 @@ export class BucketsComponent implements OnInit{
     }
     initBucket2backendAnd2Type(){
         window['getAkSkList'](()=>{
-            let options: any = {};
-            this.getSignature(options);
-            this.http.get('v1/s3',options).subscribe((res)=>{
-                let str = res['_body'];
-                let x2js = new X2JS();
-                let jsonObj = x2js.xml_str2json(str);
-                let buckets = (jsonObj ? jsonObj.ListAllMyBucketsResult.Buckets:[]);
-                let allBuckets = [];
-                if(Object.prototype.toString.call(buckets) === "[object Array]"){
-                    allBuckets = buckets;
-                }else if(Object.prototype.toString.call(buckets) === "[object Object]"){
-                    allBuckets = [buckets];
-                }
-                Consts.BUCKET_BACKND.clear();
-                Consts.BUCKET_TYPE.clear();
-                this.http.get('v1/{project_id}/backends').subscribe((res)=>{
-                    let backends = res.json().backends ? res.json().backends :[];
-                    let backendsObj = {};
-                    backends.forEach(element => {
-                        backendsObj[element.name]= element.type;
-                    });
-                    allBuckets.forEach(item=>{
-                        Consts.BUCKET_BACKND.set(item.Name,item.LocationConstraint);
-                        Consts.BUCKET_TYPE.set(item.Name,backendsObj[item.LocationConstraint]);
+            let requestMethod = "GET";
+            let url = this.BucketService.url;
+            let body = "";
+            window['canonicalString'](requestMethod, url, body,()=>{
+                let options: any = {};
+                this.getSignature(options);
+                this.BucketService.getBuckets(options).subscribe((res)=>{
+                    let str = res['_body'];
+                    let x2js = new X2JS();
+                    let jsonObj = x2js.xml_str2json(str);
+                    let buckets = (jsonObj ? jsonObj.ListAllMyBucketsResult.Buckets:[]);
+                    let allBuckets = [];
+                    if(Object.prototype.toString.call(buckets) === "[object Array]"){
+                        allBuckets = buckets;
+                    }else if(Object.prototype.toString.call(buckets) === "[object Object]"){
+                        allBuckets = [buckets];
+                    }
+                    Consts.BUCKET_BACKND.clear();
+                    Consts.BUCKET_TYPE.clear();
+                    this.http.get('v1/{project_id}/backends').subscribe((res)=>{
+                        let backends = res.json().backends ? res.json().backends :[];
+                        let backendsObj = {};
+                        backends.forEach(element => {
+                            backendsObj[element.name]= element.type;
+                        });
+                        allBuckets.forEach(item=>{
+                            Consts.BUCKET_BACKND.set(item.Name,item.LocationConstraint);
+                            Consts.BUCKET_TYPE.set(item.Name,backendsObj[item.LocationConstraint]);
+                        });
                     });
                 });
-            });
+            })
         })
     }
     getTypes() {
@@ -341,13 +351,18 @@ export class BucketsComponent implements OnInit{
                         <LocationConstraint>${this.createBucketForm.value.backend}</LocationConstraint>
                     </CreateBucketConfiguration>`
         window['getAkSkList'](()=>{
-            let options: any = {};
-            this.getSignature(options);
-            options.headers.set('Content-Type','application/xml');
-            this.BucketService.createBucket(this.createBucketForm.value.name,xmlStr,options).subscribe(()=>{
-                this.createBucketDisplay = false;
-                this.getBuckets();
-            }); 
+            let requestMethod = "PUT";
+            let url = this.BucketService.url+"/"+this.createBucketForm.value.name;
+            let body = "";
+            window['canonicalString'](requestMethod, url, body,()=>{
+                let options: any = {};
+                this.getSignature(options);
+                options.headers.set('Content-Type','application/xml');
+                this.BucketService.createBucket(this.createBucketForm.value.name,xmlStr,options).subscribe(()=>{
+                    this.createBucketDisplay = false;
+                    this.getBuckets();
+                }); 
+            })
         })           
     }
     showCreateForm(){
@@ -358,40 +373,46 @@ export class BucketsComponent implements OnInit{
     }
     deleteBucket(bucket){
         window['getAkSkList'](()=>{
-            let options: any = {};
-            this.getSignature(options);
-            this.BucketService.getBucketById(bucket.name,options).subscribe((res) => {
-                let str = res._body;
-                let x2js = new X2JS();
-                let jsonObj = x2js.xml_str2json(str);
-                let alldir = jsonObj.ListObjectResponse.ListObjects ? jsonObj.ListObjectResponse.ListObjects :[] ;
-                if(alldir.length === 0){
-                    this.http.get(`v1/{project_id}/plans?bucketname=${bucket.name}`).subscribe((res)=>{
-                        let plans = res.json().plans ? res.json().plans : [];
-                        let planNames = plans.map((item)=> item.name);
-                        if(plans.length === 0){
-                            let msg = "<div>Are you sure you want to delete the Bucket ?</div><h3>[ "+ bucket.name +" ]</h3>";
-                            let header ="Delete";
-                            let acceptLabel = "Delete";
-                            let warming = true;
-                            this.confirmDialog([msg,header,acceptLabel,warming,"delete"], bucket);
-                        }else{
-                            let msg = `<div>The bucket has created the following migration task, 
-                            and removing the bucket will remove the migration task at the same time.</div>
-                            <h5>[${planNames}]</h5>
-                            <div>Are you sure you want to delete the Bucket?</div>
-                            <h3>[${bucket.name}]</h3>
-                            `;
-                            let header ="Delete";
-                            let acceptLabel = "Delete";
-                            let warming = true;
-                            this.confirmDialog([msg,header,acceptLabel,warming,"delete"], bucket,plans);
-                        }
-                    });
-                }else{
-                    this.msg.info("The backend cannot be deleted. please delete objects first");
-                }
-            }); 
+            let requestMethod = "GET";
+            let url = this.BucketService.url + '/' + bucket.name;
+            let body = "";
+            window['canonicalString'](requestMethod, url, body,()=>{
+                let options: any = {};
+                this.getSignature(options);
+                this.BucketService.getBucketById(bucket.name,options).subscribe((res) => {
+                    let str = res._body;
+                    let x2js = new X2JS();
+                    let jsonObj = x2js.xml_str2json(str);
+                    let alldir = jsonObj.ListObjectResponse.ListObjects ? jsonObj.ListObjectResponse.ListObjects :[] ;
+                    if(alldir.length === 0){
+                        this.http.get(`v1/{project_id}/plans?bucketname=${bucket.name}`).subscribe((res)=>{
+                            let plans = res.json().plans ? res.json().plans : [];
+                            let planNames = plans.map((item)=> item.name);
+                            if(plans.length === 0){
+                                let msg = "<div>Are you sure you want to delete the Bucket ?</div><h3>[ "+ bucket.name +" ]</h3>";
+                                let header ="Delete";
+                                let acceptLabel = "Delete";
+                                let warming = true;
+                                this.confirmDialog([msg,header,acceptLabel,warming,"delete"], bucket);
+                            }else{
+                                let msg = `<div>The bucket has created the following migration task, 
+                                and removing the bucket will remove the migration task at the same time.</div>
+                                <h5>[${planNames}]</h5>
+                                <div>Are you sure you want to delete the Bucket?</div>
+                                <h3>[${bucket.name}]</h3>
+                                `;
+                                let header ="Delete";
+                                let acceptLabel = "Delete";
+                                let warming = true;
+                                this.confirmDialog([msg,header,acceptLabel,warming,"delete"], bucket,plans);
+                            }
+                        });
+                    }else{
+                        this.msg.info("The backend cannot be deleted. please delete objects first");
+                    }
+                }); 
+            })
+             
         })
         
     }
@@ -413,14 +434,19 @@ export class BucketsComponent implements OnInit{
                         });
                     }
                     window['getAkSkList'](()=>{
-                        let options: any = {};
-                        this.getSignature(options);
-                        this.BucketService.deleteBucket(name,options).subscribe((res) => {
-                            this.getBuckets();
-                        },
-                        error=>{
-                            this.getBuckets();
-                        });
+                        let requestMethod = "DELETE";
+                        let url = this.BucketService.url + '/' + name;
+                        let body = "";
+                        window['canonicalString'](requestMethod, url, body,()=>{
+                            let options: any = {};
+                            this.getSignature(options);
+                            this.BucketService.deleteBucket(name,options).subscribe((res) => {
+                                this.getBuckets();
+                            },
+                            error=>{
+                                this.getBuckets();
+                            });
+                        })
                     })
                     
                 }

@@ -9,6 +9,8 @@ import { akSkService } from './business/ak-sk/ak-sk.service';
 let d3 = window["d3"];
 declare let X2JS: any;
 let CryptoJS = require("crypto-js");
+let crypto = require("crypto-browserify");
+let urlJS = require("url");
 
 @Component({
     selector: 'app-root',
@@ -152,71 +154,80 @@ export class AppComponent implements OnInit, AfterViewInit {
                 this.selectFileName = selectFile.name 
             }
             this.fileName = selectFile.name;
-            
+            let uploadUrl = 'v1/s3/'+ bucketId + '/' + this.selectFileName;
             if (selectFile['size'] > Consts.BYTES_PER_CHUNK) {
                 //first step get uploadId
                 window['getAkSkList'](()=>{
+                    let requestMethod = "PUT";
+                    let url = uploadUrl + "?uploads";
+                    let body = "";
+                    window['canonicalString'](requestMethod, url, body,()=>{
+                        this.getSignature();
+                        options.headers.set('Authorization', this.Signature);
+                        options.headers.set('X-Auth-Date', this.kDate);
+                        this.http.put( '/' + uploadUrl + "?uploads", '', options).subscribe((res) => {
+                            let str = res['_body'];
+                            let x2js = new X2JS();
+                            let jsonObj = x2js.xml_str2json(str);
+                            let uploadId = jsonObj.InitiateMultipartUploadResult.UploadId;
+                            // second step part upload
+                            window['uploadPart'](selectFile, uploadId, bucketId, options, cb);
+                        },
+                        (error)=>{
+                            if(uploadNum < 5){
+                                window['startUpload'] (selectFile, bucketId, options,folderId, cb);
+                                uploadNum++;
+                            }else{
+                                uploadNum = 0;
+                                this.showPrompt = false;
+                                window['isUpload'] = false;
+                                this.msg.error("Upload failed. The network may be unstable. Please try again later.");
+                                if (cb) {
+                                    cb();
+                                }
+                            }
+                        });  
+                    })
+                })
+            } else {
+                window['singleUpload'](selectFile, bucketId, options, uploadUrl, cb);
+            }
+        }
+        window['singleUpload'] = (selectFile, bucketId, options, uploadUrl, cb) => {
+            window['getAkSkList'](()=>{
+                let requestMethod = "PUT";
+                let url = uploadUrl;
+                let body = "";
+                window['canonicalString'](requestMethod, url, body,()=>{
                     this.getSignature();
                     options.headers.set('Authorization', this.Signature);
                     options.headers.set('X-Auth-Date', this.kDate);
-                    this.http.put('/v1/s3/'+ bucketId + '/' + this.selectFileName + "?uploads", '', options).subscribe((res) => {
-                        let str = res['_body'];
-                        let x2js = new X2JS();
-                        let jsonObj = x2js.xml_str2json(str);
-                        let uploadId = jsonObj.InitiateMultipartUploadResult.UploadId;
-                        // second step part upload
-                        
-                        window['uploadPart'](selectFile, uploadId, bucketId, options, cb);
+                    this.http.put("/" + uploadUrl, selectFile, options).subscribe((res) => {
+                        this.showPrompt = false;
+                        window['isUpload'] = false;
+                        this.msg.success("Upload file ["+ selectFile.name +"] successfully.");
+                        if (cb) {
+                            cb();
+                        }
+                        uploadNum = 0;
                     },
                     (error)=>{
                         if(uploadNum < 5){
-                            window['startUpload'] (selectFile, bucketId, options,folderId, cb);
+                            window['singleUpload'](selectFile, bucketId, options, cb);
                             uploadNum++;
                         }else{
-                            uploadNum = 0;
                             this.showPrompt = false;
+                            uploadNum = 0;
+                            console.log('error');
                             window['isUpload'] = false;
                             this.msg.error("Upload failed. The network may be unstable. Please try again later.");
                             if (cb) {
                                 cb();
                             }
                         }
+                        
                     });
                 })
-            } else {
-                window['singleUpload'](selectFile, bucketId, options, cb);
-            }
-        }
-        window['singleUpload'] = (selectFile, bucketId, options, cb) => {
-            window['getAkSkList'](()=>{
-                this.getSignature();
-                options.headers.set('Authorization', this.Signature);
-                options.headers.set('X-Auth-Date', this.kDate);
-                this.http.put('/v1/s3/'+ bucketId + '/' + this.selectFileName, selectFile, options).subscribe((res) => {
-                    this.showPrompt = false;
-                    window['isUpload'] = false;
-                    this.msg.success("Upload file ["+ selectFile.name +"] successfully.");
-                    if (cb) {
-                        cb();
-                    }
-                    uploadNum = 0;
-                },
-                (error)=>{
-                    if(uploadNum < 5){
-                        window['singleUpload'](selectFile, bucketId, options, cb);
-                        uploadNum++;
-                    }else{
-                        this.showPrompt = false;
-                        uploadNum = 0;
-                        console.log('error');
-                        window['isUpload'] = false;
-                        this.msg.error("Upload failed. The network may be unstable. Please try again later.");
-                        if (cb) {
-                            cb();
-                        }
-                    }
-                    
-                });
             })
         }
         window['uploadPart'] = (selectFile, uploadId, bucketId, options, cb) => {
@@ -241,64 +252,102 @@ export class AppComponent implements OnInit, AfterViewInit {
             window['segmentUpload'](0, proArr, selectFile, uploadId, options, bucketId, cb);
         }
         window['segmentUpload'] = (i, chunks, blob, uploadId, options, bucketId, cb) => {
-            let chunk;
-            chunk = blob.slice(chunks[i].start, chunks[i].end);
-
-            this.http.put('/v1/s3/' + bucketId + '/' + this.selectFileName + '?partNumber=' + (i + 1) + '&uploadId=' + uploadId, chunk, options).subscribe((data) => {
-                let x2js = new X2JS();
-                let jsonObj = x2js.xml_str2json(data['_body']);
-                window['uploadPartArr'].push(jsonObj);
-                uploadNum = 0;
-                if (i < (chunks.length - 1)) {
-                    window['segmentUpload'](i + 1, chunks, blob, uploadId, options, bucketId, cb);
-                } else {
-                    let marltipart = '<CompleteMultipartUpload>';
-                    window['uploadPartArr'].forEach(item => {
-                        marltipart += `<Part>
-                        <PartNumber>${item.UploadPartResult.PartNumber}</PartNumber>
-                        <ETag>${item.UploadPartResult.ETag}</ETag>
-                        </Part>`
-                    });
-                    marltipart += '</CompleteMultipartUpload>';
-                    window['CompleteMultipartUpload'](bucketId, blob, uploadId, marltipart, options, cb);
-                }
-            },
-            (error)=>{
-                if(uploadNum < 5){
-                    window['segmentUpload'](i, chunks, blob, uploadId, options, bucketId, cb);
-                    uploadNum++;
-                }else{
-                    this.showPrompt = false;
-                    uploadNum = 0;
-                    window['isUpload'] = false;
-                    this.http.delete('/v1/s3/' +bucketId + '/' +  this.selectFileName + "?uploadId=" + uploadId).subscribe((data)=>{});
-                    this.msg.error("Upload failed. The network may be unstable. Please try again later.");
-                    if (cb) {
-                        cb();
-                    }
-                }
-                
-            });
+            let chunk = blob.slice(chunks[i].start, chunks[i].end);
+            let uploadUrl = 'v1/s3/'+ bucketId + '/' + this.selectFileName;
+            window['getAkSkList'](()=>{
+                let requestMethod = "PUT";
+                    let url = uploadUrl + '?partNumber=' + (i + 1) + '&uploadId=' + uploadId;
+                    let body = "";
+                    window['canonicalString'](requestMethod, url, body,()=>{
+                        this.getSignature();
+                        options.headers.set('Authorization', this.Signature);
+                        options.headers.set('X-Auth-Date', this.kDate);
+                        this.http.put("/"+ uploadUrl + '?partNumber=' + (i + 1) + '&uploadId=' + uploadId, chunk, options).subscribe((data) => {
+                            let x2js = new X2JS();
+                            let jsonObj = x2js.xml_str2json(data['_body']);
+                            window['uploadPartArr'].push(jsonObj);
+                            uploadNum = 0;
+                            if (i < (chunks.length - 1)) {
+                                window['segmentUpload'](i + 1, chunks, blob, uploadId, options, bucketId, cb);
+                            } else {
+                                let marltipart = '<CompleteMultipartUpload>';
+                                window['uploadPartArr'].forEach(item => {
+                                    marltipart += `<Part>
+                                    <PartNumber>${item.UploadPartResult.PartNumber}</PartNumber>
+                                    <ETag>${item.UploadPartResult.ETag}</ETag>
+                                    </Part>`
+                                });
+                                marltipart += '</CompleteMultipartUpload>';
+                                window['CompleteMultipartUpload'](bucketId, blob, uploadId, marltipart, options, cb);
+                            }
+                        },
+                        (error)=>{
+                            if(uploadNum < 5){
+                                window['segmentUpload'](i, chunks, blob, uploadId, options, bucketId, cb);
+                                uploadNum++;
+                            }else{
+                                this.showPrompt = false;
+                                uploadNum = 0;
+                                window['isUpload'] = false;
+                                window['getAkSkList'](()=>{
+                                    let requestMethod = "DELETE";
+                                    let url = uploadUrl + '?uploadId=' + uploadId;
+                                    let body = "";
+                                    window['canonicalString'](requestMethod, url, body,()=>{
+                                        this.http.delete("/" + uploadUrl + "?uploadId=" + uploadId, options).subscribe((data)=>{});
+                                        this.msg.error("Upload failed. The network may be unstable. Please try again later.");
+                                        if (cb) {
+                                            cb();
+                                        }
+                                    })
+                                })
+                            } 
+                        });
+                    })
+            })
+            
         }
         window['CompleteMultipartUpload'] = (bucketId, blob, uploadId, marltipart, options, cb) => {
-            this.http.put('/v1/s3/' + bucketId + '/' + this.selectFileName + '?uploadId=' + uploadId, marltipart, options).subscribe((res) => {
-                this.showPrompt = false;
-                window['isUpload'] = false;
-                this.msg.success("Upload file ["+ blob.name +"] successfully.");
-                if (cb) {
-                    cb();
-                }
-            },
-            error =>{
-                if(uploadNum < 5){
-                    window['CompleteMultipartUpload'](bucketId, blob, uploadId, marltipart, options, cb);
-                    uploadNum++;
-                }else{
-                    this.showPrompt = false;
-                    uploadNum = 0; 
-                    this.http.delete('/v1/s3/' +bucketId + '/' +  this.selectFileName + "?uploadId=" + uploadId).subscribe((data)=>{});
-                }
-            });
+            let uploadUrl = 'v1/s3/'+ bucketId + '/' + this.selectFileName;
+            window['getAkSkList'](()=>{
+                let requestMethod = "PUT";
+                let url = uploadUrl + '?uploadId=' + uploadId;
+                let body = "";
+                window['canonicalString'](requestMethod, url, body,()=>{
+                    this.getSignature();
+                    options.headers.set('Authorization', this.Signature);
+                    options.headers.set('X-Auth-Date', this.kDate);
+                    this.http.put("/" + uploadUrl + '?uploadId=' + uploadId, marltipart, options).subscribe((res) => {
+                        this.showPrompt = false;
+                        window['isUpload'] = false;
+                        this.msg.success("Upload file ["+ blob.name +"] successfully.");
+                        if (cb) {
+                            cb();
+                        }
+                    },
+                    error =>{
+                        if(uploadNum < 5){
+                            window['CompleteMultipartUpload'](bucketId, blob, uploadId, marltipart, options, cb);
+                            uploadNum++;
+                        }else{
+                            this.showPrompt = false;
+                            uploadNum = 0;
+                            window['getAkSkList'](()=>{
+                                let requestMethod = "DELETE";
+                                let url = uploadUrl + '?uploadId=' + uploadId;
+                                let body = "";
+                                window['canonicalString'](requestMethod, url, body,()=>{
+                                    this.getSignature();
+                                    options.headers.set('Authorization', this.Signature);
+                                    options.headers.set('X-Auth-Date', this.kDate);
+                                    this.http.delete("/" + uploadUrl + "?uploadId=" + uploadId, options).subscribe((data)=>{});
+                                })
+                            })
+                        }
+                    });
+                })
+            })
+            
         }
         // Global upload end
 
@@ -392,20 +441,61 @@ export class AppComponent implements OnInit, AfterViewInit {
             let requestDateTime = this.SignatureKey['dateStamp'];
             let credentialString = this.SignatureKey['AccessKey'] + "/" + 
             this.SignatureKey['dayDate'] + "/" + this.SignatureKey['regionName'] + "/" + this.SignatureKey['serviceName'] + "/" + "sign_request";
+            let type = typeof this.canonicalString;
+            console.log("type is: " + type);
             console.log("canonicalString is: " + this.canonicalString);
-            let canonical = CryptoJS.SHA256(this.canonicalString);
+            // let canonical = CryptoJS.SHA256(this.canonicalString);
+            // console.log("canonical is: " + canonical);
+
+            let canonical = window['hashHex'](this.canonicalString);
             console.log("canonical is: " + canonical);
+
             this.stringToSign = authHeaderPrefix + "\n" + requestDateTime + "\n" + credentialString + "\n" + canonical;
         }
         window['canonicalString'] = (requestMethod, url, body,cb)=>{
             let canonicalHeaders = "x-auth-date:" + this.SignatureKey['dateStamp'] + "\n";
             let signedHeaders = "x-auth-date";
             let hash = CryptoJS.SHA256(body);
-            this.canonicalString = requestMethod + "\n" + url + "\n" + canonicalHeaders + "\n" + signedHeaders + "\n" + hash;
+            let rawQuery = "";
+            if(url.indexOf("?") !=-1){
+                let index = url.indexOf("?");
+                let query = url.substring(index+1,url.length);
+                url = url.substring(0,index);
+                rawQuery = window['parameter'](query,rawQuery)
+            }else{
+                rawQuery = "";  
+            }
+            url = encodeURI(url);
+            this.canonicalString = requestMethod + "\n" + "/" + url + "" + "\n" + rawQuery + "\n" + canonicalHeaders + "\n" + signedHeaders + "\n" + hash;
             window['buildStringToSign']();
             if (cb) {
                 cb();
             }
+        }
+        window['hashHex'] = (msg)=>{
+            var hash = crypto.createHash('sha256');
+            hash.update(msg);
+            return hash.digest('hex');
+            
+        }
+        window['parameter'] = (param,rawQuery)=>{
+           if(param.indexOf("&") != -1){
+                let paramArray = param.split("&").sort();
+                paramArray.map((item,index)=>{
+                    if(item.indexOf("=") ==-1){
+                        item += "=";
+                    }
+                    if(index < paramArray.length-1){
+                        item += "&";
+                    }
+                    rawQuery += item;
+                })
+            }else if(param.indexOf("=") != -1){
+                rawQuery = param;
+            }else{
+                rawQuery = param.replace(/\s/g,'%20') + "=";
+            }
+            return rawQuery;
         }
     }
 
