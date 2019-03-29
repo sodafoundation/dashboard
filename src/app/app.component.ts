@@ -483,7 +483,7 @@ export class AppComponent implements OnInit, AfterViewInit {
         let kService = SignatureObjectwindow.SignatureKey.serviceName;
         let kSigning = SignatureObjectwindow.kSigning;
         let Credential = kAccessKey + '/' + this.kDate.substr(0,8) + '/' + kRegion + '/' + kService + '/' + 'sign_request';
-        this.Signature = 'OPENSDS-HMAC-SHA256' + ' Credential=' + Credential + ',SignedHeaders=host;x-auth-date;x-auth-token' + ",Signature=" + kSigning;
+        this.Signature = 'OPENSDS-HMAC-SHA256' + ' Credential=' + Credential + ',SignedHeaders=host;x-auth-date' + ",Signature=" + kSigning;
     }
     checkTimeOut() {
         this.currentTime = new Date().getTime(); //update current time
