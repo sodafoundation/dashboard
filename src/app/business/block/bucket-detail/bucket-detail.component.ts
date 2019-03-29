@@ -232,7 +232,7 @@ export class BucketDetailComponent implements OnInit {
     this.kService = SignatureObjectwindow.SignatureKey.serviceName;
     this.kSigning = SignatureObjectwindow.kSigning;
     let Credential = this.kAccessKey + '/' + this.kDate.substr(0,8) + '/' + this.kRegion + '/' + this.kService + '/' + 'sign_request';
-    this.Signature = 'OPENSDS-HMAC-SHA256' + ' Credential=' + Credential + ',SignedHeaders=host;x-auth-date;x-auth-token' + ",Signature=" + this.kSigning;
+    this.Signature = 'OPENSDS-HMAC-SHA256' + ' Credential=' + Credential + ',SignedHeaders=host;x-auth-date' + ",Signature=" + this.kSigning;
     options['headers'] = new Headers();
     options.headers.set('Authorization', this.Signature);
     options.headers.set('X-Auth-Date', this.kDate);
@@ -349,7 +349,6 @@ export class BucketDetailComponent implements OnInit {
         this.getSignature(options);
         options = {
           headers: {
-            'X-Auth-Token': localStorage['auth-token'],
             'Authorization': this.Signature,
             'X-Auth-Date': this.kDate
           },

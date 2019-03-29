@@ -155,8 +155,6 @@ export class HomeComponent implements OnInit {
             let url = this.BucketService.url;
             window['canonicalString'](requestMethod, url, ()=>{
                 let options: any = {};
-                let Referer = window.location.origin + window.location.pathname;
-                let userAgent = window.navigator.userAgent;
                 this.getSignature(options);
                 this.BucketService.getBuckets(options).subscribe((res)=>{
                     let str = res['_body'];
@@ -197,7 +195,7 @@ export class HomeComponent implements OnInit {
         let kService = SignatureObjectwindow.SignatureKey.serviceName;
         let kSigning = SignatureObjectwindow.kSigning;
         let Credential = kAccessKey + '/' + kDate.substr(0,8) + '/' + kRegion + '/' + kService + '/' + 'sign_request';
-        let Signature = 'OPENSDS-HMAC-SHA256' + ' Credential=' + Credential + ',SignedHeaders=host;x-auth-date;x-auth-token' + ",Signature=" + kSigning;
+        let Signature = 'OPENSDS-HMAC-SHA256' + ' Credential=' + Credential + ',SignedHeaders=host;x-auth-date' + ",Signature=" + kSigning;
         options['headers'] = new Headers();
         options.headers.set('Authorization', Signature);
         options.headers.set('X-Auth-Date', kDate);

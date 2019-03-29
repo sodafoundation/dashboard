@@ -55,7 +55,7 @@ export class UserListComponent implements OnInit, AfterViewChecked {
         this.myFormGroup = this.fb.group({
             "form_username": ["", {validators:[Validators.required, Validators.pattern(this.validRule.name), this.ifUserExisting(this.tenantUsers)], updateOn:'change'}  ],
             "form_description":["", Validators.maxLength(200) ],
-            "form_tenant": [""],
+            "form_tenant": ["", {validators:[Validators.required]}],
             "form_isModifyPsw": [true],
             "form_psw": ["", {validators: [Validators.required, Validators.minLength(8), this.regPassword], updateOn:'blur'} ],
             "form_pswConfirm": ["", [Validators.required, this.regConfirmPassword(this.newPassword)] ]

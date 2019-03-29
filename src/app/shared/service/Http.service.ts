@@ -58,11 +58,15 @@ export class HttpService extends Http {
     presetURL(url, options){
         // Configure token option
         if( localStorage['auth-token'] && options && options.headers  ){
-            options.headers.set('X-Auth-Token', localStorage['auth-token']);
+            if(!url.includes("v1/s3")){
+                options.headers.set('X-Auth-Token', localStorage['auth-token']);
+            }
         }else if(localStorage['auth-token']){
             !options && (options = {})
             !options.headers && (options['headers'] = new Headers());
-            options.headers.set('X-Auth-Token', localStorage['auth-token']);
+            if(!url.includes("v1/s3")){
+                options.headers.set('X-Auth-Token', localStorage['auth-token']);
+            }
             if(url.includes("v1/s3")){
                 options.headers.set("Content-Type", "application/xml");
             }else{

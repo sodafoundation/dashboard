@@ -106,7 +106,7 @@ export class MigrationListComponent implements OnInit {
                 let kService = SignatureObjectwindow.SignatureKey.serviceName;
                 let kSigning = SignatureObjectwindow.kSigning;
                 let Credential = kAccessKey + '/' + kDate.substr(0,8) + '/' + kRegion + '/' + kService + '/' + 'sign_request';
-                let Signature = 'OPENSDS-HMAC-SHA256' + ' Credential=' + Credential + ',SignedHeaders=host;x-auth-date;x-auth-token' + ",Signature=" + kSigning;
+                let Signature = 'OPENSDS-HMAC-SHA256' + ' Credential=' + Credential + ',SignedHeaders=host;x-auth-date' + ",Signature=" + kSigning;
                 let options: any = {};
                 options['headers'] = new Headers();
                 options.headers.set('Authorization', Signature);
