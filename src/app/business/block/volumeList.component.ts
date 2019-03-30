@@ -72,7 +72,10 @@ export class VolumeListComponent implements OnInit {
         "description": { maxlength: "Max. length is 200." },
         "repName":{ required: "Name is required." },
         "profileOption":{ required: "Name is required." },
-        "expandSize":{required: "Expand Capacity is required."}
+        "expandSize":{
+            required: "Expand Capacity is required.",
+            pattern: "Expand Capacity can only be number"
+        }
     };
     profiles;
     selectedVolume;
@@ -96,7 +99,7 @@ export class VolumeListComponent implements OnInit {
             "name": ['', Validators.required]
         });
         this.expandFormGroup = this.fb.group({
-            "expandSize":[1,{validators:[Validators.required], updateOn:'change'} ],
+            "expandSize":[1,{validators:[Validators.required,Validators.pattern(/^\d+$/)], updateOn:'change'} ],
             "capacityOption":[this.capacityOptions[0] ]
         });
         this.expandFormGroup.get("expandSize").valueChanges.subscribe(

@@ -6,6 +6,8 @@ import { I18NService ,HttpService, MsgBoxService, Consts} from 'app/shared/api';
 import { ReactiveFormsModule, FormsModule,FormControl, FormGroup, FormBuilder,Validators,ValidatorFn, AbstractControl } from '@angular/forms';
 import { MenuItem ,ConfirmationService,ConfirmDialogModule} from '../../components/common/api';
 import { Router } from '@angular/router';
+import { Headers } from '@angular/http';
+import { BucketService} from '../block/buckets.service';
 
 declare let X2JS:any;
 @Component({
@@ -17,14 +19,15 @@ declare let X2JS:any;
 export class HomeComponent implements OnInit {
     lineData ={};
     lineOption = {};
-    showRgister = false;
+    showRegisterFlag = false;
     allTypes = [];
     showBackends = false;
     allBackends_count={
         aws:0,
         huaweipri:0,
         huaweipub:0,
-        localBKD:0
+        localBKD:0,
+        ibmcos:0
     }
     counts= {
         volumesCount:0,
@@ -45,6 +48,7 @@ export class HomeComponent implements OnInit {
     @ViewChild("path") path: ElementRef;
     @ViewChild("cloud_aws") c_AWS: ElementRef;
     @ViewChild("cloud_hw") c_HW: ElementRef;
+    @ViewChild("cloud_ibmcos") c_IBMCOS: ElementRef;
     @ViewChild("cloud_hw_p") c_HWP: ElementRef;
     @ViewChild("svgCon") svgCon: ElementRef;
     
@@ -59,7 +63,8 @@ export class HomeComponent implements OnInit {
         private fb:FormBuilder,
         private ConfirmationService:ConfirmationService,
         private router: Router,
-        private msg: MsgBoxService
+        private msg: MsgBoxService,
+        private BucketService: BucketService,
     ) { 
         this.cloud_type = Consts.CLOUD_TYPE;
     }
@@ -128,7 +133,7 @@ export class HomeComponent implements OnInit {
             that.scaleX = svgConW/240; 
             that.scaleY = 5;
 
-            let clouds = [that.c_AWS.nativeElement, that.c_HW.nativeElement, that.c_HWP.nativeElement];
+            let clouds = [that.c_AWS.nativeElement, that.c_HW.nativeElement, that.c_HWP.nativeElement, that.c_IBMCOS.nativeElement];
             clouds.forEach((item, index) => {
                 let totalLength = that.path.nativeElement.getTotalLength();
                 let point = totalLength/clouds.length * (index+1) + moveX + initPos;
@@ -145,35 +150,57 @@ export class HomeComponent implements OnInit {
     }
 
     initBucket2backendAnd2Type(){
-        this.http.get('v1/s3').subscribe((res)=>{
-            let str = res['_body'];
-            let x2js = new X2JS();
-            let jsonObj = x2js.xml_str2json(str);
-            let buckets = (jsonObj ? jsonObj.ListAllMyBucketsResult.Buckets:[]);
-            let allBuckets = [];
-            if(Object.prototype.toString.call(buckets) === "[object Array]"){
-                allBuckets = buckets;
-            }else if(Object.prototype.toString.call(buckets) === "[object Object]"){
-                allBuckets = [buckets];
-            }
-            this.counts.bucketsCount = allBuckets.length;
-            Consts.BUCKET_BACKND.clear();
-            Consts.BUCKET_TYPE.clear();
-            this.http.get('v1/{project_id}/backends').subscribe((res)=>{
-                let backends = res.json().backends ? res.json().backends :[];
-                let backendsObj = {};
-                backends.forEach(element => {
-                    backendsObj[element.name]= element.type;
-                });
-                allBuckets.forEach(item=>{
-                    Consts.BUCKET_BACKND.set(item.Name,item.LocationConstraint);
-                    Consts.BUCKET_TYPE.set(item.Name,backendsObj[item.LocationConstraint]);
-                });
-                this.initBackendsAndNum(backends);//must after Consts.BUCKET_BACKND.set
+        window['getAkSkList'](()=>{
+            let requestMethod = "GET";
+            let url = this.BucketService.url;
+            window['canonicalString'](requestMethod, url, ()=>{
+                let options: any = {};
+                this.getSignature(options);
+                this.BucketService.getBuckets(options).subscribe((res)=>{
+                    let str = res['_body'];
+                    let x2js = new X2JS();
+                    let jsonObj = x2js.xml_str2json(str);
+                    let buckets = (jsonObj ? jsonObj.ListAllMyBucketsResult.Buckets:[]);
+                    let allBuckets = [];
+                    if(Object.prototype.toString.call(buckets) === "[object Array]"){
+                        allBuckets = buckets;
+                    }else if(Object.prototype.toString.call(buckets) === "[object Object]"){
+                        allBuckets = [buckets];
+                    }
+                    this.counts.bucketsCount = allBuckets.length;
+                    Consts.BUCKET_BACKND.clear();
+                    Consts.BUCKET_TYPE.clear();
+                    this.http.get('v1/{project_id}/backends').subscribe((res)=>{
+                        let backends = res.json().backends ? res.json().backends :[];
+                        let backendsObj = {};
+                        backends.forEach(element => {
+                            backendsObj[element.name]= element.type;
+                        });
+                        allBuckets.forEach(item=>{
+                            Consts.BUCKET_BACKND.set(item.Name,item.LocationConstraint);
+                            Consts.BUCKET_TYPE.set(item.Name,backendsObj[item.LocationConstraint]);
+                        });
+                        this.initBackendsAndNum(backends);//must after Consts.BUCKET_BACKND.set
+                    });
+                });  
             });
-        });
+        }) 
     }
-
+    //Request header with AK/SK authentication added
+    getSignature(options) {
+        let SignatureObjectwindow = window['getSignatureKey']();
+        let kAccessKey = SignatureObjectwindow.SignatureKey.AccessKey;
+        let kDate = SignatureObjectwindow.SignatureKey.dateStamp;
+        let kRegion = SignatureObjectwindow.SignatureKey.regionName;
+        let kService = SignatureObjectwindow.SignatureKey.serviceName;
+        let kSigning = SignatureObjectwindow.kSigning;
+        let Credential = kAccessKey + '/' + kDate.substr(0,8) + '/' + kRegion + '/' + kService + '/' + 'sign_request';
+        let Signature = 'OPENSDS-HMAC-SHA256' + ' Credential=' + Credential + ',SignedHeaders=host;x-auth-date' + ",Signature=" + kSigning;
+        options['headers'] = new Headers();
+        options.headers.set('Authorization', Signature);
+        options.headers.set('X-Auth-Date', kDate);
+        return options;  
+    }
     initBackendsAndNum(backends){
         let backendArr = Array.from(Consts.BUCKET_BACKND.values());
         this.allBackendNameForCheck = [];
@@ -196,6 +223,7 @@ export class HomeComponent implements OnInit {
         this.allBackends_count.huaweipri = this.Allbackends[this.cloud_type[1]] ? this.Allbackends[Consts.CLOUD_TYPE[1]].length :0;
         this.allBackends_count.huaweipub = this.Allbackends[this.cloud_type[2]] ? this.Allbackends[Consts.CLOUD_TYPE[2]].length :0;
         this.allBackends_count.localBKD = this.Allbackends[this.cloud_type[3]] ? this.Allbackends[Consts.CLOUD_TYPE[3]].length :0 + this.Allbackends[this.cloud_type[4]] ? this.Allbackends[Consts.CLOUD_TYPE[4]].length :0;
+        this.allBackends_count.ibmcos = this.Allbackends[this.cloud_type[5]] ? this.Allbackends[Consts.CLOUD_TYPE[5]].length :0;
     }
 
     getType(){
@@ -236,7 +264,7 @@ export class HomeComponent implements OnInit {
         });
     }
 
-    showBackendsDeatil(type?){
+    showBackendsDetail(type?){
         this.showBackends = true;
         
         if(type){
@@ -278,7 +306,7 @@ export class HomeComponent implements OnInit {
                             this.http.get('v1/{project_id}/backends').subscribe((res)=>{
                                 let backends = res.json().backends ? res.json().backends :[];
                                 this.initBackendsAndNum(backends);
-                                this.showBackendsDeatil(this.selectedType);
+                                this.showBackendsDetail(this.selectedType);
                             });
                         });
                     }
@@ -325,7 +353,7 @@ export class HomeComponent implements OnInit {
         timeout:18000
         };
         this.http.post("v1/{project_id}/backends", param,options).subscribe((res) => {
-            this.showRgister = false;
+            this.showRegisterFlag = false;
             this.http.get('v1/{project_id}/backends').subscribe((res)=>{
                 let backends = res.json().backends ? res.json().backends :[];
                 this.initBackendsAndNum(backends);
@@ -333,7 +361,7 @@ export class HomeComponent implements OnInit {
         });
     }
     showRegister(){
-        this.showRgister = true;
+        this.showRegisterFlag = true;
         this.backendForm.reset();
         this.backendForm.controls['name'].setValidators([Validators.required,Utils.isExisted(this.allBackendNameForCheck)]);
     }

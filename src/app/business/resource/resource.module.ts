@@ -3,13 +3,8 @@ import { CommonModule } from '@angular/common';
 import { ResourceComponent } from './resource.component';
 import { RouterModule } from '@angular/router';
 import { TabViewModule, ButtonModule, DataTableModule, InputTextModule } from './../../components/common/api';
-
-
-import { RegionModule } from './region/region.module';
-
-import { ZoneModule } from './zone/zone.module';
-
-import { StorageModule } from './storage/storage.module';
+import { HttpService } from './../../shared/service/Http.service';
+import { AvailabilityZonesService } from './resource.service';
 
 let routers = [{
   path: '',
@@ -27,10 +22,7 @@ let routers = [{
     ButtonModule,
     DataTableModule,
     InputTextModule,
-    RegionModule,
-    ZoneModule,
-    StorageModule
   ],
-  providers: []
+  providers: [HttpService,AvailabilityZonesService]
 })
 export class ResourceModule { }

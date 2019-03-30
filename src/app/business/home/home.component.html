@@ -8,25 +8,43 @@
                 </g>
             </svg>
             <div (click)="showRegister()" class="ui-home-backend-add">+</div>
-            <div (click)="showBackendsDeatil()" class="cloud-center" >
+            <div (click)="showBackendsDetail()" class="cloud-center" >
                 <div class="ui-home-backend-count">{{allBackends_count.localBKD}}</div>
             </div>
-            <div #cloud_aws class="cloud" (click)="showBackendsDeatil(cloud_type[0])">
+            <div #cloud_aws class="cloud" (click)="showBackendsDetail(cloud_type[0])">
                 <div class="ui-home-backend-count">{{allBackends_count.aws}}</div>
                 <div class="ui-home-backend-logo">
-                    <img src="assets/business/images/common/aws.svg" />
+                    <img src="assets/business/images/common/aws.svg" width="64px"/>
+                </div>
+                <div class="ui-home-backend-name">
+                    <span>Amazon S3</span>
                 </div>
             </div>
-            <div #cloud_hw class="cloud" (click)="showBackendsDeatil(cloud_type[1])">
+            <div #cloud_hw class="cloud" (click)="showBackendsDetail(cloud_type[1])">
                 <div class="ui-home-backend-count">{{allBackends_count.huaweipri}}</div>
                 <div class="ui-home-backend-logo">
-                    <img src="assets/business/images/common/azure.svg" width="42" />
+                    <img src="assets/business/images/common/azure.svg"  width="64px"/>
+                </div>
+                <div class="ui-home-backend-name">
+                    <span>Azure Storage</span>
                 </div>
             </div>            
-            <div #cloud_hw_p class="cloud" (click)="showBackendsDeatil(cloud_type[2])">
+            <div #cloud_hw_p class="cloud" (click)="showBackendsDetail(cloud_type[2])">
                 <div class="ui-home-backend-count">{{allBackends_count.huaweipub}}</div>
                 <div class="ui-home-backend-logo">
-                    <img src="assets/business/images/common/huawei.svg" width="32" />
+                    <img src="assets/business/images/common/huawei.svg"  width="64px"/>
+                </div>
+                <div class="ui-home-backend-name">
+                    <span>Huawei</span>
+                </div>
+            </div>
+            <div #cloud_ibmcos class="cloud" (click)="showBackendsDetail(cloud_type[5])">
+                <div class="ui-home-backend-count">{{allBackends_count.ibmcos}}</div>
+                <div class="ui-home-backend-logo">
+                    <img src="assets/business/images/common/ibm.svg"  width="64px"/>
+                </div>
+                <div class="ui-home-backend-name">
+                    <span>IBM COS</span>
                 </div>
             </div>
         </div>
@@ -38,7 +56,8 @@
     </div>
     <div style="display:flex;">
         <div style="flex:1;padding:20px;">
-            <p-card title="Resource" styleClass="ui-card-shadow">
+            <p-card styleClass="ui-card-shadow">
+                <div class="ui-card-title">Resource</div>
                 <div class="ui-home-card">
                     <div class="ui-home-card-count">
                         <div class="ui-home-card-num">{{counts.volumesCount}}</div>
@@ -58,15 +77,9 @@
                 </div>
             </p-card>
         </div>
-        <!-- <div style="flex:1;padding:20px;">
-            <p-card title="Dataflow Capacity" styleClass="ui-card-shadow" >
-                <div class="ui-home-card">
-                    <p-chart type="line" [responsiveHeight] = "120" [options]='lineOption' [data]="lineData"></p-chart>
-                </div>
-            </p-card>
-        </div> -->
         <div style="flex:1;padding:20px;">
-            <p-card title="Dataflow Quantity" styleClass="ui-card-shadow">
+            <p-card styleClass="ui-card-shadow">
+                    <div class="ui-card-title">Dataflow Quantity</div>
                 <div class="ui-home-card">
                     <div class="ui-home-card-count">
                         <div class="ui-home-card-num">{{counts.migrationCount}}</div>
@@ -99,27 +112,27 @@
 </div>
 
 
-<p-home-dialog header="Register Storage Backend" [(visible)]="showRgister" [width]="510" [height]="790" modal="modal" [style]="{'opacity':'0.95','right':'46px','top':'80px','background':'rgb(44,63,97)'}" >
+<p-home-dialog header="Register Storage Backend" [(visible)]="showRegisterFlag" [width]="510" [height]="790" modal="modal" [style]="{'opacity':'0.95','right':'46px','top':'80px','background':'rgb(44,63,97)'}" >
         <form [grid]="{label: 'ui-g-5', content:'ui-g-20'}" [formGroup]="backendForm" [errorMessage]="errorMessage">
-            <form-item label="Name" >
+            <form-item label="Name" [required]="true">
                 <input id="name" type="text" name="name" formControlName="name"  pInputText />
             </form-item>
-            <form-item label="Type" >
+            <form-item label="Type" [required]="true">
                 <p-dropdown [style]="{'min-width':'220px'}" placeholder="Please select" formControlName="type" [options]="allTypes"  ></p-dropdown>
             </form-item>
-            <form-item label="Region" >
+            <form-item label="Region" [required]="true">
                 <input id="region" type="text" name="region"  formControlName="region"  pInputText />
             </form-item>
-            <form-item label="Endpoint" >
+            <form-item label="Endpoint" [required]="true">
                 <input id="endpoint" type="text" name="endpoint"  formControlName="endpoint"  pInputText />
             </form-item>
-            <form-item label="Bucket" >
+            <form-item label="Bucket" [required]="true">
                 <input id="bucket" type="text" name="bucket" formControlName="bucket"  placeholder="Bucket name" pInputText />
             </form-item>
-            <form-item label="Access Key" >
+            <form-item label="Access Key" [required]="true">
                 <input id="accessKey" type="text" name="accessKey" formControlName="ak"  pInputText />
             </form-item>
-            <form-item label="Secret Key" >
+            <form-item label="Secret Key" [required]="true">
                 <input id="secretKey" type="text" name="secretKey" formControlName="sk"  pInputText />
             </form-item>
         </form>

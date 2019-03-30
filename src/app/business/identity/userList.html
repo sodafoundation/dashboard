@@ -51,7 +51,7 @@
             <textarea [rows]="3" [cols]="27" pInputTextarea formControlName="form_description" ></textarea>
         </form-item>
 
-        <form-item *ngIf="!isEditUser" label="{{label.tenantLabel}}" [required]="false">
+        <form-item *ngIf="!isEditUser" label="{{label.tenantLabel}}" [required]="true">
             <p-multiSelect [options]="tenantLists" [filter]="false" formControlName="form_tenant"></p-multiSelect>
         </form-item>
 

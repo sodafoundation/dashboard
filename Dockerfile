@@ -33,6 +33,5 @@ WORKDIR /opt/dashboard
 COPY ./ ./
 RUN chmod 755 ./image_builder.sh && sudo ./image_builder.sh
 
-COPY entrypoint.sh ./
 # Define default command.
 ENTRYPOINT /opt/dashboard/entrypoint.sh

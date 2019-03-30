@@ -1,6 +1,6 @@
 import { Router,ActivatedRoute } from '@angular/router';
 import { Component, OnInit, ViewContainerRef, ViewChild, Directive, ElementRef, HostBinding, HostListener } from '@angular/core';
-import { I18NService ,Consts,Utils} from 'app/shared/api';
+import { I18NService ,Consts,Utils,MsgBoxService} from 'app/shared/api';
 import { AppService } from 'app/app.service';
 import { trigger, state, style, transition, animate} from '@angular/animations';
 import { I18nPluralPipe } from '@angular/common';
@@ -9,7 +9,7 @@ import { MenuItem ,ConfirmationService} from '../../components/common/api';
 import { BucketService} from './buckets.service';
 import { debug } from 'util';
 import { MigrationService } from './../dataflow/migration.service';
-import { Http } from '@angular/http';
+import { Http, Headers } from '@angular/http';
 declare let X2JS:any;
 @Component({
     selector: 'bucket-list',
@@ -43,6 +43,12 @@ declare let X2JS:any;
     ]
 })
 export class BucketsComponent implements OnInit{
+    kAccessKey = "";
+    kDate = "";
+    kRegion = "";
+    kService = "";
+    kSigning = "";
+    Signature = "";
     selectedBuckets=[];
     allBuckets = [];
     createBucketForm:FormGroup;
@@ -79,6 +85,7 @@ export class BucketsComponent implements OnInit{
         private BucketService: BucketService,
         private MigrationService:MigrationService,
         private http:Http,
+        private msg: MsgBoxService
     ){
         this.errorMessage = {
             "name": { required: "Name is required.",isExisted:"Name is existing" },
@@ -161,54 +168,85 @@ export class BucketsComponent implements OnInit{
         this.allBuckets = [];
         this.bucketOption = [];
         this.allBucketNameForCheck = [];
-        this.BucketService.getBuckets().subscribe((res) => {
-            let str = res._body;
-            let x2js = new X2JS();
-            let jsonObj = x2js.xml_str2json(str);
-            let buckets = (jsonObj ? jsonObj.ListAllMyBucketsResult.Buckets:[]);
-            if(Object.prototype.toString.call(buckets) === "[object Array]"){
-                this.allBuckets = buckets;
-            }else if(Object.prototype.toString.call(buckets) === "[object Object]"){
-                this.allBuckets = [buckets];
-            }
-            this.allBuckets.forEach(item=>{
-                item.name =item.Name;
-                this.allBucketNameForCheck.push(item.Name);
-                item.createdAt = Utils.formatDate(item.CreationDate);
-                this.bucketOption.push({
-                    label:item.name,
-                    value:item.name
-                });
-            });
-            this.initBucket2backendAnd2Type();
-        });
+        window['getAkSkList'](()=>{
+            let requestMethod = "GET";
+            let url = this.BucketService.url;
+            window['canonicalString'](requestMethod, url,()=>{
+                let options: any = {};
+                this.getSignature(options);
+                this.BucketService.getBuckets(options).subscribe((res) => {
+                    let str = res._body;
+                    let x2js = new X2JS();
+                    let jsonObj = x2js.xml_str2json(str);
+                    let buckets = (jsonObj ? jsonObj.ListAllMyBucketsResult.Buckets:[]);
+                    if(Object.prototype.toString.call(buckets) === "[object Array]"){
+                        this.allBuckets = buckets;
+                    }else if(Object.prototype.toString.call(buckets) === "[object Object]"){
+                        this.allBuckets = [buckets];
+                    }
+                    this.allBuckets.forEach(item=>{
+                        item.name =item.Name;
+                        this.allBucketNameForCheck.push(item.Name);
+                        item.createdAt = Utils.formatDate(item.CreationDate);
+                        this.bucketOption.push({
+                            label:item.name,
+                            value:item.name
+                        });
+                    });
+                    this.initBucket2backendAnd2Type();
+                }); 
+            })
+        })
+    }
+    //Request header with AK/SK authentication added
+    getSignature(options) {
+        let SignatureObjectwindow = window['getSignatureKey']();
+        this.kAccessKey = SignatureObjectwindow.SignatureKey.AccessKey;
+        this.kDate = SignatureObjectwindow.SignatureKey.dateStamp;
+        this.kRegion = SignatureObjectwindow.SignatureKey.regionName;
+        this.kService = SignatureObjectwindow.SignatureKey.serviceName;
+        this.kSigning = SignatureObjectwindow.kSigning;
+        let Credential = this.kAccessKey + '/' + this.kDate.substr(0,8) + '/' + this.kRegion + '/' + this.kService + '/' + 'sign_request';
+        this.Signature = 'OPENSDS-HMAC-SHA256' + ' Credential=' + Credential + ',SignedHeaders=host;x-auth-date' + ",Signature=" + this.kSigning;
+        options['headers'] = new Headers();
+        options.headers.set('Authorization', this.Signature);
+        options.headers.set('X-Auth-Date', this.kDate);
+        return options;  
     }
     initBucket2backendAnd2Type(){
-        this.http.get('v1/s3').subscribe((res)=>{
-            let str = res['_body'];
-            let x2js = new X2JS();
-            let jsonObj = x2js.xml_str2json(str);
-            let buckets = (jsonObj ? jsonObj.ListAllMyBucketsResult.Buckets:[]);
-            let allBuckets = [];
-            if(Object.prototype.toString.call(buckets) === "[object Array]"){
-                allBuckets = buckets;
-            }else if(Object.prototype.toString.call(buckets) === "[object Object]"){
-                allBuckets = [buckets];
-            }
-            Consts.BUCKET_BACKND.clear();
-            Consts.BUCKET_TYPE.clear();
-            this.http.get('v1/{project_id}/backends').subscribe((res)=>{
-                let backends = res.json().backends ? res.json().backends :[];
-                let backendsObj = {};
-                backends.forEach(element => {
-                    backendsObj[element.name]= element.type;
+        window['getAkSkList'](()=>{
+            let requestMethod = "GET";
+            let url = this.BucketService.url;
+            window['canonicalString'](requestMethod, url,()=>{
+                let options: any = {};
+                this.getSignature(options);
+                this.BucketService.getBuckets(options).subscribe((res)=>{
+                    let str = res['_body'];
+                    let x2js = new X2JS();
+                    let jsonObj = x2js.xml_str2json(str);
+                    let buckets = (jsonObj ? jsonObj.ListAllMyBucketsResult.Buckets:[]);
+                    let allBuckets = [];
+                    if(Object.prototype.toString.call(buckets) === "[object Array]"){
+                        allBuckets = buckets;
+                    }else if(Object.prototype.toString.call(buckets) === "[object Object]"){
+                        allBuckets = [buckets];
+                    }
+                    Consts.BUCKET_BACKND.clear();
+                    Consts.BUCKET_TYPE.clear();
+                    this.http.get('v1/{project_id}/backends').subscribe((res)=>{
+                        let backends = res.json().backends ? res.json().backends :[];
+                        let backendsObj = {};
+                        backends.forEach(element => {
+                            backendsObj[element.name]= element.type;
+                        });
+                        allBuckets.forEach(item=>{
+                            Consts.BUCKET_BACKND.set(item.Name,item.LocationConstraint);
+                            Consts.BUCKET_TYPE.set(item.Name,backendsObj[item.LocationConstraint]);
+                        });
+                    });
                 });
-                allBuckets.forEach(item=>{
-                    Consts.BUCKET_BACKND.set(item.Name,item.LocationConstraint);
-                    Consts.BUCKET_TYPE.set(item.Name,backendsObj[item.LocationConstraint]);
-                });
-            });
-        });
+            })
+        })
     }
     getTypes() {
         this.allTypes = [];
@@ -310,11 +348,19 @@ export class BucketsComponent implements OnInit{
         let xmlStr = `<CreateBucketConfiguration xmlns=\"http://s3.amazonaws.com/doc/2006-03-01/\">
                         <LocationConstraint>${this.createBucketForm.value.backend}</LocationConstraint>
                     </CreateBucketConfiguration>`
-        this.BucketService.createBucket(this.createBucketForm.value.name,xmlStr).subscribe(()=>{
-            this.createBucketDisplay = false;
-            this.getBuckets();
-        });
-        
+        window['getAkSkList'](()=>{
+            let requestMethod = "PUT";
+            let url = this.BucketService.url+"/"+this.createBucketForm.value.name;
+            window['canonicalString'](requestMethod, url,()=>{
+                let options: any = {};
+                this.getSignature(options);
+                options.headers.set('Content-Type','application/xml');
+                this.BucketService.createBucket(this.createBucketForm.value.name,xmlStr,options).subscribe(()=>{
+                    this.createBucketDisplay = false;
+                    this.getBuckets();
+                }); 
+            })
+        })           
     }
     showCreateForm(){
         this.createBucketDisplay = true;
@@ -323,29 +369,47 @@ export class BucketsComponent implements OnInit{
         this.getTypes();
     }
     deleteBucket(bucket){
-        this.http.get(`v1/{project_id}/plans?bucketname=${bucket.name}`).subscribe((res)=>{
-            let plans = res.json().plans ? res.json().plans : [];
-            let planNames = plans.map((item)=> item.name);
-            if(plans.length === 0){
-                let msg = "<div>Are you sure you want to delete the Bucket ?</div><h3>[ "+ bucket.name +" ]</h3>";
-                let header ="Delete";
-                let acceptLabel = "Delete";
-                let warming = true;
-                this.confirmDialog([msg,header,acceptLabel,warming,"delete"], bucket);
-            }else{
-                let msg = `<div>The bucket has created the following migration task, 
-                and removing the bucket will remove the migration task at the same time.</div>
-                <h5>[${planNames}]</h5>
-                <div>Are you sure you want to delete the Bucket?</div>
-                <h3>[${bucket.name}]</h3>
-                `;
-                let header ="Delete";
-                let acceptLabel = "Delete";
-                let warming = true;
-                this.confirmDialog([msg,header,acceptLabel,warming,"delete"], bucket,plans);
-            }
-        });
-
+        window['getAkSkList'](()=>{
+            let requestMethod = "GET";
+            let url = this.BucketService.url + '/' + bucket.name;
+            window['canonicalString'](requestMethod, url,()=>{
+                let options: any = {};
+                this.getSignature(options);
+                this.BucketService.getBucketById(bucket.name,options).subscribe((res) => {
+                    let str = res._body;
+                    let x2js = new X2JS();
+                    let jsonObj = x2js.xml_str2json(str);
+                    let alldir = jsonObj.ListObjectResponse.ListObjects ? jsonObj.ListObjectResponse.ListObjects :[] ;
+                    if(alldir.length === 0){
+                        this.http.get(`v1/{project_id}/plans?bucketname=${bucket.name}`).subscribe((res)=>{
+                            let plans = res.json().plans ? res.json().plans : [];
+                            let planNames = plans.map((item)=> item.name);
+                            if(plans.length === 0){
+                                let msg = "<div>Are you sure you want to delete the Bucket ?</div><h3>[ "+ bucket.name +" ]</h3>";
+                                let header ="Delete";
+                                let acceptLabel = "Delete";
+                                let warming = true;
+                                this.confirmDialog([msg,header,acceptLabel,warming,"delete"], bucket);
+                            }else{
+                                let msg = `<div>The bucket has created the following migration task, 
+                                and removing the bucket will remove the migration task at the same time.</div>
+                                <h5>[${planNames}]</h5>
+                                <div>Are you sure you want to delete the Bucket?</div>
+                                <h3>[${bucket.name}]</h3>
+                                `;
+                                let header ="Delete";
+                                let acceptLabel = "Delete";
+                                let warming = true;
+                                this.confirmDialog([msg,header,acceptLabel,warming,"delete"], bucket,plans);
+                            }
+                        });
+                    }else{
+                        this.msg.info("The backend cannot be deleted. please delete objects first");
+                    }
+                }); 
+            })
+             
+        })
         
     }
     configLife(bucket){
@@ -365,12 +429,21 @@ export class BucketsComponent implements OnInit{
                             this.http.delete(`v1/{project_id}/plans/${element.id}`).subscribe();
                         });
                     }
-                    this.BucketService.deleteBucket(name).subscribe((res) => {
-                        this.getBuckets();
-                    },
-                    error=>{
-                        this.getBuckets();
-                    });
+                    window['getAkSkList'](()=>{
+                        let requestMethod = "DELETE";
+                        let url = this.BucketService.url + '/' + name;
+                        window['canonicalString'](requestMethod, url,()=>{
+                            let options: any = {};
+                            this.getSignature(options);
+                            this.BucketService.deleteBucket(name,options).subscribe((res) => {
+                                this.getBuckets();
+                            },
+                            error=>{
+                                this.getBuckets();
+                            });
+                        })
+                    })
+                    
                 }
                 catch (e) {
                     console.log(e);
