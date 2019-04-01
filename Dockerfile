@@ -17,21 +17,16 @@
 # Docker run usage:
 # 	docker run -d -p 8088:8088 opensdsio/dashboard:latest
 
-FROM node:8-alpine
+FROM nginx:alpine
 MAINTAINER Leon Wang <wanghui71leon@gmail.com>
-
-ARG DEBIAN_FRONTEND=noninteractive
-
-# Download and install some packages.
-RUN apk update && apk add ca-certificates bash sudo g++ nginx \
-  && rm -rf /var/cache/apk/*
-
 # Current directory is always /opt/dashboard.
 WORKDIR /opt/dashboard
 
-# Copy dashboard source code into container before running command.
-COPY ./ ./
-RUN chmod 755 ./image_builder.sh && sudo ./image_builder.sh
+# Copy dashboard source dist pakcage into container before running command.
+RUN mkdir /var/www/html -p
+COPY ./dist /var/www/html
+COPY entrypoint.sh .
+
 
 # Define default command.
-ENTRYPOINT /opt/dashboard/entrypoint.sh
+CMD /opt/dashboard/entrypoint.sh
