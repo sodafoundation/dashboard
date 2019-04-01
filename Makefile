@@ -26,7 +26,7 @@ dashboard:
 	  && ./image_builder.sh
 .PHONY: dashboard
 
-docker:
+docker: dashboard
 	docker build . -t $(IMAGE):$(VERSION)
 .PHONY: docker
 
