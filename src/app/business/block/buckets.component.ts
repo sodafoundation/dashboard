@@ -76,8 +76,6 @@ export class BucketsComponent implements OnInit{
     };
     selectType;
     allBucketNameForCheck=[];
-    showCreateBucket = false;
-    akSkRouterLink = "/akSkManagement";
     constructor(
         public I18N: I18NService,
         private router: Router,
@@ -176,51 +174,44 @@ export class BucketsComponent implements OnInit{
             window['canonicalString'](requestMethod, url,()=>{
                 let options: any = {};
                 this.getSignature(options);
-                if(Object.keys(options).length > 0){
-                    this.showCreateBucket = false;
-                    this.BucketService.getBuckets(options).subscribe((res) => {
-                        let str = res._body;
-                        let x2js = new X2JS();
-                        let jsonObj = x2js.xml_str2json(str);
-                        let buckets = (jsonObj ? jsonObj.ListAllMyBucketsResult.Buckets:[]);
-                        if(Object.prototype.toString.call(buckets) === "[object Array]"){
-                            this.allBuckets = buckets;
-                        }else if(Object.prototype.toString.call(buckets) === "[object Object]"){
-                            this.allBuckets = [buckets];
-                        }
-                        this.allBuckets.forEach(item=>{
-                            item.name =item.Name;
-                            this.allBucketNameForCheck.push(item.Name);
-                            item.createdAt = Utils.formatDate(item.CreationDate);
-                            this.bucketOption.push({
-                                label:item.name,
-                                value:item.name
-                            });
+                this.BucketService.getBuckets(options).subscribe((res) => {
+                    let str = res._body;
+                    let x2js = new X2JS();
+                    let jsonObj = x2js.xml_str2json(str);
+                    let buckets = (jsonObj ? jsonObj.ListAllMyBucketsResult.Buckets:[]);
+                    if(Object.prototype.toString.call(buckets) === "[object Array]"){
+                        this.allBuckets = buckets;
+                    }else if(Object.prototype.toString.call(buckets) === "[object Object]"){
+                        this.allBuckets = [buckets];
+                    }
+                    this.allBuckets.forEach(item=>{
+                        item.name =item.Name;
+                        this.allBucketNameForCheck.push(item.Name);
+                        item.createdAt = Utils.formatDate(item.CreationDate);
+                        this.bucketOption.push({
+                            label:item.name,
+                            value:item.name
                         });
-                        this.initBucket2backendAnd2Type();
                     });
-                }else{
-                    this.showCreateBucket = true;
-                }
+                    this.initBucket2backendAnd2Type();
+                }); 
             })
         })
     }
     //Request header with AK/SK authentication added
     getSignature(options) {
         let SignatureObjectwindow = window['getSignatureKey']();
-        if(Object.keys(SignatureObjectwindow.SignatureKey).length > 0){
-            this.kAccessKey = SignatureObjectwindow.SignatureKey.AccessKey;
-            this.kDate = SignatureObjectwindow.SignatureKey.dateStamp;
-            this.kRegion = SignatureObjectwindow.SignatureKey.regionName;
-            this.kService = SignatureObjectwindow.SignatureKey.serviceName;
-            this.kSigning = SignatureObjectwindow.kSigning;
-            let Credential = this.kAccessKey + '/' + this.kDate.substr(0,8) + '/' + this.kRegion + '/' + this.kService + '/' + 'sign_request';
-            this.Signature = 'OPENSDS-HMAC-SHA256' + ' Credential=' + Credential + ',SignedHeaders=host;x-auth-date' + ",Signature=" + this.kSigning;
-            options['headers'] = new Headers();
-            options.headers.set('Authorization', this.Signature);
-            options.headers.set('X-Auth-Date', this.kDate);
-            return options; 
-        }
+        this.kAccessKey = SignatureObjectwindow.SignatureKey.AccessKey;
+        this.kDate = SignatureObjectwindow.SignatureKey.dateStamp;
+        this.kRegion = SignatureObjectwindow.SignatureKey.regionName;
+        this.kService = SignatureObjectwindow.SignatureKey.serviceName;
+        this.kSigning = SignatureObjectwindow.kSigning;
+        let Credential = this.kAccessKey + '/' + this.kDate.substr(0,8) + '/' + this.kRegion + '/' + this.kService + '/' + 'sign_request';
+        this.Signature = 'OPENSDS-HMAC-SHA256' + ' Credential=' + Credential + ',SignedHeaders=host;x-auth-date' + ",Signature=" + this.kSigning;
+        options['headers'] = new Headers();
+        options.headers.set('Authorization', this.Signature);
+        options.headers.set('X-Auth-Date', this.kDate);
+        return options;  
     }
     initBucket2backendAnd2Type(){
         window['getAkSkList'](()=>{

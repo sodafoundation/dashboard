@@ -55,7 +55,7 @@ export class AppComponent implements OnInit, AfterViewInit {
     projectItemId;
     userId;
     SignatureKey = {};
-    akSkRouterLink = "/akSkManagement";
+    akSkRouterLink = "/akSkManagement/";
     Signature = "";
     kDate = "";
     stringToSign = "";
@@ -183,7 +183,7 @@ export class AppComponent implements OnInit, AfterViewInit {
                                     cb();
                                 }
                             }
-                        });
+                        });  
                     })
                 })
             } else {
@@ -361,10 +361,7 @@ export class AppComponent implements OnInit, AfterViewInit {
                     let accessKey = JSON.parse(item.blob);
                     detailArr.push(accessKey);
                 })
-                this.SignatureKey = [];
-                if(detailArr.length > 0){
-                    window['getParameters'](detailArr); 
-                }
+                window['getParameters'](detailArr);
                 if (cb) {
                     cb();
                 }
@@ -398,6 +395,7 @@ export class AppComponent implements OnInit, AfterViewInit {
         this.renderWave();
         
         window['getParameters'] = (detailArr)=>{
+            this.SignatureKey = [];
             let secretAccessKey = detailArr[Math.round(Math.random()*(detailArr.length-1))];
             this.SignatureKey['secretAccessKey'] = secretAccessKey.secret;
             //System time is converted to UTC time
@@ -479,16 +477,13 @@ export class AppComponent implements OnInit, AfterViewInit {
     //Request header with AK/SK authentication added
     getSignature(){
         let SignatureObjectwindow = window['getSignatureKey']();
-        this.Signature = "";
-        if(Object.keys(SignatureObjectwindow.SignatureKey).length > 0){
-            let kAccessKey = SignatureObjectwindow.SignatureKey.AccessKey;
-            this.kDate = SignatureObjectwindow.SignatureKey.dateStamp;
-            let kRegion = SignatureObjectwindow.SignatureKey.regionName;
-            let kService = SignatureObjectwindow.SignatureKey.serviceName;
-            let kSigning = SignatureObjectwindow.kSigning;
-            let Credential = kAccessKey + '/' + this.kDate.substr(0,8) + '/' + kRegion + '/' + kService + '/' + 'sign_request';
-            this.Signature = 'OPENSDS-HMAC-SHA256' + ' Credential=' + Credential + ',SignedHeaders=host;x-auth-date' + ",Signature=" + kSigning;
-        } 
+        let kAccessKey = SignatureObjectwindow.SignatureKey.AccessKey;
+        this.kDate = SignatureObjectwindow.SignatureKey.dateStamp;
+        let kRegion = SignatureObjectwindow.SignatureKey.regionName;
+        let kService = SignatureObjectwindow.SignatureKey.serviceName;
+        let kSigning = SignatureObjectwindow.kSigning;
+        let Credential = kAccessKey + '/' + this.kDate.substr(0,8) + '/' + kRegion + '/' + kService + '/' + 'sign_request';
+        this.Signature = 'OPENSDS-HMAC-SHA256' + ' Credential=' + Credential + ',SignedHeaders=host;x-auth-date' + ",Signature=" + kSigning;
     }
     checkTimeOut() {
         this.currentTime = new Date().getTime(); //update current time
@@ -639,8 +634,8 @@ export class AppComponent implements OnInit, AfterViewInit {
             this.projectItemId = project.id;
             this.userId = user.id;
             this.tenantItems = [];
-            window['userId'] = this.userId;
-            window['projectItemId'] = this.projectItemId;
+            this.akSkRouterLink = "/akSkManagement/";
+            this.akSkRouterLink += this.userId + "/" + this.projectItemId;
             projects.map(item => {
                 let tenantItemObj = {};
                 tenantItemObj["label"] = item.name;

@@ -15,6 +15,8 @@ import { Http } from '@angular/http';
     providers: [ConfirmationService, MsgBoxService]
 })
 export class AkSkComponent implements OnInit{
+    userId;
+    projectItemId;
     akSkDetail = [];
     showAkSk = false;
     newRandomValues = "";
@@ -40,7 +42,11 @@ export class AkSkComponent implements OnInit{
     ){}
 
     ngOnInit() {
-        this.manageAkSk();
+        this.ActivatedRoute.params.subscribe((params) =>{
+            this.userId =  params.userId;
+            this.projectItemId = params.projectItemId;
+            this.manageAkSk();
+        })
         
     }
     manageAkSk(){
@@ -48,7 +54,7 @@ export class AkSkComponent implements OnInit{
         this.akSkDetail = [];
         let request: any = { params:{} };
         request.params = {
-            "userId": window['userId'],
+            "userId":this.userId,
             "type":"ec2"
         }
         this.akSkService.getAkSkList(request,this.options).subscribe(res=>{
@@ -69,9 +75,7 @@ export class AkSkComponent implements OnInit{
             }else{
                 this.canAddKey = false;
             }
-            if(this.akSkDetail.length > 0){
-                window['getParameters'](this.akSkDetail);
-            }
+            window['getParameters'](this.akSkDetail); 
         })
     }
     addKey(){
@@ -83,9 +87,9 @@ export class AkSkComponent implements OnInit{
         request = {
             "credential":{
                 "blob": blob,
-                "project_id": window['projectItemId'],
+                "project_id": this.projectItemId,
                 "type": "ec2",
-                "user_id":  window['userId']
+                "user_id": this.userId
             }
         }
         this.akSkService.createAkSk(request,this.options).subscribe(re=>{
