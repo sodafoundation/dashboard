@@ -100,55 +100,57 @@ export class MigrationListComponent implements OnInit {
             window['canonicalString'](requestMethod, url,()=>{
                 //Request header with AK/SK authentication added
                 let SignatureObjectwindow = window['getSignatureKey']();
-                let kAccessKey = SignatureObjectwindow.SignatureKey.AccessKey;
-                let kDate = SignatureObjectwindow.SignatureKey.dateStamp;
-                let kRegion = SignatureObjectwindow.SignatureKey.regionName;
-                let kService = SignatureObjectwindow.SignatureKey.serviceName;
-                let kSigning = SignatureObjectwindow.kSigning;
-                let Credential = kAccessKey + '/' + kDate.substr(0,8) + '/' + kRegion + '/' + kService + '/' + 'sign_request';
-                let Signature = 'OPENSDS-HMAC-SHA256' + ' Credential=' + Credential + ',SignedHeaders=host;x-auth-date' + ",Signature=" + kSigning;
-                let options: any = {};
-                options['headers'] = new Headers();
-                options.headers.set('Authorization', Signature);
-                options.headers.set('X-Auth-Date', kDate);
-                this.BucketService.getBuckets(options).subscribe((res) => {
-                    let str = res._body;
-                    let x2js = new X2JS();
-                    let jsonObj = x2js.xml_str2json(str);
-                    let buckets = (jsonObj ? jsonObj.ListAllMyBucketsResult.Buckets:[]);
-                    let allBuckets = [];
-                    if(Object.prototype.toString.call(buckets) === "[object Array]"){
-                        allBuckets = buckets;
-                    }else if(Object.prototype.toString.call(buckets) === "[object Object]"){
-                        allBuckets = [buckets];
-                    }
-                    if(Consts.BUCKET_BACKND.size > 0 && Consts.BUCKET_TYPE.size > 0 ){
-                        allBuckets.forEach(item=>{
-                            this.bucketOption.push({
+                if(Object.keys(SignatureObjectwindow.SignatureKey).length > 0){
+                    let kAccessKey = SignatureObjectwindow.SignatureKey.AccessKey;
+                    let kDate = SignatureObjectwindow.SignatureKey.dateStamp;
+                    let kRegion = SignatureObjectwindow.SignatureKey.regionName;
+                    let kService = SignatureObjectwindow.SignatureKey.serviceName;
+                    let kSigning = SignatureObjectwindow.kSigning;
+                    let Credential = kAccessKey + '/' + kDate.substr(0,8) + '/' + kRegion + '/' + kService + '/' + 'sign_request';
+                    let Signature = 'OPENSDS-HMAC-SHA256' + ' Credential=' + Credential + ',SignedHeaders=host;x-auth-date' + ",Signature=" + kSigning;
+                    let options: any = {};
+                    options['headers'] = new Headers();
+                    options.headers.set('Authorization', Signature);
+                    options.headers.set('X-Auth-Date', kDate);
+                    this.BucketService.getBuckets(options).subscribe((res) => {
+                        let str = res._body;
+                        let x2js = new X2JS();
+                        let jsonObj = x2js.xml_str2json(str);
+                        let buckets = (jsonObj ? jsonObj.ListAllMyBucketsResult.Buckets:[]);
+                        let allBuckets = [];
+                        if(Object.prototype.toString.call(buckets) === "[object Array]"){
+                            allBuckets = buckets;
+                        }else if(Object.prototype.toString.call(buckets) === "[object Object]"){
+                            allBuckets = [buckets];
+                        }
+                        if(Consts.BUCKET_BACKND.size > 0 && Consts.BUCKET_TYPE.size > 0 ){
+                            allBuckets.forEach(item=>{
+                                this.bucketOption.push({
+                                            label:item.Name,
+                                            value:item.Name
+                                        });
+                            });
+                            this.getMigrations();
+                        }else{
+                            this.http.get('v1/{project_id}/backends').subscribe((res)=>{
+                                let backends = res.json().backends ? res.json().backends :[];
+                                let backendsObj = {};
+                                backends.forEach(element => {
+                                    backendsObj[element.name]= element.type;
+                                });
+                                allBuckets.forEach(item=>{
+                                    Consts.BUCKET_BACKND.set(item.Name,item.LocationConstraint);
+                                    Consts.BUCKET_TYPE.set(item.Name,backendsObj[item.LocationConstraint]);
+                                    this.bucketOption.push({
                                         label:item.Name,
                                         value:item.Name
                                     });
-                        });
-                        this.getMigrations();
-                    }else{
-                        this.http.get('v1/{project_id}/backends').subscribe((res)=>{
-                            let backends = res.json().backends ? res.json().backends :[];
-                            let backendsObj = {};
-                            backends.forEach(element => {
-                                backendsObj[element.name]= element.type;
-                            });
-                            allBuckets.forEach(item=>{
-                                Consts.BUCKET_BACKND.set(item.Name,item.LocationConstraint);
-                                Consts.BUCKET_TYPE.set(item.Name,backendsObj[item.LocationConstraint]);
-                                this.bucketOption.push({
-                                    label:item.Name,
-                                    value:item.Name
                                 });
+                                this.getMigrations();
                             });
-                            this.getMigrations();
-                        });
-                    }
-                });
+                        }
+                    }); 
+                }
             })
             
         })
