@@ -168,9 +168,6 @@ export class HomeComponent implements OnInit {
                         }else if(Object.prototype.toString.call(buckets) === "[object Object]"){
                             allBuckets = [buckets];
                         }
-                        this.counts.bucketsCount = allBuckets.length;
-                        Consts.BUCKET_BACKND.clear();
-                        Consts.BUCKET_TYPE.clear();
                         this.getBuckend(allBuckets);
                     }); 
                 }else{
@@ -182,6 +179,9 @@ export class HomeComponent implements OnInit {
         }) 
     }
     getBuckend(allBuckets){
+        this.counts.bucketsCount = allBuckets.length;
+        Consts.BUCKET_BACKND.clear();
+        Consts.BUCKET_TYPE.clear();
         this.http.get('v1/{project_id}/backends').subscribe((res)=>{
             let backends = res.json().backends ? res.json().backends :[];
             let backendsObj = {};
