@@ -1,4 +1,5 @@
-#!/bin/bash
+/opt/dashboard # cat entrypoint.sh 
+#!/bin/sh
 
 # Copyright (c) 2018 Huawei Technologies Co., Ltd. All Rights Reserved.
 #
@@ -38,4 +39,4 @@ cat > /etc/nginx/conf.d/default.conf <<EOF
     }
 EOF
 
-/usr/sbin/nginx -g "pid /tmp/nginx.pid; daemon off;"
+/usr/sbin/nginx -g "daemon off;"
