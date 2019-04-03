@@ -168,26 +168,32 @@ export class HomeComponent implements OnInit {
                         }else if(Object.prototype.toString.call(buckets) === "[object Object]"){
                             allBuckets = [buckets];
                         }
-                        this.counts.bucketsCount = allBuckets.length;
-                        Consts.BUCKET_BACKND.clear();
-                        Consts.BUCKET_TYPE.clear();
-                        this.http.get('v1/{project_id}/backends').subscribe((res)=>{
-                            let backends = res.json().backends ? res.json().backends :[];
-                            let backendsObj = {};
-                            backends.forEach(element => {
-                                backendsObj[element.name]= element.type;
-                            });
-                            allBuckets.forEach(item=>{
-                                Consts.BUCKET_BACKND.set(item.Name,item.LocationConstraint);
-                                Consts.BUCKET_TYPE.set(item.Name,backendsObj[item.LocationConstraint]);
-                            });
-                            this.initBackendsAndNum(backends);//must after Consts.BUCKET_BACKND.set
-                        });
+                        this.getBuckend(allBuckets);
                     }); 
+                }else{
+                    let allBuckets = [];
+                    this.getBuckend(allBuckets);
                 }
                  
             });
         }) 
+    }
+    getBuckend(allBuckets){
+        this.counts.bucketsCount = allBuckets.length;
+        Consts.BUCKET_BACKND.clear();
+        Consts.BUCKET_TYPE.clear();
+        this.http.get('v1/{project_id}/backends').subscribe((res)=>{
+            let backends = res.json().backends ? res.json().backends :[];
+            let backendsObj = {};
+            backends.forEach(element => {
+                backendsObj[element.name]= element.type;
+            });
+            allBuckets.forEach(item=>{
+                Consts.BUCKET_BACKND.set(item.Name,item.LocationConstraint);
+                Consts.BUCKET_TYPE.set(item.Name,backendsObj[item.LocationConstraint]);
+            });
+            this.initBackendsAndNum(backends);//must after Consts.BUCKET_BACKND.set
+        });
     }
     //Request header with AK/SK authentication added
     getSignature(options) {
