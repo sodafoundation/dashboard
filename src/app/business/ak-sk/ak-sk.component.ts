@@ -55,9 +55,11 @@ export class AkSkComponent implements OnInit{
             let response = res.json();
             let detailArr = [];
             response.credentials.forEach(item=>{
-                let accessKey = JSON.parse(item.blob);
-                accessKey.id = item.id;
-                detailArr.push(accessKey);
+                if(item.user_id == window['userId']){
+                    let accessKey = JSON.parse(item.blob);
+                    accessKey.id = item.id;
+                    detailArr.push(accessKey);
+                }
             })
             if(Object.prototype.toString.call(detailArr) === "[object Array]"){
                 this.akSkDetail = detailArr;

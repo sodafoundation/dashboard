@@ -358,8 +358,10 @@ export class AppComponent implements OnInit, AfterViewInit {
                 let response = res.json();
                 let detailArr = [];
                 response.credentials.forEach(item=>{
-                    let accessKey = JSON.parse(item.blob);
-                    detailArr.push(accessKey);
+                    if(item.user_id == window['userId']){
+                        let accessKey = JSON.parse(item.blob);
+                        detailArr.push(accessKey);
+                    }
                 })
                 this.SignatureKey = [];
                 if(detailArr.length > 0){
@@ -573,6 +575,7 @@ export class AppComponent implements OnInit, AfterViewInit {
     }
 
     login() {
+        this.isHomePage = true;
         let request: any = { auth: {} };
         request.auth = {
             "identity": {

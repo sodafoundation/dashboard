@@ -12,7 +12,7 @@
             <button class="" pButton type="button" (click)="getBuckets()"  icon="fa-refresh"></button>
         </div>
     </div>
-    <div style="padding-bottom: 0.1rem;" *ngIf="showCreateBucket">
+    <div style="padding-bottom: 0.1rem;color:red;" *ngIf="showCreateBucket">
         The operation of the buckets requires AK/SK authentication. The current system does not have AK/SK. Please go to
         <b>
             <a href="#" [routerLink] = "[akSkRouterLink]">add AK/SK</a> 
