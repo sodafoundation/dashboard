@@ -61,7 +61,7 @@ export class CreateProfileComponent implements OnInit {
     param = {
         name: '',
         description: '',
-        extras: {
+        customProperties: {
              
         }
     };
@@ -405,7 +405,7 @@ export class CreateProfileComponent implements OnInit {
                 }
                 return;
             }
-            this.param.extras["replicationType"]= "ArrayBased";
+            this.param.customProperties["replicationType"]= "ArrayBased";
             this.param["replicationProperties"]={
                 "dataProtection": {
                     "replicaType": this.repPolicy.value.repType,
@@ -449,7 +449,7 @@ export class CreateProfileComponent implements OnInit {
         if (this.customizationItems.length > 0) {
             let arrLength = this.customizationItems.length;
             for (let i = 0; i < arrLength; i++) {
-                this.param.extras[this.customizationItems[i].key] = this.customizationItems[i].value;
+                this.param.customProperties[this.customizationItems[i].key] = this.customizationItems[i].value;
             }
         }
         this.createProfile(this.param);
