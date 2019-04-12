@@ -1,4 +1,3 @@
-/opt/dashboard # cat entrypoint.sh 
 #!/bin/sh
 
 # Copyright (c) 2018 Huawei Technologies Co., Ltd. All Rights Reserved.
@@ -15,28 +14,42 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-OPENSDS_HOST_IP=${OPENSDS_HOST_IP:-127.0.0.1}
+OPENSDS_HOTPOT_URL=${OPENSDS_HOTPOT_URL:-http://127.0.0.1:50040}
+OPENSDS_GELATO_URL=${OPENSDS_GELATO_URL:-http://127.0.0.1:8089}
+OPENSDS_AUTH_URL=${OPENSDS_AUTH_URL:-http://127.0.0.1/identity}
+
+OPENSDS_HOTPOT_API_VERSION=${OPENSDS_HOTPOT_API_VERSION:-v1beta}
+OPENSDS_GELATO_API_VERSION=${OPENSDS_GELATO_API_VERSION:-v1}
+OPENSDS_AUTH_API_VERSION=${OPENSDS_AUTH_API_VERSION:-v3}
+
 LISTEN_PORT=${LISTEN_PORT:-8088}
 cat > /etc/nginx/conf.d/default.conf <<EOF
     server {
-        listen $LISTEN_PORT default_server;
-        listen [::]:$LISTEN_PORT default_server;
+        listen ${LISTEN_PORT} default_server;
+        listen [::]:${LISTEN_PORT} default_server;
         root /var/www/html;
         index index.html index.htm index.nginx-debian.html;
         server_name _;
-        location /v3/ {
-            proxy_pass http://$OPENSDS_HOST_IP/identity/v3/;
+        location /${OPENSDS_AUTH_API_VERSION}/ {
+            proxy_pass ${OPENSDS_AUTH_URL}/${OPENSDS_AUTH_API_VERSION}/;
         }
 
-        location /v1beta/ {
-            proxy_pass http://$OPENSDS_HOST_IP:50040/v1beta/;
+        location /${OPENSDS_HOTPOT_API_VERSION}/ {
+            proxy_pass ${OPENSDS_HOTPOT_URL}/${OPENSDS_HOTPOT_API_VERSION}/;
         }
 
-        location /v1/ {
-            proxy_pass http://$OPENSDS_HOST_IP:8089/v1/;
+        location /${OPENSDS_GELATO_API_VERSION}/ {
+            proxy_pass ${OPENSDS_GELATO_URL}/${OPENSDS_GELATO_API_VERSION}/;
             client_max_body_size 10240m;
         }
     }
 EOF
 
+# print some log to stdin
+echo "Service Start Time $(date)"
+echo "Configuration /etc/nginx/conf.d/default.conf"
+cat /etc/nginx/conf.d/default.conf
+
+# start nginx service
 /usr/sbin/nginx -g "daemon off;"
+
