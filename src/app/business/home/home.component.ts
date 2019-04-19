@@ -44,6 +44,7 @@ export class HomeComponent implements OnInit {
     selectedBackend:any;
     cloud_type = [];
     allBackendNameForCheck=[];
+    isLocalCloud=false;
 
     @ViewChild("path") path: ElementRef;
     @ViewChild("cloud_aws") c_AWS: ElementRef;
@@ -85,7 +86,7 @@ export class HomeComponent implements OnInit {
         this.backendForm = this.fb.group({
             "name":['', {validators:[Validators.required,Utils.isExisted(this.allBackendNameForCheck)]}],
             "type":['',{validators:[Validators.required]}],
-            "region":['',{validators:[Validators.required], updateOn:'change'}],
+            "region":['',{updateOn:'change'}],
             "endpoint":['',{validators:[Validators.required], updateOn:'change'}],
             "bucket":['',{validators:[Validators.required], updateOn:'change'}],
             "ak":['',{validators:[Validators.required], updateOn:'change'}],
@@ -148,6 +149,21 @@ export class HomeComponent implements OnInit {
         });
         this.initBucket2backendAnd2Type();
     }
+
+/* ---- to hide region textbox on selection of 'CEPH" type -----*/    
+onChange(event) {
+    console.log('event :' + event);
+	var strUser = event.value;
+     if(strUser == 'ceph-s3'){
+      	this.isLocalCloud=true;
+
+    }else{
+ 	this.isLocalCloud=false;
+     
+     }
+    console.log(event.value);
+
+} 
 
     initBucket2backendAnd2Type(){
         window['getAkSkList'](()=>{
@@ -238,6 +254,8 @@ export class HomeComponent implements OnInit {
             });
         });
     }
+
+
     configModify(backend){
         this.modifyBackendshow = true;
         this.selectedBackend = backend;
@@ -270,11 +288,19 @@ export class HomeComponent implements OnInit {
         if(type){
             this.selectedType = type;
             this.typeDetail = this.Allbackends[type] ? this.Allbackends[type]:[];
+
+            
+
+
         }else{
             this.selectedType = null;
             let fs_arr = this.Allbackends['fusionstorage-object'] ? this.Allbackends['fusionstorage-object'] : [];
             let ceph_arr = this.Allbackends['ceph-s3'] ? this.Allbackends['ceph-s3'] : [];
             this.typeDetail = fs_arr.concat(ceph_arr);
+
+
+
+
         }
     }
 
