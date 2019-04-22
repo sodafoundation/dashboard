@@ -158,13 +158,10 @@ onChange(event) {
       	this.isLocalCloud=true;
 
     }else{
- 	this.isLocalCloud=false;
-     
+ 	this.isLocalCloud=false; 
      }
     console.log(event.value);
-
 } 
-
     initBucket2backendAnd2Type(){
         window['getAkSkList'](()=>{
             let requestMethod = "GET";
@@ -254,8 +251,6 @@ onChange(event) {
             });
         });
     }
-
-
     configModify(backend){
         this.modifyBackendshow = true;
         this.selectedBackend = backend;
@@ -288,19 +283,11 @@ onChange(event) {
         if(type){
             this.selectedType = type;
             this.typeDetail = this.Allbackends[type] ? this.Allbackends[type]:[];
-
-            
-
-
         }else{
             this.selectedType = null;
             let fs_arr = this.Allbackends['fusionstorage-object'] ? this.Allbackends['fusionstorage-object'] : [];
             let ceph_arr = this.Allbackends['ceph-s3'] ? this.Allbackends['ceph-s3'] : [];
             this.typeDetail = fs_arr.concat(ceph_arr);
-
-
-
-
         }
     }
 
