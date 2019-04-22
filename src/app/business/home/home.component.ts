@@ -152,15 +152,13 @@ export class HomeComponent implements OnInit {
 
 /* ---- to hide region textbox on selection of 'CEPH" type -----*/    
 onChange(event) {
-    console.log('event :' + event);
-	var strUser = event.value;
+	let strUser = event.value;
      if(strUser == 'ceph-s3'){
       	this.isLocalCloud=true;
 
     }else{
  	this.isLocalCloud=false; 
      }
-    console.log(event.value);
 } 
     initBucket2backendAnd2Type(){
         window['getAkSkList'](()=>{
