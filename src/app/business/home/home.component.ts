@@ -199,17 +199,9 @@ export class HomeComponent implements OnInit {
     getSignature(options) {
         let SignatureObjectwindow = window['getSignatureKey']();
         if(Object.keys(SignatureObjectwindow.SignatureKey).length > 0){
-            let kAccessKey = SignatureObjectwindow.SignatureKey.AccessKey;
-            let kDate = SignatureObjectwindow.SignatureKey.dateStamp;
-            let kRegion = SignatureObjectwindow.SignatureKey.regionName;
-            let kService = SignatureObjectwindow.SignatureKey.serviceName;
-            let kSigning = SignatureObjectwindow.kSigning;
-            let Credential = kAccessKey + '/' + kDate.substr(0,8) + '/' + kRegion + '/' + kService + '/' + 'sign_request';
-            let Signature = 'OPENSDS-HMAC-SHA256' + ' Credential=' + Credential + ',SignedHeaders=host;x-auth-date' + ",Signature=" + kSigning;
-            options['headers'] = new Headers();
-            options.headers.set('Authorization', Signature);
-            options.headers.set('X-Auth-Date', kDate);
-            return options; 
+            let requestObject = this.BucketService.getSignatureOptions(SignatureObjectwindow,options);
+            options = requestObject['options'];
+            return options;
         } 
     }
     initBackendsAndNum(backends){

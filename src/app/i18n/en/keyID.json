@@ -113,8 +113,27 @@
     "sds_login_error_msg_401":"Incorrect username or password!",
     "sds_login_error_msg_503":"Service Unavailable!",
     "sds_login_error_msg_default":"Internal Server Error!",
-    "sds_isExisted": "Name is existing."
-
-
-
+    "sds_isExisted": "Name is existing.",
+    "sds_lifeCycleDays": "Days after Creation",
+    "sds_lifeCycleTrans": "Transistion to",
+    "sds_lifeCycle_expiration_delete": "Days after creation delete object",
+    "sds_lifeCycle_expiration_cleanUp": "Clean up unfinished staging uploads",
+    "sds_lifeCycle_edit": "Edit",
+    "sds_backend": "backend",
+    "sds_creatFileShare": "Create File Share",
+    "sds_fileShare_detail": "File Share detail",
+    "sds_fileShare_protocol": "Protocols",
+    "sds_fileShare_shareSize": "shareSize",
+    "sds_fileShare_title": "File Share",
+    "sds_fileShare_access": "Access",
+    "sds_fileShare_acl_user": "Add Host/Network Group",
+    "sds_fileShare_acl_level": "Access Level",
+    "sds_fileShare_delete_acl": "Delete Access",
+    "sds_fileShare_addRule": "Add Rule",
+    "sds_fileShare_create": "Create File Share",
+    "sds_backendNull": "backend is required",
+    "sds_fileShare_delete": "Delete FileShare",
+    "sds_profile_storgeType": "Storage Type",
+    "sds_profile_storageAcl": "Storage Access Capability",
+    "sds_storageClassNull": "storageClass is required"
 }

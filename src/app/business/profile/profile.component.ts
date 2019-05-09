@@ -1,6 +1,6 @@
 import { Router } from '@angular/router';
 import { Component, OnInit, ViewContainerRef, ViewChild, Directive, ElementRef, HostBinding, HostListener } from '@angular/core';
-import { I18NService } from 'app/shared/api';
+import { I18NService, ParamStorService } from 'app/shared/api';
 import { AppService } from 'app/app.service';
 import { trigger, state, style, transition, animate } from '@angular/animations';
 import { I18nPluralPipe } from '@angular/common';
@@ -43,21 +43,34 @@ export class ProfileComponent implements OnInit {
     profileId;
     profiles;
     showWarningDialog = false;
+    isAdministrator = true;
     constructor(
         public I18N: I18NService,
         // private router: Router
         private ProfileService: ProfileService,
-        private confirmationService:ConfirmationService
+        private confirmationService:ConfirmationService,
+        private paramStor: ParamStorService
     ) { }
     showCard = true;
     ngOnInit() {
         this.getProfiles();
         this.profiles = [];
+        let username = this.paramStor.CURRENT_USER().split("|")[0];
+        if(username == "admin"){
+            this.isAdministrator = true;
+        }else{
+            this.isAdministrator = false;
+        }
     }
 
     getProfiles() {
         this.ProfileService.getProfiles().subscribe((res) => {
             this.profiles = res.json();
+            this.profiles.forEach(item=>{
+                if(item.storageType && item.storageType == "File"){
+                    delete item.replicationProperties;
+                }
+            })
         });
     }
 

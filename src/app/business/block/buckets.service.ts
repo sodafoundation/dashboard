@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { I18NService, HttpService, ParamStorService } from '../../shared/api';
 import { Observable } from 'rxjs';
+import { Headers } from '@angular/http';
 
 @Injectable()
 export class BucketService {
@@ -68,6 +69,42 @@ export class BucketService {
   getBackendsByTypeId(typeId): Observable<any> {
     return this.http.get('v1/{project_id}/backends?type=' + typeId);
   }
-}
 
+  //get transOptions
+  getTransOptions(param,options){
+    let url = this.url + "/" + param;
+    return this.http.get(url, options);
+  }
+  //get lifeCycle
+  getLifeCycle(name, options){
+    let url = this.url + "/" + name;
+    return this.http.get(url, options)
+  }
+  //put lifeCycle
+  createLifeCycle(name,param,options){
+    let url = this.url + "/" + name;
+    return this.http.put(url,param,options);
+  }
+
+  // Rquest header with AK/SK authentication added
+  getSignatureOptions(SignatureObjectwindow, options?){
+    let kAccessKey = SignatureObjectwindow.SignatureKey.AccessKey;
+    let kDate = SignatureObjectwindow.SignatureKey.dateStamp;
+    let kRegion = SignatureObjectwindow.SignatureKey.regionName;
+    let kService = SignatureObjectwindow.SignatureKey.serviceName;
+    let kSigning = SignatureObjectwindow.kSigning;
+    let Credential = kAccessKey + '/' + kDate.substr(0,8) + '/' + kRegion + '/' + kService + '/' + 'sign_request';
+    let Signature = 'OPENSDS-HMAC-SHA256' + ' Credential=' + Credential + ',SignedHeaders=host;x-auth-date' + ",Signature=" + kSigning;
+    let requestObject = {};
+    if(options){
+      options['headers'] = new Headers();
+      options.headers.set('Authorization',Signature);
+      options.headers.set('X-Auth-Date', kDate);
+      requestObject['options'] = options;
+    }
+    requestObject['Signature'] = Signature;
+    requestObject['kDate'] = kDate;
+    return requestObject;
+  }
+}
 

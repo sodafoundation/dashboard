@@ -19,11 +19,7 @@ declare let X2JS:any;
   providers: [ConfirmationService, MsgBoxService],
 })
 export class BucketDetailComponent implements OnInit {
-  kAccessKey = "";
   kDate = "";
-  kRegion = "";
-  kService = "";
-  kSigning = "";
   Signature = "";
   colon = "/";
   folderId = "";
@@ -57,11 +53,16 @@ export class BucketDetailComponent implements OnInit {
     "backend": { required: "Backend is required." },
     "name": {
       required: "name is required.",
+      isExisted:"Name is existing",
       pattern: "Folder names cannot contain the following names/:"
     }
   };
+  validRule= {
+    'name':/^((?!\/|:).)*$/
+  };
   uploadForm :FormGroup;
   files;
+  allFolderNameForCheck = [];
   constructor(
     private ActivatedRoute: ActivatedRoute,
     public I18N:I18NService,
@@ -74,7 +75,7 @@ export class BucketDetailComponent implements OnInit {
   ) 
   {
     this.createFolderForm = this.fb.group({
-      "name": ["",{validators:[Validators.required,Validators.pattern(/^((?!\/|:).)*$/)], updateOn:'change'}]
+      "name": ["",{validators:[Validators.required,Utils.isExisted(this.allFolderNameForCheck),Validators.pattern(this.validRule.name)], updateOn:'change'}]
     });
     this.uploadForm = this.fb.group({
         "backend":["",{validators:[Validators.required], updateOn:'change'}],
@@ -189,11 +190,13 @@ export class BucketDetailComponent implements OnInit {
             })
           }
           let folderArray = [];
+          this.allFolderNameForCheck = [];
           this.allDir.forEach(item=>{
             item.size = Utils.getDisplayCapacity(item.Size,2,'KB');
             item.lastModified = Utils.formatDate(item.LastModified);
             if(item.ObjectKey.indexOf(this.colon) !=-1){
               item.objectName = item.ObjectKey.slice(0,item.ObjectKey.lastIndexOf(this.colon));
+              this.allFolderNameForCheck.push(item.objectName);
               item.newFolder = true;
               item.disabled = false;
               item.size = "--";
@@ -226,17 +229,11 @@ export class BucketDetailComponent implements OnInit {
   //Request header with AK/SK authentication added
   getSignature(options) {
     let SignatureObjectwindow = window['getSignatureKey']();
-    this.kAccessKey = SignatureObjectwindow.SignatureKey.AccessKey;
-    this.kDate = SignatureObjectwindow.SignatureKey.dateStamp;
-    this.kRegion = SignatureObjectwindow.SignatureKey.regionName;
-    this.kService = SignatureObjectwindow.SignatureKey.serviceName;
-    this.kSigning = SignatureObjectwindow.kSigning;
-    let Credential = this.kAccessKey + '/' + this.kDate.substr(0,8) + '/' + this.kRegion + '/' + this.kService + '/' + 'sign_request';
-    this.Signature = 'OPENSDS-HMAC-SHA256' + ' Credential=' + Credential + ',SignedHeaders=host;x-auth-date' + ",Signature=" + this.kSigning;
-    options['headers'] = new Headers();
-    options.headers.set('Authorization', this.Signature);
-    options.headers.set('X-Auth-Date', this.kDate);
-    return options;  
+    let requestObject = this.BucketService.getSignatureOptions(SignatureObjectwindow,options);
+    options = requestObject['options'];
+    this.Signature = requestObject['Signature'];
+    this.kDate = requestObject['kDate'];
+    return options;
   }
   getTypes() {
     this.allTypes = [];
@@ -283,6 +280,7 @@ export class BucketDetailComponent implements OnInit {
       case 'fromFolder':
         this.createFolderForm.reset();
         this.showCreateFolder = true;
+        this.createFolderForm.controls['name'].setValidators([Validators.required,Utils.isExisted(this.allFolderNameForCheck),Validators.pattern(this.validRule.name)]);
         let user =document.getElementById("folder");
         break;
       case 'upload':
@@ -379,14 +377,6 @@ export class BucketDetailComponent implements OnInit {
     });
     
     
-  }
-  showDialog(from){
-    switch(from){
-      case 'fromFolder':
-        this.createFolderForm.reset();
-        this.showCreateFolder = true;
-        break;
-    }
   }
   //Gets the name of the folder
   folderNameOnChanged(folder){
