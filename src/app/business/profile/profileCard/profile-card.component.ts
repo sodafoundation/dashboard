@@ -99,7 +99,7 @@ export class ProfileCardComponent implements OnInit {
                 position: 'right',
                 fontSize: 12
             }
-        }; 
+        };
     }
 
     index;
