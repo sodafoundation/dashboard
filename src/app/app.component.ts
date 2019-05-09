@@ -5,6 +5,7 @@ import { I18NService, Consts, ParamStorService, MsgBoxService, Utils } from 'app
 import { I18nPluralPipe } from '@angular/common';
 import { MenuItem, SelectItem} from './components/common/api';
 import { akSkService } from './business/ak-sk/ak-sk.service';
+import { BucketService } from './business/block/buckets.service';
 
 let d3 = window["d3"];
 declare let X2JS: any;
@@ -78,6 +79,11 @@ export class AppComponent implements OnInit, AfterViewInit {
             "title": "Dataflow",
             "description": "Through migration / replication capability.",
             "routerLink": "/dataflow"
+        },
+        {
+            "title": "Profile",
+            "description": "Profiles",
+            "routerLink": "/profile"
         }
     ]
 
@@ -99,7 +105,7 @@ export class AppComponent implements OnInit, AfterViewInit {
         },
         {
             "title": "Profile",
-            "description": "Block profiles",
+            "description": "Profiles",
             "routerLink": "/profile"
         },
         {
@@ -126,7 +132,8 @@ export class AppComponent implements OnInit, AfterViewInit {
         private paramStor: ParamStorService,
         private msg: MsgBoxService,
         private akSkService: akSkService,
-        public I18N: I18NService
+        public I18N: I18NService,
+        private BucketService: BucketService
     ) { }
 
     // Wave params
@@ -152,7 +159,7 @@ export class AppComponent implements OnInit, AfterViewInit {
                 this.selectFileName = selectFile.name 
             }
             this.fileName = selectFile.name;
-            let uploadUrl = 'v1/s3/'+ bucketId + '/' + this.selectFileName;
+            let uploadUrl = this.BucketService.url + '/'+ bucketId + '/' + this.selectFileName;
             if (selectFile['size'] > Consts.BYTES_PER_CHUNK) {
                 //first step get uploadId
                 window['getAkSkList'](()=>{
@@ -249,7 +256,7 @@ export class AppComponent implements OnInit, AfterViewInit {
         }
         window['segmentUpload'] = (i, chunks, blob, uploadId, options, bucketId, cb) => {
             let chunk = blob.slice(chunks[i].start, chunks[i].end);
-            let uploadUrl = 'v1/s3/'+ bucketId + '/' + this.selectFileName;
+            let uploadUrl = this.BucketService.url + '/'+ bucketId + '/' + this.selectFileName;
             window['getAkSkList'](()=>{
                 let requestMethod = "PUT";
                 let url = uploadUrl + '?partNumber=' + (i + 1) + '&uploadId=' + uploadId;
@@ -301,7 +308,7 @@ export class AppComponent implements OnInit, AfterViewInit {
             })
         }
         window['CompleteMultipartUpload'] = (bucketId, blob, uploadId, marltipart, options, cb) => {
-            let uploadUrl = 'v1/s3/'+ bucketId + '/' + this.selectFileName;
+            let uploadUrl = this.BucketService.url + '/'+ bucketId + '/' + this.selectFileName;
             window['getAkSkList'](()=>{
                 let requestMethod = "PUT";
                 let url = uploadUrl + '?uploadId=' + uploadId;
@@ -483,13 +490,9 @@ export class AppComponent implements OnInit, AfterViewInit {
         let SignatureObjectwindow = window['getSignatureKey']();
         this.Signature = "";
         if(Object.keys(SignatureObjectwindow.SignatureKey).length > 0){
-            let kAccessKey = SignatureObjectwindow.SignatureKey.AccessKey;
-            this.kDate = SignatureObjectwindow.SignatureKey.dateStamp;
-            let kRegion = SignatureObjectwindow.SignatureKey.regionName;
-            let kService = SignatureObjectwindow.SignatureKey.serviceName;
-            let kSigning = SignatureObjectwindow.kSigning;
-            let Credential = kAccessKey + '/' + this.kDate.substr(0,8) + '/' + kRegion + '/' + kService + '/' + 'sign_request';
-            this.Signature = 'OPENSDS-HMAC-SHA256' + ' Credential=' + Credential + ',SignedHeaders=host;x-auth-date' + ",Signature=" + kSigning;
+            let requestObject = this.BucketService.getSignatureOptions(SignatureObjectwindow);
+            this.Signature = requestObject['Signature'];
+            this.kDate = requestObject['kDate'];
         } 
     }
     checkTimeOut() {

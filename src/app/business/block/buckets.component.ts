@@ -43,12 +43,6 @@ declare let X2JS:any;
     ]
 })
 export class BucketsComponent implements OnInit{
-    kAccessKey = "";
-    kDate = "";
-    kRegion = "";
-    kService = "";
-    kSigning = "";
-    Signature = "";
     selectedBuckets=[];
     allBuckets = [];
     createBucketForm:FormGroup;
@@ -209,17 +203,9 @@ export class BucketsComponent implements OnInit{
     getSignature(options) {
         let SignatureObjectwindow = window['getSignatureKey']();
         if(Object.keys(SignatureObjectwindow.SignatureKey).length > 0){
-            this.kAccessKey = SignatureObjectwindow.SignatureKey.AccessKey;
-            this.kDate = SignatureObjectwindow.SignatureKey.dateStamp;
-            this.kRegion = SignatureObjectwindow.SignatureKey.regionName;
-            this.kService = SignatureObjectwindow.SignatureKey.serviceName;
-            this.kSigning = SignatureObjectwindow.kSigning;
-            let Credential = this.kAccessKey + '/' + this.kDate.substr(0,8) + '/' + this.kRegion + '/' + this.kService + '/' + 'sign_request';
-            this.Signature = 'OPENSDS-HMAC-SHA256' + ' Credential=' + Credential + ',SignedHeaders=host;x-auth-date' + ",Signature=" + this.kSigning;
-            options['headers'] = new Headers();
-            options.headers.set('Authorization', this.Signature);
-            options.headers.set('X-Auth-Date', this.kDate);
-            return options; 
+            let requestObject = this.BucketService.getSignatureOptions(SignatureObjectwindow, options);
+            options = requestObject['options'];
+            return options;
         }
     }
     initBucket2backendAnd2Type(){

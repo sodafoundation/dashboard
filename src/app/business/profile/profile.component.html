@@ -3,12 +3,12 @@
     <p>{{I18N.keyID['sds_profile_list_descrip']}}</p>
 </div>
 
-<div class="content-header">
+<div class="content-header" *ngIf="isAdministrator">
     <p-button label="{{I18N.keyID['sds_block_volume_create']}}" styleClass="ui-button-secondary ui-button-large" [routerLink]="['/createProfile']"></p-button>
 </div>
 
 <div class="ui-g-12 ui-md-6 relative-class" *ngFor="let profile of profiles">
-    <div class="table-toolbar">
+    <div class="table-toolbar" *ngIf="isAdministrator">
         <p-button (click)="showWarningDialogFun(profile)" styleClass="close-class profile-card-close" icon="fa fa-fw fa-close">
         </p-button>
     </div>

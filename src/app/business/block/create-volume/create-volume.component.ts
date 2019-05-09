@@ -150,10 +150,12 @@ export class CreateVolumeComponent implements OnInit {
     this.ProfileService.getProfiles().subscribe((res) => {
       let profiles = res.json();
       profiles.forEach(profile => {
-        this.profileOptions.push({
-          label: profile.name,
-          value: {id:profile.id,profileName:profile.name}
-        });
+        if(!profile.storageType || profile.storageType =="Block"){
+          this.profileOptions.push({
+            label: profile.name,
+            value: {id:profile.id,profileName:profile.name}
+          });
+        }
       });
     });
   }
