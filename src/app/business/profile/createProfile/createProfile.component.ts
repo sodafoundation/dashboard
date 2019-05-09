@@ -426,6 +426,9 @@ export class CreateProfileComponent implements OnInit {
         this.msgs.push({ severity: 'info', summary: 'Success', detail: 'Form Submitted' });
         this.param.name = value.name;
         this.param.description = value.description;
+        if(value.storageTypes == "Block"){
+            value.storageTypes = "block";
+        }
         this.param.storageType = value.storageTypes;
         if(this.qosIsChecked){
             if(!this.qosPolicy.valid){
@@ -454,7 +457,12 @@ export class CreateProfileComponent implements OnInit {
                 }
             }
         }
-        if(value.storageTypes == "File"){
+        if(value.storageTypes == "file"){
+            if(value.storageAcl == "Read,Write"){
+                value.storageAcl = ["Read","Write"];
+            }else if(value.storageAcl == "Read,Write,Execute"){
+                value.storageAcl = ["Read","Write","Execute"];
+            }
             this.param["provisioningProperties"].dataStorage.storageAccessCapability = value.storageAcl;
         }
         if(this.replicationIsChecked){
