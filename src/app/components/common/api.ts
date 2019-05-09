@@ -44,4 +44,3 @@ export { GrowlModule } from '../growl/growl';
 export { PanelModule } from '../panel/panel';
 export { SpinnerModule } from '../spinner/spinner';
 export { CalendarModule } from '../calendar/calendar';
-export { InputSwitchModule } from '../inputswitch/inputswitch';
