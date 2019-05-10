@@ -42,7 +42,7 @@
         </form-item>
 
         <form-item label="{{label.profile}}" [required]="false">
-            <p-dropdown [style]="{'min-width':'220px'}" [options]="snapProfileOptions" formControlName="profile"></p-dropdown>
+            <p-dropdown [style]="{'min-width':'220px'}" placeholder="Please select" [options]="snapProfileOptions" formControlName="profile"></p-dropdown>
         </form-item>
 
         <form-item label="{{label.description}}" [required]="false">
@@ -147,7 +147,7 @@
                         </form-item>
                         <form-item label="Secondary Profile" [required]="true">
                             <div style="display: inline-flex;" class="ui-fluid">
-                                <p-dropdown [style]="{'min-width':'136px'}" [options]="profileOptions" formControlName="profileOption"></p-dropdown>
+                                <p-dropdown [style]="{'min-width':'136px'}" [options]="profileOptions" formControlName="profileOption" placeholder="{{I18N.keyID['sds_block_volume_selectpro']}}"></p-dropdown>
                             </div>
                         </form-item>
                     </form>

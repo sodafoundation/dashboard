@@ -8,12 +8,20 @@
             <div style="overflow: hidden; text-overflow:ellipsis; white-space: nowrap;" title="{{data && data.description ?data.description :'--'}}">{{data && data.description ?data.description :"--"}}</div>
         </div>
         <div class="padding-class"style="clear:both;">
+            <span class="label-class">Storage Type:</span>
+            <span>{{data.storageType? data.storageType : "--"}}</span>
+        </div>
+        <div class="padding-class">
             <span class="label-class">Access Protocol:</span>
             <span>{{data['provisioningProperties'].ioConnectivity && data['provisioningProperties'].ioConnectivity.accessProtocol}}</span>
         </div>
         <div class="padding-class">
             <span class="label-class">Provisioning Type:</span>
             <span>{{data['provisioningProperties'].dataStorage && data['provisioningProperties'].dataStorage.provisioningPolicy}}</span>
+        </div>
+        <div class="padding-class" *ngIf="storageAclFlag">
+            <span class="label-class">Storage Access Capability:</span>
+            <span>{{data['provisioningProperties'].dataStorage && data['provisioningProperties'].dataStorage.storageAccessCapability}}</span>
         </div>
         <div class="padding-class">
             <span class="label-class">bucketName:</span>

@@ -8,6 +8,8 @@ import { AppComponent } from './app.component';
 import { SharedModule } from './shared/shared.module';
 import { DropMenuModule, SelectButtonModule, ButtonModule, InputTextModule } from './components/common/api';
 import { LocationStrategy, HashLocationStrategy } from '@angular/common';
+import { BucketService } from './business/block/buckets.service';
+import { HttpService } from './shared/service/Http.service';
 
 import { MessagesModule } from './components/messages/messages';
 
@@ -29,7 +31,7 @@ import { MessagesModule } from './components/messages/messages';
     InputTextModule
   ],
   providers: [
-      { provide: LocationStrategy, useClass: HashLocationStrategy }
+      { provide: LocationStrategy, useClass: HashLocationStrategy }, BucketService, HttpService
   ],
   bootstrap: [AppComponent]
 })

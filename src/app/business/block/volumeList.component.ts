@@ -40,18 +40,8 @@ export class VolumeListComponent implements OnInit {
         }
 
     ];
-    profileOptions = [
-        {
-            label: 'Select Profile',
-            value: null
-        }
-    ];
-    snapProfileOptions = [
-        {
-            label: 'Select Profile',
-            value: null
-        }
-    ];
+    profileOptions = [];
+    snapProfileOptions = [];
     azOption=[{label:"Secondary",value:"secondary"}];
     selectedVolumes = [];
     volumes = [];
@@ -71,7 +61,7 @@ export class VolumeListComponent implements OnInit {
         "name": { required: "Name is required." },
         "description": { maxlength: "Max. length is 200." },
         "repName":{ required: "Name is required." },
-        "profileOption":{ required: "Name is required." },
+        "profileOption":{ required: "Profile is required." },
         "expandSize":{
             required: "Expand Capacity is required.",
             pattern: "Expand Capacity can only be number"
@@ -224,13 +214,17 @@ export class VolumeListComponent implements OnInit {
     }
 
     getProfiles() {
+        this.profileOptions = [];
+        this.snapProfileOptions = [];
         this.ProfileService.getProfiles().subscribe((res) => {
             this.profiles = res.json();
             this.profiles.forEach(profile => {
-                this.profileOptions.push({
-                    label: profile.name,
-                    value: profile.id
-                });
+                if(!profile.storageType || profile.storageType =="block"){
+                    this.profileOptions.push({
+                        label: profile.name,
+                        value: profile.id
+                    });
+                }
                 if(profile.snapshotProperties.topology.bucket){
                     this.snapProfileOptions.push({
                         label: profile.name,

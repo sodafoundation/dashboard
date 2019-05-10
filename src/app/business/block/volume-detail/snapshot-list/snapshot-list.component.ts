@@ -157,6 +157,7 @@ export class SnapshotListComponent implements OnInit {
           value: this.volumeId
         }
       );
+      this.getSnapshots(this.getSnapshots);
     });
   }
 

@@ -45,6 +45,7 @@ import { ButtonModule } from './../../../components/common/api';
 export class ProfileCardComponent implements OnInit {
     policys = [];
     data:any;
+    storageAclFlag = false;
     @Input() 
     set cardData(data: any) {
         this.data = data;
@@ -56,8 +57,13 @@ export class ProfileCardComponent implements OnInit {
             if(data['snapshotProperties'].retention && Object.keys(data['snapshotProperties'].retention).length !== 0){
                 this.policys.push("Snapshot");
             }
-            if(data['replicationProperties'].dataProtection && Object.keys(data['replicationProperties'].dataProtection).length !== 0){
+            if(data['replicationProperties'] && data['replicationProperties'].dataProtection && Object.keys(data['replicationProperties'].dataProtection).length !== 0){
                 this.policys.push("Replication");
+            }
+            if(data['provisioningProperties'].dataStorage.storageAccessCapability){
+                this.storageAclFlag = true;
+            }else{
+                this.storageAclFlag = false;
             }
         }
         
