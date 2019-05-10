@@ -193,7 +193,7 @@ export class BucketDetailComponent implements OnInit {
           this.allFolderNameForCheck = [];
           this.allDir.forEach(item=>{
             item.size = Utils.getDisplayCapacity(item.Size,2,'KB');
-            item.lastModified = Utils.formatDate(item.LastModified);
+            item.lastModified = Utils.formatDate(item.LastModified * 1000);
             if(item.ObjectKey.indexOf(this.colon) !=-1){
               item.objectName = item.ObjectKey.slice(0,item.ObjectKey.lastIndexOf(this.colon));
               this.allFolderNameForCheck.push(item.objectName);
