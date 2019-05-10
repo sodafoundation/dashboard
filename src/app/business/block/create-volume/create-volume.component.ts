@@ -150,7 +150,7 @@ export class CreateVolumeComponent implements OnInit {
     this.ProfileService.getProfiles().subscribe((res) => {
       let profiles = res.json();
       profiles.forEach(profile => {
-        if(!profile.storageType || profile.storageType =="Block"){
+        if(!profile.storageType || profile.storageType =="block"){
           this.profileOptions.push({
             label: profile.name,
             value: {id:profile.id,profileName:profile.name}

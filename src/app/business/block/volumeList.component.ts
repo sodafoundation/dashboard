@@ -41,6 +41,7 @@ export class VolumeListComponent implements OnInit {
 
     ];
     profileOptions = [];
+    snapProfileOptions = [];
     azOption=[{label:"Secondary",value:"secondary"}];
     selectedVolumes = [];
     volumes = [];
@@ -214,11 +215,18 @@ export class VolumeListComponent implements OnInit {
 
     getProfiles() {
         this.profileOptions = [];
+        this.snapProfileOptions = [];
         this.ProfileService.getProfiles().subscribe((res) => {
             this.profiles = res.json();
             this.profiles.forEach(profile => {
-                if(!profile.storageType || profile.storageType =="Block"){
+                if(!profile.storageType || profile.storageType =="block"){
                     this.profileOptions.push({
+                        label: profile.name,
+                        value: profile.id
+                    });
+                }
+                if(profile.snapshotProperties.topology.bucket){
+                    this.snapProfileOptions.push({
                         label: profile.name,
                         value: profile.id
                     });
