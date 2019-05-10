@@ -41,6 +41,10 @@
             <input type="text" pInputText formControlName="name" />
         </form-item>
 
+        <form-item label="{{label.profile}}" [required]="false">
+            <p-dropdown [style]="{'min-width':'220px'}" placeholder="Please select" [options]="snapProfileOptions" formControlName="profile"></p-dropdown>
+        </form-item>
+
         <form-item label="{{label.description}}" [required]="false">
             <textarea [rows]="5" [cols]="48" pInputTextarea formControlName="description"></textarea>
         </form-item>
