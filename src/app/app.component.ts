@@ -57,7 +57,7 @@ export class AppComponent implements OnInit, AfterViewInit {
     userId;
     SignatureKey = {};
     akSkRouterLink = "/akSkManagement";
-    monitorConfigLink = "/monitor/config"'
+    monitorConfigLink = "/monitor/config";
     Signature = "";
     kDate = "";
     stringToSign = "";
