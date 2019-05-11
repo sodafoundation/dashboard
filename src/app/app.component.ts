@@ -57,6 +57,7 @@ export class AppComponent implements OnInit, AfterViewInit {
     userId;
     SignatureKey = {};
     akSkRouterLink = "/akSkManagement";
+    monitorConfigLink = "/monitor/config"'
     Signature = "";
     kDate = "";
     stringToSign = "";
@@ -102,6 +103,11 @@ export class AppComponent implements OnInit, AfterViewInit {
             "title": "Dataflow",
             "description": "Through migration / replication capability.",
             "routerLink": "/dataflow"
+        },
+        {
+            "title": "Monitor",
+            "description": "Telemetry information.",
+            "routerLink": "/monitor"
         },
         {
             "title": "Profile",
@@ -695,6 +701,13 @@ export class AppComponent implements OnInit, AfterViewInit {
                         },{
                             label: "AK/SK Management",
                             routerLink: this.akSkRouterLink,
+                            command: ()=>{
+                                this.isHomePage = false;
+                            }
+                        },
+                        {
+                            label: "Monitor Configuration",
+                            routerLink: this.monitorConfigLink,
                             command: ()=>{
                                 this.isHomePage = false;
                             }
