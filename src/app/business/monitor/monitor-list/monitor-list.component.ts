@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import {MonitorService} from '../monitor.service';
+import { ButtonModule, Message} from '../../../components/common/api';
 
 @Component({
   selector: 'app-monitor-list',
@@ -8,6 +9,7 @@ import {MonitorService} from '../monitor.service';
 })
 export class MonitorListComponent implements OnInit {
 
+  msgs: Message[];
   monitorList: any[];
   options = {
     headers: {
