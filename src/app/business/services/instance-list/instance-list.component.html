@@ -13,7 +13,7 @@
           <button type="button" class="ui-button-secondary" pButton (click)="refreshTable()"  icon="fa fa-refresh" pTooltip="Refresh Table" tooltipPosition="top"></button>
       </div>
   </div>
-  <p-dataTable [value]="instances" [loading]="loading" loadingIcon="fa-spinner" expandableRows="true" [rows]="10" [paginator]="true" [rowsPerPageOptions]="[5,10,20]" [emptyMessage]="emptymessage">
+  <p-dataTable [value]="instances" [loading]="loading" loadingIcon="fa-spinner" expandableRows="true" [rows]="10" [paginator]="true" [rowsPerPageOptions]="[5,10,20]">
       <p-column expander="true" [style]="{'width':'22px'}"></p-column>  
       <p-column field="parameters.name" header="Name" >
         <ng-template pTemplate="body" let-instance="rowData">
@@ -66,9 +66,7 @@
               </div>
           </div>
       </ng-template>
-      <ng-template pTemplate="emptymessage">
-          
-      </ng-template>
+      
   </p-dataTable>
 </div>
 

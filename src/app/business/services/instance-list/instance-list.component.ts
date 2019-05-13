@@ -12,12 +12,14 @@ export class InstanceListComponent implements OnInit {
   instances: any[] ;
   first: number = 0;
   id: any;
+  loading: boolean;
   constructor( private router: Router,
     private ActivatedRoute:ActivatedRoute,
     public I18N: I18NService,
     ) { }
 
   ngOnInit() {
+    this.loading = true;
     this.id = this.ActivatedRoute.snapshot.params['id'];
     console.log("Sent id in Instance list is ", this.id);
     this.instances  = [
@@ -2332,6 +2334,10 @@ export class InstanceListComponent implements OnInit {
   this.instances.forEach(element => {
     //element['start_timestamp'] = this.util.formatDate(element['start_timestamp']);
   });
+  this.loading = false;
+  }
+  refreshTable(){
+      console.log("Table REfreshed");
   }
 
 }
