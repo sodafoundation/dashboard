@@ -217,7 +217,7 @@ body{
 
 #layout-topbar .user-info .ui-button {
     width: 0.24rem;
-    color: #54617a;
+    color: #ffffff;
     .fa {
         font-size: 0.24rem;
         margin-top: -0.12rem;
@@ -778,9 +778,6 @@ pre {
     width: 100%;
 }
 
-.ui-growl {
-    top: 100px;
-}
 
 a {
     text-decoration: none;
@@ -1933,3 +1930,25 @@ a {
         }
     }
 }
+/* Common Overrides */
+.ui-button-icon-left{
+    left: 0.1rem !important;
+}
+.page-header{
+    margin-bottom: 25px;
+}
+.page-title{
+    font-size: 0.3rem;
+    line-height: 50px;
+    color: #657D95;
+}
+.page-subtitle{
+    color: #657D95;line-height: 20px;
+}
+.table-toolbar{
+    margin-top: 20px
+}
+.ui-growl-message p{
+    color: #ffffff;
+}
+/* Common Overides end */

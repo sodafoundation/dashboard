@@ -24,7 +24,7 @@
         <div class="user-info">
             <div>
                 <h1>{{ username }}</h1>
-                <p-dropmenu icon="fa-ellipsis-v" [model]="dropMenuItems" styleClass="ui-dropmenu-large"></p-dropmenu>
+                <p-dropmenu icon="fa-chevron-circle-down" [model]="dropMenuItems" styleClass="ui-dropmenu-large"></p-dropmenu>
             </div>
             <p><span><i class="fa fa-map-marker"></i>default_region</span><span *ngIf=" username!='admin' "><i class="fa fa-users"></i>{{ currentTenant }}</span></p>
             <a href="#" [routerLink]="[akSkRouterLink]"></a>
