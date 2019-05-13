@@ -1,0 +1,45 @@
+<div id="instance-list">
+    <div class="page-header">
+        <div class="page-title">Create Instance</div>
+        <div class="page-subtitle">
+            Create an instance of a workload.
+        </div>
+    </div>
+    <div class="create-instance-form">
+        <form [formGroup]="createInstanceForm" [grid]="{label: 'ui-g-2', content:'ui-g-2'}" (ngSubmit)="onSubmit(createInstanceForm.value)" [errorMessage]="errorMessage">
+            <div class="ui-grid ui-grid-responsive ui-grid-pad ui-fluid">
+                <form-item label="{{label.hostIP}}" [required]="true">
+                    <input pInputText type="text" size="80" formControlName="hostIP" />
+                </form-item>
+                <form-item label="{{label.port}}" [required]="true">
+                    <input pInputText type="text" size="80" formControlName="port" />
+                </form-item>
+                <form-item label="{{label.name}}" [required]="true">
+                    <input pInputText type="text" size="80" formControlName="name" />
+                </form-item>
+                <form-item label="{{label.description}}" [required]="false">
+                    <textarea [rows]="5" [cols]="48"  pInputTextarea formControlName="description"></textarea>
+                </form-item>
+                <form-item label="{{label.destBackend}}" [required]="true">
+                    <input pInputText type="text" size="80" formControlName="destBackend" />
+                </form-item>
+                <form-item label="{{label.srcBucketName}}" [required]="true">
+                    <input pInputText type="text" size="80" formControlName="srcBucketName" />
+                </form-item>
+                <form-item label="{{label.destBucketName}}" [required]="true">
+                    <input pInputText type="text" size="80" formControlName="destBucketName" />
+                </form-item>
+                <form-item label="{{label.remainSource}}" [required]="true">
+                    <span *ngIf = "false"><p-radioButton label="Auto" formControlName="remainSource" name="typeRadioGroup" value="Auto"></p-radioButton></span>
+                    <span><p-radioButton label="True" formControlName="remainSource" name="typeRadioGroup" value="true"></p-radioButton></span>
+                    <span style="margin-left: 30px;"><p-radioButton label="False" formControlName="remainSource" name="typeRadioGroup" value="false"></p-radioButton></span>
+                </form-item>
+                
+            </div>
+            <div class="form-submit-button">
+                <button pButton type="submit" class="ui-button-secondary ui-button-large" label="OK" [disabled]="!createInstanceForm.valid"></button>
+                <button pButton type="button" class="ui-button-large" label="Cancel" [routerLink]="['/services']"></button>
+            </div>
+        </form>
+    </div>
+</div>

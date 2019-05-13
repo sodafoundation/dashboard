@@ -1,0 +1,37 @@
+<p-growl [value]="msgs"></p-growl>
+<div id="service-list-component">
+    <div class="page-header">
+        <div class="page-title">Service List</div>
+        <div class="page-subtitle">
+            You can create an instance of any of the services below by clicking on the create button.
+        </div>
+    </div>
+    
+    <div class="service-category" *ngFor="let category of services; index as i">
+        <p-panel [toggleable]="true">
+            <p-header>
+                {{category.service.name | titlecase}} <i class="icon fa fa-question-circle" pTooltip="Click on any of the services to run." tooltipPosition="right"></i>
+            </p-header>
+            <div class="ui-g service-row" >
+                <div class="ui-g-4" *ngFor="let item of category.service.workflows; index as i">
+                    <p-card title="{{item.name}}" subtitle="Number of instances: {{instanceCount}}" styleClass="workflow-definition-card">
+                        <p-header>
+                            <!-- <span class="pull-right">
+                                    <button pButton type="button" icon="fa-chevron-down" ></button>
+                            </span> -->
+                        </p-header>
+                        <div>{{item.description}}</div>
+                        <p-footer>
+                            <button pButton type="button" label="Provision" icon="fa-play" class="ui-button-secondary" [routerLink]="['createInstance', item.id]"></button>
+                            <button pButton type="button" label="Instances" icon="fa-list" class="ui-button-primary" [routerLink]="['instanceList', item.id]" [disabled]="!instanceCount"></button>
+                        </p-footer>
+                    </p-card>
+                </div>
+            </div>
+            <p-footer>
+                Click on any of the services to start an instance.
+            </p-footer>
+        </p-panel>
+    </div>
+</div>
+

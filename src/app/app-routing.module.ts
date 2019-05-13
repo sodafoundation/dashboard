@@ -18,7 +18,8 @@ const routes: Routes = [
     {path: 'dataflow', loadChildren: './business/dataflow/dataflow.module#DataflowModule'},
     {path: 'bucketDetail/:bucketId', loadChildren: './business/block/bucket-detail/bucket-detail.module#BucketDetailModule'},
     {path: 'akSkManagement', loadChildren: './business/ak-sk/ak-sk.module#AkSkModule'},
-    {path: 'monitor', loadChildren: './business/monitor/monitor.module#MonitorModule'}
+    {path: 'monitor', loadChildren: './business/monitor/monitor.module#MonitorModule'},
+    {path: 'services', loadChildren: './business/services/services.module#ServicesModule'}
 ];
 
 @NgModule({

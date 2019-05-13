@@ -6,7 +6,7 @@ import { trigger, state, style, transition, animate} from '@angular/animations';
 import { I18nPluralPipe } from '@angular/common';
 
 @Component({
-    templateUrl: './service.component.html',
+    template: `<router-outlet></router-outlet>`,
     styleUrls: [],
     animations: [
         trigger('overlayState', [
@@ -34,11 +34,9 @@ import { I18nPluralPipe } from '@angular/common';
         ])
     ]
 })
-export class ServiceComponent implements OnInit{
+export class ServicesComponent implements OnInit{
 
     constructor(
-        // private I18N: I18NService,
-        // private router: Router
     ){}
     
     ngOnInit() {
