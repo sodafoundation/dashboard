@@ -102,6 +102,12 @@ export class SnapshotListComponent implements OnInit {
   }
 
   createSnapshot() {
+    if(!this.snapshotFormGroup.valid){
+      for(let i in this.snapshotFormGroup.controls){
+          this.snapshotFormGroup.controls[i].markAsTouched();
+      }
+      return;
+    }
     let param = {
       name: this.snapshotFormGroup.value.name,
       volumeId: this.volumeId,
@@ -175,6 +181,12 @@ export class SnapshotListComponent implements OnInit {
   }
 
   modifySnapshot(){
+    if(!this.snapshotFormGroup.valid){
+      for(let i in this.snapshotFormGroup.controls){
+          this.snapshotFormGroup.controls[i].markAsTouched();
+      }
+      return;
+    }
     let param = {
       name: this.snapshotFormGroup.value.name,
       description: this.snapshotFormGroup.value.description
@@ -191,16 +203,22 @@ export class SnapshotListComponent implements OnInit {
 
   showSnapshotPropertyDialog(method,selectedSnapshot?){
     this.snapshotPropertyDisplay = true;
+    this.snapshotFormGroup.reset();
     if(method === 'create'){
       this.isCreate = true;
       this.isModify = false;
       this.snapshotProperty.name = '';
       this.snapshotProperty.description = '';
+      this.snapshotFormGroup.controls['name'].setValidators([Validators.required]);
     }else if(method === 'modify'){
       this.isCreate = false;
       this.isModify = true;
       this.snapshotProperty.name = selectedSnapshot.name;
       this.snapshotProperty.description = selectedSnapshot.description;
+      this.createVolumeFormGroup = this.fb.group({
+        "name": [this.snapshotProperty.name, Validators.required],
+        "description": ["", Validators.maxLength(200)]
+      });
     }
     if(selectedSnapshot && selectedSnapshot.id){
       this.selectedSnapshotId = selectedSnapshot.id;
