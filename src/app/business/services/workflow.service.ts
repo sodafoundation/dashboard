@@ -7,7 +7,7 @@ import { I18NService, ParamStorService } from '../../shared/api';
 @Injectable()
 export class WorkflowService {
 
-  url = "v1beta/orchestration/";
+  url = "/v1beta/orchestration";
   options = {
       headers: {
           'X-Auth-Token': localStorage['auth-token']
@@ -24,12 +24,17 @@ export class WorkflowService {
   }
 
   public getServices(): Observable<any> {
-    let detailUrl = this.url + 'services'
+    let detailUrl = this.url + '/services'
     return this.http.get(detailUrl);
   }
 
   public getInstances(): Observable<any> {
-    let detailUrl = this.url + 'instances'
+    let detailUrl = this.url + 'instances';
+    return this.http.get(detailUrl);
+  }
+
+  public getInstancesById(id): Observable<any> {
+    let detailUrl = this.url + 'instances/' + id 
     return this.http.get(detailUrl);
   }
 

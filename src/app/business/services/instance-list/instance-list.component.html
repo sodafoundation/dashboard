@@ -32,10 +32,10 @@
       </p-column>
       <p-column header="{{I18N.keyID['sds_block_volume_operation']}}" [style]="{'width':'500px'}">
           <ng-template pTemplate="body" let-instance="rowData">
-            <button [disabled]="instance.status=='requested'" pButton type="button" label="Run" icon="fa fa-play" styleClass="ui-button-success"  (click)="startInstance()"></button>
-            <button [disabled]="instance.status!='requested'" pButton type="button" label="Re-Run" icon="fa fa-repeat" styleClass="ui-button-info"  (click)="restartInstance()"></button>
-            <button pButton type="button" label="Pause" icon="fa fa-pause" styleClass="ui-button-info"  (click)="pauseInstance()"></button>
-            <button pButton type="button" label="Abort" icon="fa fa-exclamation-triangle" styleClass="ui-button-danger"  (click)="abortInstance()"></button>
+            <button [disabled]="instance.status=='requested'" pButton type="button" label="Run" icon="fa fa-play" styleClass="ui-button-success"  (click)="startInstance(instance.id)"></button>
+            <button [disabled]="instance.status!='requested'" pButton type="button" label="Re-Run" icon="fa fa-repeat" styleClass="ui-button-info"  (click)="restartInstance(instance.id)"></button>
+            <button pButton type="button" label="Pause" icon="fa fa-pause" styleClass="ui-button-info"  (click)="pauseInstance(instance.id)"></button>
+            <button pButton type="button" label="Abort" icon="fa fa-exclamation-triangle" styleClass="ui-button-danger"  (click)="abortInstance(instance.id)"></button>
           </ng-template>
       </p-column>
       <ng-template let-instance pTemplate="rowexpansion">

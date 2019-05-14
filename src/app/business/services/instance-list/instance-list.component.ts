@@ -2,6 +2,7 @@ import { Router,ActivatedRoute } from '@angular/router';
 import { Component, OnInit } from '@angular/core';
 import {OverlayPanelModule} from '../../../components/common/api';
 import { I18NService, MsgBoxService } from '../../../shared/api';
+import * as _ from "underscore";
 
 @Component({
   selector: 'app-instance-list',
@@ -2338,6 +2339,22 @@ export class InstanceListComponent implements OnInit {
   }
   refreshTable(){
       console.log("Table REfreshed");
+  }
+
+  startInstance(instanceId){
+    console.log("Starting Instance:", instanceId);
+  }
+
+  restartInstance(instanceId){
+    console.log("Restarting Instance:", instanceId);
+  }
+
+  pauseInstance(instanceId){
+    console.log("Pausing Instance:", instanceId);
+  }
+
+  abortInstance(instanceId){
+    console.log("Aborting Instance:", instanceId);
   }
 
 }
