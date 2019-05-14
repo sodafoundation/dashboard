@@ -2,11 +2,12 @@
     <div class="page-header">
         <div class="page-title">Create Instance</div>
         <div class="page-subtitle">
-            Create an instance of a workload.
+            Create an instance of a service.
         </div>
     </div>
-    <div class="create-instance-form">
-        <form [formGroup]="createInstanceForm" [grid]="{label: 'ui-g-2', content:'ui-g-2'}" (ngSubmit)="onSubmit(createInstanceForm.value)" [errorMessage]="errorMessage">
+    <div *ngIf="instanceInput" class="create-instance-form">
+            <dynamic-form  [dataObject]="instanceInput"></dynamic-form>
+        <!-- <form [formGroup]="createInstanceForm" [grid]="{label: 'ui-g-2', content:'ui-g-2'}" (ngSubmit)="onSubmit(createInstanceForm.value)" [errorMessage]="errorMessage">
             <div class="ui-grid ui-grid-responsive ui-grid-pad ui-fluid">
                 <form-item label="{{label.hostIP}}" [required]="true">
                     <input pInputText type="text" size="80" formControlName="hostIP" />
@@ -40,6 +41,6 @@
                 <button pButton type="submit" class="ui-button-secondary ui-button-large" label="OK" [disabled]="!createInstanceForm.valid"></button>
                 <button pButton type="button" class="ui-button-large" label="Cancel" [routerLink]="['/services']"></button>
             </div>
-        </form>
+        </form> -->
     </div>
 </div>

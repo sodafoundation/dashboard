@@ -18,13 +18,15 @@ import { ServicesListComponent } from './services-list/services-list.component';
 import { CreateInstanceComponent } from './create-instance/create-instance.component';
 import { WorkflowService } from './workflow.service';
 import { HttpClientModule } from '@angular/common/http';
+import { DynamicFormComponent } from './dynamic-form/dynamic-form.component';
 
 @NgModule({
   declarations: [
     ServicesComponent,
     InstanceListComponent,
     ServicesListComponent,
-    CreateInstanceComponent
+    CreateInstanceComponent,
+    DynamicFormComponent
   ],
   imports: [CommonModule,
     ReactiveFormsModule,

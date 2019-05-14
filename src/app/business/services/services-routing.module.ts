@@ -11,7 +11,7 @@ const routers: Routes = [
         component: ServicesListComponent
     },
     {
-        path: 'createInstance/:id',
+        path: 'createInstance/:action',
         component: CreateInstanceComponent,
     },
     {

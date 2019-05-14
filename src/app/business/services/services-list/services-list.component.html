@@ -9,7 +9,7 @@
     <div class="service-category" *ngFor="let category of services; index as i">
         <p-panel [toggleable]="true">
             <p-header>
-                {{category.service.name | titlecase}} <i class="icon fa fa-question-circle" pTooltip="Click on any of the services to run." tooltipPosition="right"></i>
+                {{category.service.group | titlecase}} <i class="icon fa fa-question-circle" pTooltip="Click on any of the services to run." tooltipPosition="right"></i>
             </p-header>
             <div class="ui-g service-row" >
                 <div class="ui-g-4" *ngFor="let item of category.service.workflows; index as i">

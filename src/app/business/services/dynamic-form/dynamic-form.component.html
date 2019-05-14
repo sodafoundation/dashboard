@@ -1,0 +1,38 @@
+<form [grid]="{label: 'ui-g-2', content:'ui-g-2'}" novalidate (ngSubmit)="onSubmit(form.value)" [formGroup]="form">
+
+    <div class="ui-grid ui-grid-responsive ui-grid-pad ui-fluid">
+        <div *ngFor="let prop of objectProps">
+          <!-- <label [attr.for]="prop">{{prop.label}}</label> -->
+
+          <div [ngSwitch]="prop.inputType">
+            <form-item *ngIf="prop.showThis" label="{{prop.label}}" [required]="true">
+              <input pInputText size="80" *ngSwitchCase="'text'"
+                [formControlName]="prop.key"
+                [id]="prop.key" [type]="prop.type" [value]="prop.default ? prop.default : ''">
+            </form-item>
+            
+            <div *ngSwitchCase="'radio'">
+              <form-item label="{{prop.label}}" [required]="true">
+                  <!-- <span *ngIf = "false"><p-radioButton label="Auto" [formControlName]="prop.key" name="typeRadioGroup" value="Auto"></p-radioButton></span> -->
+                  <span *ngFor="let option of prop.options">
+                      <p-radioButton [label]="option.label" [formControlName]="prop.key" name="typeRadioGroup" [value]="option.value"></p-radioButton>
+                  </span>
+                  <!-- <span><p-radioButton [label]="option.label" [formControlName]="prop.key" name="typeRadioGroup" [value]="option.value"></p-radioButton></span>
+                  <span style="margin-left: 30px;"><p-radioButton label="False" [formControlName]="prop.key" name="typeRadioGroup" [value]="option.value"></p-radioButton></span> -->
+              </form-item>
+            </div>
+      
+          </div>
+          <div class="error" *ngIf="form.get(prop.key).invalid && (form.get(prop.key).dirty || form.get(prop.key).touched)">
+            <div *ngIf="form.get(prop.key).errors.required">
+              {{ prop.label }} is required.
+            </div>
+          </div>
+        </div>
+
+    </div>
+    <div class="form-submit-button">
+        <button pButton type="submit" class="ui-button-secondary ui-button-large" label="OK" [disabled]="!form.valid"></button>
+        <button pButton type="button" class="ui-button-large" label="Cancel" [routerLink]="['/services']"></button>
+    </div>
+</form>

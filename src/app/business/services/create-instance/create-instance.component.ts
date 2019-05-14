@@ -4,6 +4,8 @@ import { I18NService, MsgBoxService, Utils } from '../../../shared/api';
 import { Validators, FormControl, FormGroup, FormBuilder } from '@angular/forms';
 import { WorkflowService } from '../workflow.service';
 import { trigger, state, style, transition, animate } from '@angular/animations';
+import {DynamicFormComponent} from '../dynamic-form/dynamic-form.component';
+import * as _ from "underscore";
 
 @Component({
   selector: 'app-create-instance',
@@ -38,10 +40,11 @@ import { trigger, state, style, transition, animate } from '@angular/animations'
 })
 export class CreateInstanceComponent implements OnInit {
  
-  
-  id: any;
+  action: any;
+  services: any[];
   createInstanceForm: FormGroup;
   label: any;
+  instanceInput: any;
   param = {
     hostIP: '',
     port: '',
@@ -78,7 +81,8 @@ export class CreateInstanceComponent implements OnInit {
     public I18N: I18NService,
     public wfservice: WorkflowService,
     private fb: FormBuilder
-    ) { }
+    ) { 
+    }
 
     
 
@@ -93,10 +97,12 @@ export class CreateInstanceComponent implements OnInit {
     }
 
     ngOnInit() {
-      this.id = this.ActivatedRoute.snapshot.params['id'];
-      console.log("Sent id in Create is ", this.id);
-
-      this.label = {
+      this.action = this.ActivatedRoute.snapshot.params['action'];
+      console.log("Sent action in Create is ", this.action);
+      
+      this.getServicesList(this.action);
+      
+      /* this.label = {
         hostIP: 'Host IP',
         port: 'Port',
         name: this.I18N.keyID['sds_block_volume_name'],
@@ -105,9 +111,9 @@ export class CreateInstanceComponent implements OnInit {
         srcBucketName: 'Source Bucket Name',
         destBucketName: "Destination Bucket Name",
         remainSource: "Remain Source",
-      };
+      }; */
   
-      this.createInstanceForm = this.fb.group({
+     /*  this.createInstanceForm = this.fb.group({
         'hostIP': new FormControl('', Validators.required),
         'port': new FormControl('', Validators.required),
         'name': new FormControl('', Validators.required),
@@ -116,7 +122,32 @@ export class CreateInstanceComponent implements OnInit {
         "srcBucketName":  new FormControl('', Validators.required),
         "destBucketName":  new FormControl('', Validators.required),
         "remainSource": new FormControl('true', Validators.required),
+      }); */
+    }
+
+    getServicesList(action){
+      let self = this;
+      this.wfservice.getServices().subscribe(data=>{
+          this.services = data.services;
+          let count: number;
+          _.each(this.services, function(item){
+              _.find(item.service.workflows, function(ele){
+                if(action==ele['action']){
+                  console.log("Action Matched", ele);
+                  self.createDynamicForm(ele['definition']);
+                }
+              });
+          })
+      }, error => {
+          console.log("Something went wrong with fetching services.", error);
       });
+      
+    }
+
+    createDynamicForm = (element) => {
+      console.log("Selected Form Raw definition")
+      this.instanceInput = element;
+      console.log("Sending the defintion", this.instanceInput);
     }
     
     onSubmit(value) {
