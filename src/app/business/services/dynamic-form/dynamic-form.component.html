@@ -1,15 +1,17 @@
-<form [grid]="{label: 'ui-g-2', content:'ui-g-2'}" novalidate (ngSubmit)="onSubmit(form.value)" [formGroup]="form">
+<form [grid]="{label: 'ui-g-2', content:'ui-g-2'}" (ngSubmit)="onSubmit(form.value)" [formGroup]="form">
 
     <div class="ui-grid ui-grid-responsive ui-grid-pad ui-fluid">
         <div *ngFor="let prop of objectProps">
           <!-- <label [attr.for]="prop">{{prop.label}}</label> -->
 
           <div [ngSwitch]="prop.inputType">
-            <form-item *ngIf="prop.showThis" label="{{prop.label}}" [required]="true">
-              <input pInputText size="80" *ngSwitchCase="'text'"
-                [formControlName]="prop.key"
-                [id]="prop.key" [type]="prop.type" [value]="prop.default ? prop.default : ''">
-            </form-item>
+            <div *ngSwitchCase="'text'">
+              <form-item *ngIf="prop.showThis" label="{{prop.label}}" [required]="true">
+                  <input pInputText size="80" 
+                    [formControlName]="prop.key"
+                    [id]="prop.key" [type]="prop.type" [value]="prop.default ? prop.default : ''">
+                </form-item>
+            </div>
             
             <div *ngSwitchCase="'radio'">
               <form-item label="{{prop.label}}" [required]="true">
