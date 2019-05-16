@@ -9,13 +9,13 @@
     <div class="table-toolbar">
       <div class="ui-g">
         <div class="ui-g-12 ui-lg-4">
-          <button pButton type="button" label="Configuration" icon="fa-cogs" class="ui-button-secondary" [routerLink]="['config']"></button>
+          <button *ngIf="isAdministrator" pButton type="button" label="Configuration" icon="fa-cogs" class="ui-button-secondary" [routerLink]="['config']"></button>
         </div>
       </div>
     </div>
     <div class="ui-g monitor-list-row" >
         <div class="ui-g-4" *ngFor="let item of monitorList; index as i">
-            <p-card title="{{item.Name}}" subtitle="" styleClass="monitor-list-card ui-card-shadow">
+            <p-card title="{{item.name | titlecase}}" subtitle="" styleClass="monitor-list-card ui-card-shadow">
                 <p-header>
                 </p-header>
                 <div>{{item.description}}</div>
