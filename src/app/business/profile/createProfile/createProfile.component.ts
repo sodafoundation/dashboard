@@ -1,7 +1,7 @@
 import { Router } from '@angular/router';
 import { Component, OnInit, ViewContainerRef, ViewChild, Directive, ElementRef, HostBinding, HostListener } from '@angular/core';
 import { Validators, FormControl, FormGroup, FormBuilder } from '@angular/forms';
-import { I18NService } from 'app/shared/api';
+import { I18NService, Utils } from 'app/shared/api';
 import { AppService } from 'app/app.service';
 import { trigger, state, style, transition, animate } from '@angular/animations';
 import { I18nPluralPipe } from '@angular/common';
@@ -41,6 +41,7 @@ import { ProfileService } from './../profile.service';
     ]
 })
 export class CreateProfileComponent implements OnInit {
+    showStorageAcl = false;
     showCustomization = false;
     showStoragePool = false;
     msgs: Message[] = [];
@@ -70,6 +71,7 @@ export class CreateProfileComponent implements OnInit {
     replicationIsChecked = false;
     snapshotIsChecked = false;
     isReplicationFlag = true;
+    allProfileNameForCheck = [];
     protocolOptions = [
         {
             label: 'iSCSI',
@@ -88,16 +90,24 @@ export class CreateProfileComponent implements OnInit {
         {
             label: 'Block',
             value: 'Block'
+        },
+        {
+            label: 'File',
+            value: 'File' 
         }
     ];
     storgeAclOptions = [
         {
-            label: 'Read,Write',
-            value: 'Read,Write'
+            label: 'Read',
+            value: 'Read'
         },
         {
-            label: 'Read,Write,Execute',
-            value: 'Read,Write,Execute'
+            label: 'Write',
+            value: 'Write'
+        },
+        {
+            label: 'Execute',
+            value: 'Execute'
         }
     ]
    
@@ -210,7 +220,10 @@ export class CreateProfileComponent implements OnInit {
         }
     ];
     errorMessage={
-        "name": { required: this.I18N.keyID['sds_profile_create_name_require']},
+        "name": { 
+            required: this.I18N.keyID['sds_profile_create_name_require'],
+            isExisted:this.I18N.keyID['sds_isExisted'],
+        },
         "maxIOPS": { required: this.I18N.keyID['sds_required'].replace("{0}","MaxIOPS")},
         "maxBWS" :{ required: this.I18N.keyID['sds_required'].replace("{0}","MaxBWS")},
         "repPeriod" :{ required: this.I18N.keyID['sds_required'].replace("{0}","Period")},
@@ -219,7 +232,8 @@ export class CreateProfileComponent implements OnInit {
         "datetime" :{ required: this.I18N.keyID['sds_required'].replace("{0}","Execution Time")},
         "snapNum" :{ required: this.I18N.keyID['sds_required'].replace("{0}","Retention")},
         "duration" :{ required: this.I18N.keyID['sds_required'].replace("{0}","Retention")},
-        "description":{maxlength:this.I18N.keyID['sds_validate_max_length']}
+        "description":{maxlength:this.I18N.keyID['sds_validate_max_length']},
+        "storageAcl":{required:"Storage Access Capability is required"}
     };
     snapshotRetentionOptions = [
         {
@@ -293,6 +307,7 @@ export class CreateProfileComponent implements OnInit {
     }
 
     ngOnInit() {
+        this.getProfiles();
         this.label = {
             name: this.I18N.keyID['sds_block_volume_name'],
             description: this.I18N.keyID['sds_block_volume_descri'],
@@ -329,14 +344,14 @@ export class CreateProfileComponent implements OnInit {
         };
 
         this.profileform = this.fb.group({
-            'name': new FormControl('', Validators.required),
+            'name': new FormControl('', {validators:[Validators.required,Utils.isExisted(this.allProfileNameForCheck)]}),
             'description':new FormControl('',Validators.maxLength(200)),
             'protocol': new FormControl('iSCSI'),
-            'storageType': new FormControl('Thin', Validators.required),
+            'storageType': new FormControl('Thin'),
             'policys': new FormControl(''),
             'snapshotRetention': new FormControl('Time'),
             'storageTypes': new FormControl('Block', Validators.required),
-            'storageAcl': new FormControl('Read,Write', Validators.required)
+            'storageAcl': new FormControl('', Validators.required)
         });
         this.qosPolicy = this.fb.group({
             "maxIOPS": new FormControl(6000, Validators.required),
@@ -373,6 +388,13 @@ export class CreateProfileComponent implements OnInit {
                 }
             }
         );
+        this.profileform.get("storageAcl").valueChanges.subscribe((value)=>{
+            if(value.length < 2){
+                this.showStorageAcl = true;
+            }else{
+                this.showStorageAcl = false;
+            }
+        })
         this.profileform.get("storageType").valueChanges.subscribe(
             (value:string)=>{
                 this.paramData = {
@@ -417,9 +439,17 @@ export class CreateProfileComponent implements OnInit {
             }
         );
 
-
     }
 
+    getProfiles() {
+        this.allProfileNameForCheck = [];
+        this.ProfileService.getProfiles().subscribe((res) => {
+            let profiles = res.json();
+            profiles.forEach(item=>{
+                this.allProfileNameForCheck.push(item.name);
+            })
+        });
+    }
     onSubmit(value) {
         this.submitted = true;
         this.msgs = [];
@@ -428,6 +458,8 @@ export class CreateProfileComponent implements OnInit {
         this.param.description = value.description;
         if(value.storageTypes == "Block"){
             value.storageTypes = "block";
+        }else if(value.storageTypes == "File"){
+            value.storageTypes = "file";
         }
         this.param.storageType = value.storageTypes;
         if(this.qosIsChecked){
@@ -458,12 +490,10 @@ export class CreateProfileComponent implements OnInit {
             }
         }
         if(value.storageTypes == "file"){
-            if(value.storageAcl == "Read,Write"){
-                value.storageAcl = ["Read","Write"];
-            }else if(value.storageAcl == "Read,Write,Execute"){
-                value.storageAcl = ["Read","Write","Execute"];
-            }
             this.param["provisioningProperties"].dataStorage.storageAccessCapability = value.storageAcl;
+        }
+        if(this.param.storageType == "file"){
+            delete this.param["provisioningProperties"].dataStorage.provisioningPolicy;
         }
         if(this.replicationIsChecked){
             if(!this.repPolicy.valid){
@@ -511,7 +541,9 @@ export class CreateProfileComponent implements OnInit {
                     "retention": reten
                 }
             };
-            this.param["snapshotProperties"]["topology"] = {"bucket":this.snapPolicy.value.snapshotDestination};
+            if(this.param.storageType == "block"){
+                this.param["snapshotProperties"]["topology"] = {"bucket":this.snapPolicy.value.snapshotDestination};
+            }
         }
         if (this.customizationItems.length > 0) {
             let arrLength = this.customizationItems.length;

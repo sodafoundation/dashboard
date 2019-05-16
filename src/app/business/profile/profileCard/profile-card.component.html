@@ -23,18 +23,25 @@
             <span class="label-class">Storage Access Capability:</span>
             <span>{{data['provisioningProperties'].dataStorage && data['provisioningProperties'].dataStorage.storageAccessCapability}}</span>
         </div>
-        <div class="padding-class">
+        <div class="padding-class" *ngIf="!storageAclFlag">
             <span class="label-class">bucketName:</span>
             <span>{{data.snapshotProperties.topology.bucket ? data.snapshotProperties.topology.bucket :'--'}}</span>
         </div>
         <div class="padding-class item-flex">
             <div *ngIf="data && policys.length !== 0" class="item-flex">
-                <div (mouseenter)="showSuspensionFrame($event)" (mouseleave)="showSuspensionFrame($event)" *ngFor="let policy of policys; index as i" class="position-relative mouse-cursor">
-                    <div style="width:114px" class="fa fa-check icon-color-class margin-right-class">
+                <div (mouseenter)="showSuspensionFrame($event)" (mouseleave)="showSuspensionFrame($event)" 
+                *ngFor="let policy of policys; index as i" class="position-relative mouse-cursor" style="display: inline-block">
+                    <div [ngStyle]="map.policy" class="fa fa-check icon-color-class margin-right-class">
                         <span class="font-color-class">{{policy}}</span>
                     </div>
                     <app-suspension-frame [policy]="[policy,data]" [ngStyle]="{'display':i === index && isHover ? 'block' : 'none'}"></app-suspension-frame>
                 </div>
+                <div>
+                    <a (click)="modifyPorfile(policyId)">Modify</a>
+                </div>
+            </div>
+            <div *ngIf="policys.length == 0" class="item-flex">
+                    <a (click)="modifyPorfile(policyId)">Modify</a>
             </div>
         </div>
     </div>
@@ -42,4 +49,20 @@
         <p-chart [options]="option" type="doughnut" [data]="chartDatas"></p-chart>
     </div>
     <div class="ui-helper-clearfix"></div>
+
+    <p-dialog *ngIf="showModifyProfile" styleClass="create-bucket-dialog"  header="Modify Profile" [(visible)]="showModifyProfile" [width]="600" modal="modal">
+        <form [grid]="{label: 'ui-g-3', content:'ui-g-20'}" [formGroup]="modifyProfileForm" [errorMessage]="errorMessage">
+            <form-item label="Name">
+                <input type="text" pInputText formControlName="name" />
+            </form-item>
+            <form-item label="Description">
+                <textarea [rows]="5" [cols]="48" pInputTextarea formControlName="descript"></textarea>
+            </form-item>
+        </form>
+        <p-footer>
+            <button type="button" pButton (click)="submitPorfile(modifyProfileForm.value)" label="{{I18N.keyID['ok']}}"></button>
+            <button type="button" pButton (click)="showModifyProfile=false" label="{{I18N.keyID['cancel']}}"></button>
+        </p-footer>
+    </p-dialog>
+    <p-confirmDialog></p-confirmDialog>
 </div>

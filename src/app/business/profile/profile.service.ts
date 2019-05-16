@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpService } from './../../shared/service/Http.service';
 import { Observable } from 'rxjs';
+import { subscribeOn } from 'rxjs/operator/subscribeOn';
 
 @Injectable()
 export class ProfileService {
