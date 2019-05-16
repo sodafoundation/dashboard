@@ -1,4 +1,4 @@
-import { NgModule } from '@angular/core';
+import { NgModule, APP_INITIALIZER } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ButtonModule, SplitButtonModule, PanelModule, MessageModule, DataTableModule, } from '../../components/common/api';
 import {FileUploadModule} from '../../components/fileupload/fileupload';
