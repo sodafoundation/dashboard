@@ -119,7 +119,6 @@ export class CreateFileShareComponent implements OnInit{
         let dataArr = this.getFileShareDataArray(value);
         dataArr['tenantId'] = window['projectItemId'];
         dataArr['userId'] = window['userId'];
-        dataArr['exportLocations'] =  ["shares"];
         this.FileShareService.createFileShare(dataArr).subscribe((res)=>{
             this.router.navigate(['/block',"fromFileShare"]);
         })

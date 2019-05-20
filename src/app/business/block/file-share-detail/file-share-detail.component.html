@@ -112,7 +112,7 @@
                     </div>
                     <div class="right">
                         <div class="ui-inputsearch">
-                            <input type="text" #searchByName [(ngModel)]="aclfilter" pInputText placeholder="{{i18n.keyID['sds_block_volume_search']}}" />
+                            <input type="text" #searchByName pInputText placeholder="{{i18n.keyID['sds_block_volume_search']}}" />
                             <button pButton type="button" icon="fa-search" (click)="getAcls(aclfilter)"></button>
                         </div>
                         <button pButton type="button" icon="fa-refresh" (click)="getAcls(param)"></button>
@@ -135,10 +135,7 @@
 
                 <p-dialog *ngIf="aclCreateShow" header="{{i18n.keyID['sds_fileShare_addRule']}}" [(visible)]="aclCreateShow" [width]="600" modal="modal">
                     <form [grid]="{label: 'ui-g-4', content: 'ui-g-20'}" [formGroup]="createAclsFormGroup" [errorMessage]="errorMessage">
-                        <!-- <form-item [required]="true" label="{{label.aclLevel}}">
-                            <p-dropdown [options]="availabilityAclLevel" formControlName="level" [style]="{'min-width':96}" placeholder="Please select"></p-dropdown>
-                        </form-item> -->
-                        <form-item label="{{label.aclLevel}}" [required]="true" *ngIf="!isReplicationFlag" >
+                        <form-item label="{{label.aclLevel}}" [required]="true" >
                             <p-multiSelect [options]="availabilityAclLevel" [filter]="false" formControlName="level" [style]="{'min-width':'150px'}" placeholder="Please choose"></p-multiSelect>
                             <!-- <div class="ui-message-container" *ngIf="showStorageAcl">
                                 <div class="ui-message ui-message-error ui-corner-all">
@@ -176,7 +173,7 @@
                 <p-dialog *ngIf="aclModifyShow" header="{{i18n.keyID['sds_block_volume_modify']}}" [(visible)]="aclModifyShow" [width]="600" modal="modal">
                     <form [grid]="{label: 'ui-g-4', content: 'ui-g-20'}" [formGroup]="modifyAclsFormGroup" [errorMessage]="errorMessage">
                         <form-item [required]="true" label="{{label.aclLevel}}">
-                            <p-dropdown [options]="availabilityAclLevel" formControlName="accessCapability"></p-dropdown>
+                            <p-multiSelect [options]="availabilityAclLevel" [filter]="false" formControlName="accessCapability" [style]="{'min-width':'150px'}" placeholder="Please choose"></p-multiSelect>
                         </form-item>
                         <form-item [required]="true" label="{{label.user}}">
                             <div class="item-flex" style="padding: 0.5em 0;">

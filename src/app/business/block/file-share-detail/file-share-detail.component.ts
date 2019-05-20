@@ -56,9 +56,10 @@ export class FileShareDetailComponent implements OnInit{
     showCreateSnapshot = true;
     errorMessage = {
         "level": { required: "Access Level is required." },
-        "user": { required: "Host/Network group is required." },
+        "user": { required: "Ip/User is required." },
         "name":{ required: "Name is required." },
-        "userInput":{required: "Host/Network Group is required"}
+        "userInput":{required: "Ip/User is required"},
+        "accessCapability": { required: "Access Level is required." },
     }
     
     constructor(
@@ -113,7 +114,7 @@ export class FileShareDetailComponent implements OnInit{
         this.availabilityAclLevel =[
             {label: "Read", value: "Read"},
             {label: "Write", value: "Write"},
-            {label: "execute", value: "execute"}
+            {label: "Execute", value: "Execute"}
         ]
         this.availabilityip =[
             {label: "ip", value: "ip"},
@@ -148,16 +149,19 @@ export class FileShareDetailComponent implements OnInit{
         let dataArr = [];
         this.AclsItems.forEach(index=>{
             dataArr.push({
-                accessCapability: value['level'],
-                // (()=>{
-                //     if(value['level'] =="Read"){
-                //         return ["r"];
-                //     }else if(value['level'] =="Read,Write"){
-                //         return ["rw"];
-                //     }else if(value['level'] =="Read,Write,execute"){
-                //         return ["rwx"];
-                //     }
-                // })(),
+                accessCapability: (()=>{
+                    let level = value['level'];
+                    level.forEach((item,index)=>{
+                        if(item == "Read"){
+                            level[index] = "r";
+                        }else if(item == "Write"){
+                            level[index] = "w";
+                        }else if (item == "Execute"){
+                            level[index] = "x";
+                        }
+                    })
+                    return level;
+                })(),
                 type: value['user'+index],
                 accessTo: (()=>{
                     let acls = [];
@@ -205,13 +209,17 @@ export class FileShareDetailComponent implements OnInit{
                         name: item.AccessTo,
                         type: item.type,
                         level: (()=>{
-                            if(item.AccessCapability == "r"){
-                                return "Read";
-                            }else if(item.AccessCapability == "rw"){
-                                return "Read,Write";
-                            }else if(item.AccessCapability == "rwx"){
-                                return "Read,Write,execute";
-                            }
+                            let acl = item.AccessCapability;
+                            acl.forEach((item,index)=>{
+                                if(item == "r"){
+                                    acl[index] = "Read";
+                                }else if(item == "w"){
+                                    acl[index] = "Write";
+                                }else if(item == "x"){
+                                    acl[index] = "Execute";
+                                }
+                            })
+                            return acl;
                         })(),
                         createdAt: Utils.formatDate(item.createdAt),
                         updatedAt: Utils.formatDate(item.updatedAt)
