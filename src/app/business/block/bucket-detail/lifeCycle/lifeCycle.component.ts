@@ -379,6 +379,7 @@ export class LifeCycleComponent implements OnInit{
         }
     }
     enableLifeCycle(){}
+    disableLifeCycle(){}
     transSwitch(){
         let ruleValue = this.createLifeCycleForm.get('enabled').value;
         if(ruleValue){
@@ -447,7 +448,7 @@ export class LifeCycleComponent implements OnInit{
         }
         this.getLifeCycleList(value); 
     }
-    lifeCycleNameOnChanged(){
+    lifeCycleNameOnChanged(createLifeCycleForm){
 
     }
     getErrorMessage(control,extraParam){
