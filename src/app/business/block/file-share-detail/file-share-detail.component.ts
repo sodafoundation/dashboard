@@ -54,6 +54,7 @@ export class FileShareDetailComponent implements OnInit{
     AclsItems = [0];
     profiles;
     showCreateSnapshot = true;
+    aclfilter;
     errorMessage = {
         "level": { required: "Access Level is required." },
         "user": { required: "Ip/User is required." },
@@ -239,7 +240,7 @@ export class FileShareDetailComponent implements OnInit{
             this.selectedSnapshotObj['id'] = selectedSnapshot.id;
         }
     }
-    showAclPropertyDialog(dialog, acl){
+    showAclPropertyDialog(dialog, acl?){
         if(dialog == 'create'){
             this.aclCreateShow = true;
         }else if(dialog == 'modify'){
