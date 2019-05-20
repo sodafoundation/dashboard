@@ -39,6 +39,7 @@ export class BlockComponent implements OnInit{
     fromBuckets:boolean = false;
     showDropDown:boolean = false;
     fromVolume:boolean = false;
+    fromFileShare:boolean = false;
     countItems = [];
     constructor(
         public I18N: I18NService,
@@ -52,6 +53,7 @@ export class BlockComponent implements OnInit{
                 this.fromGroup = params.fromRoute === "fromGroup";
                 this.fromBuckets = params.fromRoute === "fromBuckets";
                 this.fromVolume = params.fromRoute === "fromVolume";
+                this.fromFileShare = params.fromRoute === "fromFileShare";
             }
           );
     }

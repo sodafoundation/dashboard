@@ -85,6 +85,11 @@ export class BucketService {
     let url = this.url + "/" + name;
     return this.http.put(url,param,options);
   }
+  //delete lifeCycle
+  deleteLifeCycle(name,param){
+    let url = this.url + "/" +name;
+    return this.http.delete(url,param);
+  }
 
   // Rquest header with AK/SK authentication added
   getSignatureOptions(SignatureObjectwindow, options?){
