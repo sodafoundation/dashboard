@@ -351,7 +351,7 @@ export class CreateProfileComponent implements OnInit {
             'policys': new FormControl(''),
             'snapshotRetention': new FormControl('Time'),
             'storageTypes': new FormControl('Block', Validators.required),
-            'storageAcl': new FormControl('', Validators.required)
+            'storageAcl': new FormControl('')
         });
         this.qosPolicy = this.fb.group({
             "maxIOPS": new FormControl(6000, Validators.required),
@@ -389,7 +389,7 @@ export class CreateProfileComponent implements OnInit {
             }
         );
         this.profileform.get("storageAcl").valueChanges.subscribe((value)=>{
-            if(value.length < 2){
+            if(value.length < 2 && value != ""){
                 this.showStorageAcl = true;
             }else{
                 this.showStorageAcl = false;
@@ -416,7 +416,9 @@ export class CreateProfileComponent implements OnInit {
                             value: 'CIFS' 
                         }
                     ]
-                    this.profileform.patchValue({protocol: 'NFS'})
+                    this.profileform.patchValue({protocol: 'NFS'});
+                    this.profileform.patchValue({storageAcl: ''});
+                    this.profileform.controls['storageAcl'].setValidators(Validators.required);
                     this.isReplicationFlag = false;
                 }else{
                     this.protocolOptions = [
@@ -473,7 +475,11 @@ export class CreateProfileComponent implements OnInit {
                 "ioConnectivity": {
                     "maxIOPS": Number(this.qosPolicy.value.maxIOPS),
                     "maxBWS": Number(this.qosPolicy.value.maxBWS),
-                    "accessProtocol": value.protocol
+                    "accessProtocol": (()=>{
+                        if(value.protocol == "FC"){
+                            return "fibre_channel";
+                        }
+                    })()
                 }, 
                 "dataStorage": {
                     "provisioningPolicy": value.storageType
@@ -482,7 +488,11 @@ export class CreateProfileComponent implements OnInit {
         }else{
             this.param["provisioningProperties"]= {
                 "ioConnectivity": {
-                    "accessProtocol": value.protocol
+                    "accessProtocol": (()=>{
+                        if(value.protocol == "FC"){
+                            return "fibre_channel";
+                        }
+                    })()
                 }, 
                 "dataStorage": {
                     "provisioningPolicy": value.storageType
@@ -491,8 +501,6 @@ export class CreateProfileComponent implements OnInit {
         }
         if(value.storageTypes == "file"){
             this.param["provisioningProperties"].dataStorage.storageAccessCapability = value.storageAcl;
-        }
-        if(this.param.storageType == "file"){
             delete this.param["provisioningProperties"].dataStorage.provisioningPolicy;
         }
         if(this.replicationIsChecked){

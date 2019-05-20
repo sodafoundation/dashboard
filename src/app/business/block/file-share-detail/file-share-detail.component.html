@@ -137,17 +137,9 @@
                     <form [grid]="{label: 'ui-g-4', content: 'ui-g-20'}" [formGroup]="createAclsFormGroup" [errorMessage]="errorMessage">
                         <form-item label="{{label.aclLevel}}" [required]="true" >
                             <p-multiSelect [options]="availabilityAclLevel" [filter]="false" formControlName="level" [style]="{'min-width':'150px'}" placeholder="Please choose"></p-multiSelect>
-                            <!-- <div class="ui-message-container" *ngIf="showStorageAcl">
-                                <div class="ui-message ui-message-error ui-corner-all">
-                                    <i class="fa fa-exclamation-circle"></i>
-                                    <span class="ui-message-error-text">
-                                        Please select at least two
-                                    </span>
-                                </div>
-                            </div> -->
                         </form-item>
                         <form-item [required]="true" label="{{label.user}}">
-                            <div *ngFor="let AclsItem of AclsItems;index as i">
+                            <div *ngFor="let AclsItem of aclsItems;index as i">
                                 <div class="item-flex" style="padding: 0.5em 0;">
                                     <p-dropdown [options]="availabilityip" formControlName="{{'user'+i}}" [style]="{'min-width':96}"></p-dropdown>
                                     <input type="text" pInputText formControlName="{{'userInput'+i}}" [style]="{'width':150}"/>

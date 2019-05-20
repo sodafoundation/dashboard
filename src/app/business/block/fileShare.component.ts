@@ -6,7 +6,7 @@ import { trigger, state, style, transition, animate} from '@angular/animations';
 import { I18nPluralPipe } from '@angular/common';
 import { FormGroup, Validators, FormBuilder, FormControl } from '@angular/forms';
 import { Http } from '@angular/http';
-import { FileShareService, SnapshotService } from './fileShare.service';
+import { FileShareService, SnapshotService, FileShareAclService } from './fileShare.service';
 import { ProfileService } from './../profile/profile.service';
 
 let _ = require("underscore");
@@ -14,20 +14,32 @@ let _ = require("underscore");
     selector: 'app-file-share',
     templateUrl: './fileShare.component.html',
     styleUrls: [],
-    providers: [ConfirmationService, MsgBoxService]
+    providers: [ConfirmationService, MsgBoxService ]
 })
 export class FileShareComponent implements OnInit{
     selectedFileShares = [];
     createSnapshotShow = false;
     modifyFileShareShow = false;
     createSnapshotForm;
-    errorMessage = {"name":  {required: "Name is required." } };
+    createAclsFormGroup;
+    errorMessage = {
+        "level": { required: "Access Level is required." },
+        "user": { required: "Ip/User is required." },
+        "name":  {required: "Name is required." },
+        "userInput":{required: "Ip/User is required"},
+        "accessCapability": { required: "Access Level is required." }
+    }
     selectedFileShare;
     modifyFileShareForm;
     fileShares = [];
     profiles = [];
     showCreateSnapshot = true;
-    
+    aclCreateShow = false;
+    aclsItems = [0];
+    acls =[];
+    availabilityAclLevel;
+    availabilityip;
+
     constructor(
         private ActivatedRoute: ActivatedRoute,
         public I18N:I18NService,
@@ -37,7 +49,8 @@ export class FileShareComponent implements OnInit{
         private FileShareService: FileShareService,
         private ProfileService: ProfileService,
         private SnapshotService: SnapshotService,
-        private confirmationService: ConfirmationService
+        private confirmationService: ConfirmationService,
+        private FileShareAclService: FileShareAclService
     ){
         this.createSnapshotForm = this.fb.group({
             "name": ["",Validators.required],
@@ -45,7 +58,15 @@ export class FileShareComponent implements OnInit{
         })
     }
     ngOnInit(){
-        
+        this.availabilityAclLevel =[
+            {label: "Read", value: "Read"},
+            {label: "Write", value: "Write"},
+            {label: "Execute", value: "Execute"}
+        ];
+        this.availabilityip =[
+            {label: "ip", value: "ip"},
+            {label: "user", value: "user"}
+        ]
         this.getProfile();
     }
     getFileShares(){
@@ -75,6 +96,13 @@ export class FileShareComponent implements OnInit{
             this.modifyFileShareForm = this.fb.group({
                 "name": [selectedFileShare.name],
                 "descript": ["", Validators.maxLength(200)]
+            })
+        }else if(dialog == 'acl'){
+            this.aclCreateShow = true;
+            this.createAclsFormGroup = this.fb.group({
+                "level":  ["", Validators.required],
+                "user0":  ["ip", Validators.required],
+                "userInput0": ["", Validators.required]
             })
         }
         this.selectedFileShare = selectedFileShare;
@@ -132,6 +160,69 @@ export class FileShareComponent implements OnInit{
             this.createSnapshotShow = false;
             this.getProfile();
             this.showCreateSnapshot = false;
+        })
+    }
+
+    addTransRules(){
+        this.aclsItems.push(
+            this.aclsItems[this.aclsItems.length-1] + 1
+          );
+          this.aclsItems.forEach(index => {
+            if(index !== 0){
+              this.createAclsFormGroup.addControl('user'+index, this.fb.control("", Validators.required));
+              this.createAclsFormGroup.addControl('userInput'+index, this.fb.control("", Validators.required));
+            }
+        });
+    }
+    deleteAclUsers(index){
+        this.aclsItems.splice(index, 1);
+        this.createAclsFormGroup.removeControl('user'+index);
+        this.createAclsFormGroup.removeControl('userInput'+index);
+    }
+    createAclsSubmit(value){
+        if(!this.createAclsFormGroup.valid){
+            for(let i in this.createAclsFormGroup.controls){
+                this.createAclsFormGroup.controls[i].markAsTouched();
+            }
+            return;
+        }
+        let dataArr = this.getAclsDataArray(value);
+        for(let i in dataArr){
+            this.aclsCreateSubmit(dataArr[i]);
+        }
+    }
+    getAclsDataArray(value){
+        let dataArr = [];
+        this.aclsItems.forEach(index=>{
+            dataArr.push({
+                accessCapability: (()=>{
+                    let level = value['level'];
+                    level.forEach((item,index)=>{
+                        if(item == "Read"){
+                            level[index] = "r";
+                        }else if(item == "Write"){
+                            level[index] = "w";
+                        }else if (item == "Execute"){
+                            level[index] = "x";
+                        }
+                    })
+                    return level;
+                })(),
+                type: value['user'+index],
+                accessTo: (()=>{
+                    let acls = [];
+                    acls.push(value['userInput'+index]);
+                    return acls;
+                })()
+            })
+        })
+        return dataArr;
+    }
+    aclsCreateSubmit(param){
+        param['fileshareId'] = this.selectedFileShare.id;
+        this.FileShareAclService.createFileShareAcl(param,this.selectedFileShare.id).subscribe((res)=>{
+            this.getProfile();
+            this.aclCreateShow = false;
         })
     }
 }

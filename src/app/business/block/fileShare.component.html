@@ -26,6 +26,7 @@
         <p-column header="{{I18N.keyID['sds_block_volume_operation']}}" [style]="{'width': '335px'}">
             <ng-template pTemplate="body" let-fileShare="rowData" let-i="rowIndex">
                 <!-- <a (click)="returnSelectedFileShare(fileShare,'snapshot')" [innerHtml]="I18N.keyID['sds_block_volume_createsna']"></a> -->
+                <a (click)="returnSelectedFileShare(fileShare,'acl')">Create Access</a>
                 <a (click)="returnSelectedFileShare(fileShare,'Modify')" [innerHtml]="I18N.keyID['sds_block_volume_modify']"></a>
                 <a (click)="batchDelete(fileShare)" [innerHtml]="I18N.keyID['sds_block_volume_delete']"></a>
             </ng-template>
@@ -47,6 +48,35 @@
         <p-footer>
             <button type="button" pButton (click)="createSnapshot()" label="{{I18N.keyID['ok']}}"></button>
             <button type="button" pButton (click)="createSnapshotShow=false" label="{{I18N.keyID['cancel']}}"></button>
+        </p-footer>
+    </p-dialog>
+
+    <p-dialog *ngIf="aclCreateShow" header="{{I18N.keyID['sds_fileShare_addRule']}}" [(visible)]="aclCreateShow" [width]="600" modal="modal">
+        <form [grid]="{label: 'ui-g-4', content: 'ui-g-20'}" [formGroup]="createAclsFormGroup" [errorMessage]="errorMessage">
+            <form-item label="{{I18N.keyID['sds_fileShare_acl_level']}}" [required]="true" >
+                <p-multiSelect [options]="availabilityAclLevel" [filter]="false" formControlName="level" [style]="{'min-width':'150px'}" placeholder="Please choose"></p-multiSelect>
+            </form-item>
+            <form-item [required]="true" label="{{I18N.keyID['sds_fileShare_acl_user']}}">
+                <div *ngFor="let AclsItem of aclsItems;index as i">
+                    <div class="item-flex" style="padding: 0.5em 0;">
+                        <p-dropdown [options]="availabilityip" formControlName="{{'user'+i}}" [style]="{'min-width':96}"></p-dropdown>
+                        <input type="text" pInputText formControlName="{{'userInput'+i}}" [style]="{'width':150}"/>
+                        <div class="create-profile-img " (click)="deleteAclUsers(i)">
+                            <img style="vertical-align:middle; margin-left: 40px;" src="assets/business/images/profile/u1065.png">
+                        </div>
+                    </div>
+                </div>
+                <div class="ui-grid-row volume-item">
+                    <a class="create-profile-img" (click)="addTransRules()">
+                        <img style="vertical-align:middle;" src="assets/business/images/profile/u2987.png">
+                        <span>Add Rule</span>
+                    </a>
+                </div>
+            </form-item>
+        </form>
+        <p-footer>
+            <button type="button" pButton class="ui-button-secondary" (click)="createAclsSubmit(createAclsFormGroup.value)" label="{{I18N.keyID['ok']}}" ></button>
+            <button type="button" pButton (click)="aclCreateShow=false" label="{{I18N.keyID['cancel']}}"></button>
         </p-footer>
     </p-dialog>
     

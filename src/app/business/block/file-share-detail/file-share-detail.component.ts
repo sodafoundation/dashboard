@@ -51,7 +51,7 @@ export class FileShareDetailComponent implements OnInit{
     modifyAclsFormGroup;
     availabilityAclLevel;
     availabilityip;
-    AclsItems = [0];
+    aclsItems = [0];
     profiles;
     showCreateSnapshot = true;
     aclfilter;
@@ -148,7 +148,7 @@ export class FileShareDetailComponent implements OnInit{
     }
     getAclsDataArray(value){
         let dataArr = [];
-        this.AclsItems.forEach(index=>{
+        this.aclsItems.forEach(index=>{
             dataArr.push({
                 accessCapability: (()=>{
                     let level = value['level'];
@@ -174,15 +174,15 @@ export class FileShareDetailComponent implements OnInit{
         return dataArr;
     }
     deleteAclUsers(index){
-        this.AclsItems.splice(index, 1);
+        this.aclsItems.splice(index, 1);
         this.createAclsFormGroup.removeControl('user'+index);
         this.createAclsFormGroup.removeControl('userInput'+index);
     }
     addTransRules(){
-        this.AclsItems.push(
-            this.AclsItems[this.AclsItems.length-1] + 1
+        this.aclsItems.push(
+            this.aclsItems[this.aclsItems.length-1] + 1
           );
-          this.AclsItems.forEach(index => {
+          this.aclsItems.forEach(index => {
             if(index !== 0){
               this.createAclsFormGroup.addControl('user'+index, this.fb.control("", Validators.required));
               this.createAclsFormGroup.addControl('userInput'+index, this.fb.control("", Validators.required));
@@ -346,12 +346,12 @@ export class FileShareDetailComponent implements OnInit{
         })
     }
     createAclsSubmit(value){
-        // if(!this.createAclsFormGroup.valid){
-        //     for(let i in this.createAclsFormGroup.controls){
-        //         this.createAclsFormGroup.controls[i].markAsTouched();
-        //     }
-        //     return;
-        // }
+        if(!this.createAclsFormGroup.valid){
+            for(let i in this.createAclsFormGroup.controls){
+                this.createAclsFormGroup.controls[i].markAsTouched();
+            }
+            return;
+        }
         let dataArr = this.getAclsDataArray(value);
         for(let i in dataArr){
             this.aclsCreateSubmit(dataArr[i]);

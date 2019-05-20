@@ -2,15 +2,15 @@ import { NgModule, APP_INITIALIZER } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { FileShareComponent } from './fileShare.component';
-import { ButtonModule, DataTableModule, DropMenuModule, DialogModule, FormModule, InputTextModule, InputTextareaModule, DropdownModule , ConfirmationService,ConfirmDialogModule} from '../../components/common/api';
+import { ButtonModule, DataTableModule, DropMenuModule, DialogModule, FormModule, InputTextModule, InputTextareaModule, DropdownModule , ConfirmationService,ConfirmDialogModule, MultiSelectModule } from '../../components/common/api';
 
 import { HttpService } from './../../shared/service/Http.service';
-import { FileShareService, SnapshotService } from './fileShare.service';
+import { FileShareService, SnapshotService, FileShareAclService } from './fileShare.service';
 import { ProfileService } from './../profile/profile.service';
 import { RouterModule } from '@angular/router';
 
 @NgModule({
-  declarations: [ FileShareComponent ],
+  declarations: [ FileShareComponent],
   imports: [
     CommonModule,
     ReactiveFormsModule,
@@ -24,15 +24,17 @@ import { RouterModule } from '@angular/router';
     DialogModule,
     FormModule,
     ConfirmDialogModule,
-    RouterModule
+    RouterModule,
+    MultiSelectModule
   ],
-  exports: [ FileShareComponent ],
+  exports: [ FileShareComponent],
   providers: [
     HttpService,
     FileShareService,
     SnapshotService,
     ProfileService,
-    ConfirmationService
+    ConfirmationService,
+    FileShareAclService
   ]
 })
 export class FileShareModule { }
