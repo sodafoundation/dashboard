@@ -101,13 +101,8 @@ export class ConfigComponent implements OnInit {
     this.showProgress = false;
     const formData = new FormData();
     let conf_file: File = files[0];
-    formData.append('conf_file', conf_file);
-    let detailUrl = 'v1beta/uploadconf?conftype=' + configType;
-    const uploadReq = new HttpRequest('POST', detailUrl, formData, {
-      reportProgress: true,
-      headers: new HttpHeaders().set('X-Auth-Token' , this.options.headers['X-Auth-Token'])
-    });
-    this.http.request(uploadReq).subscribe(event => {
+
+    this.monitor.uploadConfigFile(conf_file, configType).subscribe(event => {
       if (event.type === HttpEventType.UploadProgress){
         this.showProgress = true;
         this.progress = Math.round(100 * event.loaded / event.total);
@@ -115,19 +110,19 @@ export class ConfigComponent implements OnInit {
       else if (event.type === HttpEventType.Response){
         this.message = event.body.toString();
         this.msgs = [];
-        this.msgs.push({severity: 'success', summary: 'Success', detail: 'File Uploaded!'});
+        this.msgs.push({severity: 'success', summary: 'Success', detail: 'File Uploaded! The service will be restarted shortly.'});
       }  
     },
     err=>{
       this.msgs = [];
-      this.msgs.push({severity: 'error', summary: 'Error', detail: 'File could not be uploaded.'});
+      this.msgs.push({severity: 'error', summary: 'Error', detail: err.message});
     });
     
   }
 
  
   getFile(configType: string) {
-    this.config.downloadConfig(configType).subscribe(respData => {
+    this.monitor.downloadConfig(configType).subscribe(respData => {
         this.downLoadFile(respData, respData.type, configType);
     }, error => {
       this.msgs = [];

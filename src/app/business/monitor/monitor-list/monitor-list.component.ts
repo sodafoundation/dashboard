@@ -31,21 +31,10 @@ export class MonitorListComponent implements OnInit {
 
   ngOnInit() {
     this.monitor.getMonitorList().subscribe(response =>{
-
+      this.monitorList = response;
     }, error =>{
-
+      console.log("Something went wrong. Please try again.")
     });
-
-    this.monitorList  = [
-      {
-        "Name": "AlertManager",
-        "URL": "http://localhost:9091"
-      },
-      {
-        "Name": "Grafana",
-        "URL": "http://localhost:9093"
-      }
-     ];
   }
 
 }

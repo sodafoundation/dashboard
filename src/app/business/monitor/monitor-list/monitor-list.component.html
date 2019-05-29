@@ -15,7 +15,7 @@
     </div>
     <div class="ui-g monitor-list-row" >
         <div class="ui-g-4" *ngFor="let item of monitorList; index as i">
-            <p-card title="{{item.Name}}" subtitle="" styleClass="monitor-list-card ui-card-shadow">
+            <p-card title="{{item.name | titlecase}}" subtitle="" styleClass="monitor-list-card ui-card-shadow">
                 <p-header>
                 </p-header>
                 <div>{{item.description}}</div>
