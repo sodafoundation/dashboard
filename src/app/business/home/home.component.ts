@@ -103,7 +103,6 @@ export class HomeComponent implements OnInit {
             "sk":['',{validators:[Validators.required], updateOn:'change'}],
         });
 }
-        });
         this.modifyBackendForm = this.fb.group({
             "ak":['',{validators:[Validators.required], updateOn:'change'}],
             "sk":['',{validators:[Validators.required], updateOn:'change'}],
