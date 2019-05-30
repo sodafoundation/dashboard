@@ -47,6 +47,15 @@
                     <span>IBM COS</span>
                 </div>
             </div>
+            <div #cloud_gcp class="cloud" (click)="showBackendsDetail(cloud_type[6])">
+                <div class="ui-home-backend-count">{{allBackends_count.gcp}}</div>
+                <div class="ui-home-backend-logo">
+                    <img src="assets/business/images/common/google.svg"  width="64px"/>
+                </div>
+                <div class="ui-home-backend-name">
+                    <span>GCP</span>
+                </div>
+            </div>
         </div>
         <div class="bg" #circleCon>
             <svg width="240" height="64" xmlns="http://www.w3.org/2000/svg" [ngStyle]="{'transform': 'scale('+ scaleX +', '+ scaleY +')'}">

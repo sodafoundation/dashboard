@@ -1951,4 +1951,8 @@ a {
 .ui-growl-message p{
     color: #ffffff;
 }
+.ui-datatable tbody .ui-cell-data{
+    overflow: inherit !important;
+    height: auto !important;
+}
 /* Common Overides end */

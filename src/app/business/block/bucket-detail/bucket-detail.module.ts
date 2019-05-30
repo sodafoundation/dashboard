@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { BucketDetailComponent } from './bucket-detail.component';
-
+import { LifeCycleModule } from './lifeCycle/lifeCycle.module';
 import { TabViewModule,ButtonModule, DataTableModule, DropMenuModule, DialogModule, FormModule, InputTextModule, InputTextareaModule, 
   ConfirmDialogModule ,ConfirmationService,CheckboxModule,DropdownModule} from './../../../components/common/api';
 import { HttpService } from './../../../shared/service/Http.service';
@@ -31,7 +31,8 @@ let routers = [{
     ConfirmDialogModule,
     CheckboxModule,
     DropdownModule,
-    HttpClientModule
+    LifeCycleModule,
+    HttpClientModule 
   ],
   declarations: [
     BucketDetailComponent
@@ -39,7 +40,7 @@ let routers = [{
   providers: [
     HttpService,
     ConfirmationService,
-    BucketService
+    BucketService  
   ]
 })
 export class BucketDetailModule { }
