@@ -222,7 +222,7 @@ export class AppComponent implements OnInit, AfterViewInit {
                     },
                     (error)=>{
                         if(uploadNum < 5){
-                            window['singleUpload'](selectFile, bucketId, options, cb);
+                            window['singleUpload'](selectFile, bucketId, options, uploadUrl, cb);
                             uploadNum++;
                         }else{
                             this.showPrompt = false;
@@ -301,6 +301,9 @@ export class AppComponent implements OnInit, AfterViewInit {
                                 let requestMethod = "DELETE";
                                 let url = uploadUrl + '?uploadId=' + uploadId;
                                 window['canonicalString'](requestMethod, url,()=>{
+                                    this.getSignature();
+                                    options.headers.set('Authorization', this.Signature);
+                                    options.headers.set('X-Auth-Date', this.kDate);
                                     this.http.delete("/" + uploadUrl + "?uploadId=" + uploadId, options).subscribe((data)=>{});
                                     this.msg.error("Upload failed. The network may be unstable. Please try again later.");
                                     if (cb) {
