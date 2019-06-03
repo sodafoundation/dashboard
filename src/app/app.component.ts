@@ -57,6 +57,7 @@ export class AppComponent implements OnInit, AfterViewInit {
     userId;
     SignatureKey = {};
     akSkRouterLink = "/akSkManagement";
+    monitorConfigLink = "/monitor/config";
     Signature = "";
     kDate = "";
     stringToSign = "";
@@ -102,6 +103,11 @@ export class AppComponent implements OnInit, AfterViewInit {
             "title": "Dataflow",
             "description": "Through migration / replication capability.",
             "routerLink": "/dataflow"
+        },
+        {
+            "title": "Monitor",
+            "description": "Telemetry information.",
+            "routerLink": "/monitor"
         },
         {
             "title": "Profile",
@@ -216,7 +222,7 @@ export class AppComponent implements OnInit, AfterViewInit {
                     },
                     (error)=>{
                         if(uploadNum < 5){
-                            window['singleUpload'](selectFile, bucketId, options, cb);
+                            window['singleUpload'](selectFile, bucketId, options, uploadUrl, cb);
                             uploadNum++;
                         }else{
                             this.showPrompt = false;
@@ -295,6 +301,9 @@ export class AppComponent implements OnInit, AfterViewInit {
                                 let requestMethod = "DELETE";
                                 let url = uploadUrl + '?uploadId=' + uploadId;
                                 window['canonicalString'](requestMethod, url,()=>{
+                                    this.getSignature();
+                                    options.headers.set('Authorization', this.Signature);
+                                    options.headers.set('X-Auth-Date', this.kDate);
                                     this.http.delete("/" + uploadUrl + "?uploadId=" + uploadId, options).subscribe((data)=>{});
                                     this.msg.error("Upload failed. The network may be unstable. Please try again later.");
                                     if (cb) {
@@ -695,6 +704,13 @@ export class AppComponent implements OnInit, AfterViewInit {
                         },{
                             label: "AK/SK Management",
                             routerLink: this.akSkRouterLink,
+                            command: ()=>{
+                                this.isHomePage = false;
+                            }
+                        },
+                        {
+                            label: "Monitor Configuration",
+                            routerLink: this.monitorConfigLink,
                             command: ()=>{
                                 this.isHomePage = false;
                             }

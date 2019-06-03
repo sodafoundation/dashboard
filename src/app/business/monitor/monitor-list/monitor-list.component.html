@@ -1,0 +1,28 @@
+<p-growl [value]="msgs"></p-growl>
+<div id="monitor-list-component">
+    <div class="page-header">
+        <div class="page-title">Monitor Service List</div>
+        <div class="page-subtitle">
+            Click on any link below to view the respective dashboards.
+        </div>
+    </div>
+    <div class="table-toolbar">
+      <div class="ui-g">
+        <div class="ui-g-12 ui-lg-4">
+          <button *ngIf="isAdministrator" pButton type="button" label="Configuration" icon="fa-cogs" class="ui-button-secondary" [routerLink]="['config']"></button>
+        </div>
+      </div>
+    </div>
+    <div class="ui-g monitor-list-row" >
+        <div class="ui-g-4" *ngFor="let item of monitorList; index as i">
+            <p-card title="{{item.name | titlecase}}" subtitle="" styleClass="monitor-list-card ui-card-shadow">
+                <p-header>
+                </p-header>
+                <div>{{item.description}}</div>
+                <p-footer>
+                  <a href="{{item.URL}}" target="_blank"><button pButton type="button" label="View Dashboard" icon="fa-external-link" class="ui-button-secondary"></button></a>
+                </p-footer>
+            </p-card>
+        </div>
+    </div>
+</div>

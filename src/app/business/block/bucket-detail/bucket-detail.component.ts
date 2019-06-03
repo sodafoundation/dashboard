@@ -19,6 +19,8 @@ declare let X2JS:any;
   providers: [ConfirmationService, MsgBoxService],
 })
 export class BucketDetailComponent implements OnInit {
+  fromObjects:boolean = false;
+  fromLifeCycle:boolean = false;
   kDate = "";
   Signature = "";
   colon = "/";
@@ -90,6 +92,8 @@ export class BucketDetailComponent implements OnInit {
         label: this.bucketId,
         url: ["/" + this.bucketId],
       });
+      this.fromObjects = params.fromRoute === "fromObjects";
+      this.fromLifeCycle = params.fromRoute === "fromLifeCycle";
       this.backetUrl = this.bucketId;
       this.getAlldir();
       this.allTypes = [];
@@ -193,7 +197,7 @@ export class BucketDetailComponent implements OnInit {
           this.allFolderNameForCheck = [];
           this.allDir.forEach(item=>{
             item.size = Utils.getDisplayCapacity(item.Size,2,'KB');
-            item.lastModified = Utils.formatDate(item.LastModified * 1000);
+            item.lastModified = Utils.formatDate(item.LastModified *1000);
             if(item.ObjectKey.indexOf(this.colon) !=-1){
               item.objectName = item.ObjectKey.slice(0,item.ObjectKey.lastIndexOf(this.colon));
               this.allFolderNameForCheck.push(item.objectName);
@@ -222,6 +226,14 @@ export class BucketDetailComponent implements OnInit {
               item.disabled = false;
             }
           })
+          this.allDir.forEach((item,index)=>{
+            this.allDir[index].Tier = "Tier_" + item.Tier + " (" + item.StorageClass + ")";
+            if(item.objectName.length > 20){
+              item['name'] = item.objectName.substr(0,8) + "...";
+            }else{
+              item['name'] = item.objectName;
+            }
+          });
         });
         })
     })
