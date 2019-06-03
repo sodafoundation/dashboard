@@ -1,0 +1,199 @@
+<div>
+    <div class="custom-breadcrumb">
+        <span *ngFor="let item of items; index as i">
+            <a [ngClass]="{'font-color-class': i===0}" [routerLink]="[item.url,'fromFileShare']">{{item.label}}</a>
+            <span *ngIf="(i+1) !== items.length">></span>
+        </span>
+    </div>
+    <div class="volume-basic-info">
+        <h3>{{i18n.keyID['sds_block_volume_base_info']}}</h3>
+        <div class="ui-grid ui-grid-responsive ui-grid-pad ui-fluid volume-item">
+            <div class="ui-grid-row volume-basic-item-class">
+                <div class="ui-grid-col-2" [innerHtml] = "label.Name"></div>
+                <div class="ui-grid-col-2 volume-basic-item-value-color" *ngIf="fileShare" [innerHtml] = "fileShare.name"></div>
+                <div class="ui-grid-col-2" [innerHtml] = "label.Profile"></div>
+                <div class="ui-grid-col-2 volume-basic-item-value-color" *ngIf="fileShare" [innerHtml] = "fileShare.profileName"></div>
+                <div class="ui-grid-col-2" [innerHtml] = "label.Status"></div>
+                <div class="ui-grid-col-2 volume-basic-item-value-color" *ngIf="fileShare" [innerHtml] = "fileShare.status"></div>
+            </div>
+            <div class="ui-grid-row volume-basic-item-class">
+                <div class="ui-grid-col-2" [innerHtml] = "label.Description"></div>
+                <div class="ui-grid-col-2 volume-basic-item-value-color" *ngIf="fileShare" [innerHtml] = "fileShare.description"></div>
+                <div class="ui-grid-col-2" [innerHtml] = "label.Capacity"></div>
+                <div class="ui-grid-col-2 volume-basic-item-value-color" *ngIf="fileShare" [innerHtml] = "fileShare.size"></div>
+                <div class="ui-grid-col-2" [innerHtml] = "label.CreatedAt"></div>
+                <div class="ui-grid-col-2 volume-basic-item-value-color" *ngIf="fileShare" [innerHtml] = "fileShare.createdAt"></div>
+            </div>
+            <div class="ui-grid-row volume-basic-item-class">
+                <div class="ui-grid-col-2" [innerHtml] = "label.AZ"></div>
+                <div class="ui-grid-col-2 volume-basic-item-value-color" *ngIf="fileShare" [innerHtml] = "fileShare.availabilityZone"></div>
+            </div>
+        </div>
+    </div>
+    <div>
+        <p-tabView styleClass="ui-tabview-large">
+            <p-tabPanel header="{{i18n.keyID['sds_block_volume_snapshot']}}" [selected]="fromSnapshot">
+                <div>
+                    <div class="table-toolbar">
+                        <div class="left">
+                            <button pButton type="button" label="{{i18n.keyID['sds_block_volume_create']}}" (click)="showSnapshotPropertyDialog('create')" class="ui-button-secondary" [disabled]="!showCreateSnapshot"></button>
+                            <button pButton type="button" label="{{i18n.keyID['sds_block_volume_delete']}}" [disabled]="selectedSnapshots.length == 0" (click)="batchDelete('snapshot',selectedSnapshots)"></button>
+                        </div>
+                        <div class="right">
+                            <div class="ui-inputsearch">
+                                <input type="text" #searchByName [(ngModel)]="snapshotfilter" pInputText placeholder="{{i18n.keyID['sds_block_volume_search']}}" />
+                                <button pButton type="button" icon="fa-search" (click)="getSnapshots(snapshotfilter)"></button>
+                            </div>
+                            <button pButton type="button" icon="fa-refresh" (click)="getSnapshots(param.value)"></button>
+                        </div>
+                    </div>
+                    <p-dataTable [immutable]="false" [globalFilter]="searchByName" [(selection)]="selectedSnapshots" [value]="snapshots" [showHeaderCheckbox]="true" [rows]="10" [paginator]="true" [pageLinks]="3" [rowsPerPageOptions]="[10,20,50,100]">
+                        <p-column selectionMode="multiple" [style]="{'width': '60px'}"></p-column>
+                        <p-column field="name" header="{{i18n.keyID['sds_block_volume_name']}}"></p-column>
+                        <p-column field="description" header="{{i18n.keyID['sds_block_volume_descri']}}"></p-column>
+                        <p-column field="status" header="{{i18n.keyID['sds_block_volume_status']}}"></p-column>
+                        <p-column field="createdAt" header="{{i18n.keyID['sds_block_volume_createat']}}"></p-column>
+                        <!-- <p-column field="shareSize" header="{{i18n.keyID['sds_fileShare_shareSize']}}"></p-column> -->
+                        <p-column header="{{i18n.keyID['sds_block_volume_operation']}}" [style]="{'width': '25%'}">
+                            <ng-template let-snapshot="rowData" pTemplate="body">
+                                <a [routerLink]="['/createFileShare']">{{i18n.keyID['sds_fileShare_create']}}</a>
+                                <a (click)="showSnapshotPropertyDialog('modify',snapshot)">{{i18n.keyID['sds_block_volume_modify']}}</a>
+                                <a (click)="batchDelete('snapshot',snapshot)">{{i18n.keyID['sds_block_volume_delete']}}</a>
+                            </ng-template>
+                        </p-column>
+                    </p-dataTable>
+                </div>
+
+                <p-dialog *ngIf="snapshotCreateShow" header="{{i18n.keyID['sds_block_volume_createsna']}}" [(visible)]="snapshotCreateShow" [width]="600" modal="modal">
+                    <form [grid]="{label: 'ui-g-4', content:'ui-g-20'}" [formGroup]="createSnapshotFormGroup" [errorMessage]="errorMessage">
+                        <form-item label="FileShare">
+                            <span class="text-only" [innerHtml]="fileShare.name"></span>
+                        </form-item>
+                        <form-item label="{{label.Name}}" [required]="true">
+                            <input type="text" pInputText formControlName="name"/>
+                        </form-item>
+                        <form-item label="{{label.Description}}">
+                            <textarea [rows]="3" [cols]="27" pInputTextarea formControlName="description" ></textarea>
+                        </form-item>
+                    </form>
+                    <p-footer>
+                        <button type="button" pButton class="ui-button-secondary" (click)="createSnapshot()" label="{{i18n.keyID['ok']}}" ></button>
+                        <button type="button" pButton (click)="snapshotCreateShow=false" label="{{i18n.keyID['cancel']}}"></button>
+                    </p-footer>
+                </p-dialog>
+    
+                <p-dialog *ngIf="snapshotModifyShow" header="{{i18n.keyID['sds_block_volume_modify']}}" [(visible)]="snapshotModifyShow" [width]="600" modal="modal">
+                    <form [grid]="{label: 'ui-g-4', content:'ui-g-20'}" [formGroup]="modifySnapshotFormGroup" [errorMessage]="errorMessage">
+                        <form-item label="FileShare">
+                            <span class="text-only" [innerHtml]="fileShare.name"></span>
+                        </form-item>
+                        <form-item label="{{label.Name}}" [required]="true">
+                            <input type="text" pInputText formControlName="name" value="{{selectedSnapshotObj.name}}"/>
+                        </form-item>
+                        <form-item label="{{label.Description}}" [required]="false">
+                            <textarea [rows]="3" [cols]="27" pInputTextarea formControlName="description" value="{{selectedSnapshotObj.description}}"></textarea>
+                        </form-item>
+                    </form>
+                    <p-footer>
+                        <button type="button" pButton class="ui-button-secondary" (click)="modifySnapshot()" label="{{i18n.keyID['ok']}}" ></button>
+                        <button type="button" pButton (click)="snapshotModifyShow=false" label="{{i18n.keyID['cancel']}}"></button>
+                    </p-footer>
+                </p-dialog>
+            </p-tabPanel>
+
+            <p-tabPanel header="{{i18n.keyID['sds_fileShare_access']}}" [selected]="fromAcls">
+                <div class="content-header">
+                    <div class="table-toolbar">
+                        <div class="left">
+                            <button pButton type="button" label="{{i18n.keyID['sds_block_volume_create']}}"
+                                (click)="showAclPropertyDialog('create')" class="ui-button-secondary"></button>
+                            <button pButton type="button" label="{{i18n.keyID['sds_block_volume_delete']}}"
+                                [disabled]="selectedAcls.length == 0" (click)="batchDelete('acls',selectedAcls)"></button>
+                        </div>
+                        <div class="right">
+                            <div class="ui-inputsearch">
+                                <input type="text" #searchByName [(ngModel)]="aclfilter" pInputText
+                                    placeholder="{{i18n.keyID['sds_block_volume_search']}}" />
+                                <button pButton type="button" icon="fa-search" (click)="getAcls(aclfilter)"></button>
+                            </div>
+                            <button pButton type="button" icon="fa-refresh" (click)="getAcls(param)"></button>
+                        </div>
+                    </div>
+                    <p-dataTable [globalFilter]="searchByName" [(selection)]="selectedAcls" [value]="acls" [showHeaderCheckbox]="true"
+                        [rows]="10" [paginator]="true" [pageLinks]="3" [rowsPerPageOptions]="[10,20,50,100]">
+                        <p-column selectionMode="multiple" [style]="{'width': '60px'}"></p-column>
+                        <p-column field="name" header="Ip"></p-column>
+                        <p-column field="type" header="{{i18n.keyID['sds_profile_rep_type']}}" [style]="{'width': '80px'}"></p-column>
+                        <p-column field="level" header="{{i18n.keyID['sds_fileShare_acl_level']}}"></p-column>
+                        <p-column field="createdAt" header="{{i18n.keyID['sds_block_volume_createat']}}"></p-column>
+                        <p-column field="updatedAt" header="Last Modified"></p-column>
+                        <p-column header="{{i18n.keyID['sds_block_volume_operation']}}" [style]="{'width': '25%'}">
+                            <ng-template let-acl="rowData" pTemplate="body">
+                                <!-- <a (click)="showAclPropertyDialog('modify',acl)">{{i18n.keyID['sds_block_volume_modify']}}</a> -->
+                                <a (click)="batchDelete('acls',acl)">{{i18n.keyID['sds_block_volume_delete']}}</a>
+                            </ng-template>
+                        </p-column>
+                    </p-dataTable>
+                
+                    <p-dialog *ngIf="aclCreateShow" header="{{i18n.keyID['sds_fileShare_addRule']}}" [(visible)]="aclCreateShow"
+                        [width]="600" modal="modal">
+                        <form [grid]="{label: 'ui-g-4', content: 'ui-g-20'}" [formGroup]="createAclsFormGroup"
+                            [errorMessage]="errorMessage">
+                            <form-item label="{{label.aclLevel}}" [required]="true">
+                                <p-multiSelect [options]="availabilityAclLevel" [filter]="false" formControlName="level"
+                                    [style]="{'min-width':'150px'}" placeholder="Please choose"></p-multiSelect>
+                            </form-item>
+                            <form-item [required]="true" label="{{label.user}}">
+                                <div *ngFor="let AclsItem of aclsItems;index as i">
+                                    <div class="item-flex" style="padding: 0.5em 0;">
+                                        <!-- <p-dropdown [options]="availabilityip" formControlName="{{'user'+i}}" [style]="{'min-width':96}"></p-dropdown> -->
+                                        <input type="text" pInputText formControlName="{{'userInput'+i}}" [style]="{'width':150}" />
+                                        <div class="create-profile-img " (click)="deleteAclUsers(i)">
+                                            <img style="vertical-align:middle; margin-left: 40px;"
+                                                src="assets/business/images/profile/u1065.png">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="ui-grid-row volume-item">
+                                    <a class="create-profile-img" (click)="addTransRules()">
+                                        <img style="vertical-align:middle;" src="assets/business/images/profile/u2987.png">
+                                        <span>Add Rule</span>
+                                    </a>
+                                </div>
+                            </form-item>
+                            <form-item label="Description">
+                                <input type="text" pInputText formControlName="description" />
+                            </form-item>
+                        </form>
+                        <p-footer>
+                            <button type="button" pButton class="ui-button-secondary" (click)="createAclsSubmit(createAclsFormGroup.value)" label="{{i18n.keyID['ok']}}"></button>
+                            <button type="button" pButton (click)="aclCreateShow=false" label="{{i18n.keyID['cancel']}}"></button>
+                        </p-footer>
+                    </p-dialog>
+                
+                    <!-- <p-dialog *ngIf="aclModifyShow" header="{{i18n.keyID['sds_block_volume_modify']}}" [(visible)]="aclModifyShow"
+                        [width]="600" modal="modal">
+                        <form [grid]="{label: 'ui-g-4', content: 'ui-g-20'}" [formGroup]="modifyAclsFormGroup"
+                            [errorMessage]="errorMessage">
+                            <form-item [required]="true" label="{{label.aclLevel}}">
+                                <p-multiSelect [options]="availabilityAclLevel" [filter]="false" formControlName="accessCapability"
+                                    [style]="{'min-width':'150px'}" placeholder="Please choose"></p-multiSelect>
+                            </form-item>
+                            <form-item [required]="true" label="{{label.user}}">
+                                <div class="item-flex" style="padding: 0.5em 0;">
+                                    <p-dropdown [options]="availabilityip" formControlName="type" [style]="{'min-width':96}"></p-dropdown>
+                                    <input type="text" pInputText formControlName="accessTo" />
+                                </div>
+                            </form-item>
+                        </form>
+                        <p-footer>
+                            <button type="button" pButton class="ui-button-secondary" (click)="createAclsSubmit(modifyAclsFormGroup.value)" label="{{i18n.keyID['ok']}}"></button>
+                            <button type="button" pButton (click)="aclModifyShow=false" label="{{i18n.keyID['cancel']}}"></button>
+                        </p-footer>
+                    </p-dialog> -->
+                </div>
+            </p-tabPanel>
+            <p-confirmDialog></p-confirmDialog> 
+        </p-tabView>
+    </div>
+</div>

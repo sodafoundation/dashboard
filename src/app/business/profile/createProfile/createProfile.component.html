@@ -18,13 +18,21 @@
         <form-item label="{{label.protocol}}" [required]="true">
             <p-dropdown [style]="{'min-width':150}" formControlName="protocol" [options]="protocolOptions"></p-dropdown>
         </form-item>
-        <form-item label="{{label.type}}" [required]="true">
+        <form-item label="{{label.type}}" *ngIf="isReplicationFlag">
             <span *ngIf = "false"><p-radioButton label="Auto" formControlName="storageType" name="typeRadioGroup" value="Auto"></p-radioButton></span>
             <span><p-radioButton label="Thin" formControlName="storageType" name="typeRadioGroup" value="Thin"></p-radioButton></span>
             <span style="margin-left: 30px;"><p-radioButton label="Thick" formControlName="storageType" name="typeRadioGroup" value="Thick"></p-radioButton></span>
         </form-item>
-        <form-item label="{{label.storageAccess}}" [required]="true" *ngIf="!isReplicationFlag">
-            <p-dropdown [style]="{'min-width':150}" formControlName="storageAcl" [options]="storgeAclOptions"></p-dropdown>
+        <form-item label="{{label.storageAccess}}" [required]="true" *ngIf="!isReplicationFlag" >
+            <p-multiSelect [options]="storgeAclOptions" [filter]="false" formControlName="storageAcl" [style]="{'min-width':'150px'}" placeholder="Please choose"></p-multiSelect>
+            <div class="ui-message-container" *ngIf="showStorageAcl">
+                <div class="ui-message ui-message-error ui-corner-all">
+                    <i class="fa fa-exclamation-circle"></i>
+                    <span class="ui-message-error-text">
+                        Please select at least two
+                    </span>
+                </div>
+            </div>
         </form-item>
         <form-item label="{{label.qosPolicy}}" [required]="false">
             <p-checkbox (onChange)="showDetails('qos')" name="policyCheckbox"  value="Qos" label="Enable" [formControl]="profileform.controls['policys']"></p-checkbox>
@@ -126,7 +134,7 @@
                                 <span *ngIf="snapPolicy.controls['retentionOptions'].value !=='Quantity'">{{I18N.keyID['sds_profile_nuit_days']}}</span>
                             </div>
                         </form-item>
-                        <form-item label="{{label.snapshotLabel.destination}}" [required]="false">
+                        <form-item *ngIf="isReplicationFlag" label="{{label.snapshotLabel.destination}}" [required]="false">
                             <div class="create-profile-snap-col-12 input-text-vertical-align" >
                                 <input pInputText type="text" formControlName="snapshotDestination" placeholder="Bucket name" />
                             </div>

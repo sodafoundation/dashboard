@@ -17,11 +17,14 @@ const routes: Routes = [
     {path: 'block/:fromRoute', loadChildren: './business/block/block.module#BlockModule'},
     {path: 'dataflow', loadChildren: './business/dataflow/dataflow.module#DataflowModule'},
     {path: 'bucketDetail/:bucketId', loadChildren: './business/block/bucket-detail/bucket-detail.module#BucketDetailModule'},
-    {path: 'akSkManagement', loadChildren: './business/ak-sk/ak-sk.module#AkSkModule'}
+    {path: 'akSkManagement', loadChildren: './business/ak-sk/ak-sk.module#AkSkModule'},
+    {path: 'monitor', loadChildren: './business/monitor/monitor.module#MonitorModule'},
+    {path: 'createFileShare', loadChildren: './business/block/create-file-share/create-file-share.module#CreateFileShareModule'},
+    {path: 'fileShareDetail/:fileShareId', loadChildren: './business/block/file-share-detail/file-share-detail.module#FileShareDetailModule'}
 ];
 
 @NgModule({
     imports: [RouterModule.forRoot(routes)],
-    exports: [RouterModule]
+    exports: [RouterModule]
 })
 export class AppRoutingModule {}

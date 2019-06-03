@@ -228,8 +228,8 @@ export class BucketDetailComponent implements OnInit {
           })
           this.allDir.forEach((item,index)=>{
             this.allDir[index].Tier = "Tier_" + item.Tier + " (" + item.StorageClass + ")";
-            if(item.objectName.length > 20){
-              item['name'] = item.objectName.substr(0,8) + "...";
+            if(item.objectName.length > 15){
+              item['name'] = item.objectName.substr(0,15) + "...";
             }else{
               item['name'] = item.objectName;
             }
