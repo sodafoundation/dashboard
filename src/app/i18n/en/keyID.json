@@ -126,7 +126,7 @@
     "sds_fileShare_shareSize": "shareSize",
     "sds_fileShare_title": "File Share",
     "sds_fileShare_access": "Access",
-    "sds_fileShare_acl_user": "Add Host/Network Group",
+    "sds_fileShare_acl_user": "Add Ip/User",
     "sds_fileShare_acl_level": "Access Level",
     "sds_fileShare_delete_acl": "Delete Access",
     "sds_fileShare_addRule": "Add Rule",
