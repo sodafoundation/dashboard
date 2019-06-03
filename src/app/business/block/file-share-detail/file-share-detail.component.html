@@ -41,8 +41,8 @@
                         </div>
                         <div class="right">
                             <div class="ui-inputsearch">
-                                <input type="text" #searchByName [(ngModel)]="snapshotfilter" pInputText placeholder="{{i18n.keyID['sds_block_volume_search']}}" />
-                                <button pButton type="button" icon="fa-search" (click)="getSnapshots(snapshotfilter)"></button>
+                                <input type="text" #searchByName pInputText placeholder="{{i18n.keyID['sds_block_volume_search']}}" />
+                                <button pButton type="button" icon="fa-search"></button>
                             </div>
                             <button pButton type="button" icon="fa-refresh" (click)="getSnapshots(param.value)"></button>
                         </div>

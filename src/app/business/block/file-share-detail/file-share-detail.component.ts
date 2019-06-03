@@ -211,7 +211,7 @@ export class FileShareDetailComponent implements OnInit{
             })
         })
     }
-    showSnapshotPropertyDialog(dialog, selectedSnapshot){
+    showSnapshotPropertyDialog(dialog, selectedSnapshot?){
         if(dialog == 'create'){
             this.snapshotCreateShow = true;
         }else if(dialog == 'modify'){
@@ -324,7 +324,7 @@ export class FileShareDetailComponent implements OnInit{
         }
         //modify snapshot 
         let value = this.modifySnapshotFormGroup.value;
-        
+
         this.SnapshotService.updateSnapshot(this.selectedSnapshotObj['id'],value).subscribe((res)=>{
             this.snapshotModifyShow = false;
             this.getSnapshots(this.fromFileShareId);
