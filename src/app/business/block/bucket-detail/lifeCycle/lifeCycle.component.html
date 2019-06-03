@@ -34,7 +34,7 @@
         </p-column>
     </p-dataTable>
 
-    <p-dialog styleClass="upload-dialog" header="Create LifeCycle Rule" [(visible)]="liceCycleDialog" [width]="650" modal="modal" [height]="400">
+    <p-dialog styleClass="upload-dialog" header="{{lifeCycleTitle}}" [(visible)]="liceCycleDialog" [width]="650" modal="modal" [height]="400">
         <form [grid]="{label: 'ui-g-3', content:'ui-g-20'}" [formGroup]="createLifeCycleForm" (ngSubmit)="onSubmit(createLifeCycleForm.value)" [errorMessage]="errorMessage">
             <div class="volume-item" [innerHtml]="label.header"></div>
             <form-item label="Name" [required]="true">
