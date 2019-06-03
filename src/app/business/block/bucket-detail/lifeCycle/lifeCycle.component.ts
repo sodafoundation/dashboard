@@ -67,6 +67,7 @@ export class LifeCycleComponent implements OnInit {
     modifyTrans = [];
     enableCycle = false;
     disableCycle = false;
+    lifeCycleTitle;
     label = {
         header: "The data in the bucket will flow automatically according to the following rules.",
         days: this.i18n.keyID['sds_lifeCycleDays'] + ":",
@@ -414,8 +415,15 @@ export class LifeCycleComponent implements OnInit {
             let backendsArr = str.backends;
             //sibling migration is not supported in the same cloud
             if (selectedTrans == "STANDARD") {
+                let type;
+                backendsArr.forEach(item=>{
+                    if(item.name == newBackend){
+                        type = item.type;
+                    }
+                })
                 backendsArr = backendsArr.filter(item => {
-                    return item.name != newBackend;
+                    return item.type != type;
+
                 })
             }
             backendsArr.map(item => {
@@ -454,6 +462,7 @@ export class LifeCycleComponent implements OnInit {
         this.allLifeCycleCheckPrefix = [];
         this.modifyTrans = [];
         if (dialog == "create") {
+            this.lifeCycleTitle = "Create LifeCycle Rule";
             this.showCreateLifeCycle = true;
             this.showModifyLifeCycle = false;
             this.ruleChecked = true;
@@ -466,6 +475,7 @@ export class LifeCycleComponent implements OnInit {
             //reset lifeCycle
             this.getTransOptions();
         } else {
+            this.lifeCycleTitle = "Update LifeCycle Rule";
             this.showCreateLifeCycle = false;
             this.showModifyLifeCycle = true;
         }
@@ -720,7 +730,7 @@ export class LifeCycleComponent implements OnInit {
         if (index != 0 || !this.createLifeCycleForm.value["days0"]) {
             this.createLifeCycleForm.addControl('days' + index, this.fb.control(30, Validators.required));
             this.createLifeCycleForm.addControl('transId' + index, this.fb.control('', Validators.required));
-            this.createLifeCycleForm.addControl('backendId' + index, this.fb.control(this.defaultBackend, Validators.required));
+            this.createLifeCycleForm.addControl('backendId' + index, this.fb.control(this.defaultBackend));
             this.backendShow.push(false)
         }
     }
@@ -872,7 +882,7 @@ export class LifeCycleComponent implements OnInit {
     getModifyTrans(item, index, cycle) {
         this.createLifeCycleForm.addControl('days' + index, this.fb.control(item.Days, Validators.required));
         this.createLifeCycleForm.addControl('transId' + index, this.fb.control(item.StorageClass, Validators.required));
-        this.createLifeCycleForm.addControl('backendId' + index, this.fb.control(item.Backend, Validators.required));
+        this.createLifeCycleForm.addControl('backendId' + index, this.fb.control(item.Backend));
         this.modifyBakend.push(item.Backend);
         this.transDaysArr[index] = parseInt(item.Days);
         this.backendShow.push(true)
