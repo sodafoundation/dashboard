@@ -2,7 +2,7 @@ import { Component, Input, OnInit } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { I18NService, Utils ,Consts} from 'app/shared/api';
 import { MigrationService } from '../migration.service';
-import { Http} from '@angular/http';
+import { Http } from '@angular/http';
 import { interval } from 'rxjs/observable/interval';
 
 @Component({
