@@ -18,5 +18,11 @@
         </div>
         <volume-group-list #volumeGroupList></volume-group-list>
     </p-tabPanel>
+    <p-tabPanel header="File Share" [selected]="fromFileShare">
+        <div class="content-header">
+            <p>{{I18N.keyID['sds_block_volumesGroup_descrip']}}</p>
+        </div>
+        <app-file-share></app-file-share>
+    </p-tabPanel>
     
 </p-tabView>

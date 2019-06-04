@@ -63,11 +63,14 @@ export class ProfileComponent implements OnInit {
         }
     }
 
+    checkRep(){
+        this.getProfiles();
+    }
     getProfiles() {
         this.ProfileService.getProfiles().subscribe((res) => {
             this.profiles = res.json();
             this.profiles.forEach(item=>{
-                if(item.storageType && item.storageType == "File"){
+                if(item.storageType && item.storageType == "file"){
                     delete item.replicationProperties;
                 }
             })
