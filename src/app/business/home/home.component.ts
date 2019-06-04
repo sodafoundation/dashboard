@@ -82,8 +82,7 @@ export class HomeComponent implements OnInit {
         
         this.getCounts();
         this.getType();
-        
-  if(this.isLocalCloud==true){this.backendForm = this.fb.group({
+        if(this.isLocalCloud){this.backendForm = this.fb.group({
             "name":['', {validators:[Validators.required,Utils.isExisted(this.allBackendNameForCheck)]}],
             "type":['',{validators:[Validators.required]}],
             "region":['',{updateOn:'change'}],
@@ -92,7 +91,7 @@ export class HomeComponent implements OnInit {
             "ak":['',{validators:[Validators.required], updateOn:'change'}],
             "sk":['',{validators:[Validators.required], updateOn:'change'}],
         });
-}else{
+        }else{
         this.backendForm = this.fb.group({
             "name":['', {validators:[Validators.required,Utils.isExisted(this.allBackendNameForCheck)]}],
             "type":['',{validators:[Validators.required]}],
@@ -102,13 +101,12 @@ export class HomeComponent implements OnInit {
             "ak":['',{validators:[Validators.required], updateOn:'change'}],
             "sk":['',{validators:[Validators.required], updateOn:'change'}],
         });
-}
+        }
         this.modifyBackendForm = this.fb.group({
             "ak":['',{validators:[Validators.required], updateOn:'change'}],
             "sk":['',{validators:[Validators.required], updateOn:'change'}],
         });
         
-
         this.lineOption = {
             title: {
                 display: false,
@@ -162,15 +160,14 @@ export class HomeComponent implements OnInit {
     }
 
 /* ---- to hide region textbox on selection of 'CEPH" type -----*/    
-onChange(event) {
-	let strUser = event.value;
-     if(strUser == 'ceph-s3'){
-      	this.isLocalCloud=true;
-
-    }else{
+    onChange(event) {
+        let strUser = event.value;
+        if(strUser == 'ceph-s3'){
+            this.isLocalCloud=true;
+        } else {
  	this.isLocalCloud=false; 
-     }
-} 
+        }
+    } 
     initBucket2backendAnd2Type(){
         window['getAkSkList'](()=>{
             let requestMethod = "GET";
@@ -371,19 +368,17 @@ onChange(event) {
               "endpoint": this.backendForm.value.endpoint,
               "bucketName": this.backendForm.value.bucket,
               "security": this.backendForm.value.sk,
-              "access": this.backendForm.value.ak
-        };
-        } else {
-       param = {
+              "access": this.backendForm.value.ak};
+        }else{
+            param = {
               "name": this.backendForm.value.name,
               "type": this.backendForm.value.type,
               "region": this.backendForm.value.region,
               "endpoint": this.backendForm.value.endpoint,
               "bucketName": this.backendForm.value.bucket,
               "security": this.backendForm.value.sk,
-              "access": this.backendForm.value.ak
-       };
-       }
+              "access": this.backendForm.value.ak};
+        }
         let options = {
         timeout:18000
         };
