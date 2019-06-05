@@ -65,6 +65,14 @@ export class BucketDetailComponent implements OnInit {
   uploadForm :FormGroup;
   files;
   allFolderNameForCheck = [];
+  showRecoverObject = false;
+  recoverObjectFrom:FormGroup;
+  recoverNewDay;
+  showExpedited = true;
+  showStandard = false;
+  glacierShow = false;
+  noGlacierShow = false;
+  selectedDirSize: any;
   constructor(
     private ActivatedRoute: ActivatedRoute,
     public I18N:I18NService,
@@ -83,6 +91,10 @@ export class BucketDetailComponent implements OnInit {
         "backend":["",{validators:[Validators.required], updateOn:'change'}],
         "backend_type":["",{validators:[Validators.required], updateOn:'change'}],
     });
+    this.recoverObjectFrom = this.fb.group({
+      "days": [30,{validators:[Validators.required], updateOn:'change'}],
+      "recoverType":["Standard",{validators:[Validators.required], updateOn:'change'}]
+    });
   }
 
   ngOnInit() {
@@ -98,8 +110,18 @@ export class BucketDetailComponent implements OnInit {
       this.getAlldir();
       this.allTypes = [];
       this.getTypes();
-    }
-    );
+    });
+    this.recoverObjectFrom.get("recoverType").valueChanges.subscribe(
+      (value:string)=>{
+        if(value == "Expedited"){
+          this.showExpedited = true;
+          this.showStandard = false;
+        }else if(value == "Standard"){
+          this.showExpedited = false;
+          this.showStandard = true;
+        }
+      }
+    )
   }
   //Click on folder
   folderLink(file){
@@ -131,7 +153,7 @@ export class BucketDetailComponent implements OnInit {
     }
     this.getAlldir();
   }
-  getAlldir(){
+  getAlldir(selectedDir?){
     this.selectedDir = [];
     window['getAkSkList'](()=>{
       let requestMethod = "GET";
@@ -232,6 +254,14 @@ export class BucketDetailComponent implements OnInit {
               item['name'] = item.objectName.substr(0,15) + "...";
             }else{
               item['name'] = item.objectName;
+            }
+            //Object after executing the recovery strategy to ash the recovery button
+            if(selectedDir && selectedDir.ObjectKey == item.ObjectKey){
+              item.restoreDisable = selectedDir.restoreDisable;
+            }else if(item.StorageClass == "GLACIER" && item.restoreDisable){
+              item.restoreDisable = true;
+            }else{
+              item.restoreDisable = false;
             }
           });
         });
@@ -507,6 +537,83 @@ export class BucketDetailComponent implements OnInit {
   }
   tablePaginate() {
       this.selectedDir = [];
+  }
+  recoverObject(){
+    this.showRecoverObject = true;
+    this.selectedDirSize = 0;
+    this.recoverObjectFrom.patchValue({
+      days: 30,
+      recoverType: 'Standard'
+    });
+    this.selectedDir.forEach(item=>{
+      if(item.size.indexOf("KB") !=-1){
+        this.selectedDirSize += parseFloat(item.size);
+      }else if(item.size.indexOf("MB") !=-1){
+        this.selectedDirSize += parseFloat(item.size)*1024;
+      }else if(item.size.indexOf("GB") !=-1){
+        this.selectedDirSize += parseFloat(item.size)*1024*1024;
+      }
+    });
+    if(this.selectedDirSize < 1024){
+      this.selectedDirSize = this.selectedDirSize + "KB";
+    }else if(this.selectedDirSize >= 1024 && this.selectedDirSize < 1024*1024){
+      this.selectedDirSize = this.selectedDirSize/1024 + "MB";
+    }else{
+      this.selectedDirSize = this.selectedDirSize/(1024*1024) + "GB";
+    }
+    this.recoverDays(30)
+  }
+  selctedObject(selected){
+    this.glacierShow = false;
+    this.noGlacierShow = false;
+    selected.forEach(item=>{
+      if(item.StorageClass == "GLACIER"){
+        this.glacierShow = true;
+      }else{
+        this.noGlacierShow = true;
+      }
+    })
+  }
+  recoverDays(defaultDay?){
+    let days;
+    if(defaultDay){
+      days = 30*24*60*60*1000;
+    }else{
+      days = this.recoverObjectFrom.value['days']*24*60*60*1000;
+    }
+    let date = new Date().getTime();
+    let utcTime = Utils.formatDate(days +date);
+    this.recoverNewDay = utcTime.substr(0,4) + utcTime.substr(5,2) + utcTime.substr(8,2);
+  }
+  recoverSubmit(){
+    let value = this.recoverObjectFrom.value;
+    let param = {
+      RestoreRequest: {
+        Days: value.days,
+        GlacierJobParameters:{
+          Tier: value.recoverType == "Expedited" ? "STANDARD_IA": "STANDARD"
+        }
+      }
+    }
+    let x2js = new X2JS();
+    let str = x2js.json2xml_str(param);
+    this.selectedDir.forEach(item=>{
+      window['getAkSkList'](()=>{
+        let requestMethod = 'POST';
+        let url = this.BucketService.url + '/'+ this.bucketId + '/' + item.ObjectKey;
+        window['canonicalString'](requestMethod, url,()=>{
+          let options: any = {};
+          this.getSignature(options);
+          options.headers.set('Content-Type','application/xml');
+          this.BucketService.restoreObject(this.bucketId, item.ObjectKey, str, options).subscribe(res=>{
+            this.showRecoverObject=false
+            this.noGlacierShow = true;
+            item.restoreDisable = true,
+            this.getAlldir(item);
+          })
+        })
+      })
+    })
   }
 
 }

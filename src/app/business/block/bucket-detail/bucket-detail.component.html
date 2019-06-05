@@ -13,6 +13,7 @@
                     <div class="left">
                         <button class="ui-button-secondary" [disabled]="isUpload" pButton type="button" label="Upload" (click)="configUpload('upload')"></button>
                         <button pButton type="button" [disabled]="false"  label="Create Folder" (click)="configUpload('fromFolder')" ></button>
+                        <button pButton type="button" [disabled]="glacierShow == noGlacierShow || noGlacierShow" (click)="recoverObject()" label="{{I18N.keyID['sds_lifeCycle_restore']}}"></button>
                         <button pButton type="button" [disabled]="selectedDir.length === 0" (click)="deleteMultiDir()" label="{{I18N.keyID['sds_block_volume_delete']}}"></button>
                     </div>
                     <div class="right">
@@ -23,7 +24,7 @@
                         <button class="" pButton type="button" (click)="getAlldir()" icon="fa-refresh"></button>
                     </div>
                 </div>
-                <p-dataTable [value]="allDir" [globalFilter]="searchByName" [(selection)]="selectedDir"  [showHeaderCheckbox]="true" [rows]="10" [paginator]="true" [pageLinks]="3" [rowsPerPageOptions]="[10,20,50,100]">
+                <p-dataTable (click)="selctedObject(selectedDir)" [value]="allDir" [globalFilter]="searchByName" [(selection)]="selectedDir"  [showHeaderCheckbox]="true" [rows]="10" [paginator]="true" [pageLinks]="3" [rowsPerPageOptions]="[10,20,50,100]">
                     <p-column selectionMode="multiple" [style]="{'width': '60px'}"></p-column>
                     <p-column field="ObjectKey" header="{{I18N.keyID['sds_block_volume_name']}}" [style]="{'width': '170px'}" >
                         <ng-template pTemplate="body" let-file="rowData" let-i="rowIndex">
@@ -40,6 +41,7 @@
                     <p-column field="lastModified" header="Last Modified"></p-column>
                     <p-column header="{{I18N.keyID['sds_block_volume_operation']}}" [style]="{'width': '180px'}">
                         <ng-template pTemplate="body" let-file="rowData" let-i="rowIndex">
+                            <a *ngIf="!file.newFolder && file['StorageClass'] == 'GLACIER'" (click)="recoverObject()" [ngClass]="{'a-rep-disabled': file['restoreDisable']}">Restore</a>
                             <a (click)="downloadFile(file)" *ngIf="!file.newFolder">Download</a>
                             <a [ngClass]="{'a-rep-disabled':file['disabled']}" (click)="deleteFile(file)">Delete</a>
                         </ng-template>
@@ -85,6 +87,35 @@
                     <p-footer>
                         <button type="submit" class="ui-button-secondary" pButton (click)="createFolder()" label="{{I18N.keyID['ok']}}"></button>
                         <button type="button" pButton (click)="showCreateFolder=false"  label="{{I18N.keyID['cancel']}}"></button>
+                    </p-footer>
+                </p-dialog>
+                <p-dialog header="Restore Object" [(visible)]="showRecoverObject" [width]="600" modal="modal">
+                    <form [grid]="{label: 'ui-g-3', content:'ui-g-20'}" [formGroup]="recoverObjectFrom" [errorMessage]="errorMessage">
+                        <h3 class="volume-item" >Restore objects from Glacier</h3>
+                        <form-item label="Total objects">
+                            <div>{{this.selectedDir.length}}</div>
+                        </form-item>
+                        <form-item label="Total size">
+                            <div>{{selectedDirSize}}</div>
+                        </form-item>
+
+                        <h3 class="volume-item">Number of days the restored copy is available</h3>
+                        <p-spinner formControlName="days" [min]="1" (onChange)="recoverDays()"></p-spinner>
+                        <span>days</span>
+                        <div class="volume-item">Available until approximately {{recoverNewDay}}</div>
+                        <form-item label="Restore tier">
+                            <!-- <span><p-radioButton label="Expedited" formControlName="recoverType" name="typeRadioGroup" value="Expedited"></p-radioButton></span> -->
+                            <span><p-radioButton label="Standard" formControlName="recoverType" name="typeRadioGroup" value="Standard"></p-radioButton></span>
+                            <div class="volume-item">
+                                <div *ngIf="showExpedited">Restores the objects within 1 to 5 minutes.</div>
+                                <div *ngIf="showStandard">Restores the objects within 3 to 5 hours</div>
+                            </div>
+                        </form-item>
+                        
+                    </form>
+                    <p-footer>
+                        <button type="submit" class="ui-button-secondary" pButton (click)="recoverSubmit()" label="{{I18N.keyID['ok']}}"></button>
+                        <button type="button" pButton (click)="showRecoverObject=false"  label="{{I18N.keyID['cancel']}}"></button>
                     </p-footer>
                 </p-dialog>
                 <p-confirmDialog></p-confirmDialog>     
