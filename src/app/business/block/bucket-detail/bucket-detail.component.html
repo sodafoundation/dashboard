@@ -39,7 +39,7 @@
                     <p-column field="Backend" header="Location" [style]="{'width': '120px'}" ></p-column>
                     <p-column field="Tier" header="Tier" ></p-column>
                     <p-column field="lastModified" header="Last Modified"></p-column>
-                    <p-column header="{{I18N.keyID['sds_block_volume_operation']}}" [style]="{'width': '180px'}">
+                    <p-column header="{{I18N.keyID['sds_block_volume_operation']}}" [style]="{'width': '215px'}">
                         <ng-template pTemplate="body" let-file="rowData" let-i="rowIndex">
                             <a *ngIf="!file.newFolder && file['StorageClass'] == 'GLACIER'" (click)="recoverObject()" [ngClass]="{'a-rep-disabled': file['restoreDisable']}">Restore</a>
                             <a (click)="downloadFile(file)" *ngIf="!file.newFolder">Download</a>
