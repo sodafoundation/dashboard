@@ -7,7 +7,7 @@ import { I18NService, ParamStorService } from '../../shared/api';
 @Injectable()
 export class WorkflowService {
 
-  url = "/v1beta/orchestration";
+  
   options = {
       headers: {
           'X-Auth-Token': localStorage['auth-token']
@@ -15,16 +15,17 @@ export class WorkflowService {
   };
   user_id = this.paramStor.CURRENT_TENANT().split("|")[0];
   project_id = this.paramStor.CURRENT_TENANT().split("|")[1];
+  url = "/v1beta/" + this.project_id + "/orchestration/";
+  
 
   constructor(private http: HttpClient,
     private paramStor: ParamStorService) { 
-    this.getServices().subscribe(data => {
-      console.log(data);
-    });
+    console.log("Paramstor", this.paramStor.CURRENT_USER());
+    console.log("Paramstor", this.paramStor.CURRENT_TENANT());
   }
 
   public getServices(): Observable<any> {
-    let detailUrl = this.url + '/services'
+    let detailUrl = this.url + 'services'
     return this.http.get(detailUrl);
   }
 
@@ -34,14 +35,27 @@ export class WorkflowService {
   }
 
   public getInstancesById(id): Observable<any> {
-    let detailUrl = this.url + 'instances/' + id 
+    let detailUrl = this.url + 'instances/?service_def=' + id;
+    return this.http.get(detailUrl);
+  }
+
+  public getInstanceDetails(id): Observable<any> {
+    let detailUrl = this.url + 'instances/' + id;
+    return this.http.get(detailUrl);
+  }
+
+  public deleteInstance(id): Observable<any> {
+    let detailUrl = this.url + 'instances/' + id;
+    return this.http.delete(detailUrl);
+  }
+
+  public getTasks(id): Observable<any> {
+    let detailUrl = this.url + 'tasks/' + id;
     return this.http.get(detailUrl);
   }
 
   public createInstance(param) {
     let detailUrl = this.url + 'instances';
-    param['userId'] = this.user_id;
-    param['tenantId'] = this.project_id;
     console.log("Final Param to post", param);
     return this.http.post(detailUrl, param);
   }

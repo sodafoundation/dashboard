@@ -1,42 +1,83 @@
 import { Router,ActivatedRoute } from '@angular/router';
 import { Component, OnInit, Input } from '@angular/core';
+import { Message} from '../../../components/common/api';
 import { I18NService, MsgBoxService, Utils, ParamStorService } from '../../../shared/api';
 import { Validators, FormControl, FormGroup, FormBuilder } from '@angular/forms';
 import { WorkflowService } from '../workflow.service';
+import { ProfileService } from '../../profile/profile.service';
 import { trigger, state, style, transition, animate } from '@angular/animations';
 import * as _ from "underscore";
 
 @Component({
   selector: 'dynamic-form',
   templateUrl: './dynamic-form.component.html',
+  providers: [MsgBoxService],
   styleUrls: ['./dynamic-form.component.css']
 })
 export class DynamicFormComponent implements OnInit {
   @Input() dataObject: any;
+  @Input() serviceId: any;
+  @Input() selectedService: any;
+
+  msgs: Message[];
+  profileOptions: any[] = [];
   objectProps: any;
+  displayFormObject: any[];
   form: FormGroup;
-  requestBody : any;
-  default_parameters: any = {
-    "profile_id": "",
-    "tenant_id": "",
-    "auth": "",
-    "token": "",
-    "user":""
+  requestBody : any = {
+    "service_definition_id": "",
+    "user_id": "",
+    "action": "",
+    "name" : "",
+    "description" : "",
+    "parameters": {
+        
+    }
   };
+  default_parameters: any[] = [    
+    "tenant_id",
+    "auth_token",
+    "user_id",
+    "userId"
+  ];
+  
   options = {
     headers: {
         'X-Auth-Token': localStorage['auth-token']
     } 
   };
+  auth_token = localStorage['auth-token'];
+  user_id = this.paramStor.CURRENT_USER().split("|")[1];
+  project_id = this.paramStor.CURRENT_TENANT().split("|")[1];
 
   constructor(private router: Router,
     private ActivatedRoute:ActivatedRoute,
-    public I18N: I18NService,
-    public wfservice: WorkflowService,
-    public paramStor: ParamStorService,
+    public i18n: I18NService,
+    private wfservice: WorkflowService,
+    private profileService: ProfileService,
+    private paramStor: ParamStorService,
     private fb: FormBuilder) { }
 
   ngOnInit() {
+    let self = this;
+
+    this.dataObject['instanceName'] = {
+      "description": "Name of the Instance",
+      "required": true,
+      "type": "string",
+      "validation": {
+        "required": true
+      }
+    };
+
+    this.dataObject['instanceDescription'] = {
+      "description": "Description of the Instance",
+      "required": true,
+      "type": "string",
+      "validation": {
+        "required": true
+      }
+    };
     // remap the API to be suitable for iterating over it
     this.objectProps =
       Object.keys(this.dataObject)
@@ -49,23 +90,44 @@ export class DynamicFormComponent implements OnInit {
             item['validation'] = {"required": true};
           }
         })
-      console.log("Updated Object:DataObject", this.objectProps, this.dataObject);
+      
+      const formGroup2 = {};
 
-      this.requestBody = _.pick(this.objectProps, function(item){
-          item['validation'] = {required: true};
-          return item['required']==true;
-      });
-      console.log("Request Body:", this.requestBody);
       _.each(this.objectProps, function(item){
+        item['showThis'] = true;
         item['label'] = item['key'].replace(/_/g, ' ').replace(/(?: |\b)(\w)/g, function(key, p1) {
               return key.toUpperCase();    
         });
-        if(item['type']=='object' || item['key']=='auth' || item['key']=='token' || item['key']=='tenant_id' || item['key']=='profile_id' || item['required'] == false){
+
+        if(item['type']=='object'){
           item['showThis'] = false;
-        } else{
-          item['showThis'] = true;
         }
-        if(item['type'] == "string" || item['type'] == "integer"){
+        //Check if the key is a default parameter and can be passed from code. User need not enter.
+        if(item['required'] == true){
+          item['validation'] = {required: true};
+          if(_.contains(self.default_parameters, item['key'])){
+            item['showThis'] = false;
+            if(item['key']=='auth_token'){
+              item['default'] = item['value'] = self.auth_token;
+            }
+            if(item['key']=='tenant_id'){
+              item['default'] = item['value'] = self.project_id;
+            }
+            if(item['key']=='user_id' || item['key']=='userId'){
+              item['default'] = item['value'] = self.user_id;
+            }
+            console.log("This is a default param:", item['key']);
+          }
+        }
+
+        if(item['key']=='profile_id'){
+          self.getProfiles();
+          console.log("These are the profile options:", self.profileOptions);
+          item['inputType'] = "select";
+          item['options'] = self.profileOptions;
+        }
+        
+        if((item['type'] == "string" || item['type'] == "integer") && item['key'] != 'profile_id'){
           item['inputType'] = "text";
         } else if(item['type'] == "boolean"){
           item['inputType'] = "radio";
@@ -74,27 +136,36 @@ export class DynamicFormComponent implements OnInit {
             { label: "False", value: 'false'}
           ];
         } 
-        if(item['required'] == true){
-          item['validation'] = {required: true};
-        }
+        formGroup2[item['key']] = new FormControl(item['value'] || '', self.mapValidators(item['validation']));
       })
 
-      console.log("New fields added", this.objectProps);
+      console.log("DataObject is ", this.dataObject);
+      console.log("ObjectProp is ", this.objectProps);
+      
+      
 
+      console.log("Updated Data Object", this.dataObject);
+      
       // setup the form
       const formGroup = {};
-
-     /*  _.each(this.objectProps, function(item, key, val){
-        formGroup[key] = new FormControl(val[key] || '', this.mapValidators(item['validation']))
-        console.log("Interim formGroup:", formGroup);
-      });
-      this.form = new FormGroup(formGroup); */
+      
       
       for(let prop of Object.keys(this.dataObject)) {
-        formGroup[prop] = new FormControl(this.dataObject[prop].value || '', this.mapValidators(this.dataObject[prop].validation));
+        console.log("Inside dataObject", prop);
+        //formGroup[prop] = new FormControl(this.dataObject[prop].value || '', this.mapValidators(this.dataObject[prop].validation));
       }
-      this.form = new FormGroup(formGroup);
-      console.log("New FormGroup:", this.form);
+
+     /*  _.each(this.objectProps, function(ele){
+        console.log("Inside objectProps", ele);
+        if(ele['required'] == true){
+          ele['validation'] = {required: true};
+          formGroup2[ele['key']] = new FormControl(ele['value'] || '', self.mapValidators(ele['validation']));
+        }
+        
+      }); */
+      console.log("THis is new FormGroup2", formGroup2);
+      console.log("FormGorup Created:", formGroup);
+      this.form = new FormGroup(formGroup2);
     }
       
 
@@ -113,10 +184,40 @@ export class DynamicFormComponent implements OnInit {
       
         return formValidators;
       }
+      getProfiles() {
+        this.profileService.getProfiles().subscribe((res) => {
+          let profiles = res.json();
+          profiles.forEach(profile => {
+            this.profileOptions.push({
+              label: profile.name,
+              value: profile.id
+            });
+          });
+        });
+      }
 
       onSubmit(value) {
         let formObject = value;
-        console.log("Form Submitted:", formObject);
+        this.requestBody.service_definition_id = this.serviceId;
+        this.requestBody.action = this.selectedService.action;
+        this.requestBody.user_id = this.user_id;
+        this.requestBody.name = formObject.instanceName;
+        this.requestBody.description = formObject.instanceDescription;
+        this.requestBody.parameters = _.omit(formObject, ['instanceName', 'instanceDescription']);
+        this.createInstance(this.requestBody);
+      }
+
+      createInstance(param){
+        this.wfservice.createInstance(param).subscribe(res => {
+          this.msgs = [];
+          this.msgs.push({severity: 'success', summary: 'Success', detail: 'Instance Created Successfully.'});
+          this.router.navigate(['services/instanceList', this.serviceId]);
+
+        }, error => {
+          this.msgs = [];
+          this.msgs.push({severity: 'error', summary: 'Error', detail: error.message});
+        })
+        
       }
 
 }

@@ -6,28 +6,41 @@
             You can create an instance of any of the services below by clicking on the create button.
         </div>
     </div>
-    <div class="service-category" *ngFor="let category of services; index as i">
+    <div class="table-toolbar ui-grid-row ui-g" style="margin-top: 25px;">
+            <div class="ui-g-1 ui-lg-1 ui-md-1 ui-g-offset-11 ui-md-offset-11 ui-lg-offset-11">
+                <button type="button" class="ui-button-secondary refresh-service-list" pButton (click)="refreshList()"  icon="fa fa-refresh" pTooltip="Refresh Table" tooltipPosition="top"></button>
+            </div>
+        </div>
+    <div class="service-category" *ngFor="let group of serviceCatalog; index as i">
         <p-panel [toggleable]="true">
             <p-header>
-                {{category.service.group | titlecase}} <i class="icon fa fa-question-circle" pTooltip="Click on any of the services to run." tooltipPosition="right"></i>
+                {{group.groupName | titlecase}} <!-- <i class="icon fa fa-question-circle" pTooltip="Click on any of the services to run." tooltipPosition="right"></i> -->
             </p-header>
             <div class="ui-g service-row" >
-                <div class="ui-g-4" *ngFor="let item of category.service.workflows; index as i">
-                    <p-card title="{{item.name}}" subtitle="Number of instances: {{instanceCount}}" styleClass="workflow-definition-card">
+                <div class="ui-g-4" *ngFor="let item of group.services; index as i">
+                    <!-- TODO FIX The Number of instances count -->
+                    <p-card title="{{item.name}}" subtitle="Number of instances: {{item.instanceCount}}" styleClass="workflow-definition-card">
                         <p-header>
                         </p-header>
                         <div>{{item.description}}</div>
                         <p-footer>
-                            <button pButton type="button" label="Create" icon="fa-play" class="ui-button-secondary" [routerLink]="['createInstance', item.action]"></button>
-                            <button pButton type="button" label="Instances" icon="fa-list" class="ui-button-primary" [routerLink]="['instanceList', item.id]" [disabled]="!instanceCount"></button>
+                            <button pButton type="button" label="Create" icon="fa-play" class="ui-button-secondary" [routerLink]="['createInstance', item.id]"></button>
+                            <button pButton type="button" label="Instances" icon="fa-list" class="ui-button-primary" [routerLink]="['instanceList', item.id]" ></button>
                         </p-footer>
                     </p-card>
                 </div>
             </div>
-            <p-footer>
-                Click on any of the services to start an instance.
-            </p-footer>
+            <!-- <p-footer>
+                
+            </p-footer> -->
         </p-panel>
+    </div>
+    <div class="service-category">
+        <div class="ui-g" style="text-align: center;">
+            <div class="ui-g-4 ui-g-offset-4">
+                <span>No Records Found.</span>
+            </div>
+        </div>
     </div>
 </div>
 

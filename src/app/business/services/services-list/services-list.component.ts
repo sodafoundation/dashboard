@@ -40,15 +40,13 @@ import * as _ from "underscore";
 export class ServicesListComponent implements OnInit{
     msgs: Message[];
     instanceListLink: any;
-    serviceCatalog: any[];
+    serviceCatalog: any;
     services: any[];
-    instanceCount: number;
+    instanceCount: any;
     constructor(private wfservice: WorkflowService){}
     
     ngOnInit() {
         this.getServicesList();    
-        //this.getInstanceCount();  
-        this.instanceCount = 10;
         
     }
 
@@ -56,14 +54,24 @@ export class ServicesListComponent implements OnInit{
         this.getServicesList();
     }
     getServicesList(){
+        let self = this;
         this.wfservice.getServices().subscribe(data=>{
-            this.services = data.services;
-            let count: number;
+            this.services = data;
             _.each(this.services, function(item){
                 console.log("Single Service", item);
-                //count = this.getInstanceCount(item['id']);
-                //item['instanceCount'] = count;
+                item['action'] = item['workflows'][0].definition_source;
+                item['instanceCount'] = self.getInstanceCount(item['id']);
+                console.log("Number of instances updated:", item['instanceCount']);
             })
+            let groups = _.groupBy(this.services, 'group');
+            this.serviceCatalog = _.map(groups, function(item){
+                return {
+                    groupName: item[0].group,
+                    services: item
+                }
+            })
+            console.log("Service Catalog:", this.serviceCatalog);
+           
         }, error => {
             console.log("Something went wrong with fetching services.", error);
         });
@@ -71,16 +79,19 @@ export class ServicesListComponent implements OnInit{
     }
 
     getInstanceCount(id){
+        let instCount;
+        this.instanceCount = [];
         this.wfservice.getInstancesById(id).subscribe(data => {
             console.log("Get the list of instances:", data);
-            return data.length;
+            this.instanceCount = data;
+            console.log("Get the value of instance array:Length", this.instanceCount, this.instanceCount.length);
+            return this.instanceCount.length;
         }, error => {
             return 0;
         });
-        this.instanceCount = 10;
     }
 
-    save() {
+    /* save() {
         this.msgs = [];
         this.msgs.push({severity:'info', summary:'Success', detail:'Data Saved'});
     }
@@ -93,6 +104,6 @@ export class ServicesListComponent implements OnInit{
     delete() {
         this.msgs = [];
         this.msgs.push({severity:'info', summary:'Success', detail:'Data Deleted'});
-    }
+    } */
     
 }

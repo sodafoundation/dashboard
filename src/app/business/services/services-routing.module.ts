@@ -11,11 +11,11 @@ const routers: Routes = [
         component: ServicesListComponent
     },
     {
-        path: 'createInstance/:action',
+        path: 'createInstance/:serviceId',
         component: CreateInstanceComponent,
     },
     {
-        path: 'instanceList/:id',
+        path: 'instanceList/:serviceId',
         component: InstanceListComponent,
     },
     ];
