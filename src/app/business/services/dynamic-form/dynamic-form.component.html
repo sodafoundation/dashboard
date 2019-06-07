@@ -1,0 +1,61 @@
+<p-growl [value]="msgs" [sticky]="false" [life]="6000"></p-growl>
+<form [grid]="{label: 'ui-g-2', content:'ui-g-2'}" (ngSubmit)="onSubmit(form.value)" [formGroup]="form">
+    <div class="ui-grid ui-grid-responsive ui-grid-pad ui-fluid">
+        <div class="table-toolbar">
+          <h2>Instance Details</h2>
+        </div>
+        <div *ngFor="let prop of objectProps">
+            <div [ngSwitch]="prop.inputType" >
+              <div class="form-item-container" *ngSwitchCase="'text'">
+                <form-item *ngIf="prop.instanceInfo" label="{{prop.label}}" [required]="true">
+                    <input pInputText size="80" 
+                      [formControlName]="prop.key"
+                      [id]="prop.key" [type]="prop.type" [value]="prop.default ? prop.default || prop.value : ''">
+                  </form-item>
+              </div>
+            </div>
+        </div>
+
+
+        <div class="table-toolbar">
+            <h2>Parameters</h2>
+        </div>
+        <div *ngFor="let prop of objectProps">
+          <div [ngSwitch]="prop.inputType" >
+            <div class="form-item-container" *ngSwitchCase="'text'">
+              <form-item *ngIf="prop.showThis && !prop.instanceInfo" label="{{prop.label}}" [required]="true">
+                  <input pInputText size="80" 
+                    [formControlName]="prop.key"
+                    [id]="prop.key" [type]="prop.type" [value]="prop.default ? prop.default || prop.value : ''">
+                </form-item>
+            </div>
+            
+            <div class="form-item-container" *ngSwitchCase="'radio'">
+              <form-item label="{{prop.label}}" [required]="true">
+                  <span *ngFor="let option of prop.options">
+                      <p-radioButton [label]="option.label" [formControlName]="prop.key" name="typeRadioGroup" [value]="option.value"></p-radioButton>
+                  </span>
+                  <i class="icon fa fa-info-circle" pTooltip="{{prop.description}}" tooltipPosition="top"></i>
+              </form-item>
+            </div>
+
+            <div class="form-item-container" *ngSwitchCase="'select'">
+                <form-item label="{{prop.label}}" [required]="true">
+                    <p-dropdown [options]="prop.options" [formControlName]="prop.key" placeholder="Select"></p-dropdown>
+                    <i class="icon fa fa-info-circle" pTooltip="{{prop.description}}" tooltipPosition="top"></i>
+                </form-item>      
+            </div>
+          </div>
+          <div class="form-validation-error ui-g-offset-2" *ngIf="form.get(prop.key).invalid && (form.get(prop.key).dirty || form.get(prop.key).touched)">
+            <div *ngIf="form.get(prop.key).errors.required">
+              {{ prop.label }} is required.
+            </div>
+          </div>
+        </div>
+
+    </div>
+    <div class="form-submit-button">
+        <button pButton type="submit" class="ui-button-secondary ui-button-large" label="OK" [disabled]="!form.valid"></button>
+        <button pButton type="button" class="ui-button-large" label="Cancel" [routerLink]="['/services']"></button>
+    </div>
+</form>

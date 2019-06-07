@@ -20,7 +20,8 @@ const routes: Routes = [
     {path: 'akSkManagement', loadChildren: './business/ak-sk/ak-sk.module#AkSkModule'},
     {path: 'monitor', loadChildren: './business/monitor/monitor.module#MonitorModule'},
     {path: 'createFileShare', loadChildren: './business/block/create-file-share/create-file-share.module#CreateFileShareModule'},
-    {path: 'fileShareDetail/:fileShareId', loadChildren: './business/block/file-share-detail/file-share-detail.module#FileShareDetailModule'}
+    {path: 'fileShareDetail/:fileShareId', loadChildren: './business/block/file-share-detail/file-share-detail.module#FileShareDetailModule'},
+    {path: 'services', loadChildren: './business/services/services.module#ServicesModule'}
 ];
 
 @NgModule({
