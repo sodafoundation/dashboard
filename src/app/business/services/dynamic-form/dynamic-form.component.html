@@ -4,16 +4,21 @@
         <div class="table-toolbar">
           <h2>Instance Details</h2>
         </div>
-        <div *ngFor="let prop of objectProps">
-            <div [ngSwitch]="prop.inputType" >
-              <div class="form-item-container" *ngSwitchCase="'text'">
-                <form-item *ngIf="prop.instanceInfo" label="{{prop.label}}" [required]="true">
+        <div *ngFor="let item of objectProps">
+            <div *ngIf="item.instanceInfo" [ngSwitch]="item.inputType" >
+              <div  class="form-item-container" *ngSwitchCase="'text'">
+                <form-item label="{{item.label}}" [required]="true">
                     <input pInputText size="80" 
-                      [formControlName]="prop.key"
-                      [id]="prop.key" [type]="prop.type" [value]="prop.default ? prop.default || prop.value : ''">
+                      [formControlName]="item.key"
+                      [id]="item.key" [type]="item.type" [value]="item.default ? item.default || item.value : ''">
                   </form-item>
               </div>
             </div>
+            <div class="form-validation-error ui-g-offset-2" *ngIf="item.instanceInfo && (form.get(item.key)?.invalid && (form.get(item.key)?.dirty || form.get(item.key)?.touched))">
+                <div *ngIf="form.get(item.key).errors.required">
+                  {{ item.label }} is required.
+                </div>
+              </div>
         </div>
 
 
@@ -21,7 +26,7 @@
             <h2>Parameters</h2>
         </div>
         <div *ngFor="let prop of objectProps">
-          <div [ngSwitch]="prop.inputType" >
+          <div *ngIf="!prop.instanceInfo" [ngSwitch]="prop.inputType" >
             <div class="form-item-container" *ngSwitchCase="'text'">
               <form-item *ngIf="prop.showThis && !prop.instanceInfo" label="{{prop.label}}" [required]="true">
                   <input pInputText size="80" 
@@ -29,6 +34,14 @@
                     [id]="prop.key" [type]="prop.type" [value]="prop.default ? prop.default || prop.value : ''">
                 </form-item>
             </div>
+
+            <div class="form-item-container" *ngSwitchCase="'number'">
+                <form-item *ngIf="prop.showThis && !prop.instanceInfo" label="{{prop.label}}" [required]="true">
+                    <input pInputText size="80" 
+                      [formControlName]="prop.key"
+                      [id]="prop.key" [type]="prop.type" [value]="prop.default ? prop.default || prop.value : ''" min="1" step="1">
+                  </form-item>
+              </div>
             
             <div class="form-item-container" *ngSwitchCase="'radio'">
               <form-item label="{{prop.label}}" [required]="true">
@@ -46,7 +59,7 @@
                 </form-item>      
             </div>
           </div>
-          <div class="form-validation-error ui-g-offset-2" *ngIf="form.get(prop.key).invalid && (form.get(prop.key).dirty || form.get(prop.key).touched)">
+          <div class="form-validation-error ui-g-offset-2" *ngIf="!prop.instanceInfo && (form.get(prop.key)?.invalid && (form.get(prop.key)?.dirty || form.get(prop.key)?.touched))">
             <div *ngIf="form.get(prop.key).errors.required">
               {{ prop.label }} is required.
             </div>

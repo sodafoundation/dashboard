@@ -34,21 +34,19 @@ export class DynamicFormComponent implements OnInit {
         
     }
   };
-  default_parameters: any[] = [    
-    "tenant_id",
-    "auth_token",
-    "user_id",
-    "userId"
-  ];
+  default_parameters: any = {
+      "tenant_id" : "",
+      "auth_token" : "",
+      "user_id" : "",
+      "userId" : "",
+    };
   
   options = {
     headers: {
         'X-Auth-Token': localStorage['auth-token']
     } 
   };
-  auth_token = localStorage['auth-token'];
-  user_id = this.paramStor.CURRENT_USER().split("|")[1];
-  project_id = this.paramStor.CURRENT_TENANT().split("|")[1];
+  
 
   constructor(private router: Router,
     private ActivatedRoute:ActivatedRoute,
@@ -56,7 +54,11 @@ export class DynamicFormComponent implements OnInit {
     private wfservice: WorkflowService,
     private profileService: ProfileService,
     private paramStor: ParamStorService,
-    private fb: FormBuilder) { }
+    private fb: FormBuilder) {
+      this.default_parameters['auth_token'] = localStorage['auth-token'];
+      this.default_parameters['user_id'] = this.default_parameters['userId'] = this.paramStor.CURRENT_USER().split("|")[1];
+      this.default_parameters['tenant_id'] = this.paramStor.CURRENT_TENANT().split("|")[1];
+    }
 
   ngOnInit() {
     let self = this;
@@ -87,12 +89,6 @@ export class DynamicFormComponent implements OnInit {
           return Object.assign({}, { key: prop} , this.dataObject[prop]);
         });
       
-        _.each(this.dataObject, function(item){
-          if(item['required']==true){
-            item['validation'] = {"required": true};
-          }
-        })
-      
       // setup the form
       const formGroup = {};
 
@@ -101,34 +97,28 @@ export class DynamicFormComponent implements OnInit {
         item['label'] = item['key'].replace(/_/g, ' ').replace(/(?: |\b)(\w)/g, function(key, p1) {
               return key.toUpperCase();    
         });
-
-        if(item['type']=='object'){
+        if(item['key']=='timeout'){
+          item['required'] = false;
+        }
+        if(item['type']=='object' || item['required'] == false || !_.has(item, 'required')){
           item['showThis'] = false;
         }
         //Check if the key is a default parameter and can be passed from code. User need not enter.
         if(item['required'] == true){
           item['validation'] = {required: true};
-          if(_.contains(self.default_parameters, item['key'])){
+          if(_.has(self.default_parameters, item['key'])){
             item['showThis'] = false;
-            if(item['key']=='auth_token'){
-              item['default'] = item['value'] = self.auth_token;
-            }
-            if(item['key']=='tenant_id'){
-              item['default'] = item['value'] = self.project_id;
-            }
-            if(item['key']=='user_id' || item['key']=='userId'){
-              item['default'] = item['value'] = self.user_id;
-            }
+            item['default'] = item['value'] = self.default_parameters[item['key']];
           }
         }
 
-        if(item['key']=='profile_id'){
+        if(item['key']=='profile_id' && item['showThis']){
           self.getProfiles();
           item['inputType'] = "select";
           item['options'] = self.profileOptions;
         }
         
-        if((item['type'] == "string" || item['type'] == "integer") && item['key'] != 'profile_id'){
+        if(item['type'] == "string" && item['key'] != 'profile_id'){
           item['inputType'] = "text";
         } else if(item['type'] == "boolean"){
           item['inputType'] = "radio";
@@ -136,10 +126,14 @@ export class DynamicFormComponent implements OnInit {
             { label: "True", value: 'true'},
             { label: "False", value: 'false'}
           ];
-        } 
-        formGroup[item['key']] = new FormControl(item['value'] || '', self.mapValidators(item['validation']));
+        } else if(item['type'] == "integer"){
+          item['inputType'] = "number";
+        }
+        if(item['required']==true){
+          formGroup[item['key']] = new FormControl(item['value'] || '', self.mapValidators(item['validation']));
+        }
+        
       })
-
       this.form = new FormGroup(formGroup);
     }
       
@@ -175,7 +169,7 @@ export class DynamicFormComponent implements OnInit {
         let formObject = value;
         this.requestBody.service_definition_id = this.serviceId;
         this.requestBody.action = this.selectedService.action;
-        this.requestBody.user_id = this.user_id;
+        this.requestBody.user_id = this.default_parameters['user_id'];
         this.requestBody.name = formObject.instanceName;
         this.requestBody.description = formObject.instanceDescription;
         this.requestBody.parameters = _.omit(formObject, ['instanceName', 'instanceDescription']);
