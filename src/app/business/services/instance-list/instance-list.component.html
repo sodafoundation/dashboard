@@ -9,14 +9,15 @@
           List of instances of {{serviceName}} service.
       </div>
   </div>
-  <div class="ui-grid-row ui-g" style="margin-top: 25px;">
-    <div class="ui-g-1 ui-lg-1 ui-md-1">
-        <button pButton type="button" label="Create" icon="fa-play" class="ui-button-secondary" [routerLink]="['/services/createInstance']" [queryParams]="{serviceId: serviceId, serviceName: serviceName}"></button>
+  
+    <div class="table-toolbar">
+        <div class="left">
+                <button pButton type="button" label="Create" icon="fa-play" class="ui-button-secondary" [routerLink]="['/services/createInstance']" [queryParams]="{serviceId: serviceId, serviceName: serviceName}"></button>
+        </div>
+        <div class="right">
+            <button type="button"  class="" pButton (click)="refreshTable()"  icon="fa fa-refresh" pTooltip="Refresh Table" tooltipPosition="top"></button>
+        </div>
     </div>
-    <div class="ui-g-1 ui-lg-1 ui-md-1">
-        <button type="button" label="Refresh" class="ui-button-secondary" pButton (click)="refreshTable()"  icon="fa fa-refresh" pTooltip="Refresh Table" tooltipPosition="top"></button>
-    </div>
-  </div>
   <p-dataTable [value]="instances" [loading]="loading" loadingIcon="fa-spinner" expandableRows="false" resizableColumns="true" [rows]="10" [paginator]="true" [rowsPerPageOptions]="[5,10,20]">
       <p-column field="name" header="Name" >
         <ng-template pTemplate="body" let-instance="rowData">

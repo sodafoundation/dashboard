@@ -5,9 +5,9 @@
             You can create an instance of any of the services below by clicking on the create button.
         </div>
     </div>
-    <div class=" ui-grid-row ui-g" style="margin-top: 25px;">
-        <div class="ui-lg-1 ui-md-1 pull-right">
-            <button type="button" label="Refresh" class="ui-button-secondary refresh-service-list" pButton (click)="refreshList()"  icon="fa fa-refresh" pTooltip="Refresh List" tooltipPosition="top"></button>
+    <div class="list-header">
+        <div class="pull-right">
+            <button type="button" class=" refresh-service-list" pButton (click)="refreshList()"  icon="fa fa-refresh" pTooltip="Refresh List" tooltipPosition="top"></button>
         </div>
     </div>
     <div class="service-category" *ngFor="let group of serviceCatalog; index as i">
