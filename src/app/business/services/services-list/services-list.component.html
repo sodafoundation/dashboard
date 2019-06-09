@@ -17,14 +17,13 @@
             </p-header>
             <div class="ui-g service-row" >
                 <div class="ui-g-4" *ngFor="let item of group.services; index as i">
-                    <!-- TODO FIX The Number of instances count -->
-                    <p-card title="{{item.name}}" subtitle="Number of instances: {{item.instanceCount}}" styleClass="workflow-definition-card">
+                    <p-card title="{{item.name}}" subtitle="Number of instances : {{item.instanceCount? item.instanceCount : '0'}}" styleClass="workflow-definition-card">
                         <p-header>
                         </p-header>
                         <div>{{item.description}}</div>
                         <p-footer>
                             <button pButton type="button" label="Create" icon="fa-play" class="ui-button-secondary" [routerLink]="['createInstance']" [queryParams]="{serviceId: item.id, serviceName: item.name}"></button>
-                            <button pButton type="button" label="Instances" icon="fa-list" class="ui-button-primary" [routerLink]="['instanceList']" [queryParams]="{serviceId: item.id, message: msgs}" ></button>
+                            <button pButton type="button" label="Instances" icon="fa-list" class="ui-button-primary" [routerLink]="['instanceList']" [queryParams]="{serviceId: item.id, message: msgs}" [disabled]="!item.instanceCount"></button>
                         </p-footer>
                     </p-card>
                 </div>

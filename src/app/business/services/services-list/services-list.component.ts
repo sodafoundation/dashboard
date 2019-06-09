@@ -57,41 +57,7 @@ export class ServicesListComponent implements OnInit{
     }
     getServicesList(){
         let self = this;
-        self.getInstanceCount();
-        this.wfservice.getServices().subscribe(data=>{
-            if(data){
-                this.services = data;
-                _.each(this.services, function(item){
-                    item['action'] = item['workflows'][0].definition_source;
-                    _.each(self.instanceCount, function(ele){
-                        if(item['service_definition_id'] == ele['serviceId']){
-                            item['instanceCount'] = ele['count'];
-                        }
-                    })
-                })
-            } else{
-                this.services = [];
-            }
-            if(this.services.length){
-                let groups = _.groupBy(this.services, 'group');
-                this.serviceCatalog = _.map(groups, function(item){
-                    return {
-                        groupName: item[0].group,
-                        services: item
-                    }
-                })
-            } else{
-                this.serviceCatalog = []
-            }
-        }, error => {
-            this.serviceCatalog = [];
-            console.log("Something went wrong with fetching services.", error);
-        });
-    }
-
-    getInstanceCount(){
-        let self = this;
-        let instCount;
+        // Get Instance count inside get service 
         this.instanceCount = [];
         this.wfservice.getInstances().subscribe(data => {
             let tempCount = _.countBy(data, 'service_definition_id');
@@ -102,10 +68,39 @@ export class ServicesListComponent implements OnInit{
                 }
                 self.instanceCount.push(counter);
             })
-            return this.instanceCount;
+            this.wfservice.getServices().subscribe(data=>{
+                if(data){
+                    this.services = data;
+                    _.each(this.services, function(item){
+                        item['action'] = item['workflows'][0].definition_source;
+                        _.each(self.instanceCount, function(ele){
+                            if(ele['serviceId'] == item['id']){
+                                item['instanceCount'] = ele['count'];
+                            }
+                        })
+                    })
+                } else{
+                    this.services = [];
+                }
+                if(this.services.length){
+                    let groups = _.groupBy(this.services, 'group');
+                    this.serviceCatalog = _.map(groups, function(item){
+                        return {
+                            groupName: item[0].group,
+                            services: item
+                        }
+                    })
+                } else{
+                    this.serviceCatalog = []
+                }
+            }, error => {
+                this.serviceCatalog = [];
+                console.log("Something went wrong with fetching services.", error);
+            });
         }, error => {
-            return 0;
+            console.log("Something went wrong. Instance count could not be fetched")
         });
+        
     }
- 
+
 }
