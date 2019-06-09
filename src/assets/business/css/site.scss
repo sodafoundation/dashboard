@@ -1932,7 +1932,7 @@ a {
 }
 /* Common Overrides */
 .ui-button-icon-left{
-    left: 0.1rem !important;
+    left: 0.14rem !important;
 }
 .page-header{
     margin-bottom: 25px;
@@ -1956,3 +1956,42 @@ a {
     height: auto !important;
 }
 /* Common Overides end */
+/* Services Page Css */
+#service-list-component .service-category{
+    margin-bottom: 20px;
+}
+#service-list-component .workflow-definition-card.ui-card {
+    border-radius: 25px;
+}
+#service-list-component .ui-card-content{
+    min-height: 100px;
+}
+#service-list-component .ui-panel{
+    border-radius: 5px;
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+}
+#service-list-component .ui-panel-titlebar{
+    font-size: 1.5em;
+}
+#service-list-component .ui-card-footer{
+    border-top: 1px solid #3e3e3e;
+    margin-top: 1em;
+}
+#service-list-component .ui-panel-footer{
+    border: none;
+}
+.form-validation-error{
+    margin-bottom: 5px;
+    color: #f44336;
+}
+
+.no-data-found{
+    text-align: center; 
+    margin-top: 50px; 
+    padding: 50px 0;
+}
+/* Services Page Css ends */
+.list-header{
+    height: 50px;
+}
