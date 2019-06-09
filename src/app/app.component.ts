@@ -87,6 +87,11 @@ export class AppComponent implements OnInit, AfterViewInit {
             "routerLink": "/monitor"
         },
         {
+            "title": "Services",
+            "description": "Orchestration services.",
+            "routerLink": "/services"
+        },
+        {
             "title": "Profile",
             "description": "Profiles",
             "routerLink": "/profile"
