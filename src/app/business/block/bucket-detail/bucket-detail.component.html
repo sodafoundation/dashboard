@@ -25,7 +25,7 @@
                 </div>
                 <p-dataTable [value]="allDir" [globalFilter]="searchByName" [(selection)]="selectedDir"  [showHeaderCheckbox]="true" [rows]="10" [paginator]="true" [pageLinks]="3" [rowsPerPageOptions]="[10,20,50,100]">
                     <p-column selectionMode="multiple" [style]="{'width': '60px'}"></p-column>
-                    <p-column field="ObjectKey" header="{{I18N.keyID['sds_block_volume_name']}}" [style]="{'width': '150px'}" >
+                    <p-column field="ObjectKey" header="{{I18N.keyID['sds_block_volume_name']}}" [style]="{'width': '170px'}" >
                         <ng-template pTemplate="body" let-file="rowData" let-i="rowIndex">
                             <a *ngIf="file.newFolder" title="{{file.objectName}}" (click)="folderLink(file)">
                                 <img style="vertical-align: middle;" src="assets/business/images/volume/icon_folder.png">
@@ -94,4 +94,4 @@
             <lifeCycle [bucketId]="bucketId"></lifeCycle>
         </p-tabPanel> 
     </p-tabView>
-</div>
+</div> 
