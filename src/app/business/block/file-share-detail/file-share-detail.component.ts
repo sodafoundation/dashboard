@@ -92,7 +92,9 @@ export class FileShareDetailComponent implements OnInit{
             CreatedAt: this.i18n.keyID["sds_block_volume_createat"] + ":",
             AZ: this.i18n.keyID["sds_block_volume_az"] + ":",
             aclLevel: this.i18n.keyID['sds_fileShare_acl_level'],
-            user: this.i18n.keyID['sds_fileShare_acl_user']
+            user: this.i18n.keyID['sds_fileShare_acl_user'],
+            export: this.i18n.keyID['sds_fileShare_export'],
+            updatedAt: this.i18n.keyID['sds_fileShare_update']
         }
         this.items = [
             { label: this.i18n.keyID["sds_fileShare_title"], url: '/block' },
@@ -121,7 +123,7 @@ export class FileShareDetailComponent implements OnInit{
             value: this.fromFileShareId 
         };
         this.getProfile();
-        this.getAcls(this.fromFileShareId)
+        this.getAcls()
     }
     getCreateAclValue(){
         this.createAclsFormGroup = this.fb.group({
@@ -146,6 +148,8 @@ export class FileShareDetailComponent implements OnInit{
             })[0];
             this.fileShare.profileName = _profile != undefined ? _profile.name: '--';
             this.fileShare.size = Utils.getDisplayGBCapacity(res.json().size);
+            this.fileShare.createdAt = Utils.formatDate(res.json().createdAt),
+            this.fileShare.updatedAt = Utils.formatDate(res.json().updatedAt),
             this.getSnapshots(this.fromFileShareId);
         })
     }
@@ -189,11 +193,8 @@ export class FileShareDetailComponent implements OnInit{
             })
         })
     }
-    getAcls(fromFileShareId){
-        let param = {
-            fileshareid: fromFileShareId
-        }
-        this.FileShareAclService.getFileShareAcl(param).subscribe((res)=>{
+    getAcls(){
+        this.FileShareAclService.getFileShareAcl().subscribe((res)=>{
             let str = res.json();
             this.acls =[];
             str.forEach(item=>{
@@ -295,7 +296,7 @@ export class FileShareDetailComponent implements OnInit{
     }
     deleteAcls(aclId){
         this.FileShareAclService.deleteFileShareAcl(aclId).subscribe((res)=>{
-            this.getAcls(this.fromFileShareId);
+            this.getAcls();
         })
     }
     createSnapshot(){
@@ -354,13 +355,13 @@ export class FileShareDetailComponent implements OnInit{
     aclsCreateSubmit(param){
         param['fileshareId'] = this.fromFileShareId;
         this.FileShareAclService.createFileShareAcl(param,this.fromFileShareId).subscribe((res)=>{
-            this.getAcls(this.fromFileShareId);
+            this.getAcls();
             this.aclCreateShow = false;
         })
     }
     aclsModifySubmit(param){
         this.FileShareAclService.updateFileShareAcl(this.modifyAcl.id,param).subscribe((res)=>{
-            this.getAcls(this.fromFileShareId);
+            this.getAcls();
             this.aclModifyShow = false;
         })
     }

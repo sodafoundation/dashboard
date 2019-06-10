@@ -83,8 +83,8 @@ export class FileShareAclService{
         return this.http.post(this.url,param);
     }
     //get Acl
-    getFileShareAcl(param){
-        return this.http.get(this.url,param);
+    getFileShareAcl(){
+        return this.http.get(this.url);
     }
     //update Acl
     updateFileShareAcl(aclId,param){
