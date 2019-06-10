@@ -82,6 +82,16 @@ export class AppComponent implements OnInit, AfterViewInit {
             "routerLink": "/dataflow"
         },
         {
+            "title": "Monitor",
+            "description": "Telemetry information.",
+            "routerLink": "/monitor"
+        },
+        {
+            "title": "Services",
+            "description": "Orchestration services.",
+            "routerLink": "/services"
+        },
+        {
             "title": "Profile",
             "description": "Profiles",
             "routerLink": "/profile"
@@ -108,6 +118,11 @@ export class AppComponent implements OnInit, AfterViewInit {
             "title": "Monitor",
             "description": "Telemetry information.",
             "routerLink": "/monitor"
+        },
+	{
+            "title": "Services",
+            "description": "Orchestration services.",
+            "routerLink": "/services"
         },
         {
             "title": "Profile",
