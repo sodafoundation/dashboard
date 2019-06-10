@@ -5,7 +5,7 @@ import { RouterModule } from '@angular/router';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 
 import { ProfileCardComponent } from './profileCard/profile-card.component';
-import { ButtonModule,CardModule,ChartModule,MessageModule,OverlayPanelModule,DialogModule ,ConfirmationService,ConfirmDialogModule, FormModule} from '../../components/common/api';
+import { ButtonModule,CardModule,ChartModule,MessageModule,OverlayPanelModule,DialogModule ,ConfirmationService,ConfirmDialogModule, FormModule, DropMenuModule} from '../../components/common/api';
 import { ProfileService } from './profile.service';
 import { HttpService } from '../../shared/api';
 import { SuspensionFrameComponent } from './profileCard/suspension-frame/suspension-frame.component';
@@ -33,7 +33,8 @@ let routers = [{
     OverlayPanelModule,
     DialogModule,
     ConfirmDialogModule,
-    FormModule
+    FormModule,
+    DropMenuModule
   ],
   providers: [
     HttpService,

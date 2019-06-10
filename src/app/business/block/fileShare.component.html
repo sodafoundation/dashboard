@@ -27,8 +27,6 @@
             <ng-template pTemplate="body" let-fileShare="rowData" let-i="rowIndex">
                 <a (click)="returnSelectedFileShare(fileShare,'snapshot')" [innerHtml]="I18N.keyID['sds_block_volume_createsna']"></a>
                 <a (click)="returnSelectedFileShare(fileShare,'acl')">Create Access</a>
-                <!-- <a (click)="returnSelectedFileShare(fileShare,'Modify')" [innerHtml]="I18N.keyID['sds_block_volume_modify']"></a> -->
-                <!-- <a (click)="batchDelete(fileShare)" [innerHtml]="I18N.keyID['sds_block_volume_delete']"></a> -->
                 <p-dropmenu label="{{I18N.keyID['sds_block_volume_more']}}" [model]="fileShare['disabled'] ? menuDeleDisableItems: menuItems" (click)="returnSelectedFileShare(fileShare)"></p-dropmenu>
             </ng-template>
         </p-column>
@@ -90,7 +88,7 @@
                 <input type="text" pInputText formControlName="name" />
             </form-item>
             <form-item label="Description">
-                <textarea [rows]="5" [cols]="48" pInputTextarea formControlName="descript"></textarea>
+                <textarea [rows]="5" [cols]="48" pInputTextarea formControlName="description"></textarea>
             </form-item>
         </form>
         <p-footer>

@@ -73,7 +73,7 @@ export class AppComponent implements OnInit, AfterViewInit {
         },
         {
             "title": "Resource",
-            "description": "Volumes / Buckets",
+            "description": "Volumes / Buckets / File Share",
             "routerLink": "/block"
         },
         {
@@ -106,7 +106,7 @@ export class AppComponent implements OnInit, AfterViewInit {
         },
         {
             "title": "Resource",
-            "description": "Volumes / Buckets",
+            "description": "Volumes / Buckets / File Share",
             "routerLink": "/block"
         },
         {

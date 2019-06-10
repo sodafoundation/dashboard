@@ -75,7 +75,7 @@ export class FileShareComponent implements OnInit{
                     this.modifyFileShareShow = true;
                     this.modifyFileShareForm = this.fb.group({
                         "name": [this.selectedFileShare.name],
-                        "descript": ["", Validators.maxLength(200)]
+                        "description": [this.selectedFileShare.description, Validators.maxLength(200)]
                     })
                 },
                 disabled:false
@@ -95,7 +95,7 @@ export class FileShareComponent implements OnInit{
                     this.modifyFileShareShow = true;
                     this.modifyFileShareForm = this.fb.group({
                         "name": [this.selectedFileShare.name],
-                        "descript": ["", Validators.maxLength(200)]
+                        "description": [this.selectedFileShare.description, Validators.maxLength(200)]
                     })
                 },
                 disabled:false
@@ -120,6 +120,7 @@ export class FileShareComponent implements OnInit{
                 item['profileName'] = _profile != undefined ? _profile.name : '--';
                 item.size = Utils.getDisplayGBCapacity(item.size);
             })
+            this.selectedFileShares = [];
         })
     }
     getProfile(){
@@ -179,9 +180,22 @@ export class FileShareComponent implements OnInit{
         }
     }
     deleteFileShare(fileShare){
-        this.FileShareService.deleteFileShare(fileShare).subscribe(res=>{
-            this.getFileShares();
+        this.FileShareAclService.getFileShareAcl().subscribe(res=>{
+            let str = res.json();
+            str = str.filter(item=>{
+                return item.fileshareId == fileShare;
+            })
+            str.forEach((item, index)=>{
+                this.FileShareAclService.deleteFileShareAcl(item.id).subscribe((res)=>{
+                    if(index == str.length-1){
+                        this.FileShareService.deleteFileShare(fileShare).subscribe(res=>{
+                            this.getFileShares();
+                        })
+                    }
+                })
+            })
         })
+        
     }
     createSnapshot(){
         if(!this.createSnapshotForm.valid){

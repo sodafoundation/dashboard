@@ -796,10 +796,10 @@ export class LifeCycleComponent implements OnInit {
             let msg, arr = [];
             if (_.isArray(value)) {
                 arr = value;
-                msg = "<div>Are you sure you want to delete the selected LifeCycle?</div><h3>[ " + value.length + " FileShare ]</h3>";
+                msg = "<div>Are you sure you want to delete the selected LifeCycles?</div><h3>[ " + value.length + " LifeCycle ]</h3>";
             } else {
                 arr.push(value)
-                msg = "<div>Are you sure you want to delete the selected FileShare?</div><h3>[ " + value.ObjectKey + " ]</h3>";
+                msg = "<div>Are you sure you want to delete the selected LifeCycle?</div><h3>[ " + value.ObjectKey + " ]</h3>";
             }
             this.confirmationService.confirm({
                 message: msg,

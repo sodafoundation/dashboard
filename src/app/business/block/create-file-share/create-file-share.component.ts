@@ -80,11 +80,9 @@ export class CreateFileShareComponent implements OnInit{
 
         this.fileShareForm.valueChanges.subscribe(
             (value:string)=>{
-                // this.createVolumes = this.getFileShareDataArray(this.fileShareForm.value);
                 this.setRepForm();
             }
           );
-            // this.createVolumes = this.getFileShareDataArray(this.fileShareForm.value);
             this.setRepForm();
     }
     getFileShareDataArray(value){

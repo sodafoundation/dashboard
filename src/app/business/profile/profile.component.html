@@ -8,10 +8,6 @@
 </div>
 
 <div class="ui-g-12 ui-md-6 relative-class" *ngFor="let profile of profiles">
-    <div class="table-toolbar" *ngIf="isAdministrator">
-        <p-button (click)="showWarningDialogFun(profile)" styleClass="close-class profile-card-close" icon="fa fa-fw fa-close">
-        </p-button>
-    </div>
     <p-card styleClass="new-card-class ui-card-shadow">
         <profile-card [cardData]="profile" (checkParam)="checkRep($event)"></profile-card>
     </p-card>
@@ -19,7 +15,7 @@
 
 <p-dialog header="Warning" [(visible)]="showWarningDialog" [width]="500" modal="modal">
     <p-footer>
-        <button type="button" pButton (click)="deleteProfile(profileId)" label="OK"></button>
+        <button type="button" pButton label="OK"></button>
         <button type="button" pButton (click)="showWarningDialog=false" label="Cancel"></button>
     </p-footer>
 </p-dialog>

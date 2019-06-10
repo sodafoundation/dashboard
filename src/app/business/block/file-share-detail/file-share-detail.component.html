@@ -27,6 +27,10 @@
             <div class="ui-grid-row volume-basic-item-class">
                 <div class="ui-grid-col-2" [innerHtml] = "label.AZ"></div>
                 <div class="ui-grid-col-2 volume-basic-item-value-color" *ngIf="fileShare" [innerHtml] = "fileShare.availabilityZone"></div>
+                <div class="ui-grid-col-2" [innerHtml] = "label.export"></div>
+                <div class="ui-grid-col-2 volume-basic-item-value-color" *ngIf="fileShare" [innerHtml] = "fileShare.Exportlocation? fileShare.Exportlocation[0]:'--' "></div>
+                <div class="ui-grid-col-2" [innerHtml] = "label.updatedAt"></div>
+                <div class="ui-grid-col-2 volume-basic-item-value-color" *ngIf="fileShare" [innerHtml] = "fileShare.updatedAt? fileShare.updatedAt:'--' "></div>
             </div>
         </div>
     </div>
@@ -114,9 +118,9 @@
                             <div class="ui-inputsearch">
                                 <input type="text" #searchByName [(ngModel)]="aclfilter" pInputText
                                     placeholder="{{i18n.keyID['sds_block_volume_search']}}" />
-                                <button pButton type="button" icon="fa-search" (click)="getAcls(aclfilter)"></button>
+                                <button pButton type="button" icon="fa-search" (click)="getAcls()"></button>
                             </div>
-                            <button pButton type="button" icon="fa-refresh" (click)="getAcls(param)"></button>
+                            <button pButton type="button" icon="fa-refresh" (click)="getAcls()"></button>
                         </div>
                     </div>
                     <p-dataTable [globalFilter]="searchByName" [(selection)]="selectedAcls" [value]="acls" [showHeaderCheckbox]="true"
