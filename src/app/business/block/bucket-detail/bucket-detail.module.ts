@@ -43,4 +43,4 @@ let routers = [{
     BucketService  
   ]
 })
-export class BucketDetailModule { } 
+export class BucketDetailModule { }
