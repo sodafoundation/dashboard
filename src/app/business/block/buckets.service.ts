@@ -91,12 +91,6 @@ export class BucketService {
     return this.http.delete(url,param);
   }
 
-  //recover object
-  restoreObject(bucketId, objectName, param, options){
-    let url = this.url + "/" + bucketId + "/" + objectName;
-    return this.http.post(url, param, options);
-  }
-
   // Rquest header with AK/SK authentication added
   getSignatureOptions(SignatureObjectwindow, options?){
     let kAccessKey = SignatureObjectwindow.SignatureKey.AccessKey;

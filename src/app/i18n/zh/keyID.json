@@ -137,8 +137,6 @@
     "sds_profile_storageAcl": "Storage Access Capability",
     "sds_storageClassNull": "storageClass is required",
     "sds_lifeCycle_enable": "Enable lifecycle rules",
-    "sds_lifeCycle_disable": "Disable the lifecycle rule",
-    "sds_lifeCycle_restore": "Restore",
     "sds_fileShare_export": "Export Location",
     "sds_fileShare_update": "Updated At"
 }
