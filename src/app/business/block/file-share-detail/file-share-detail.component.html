@@ -118,9 +118,9 @@
                             <div class="ui-inputsearch">
                                 <input type="text" #searchByName [(ngModel)]="aclfilter" pInputText
                                     placeholder="{{i18n.keyID['sds_block_volume_search']}}" />
-                                <button pButton type="button" icon="fa-search" (click)="getAcls(aclfilter)"></button>
+                                <button pButton type="button" icon="fa-search" (click)="getAcls()"></button>
                             </div>
-                            <button pButton type="button" icon="fa-refresh" (click)="getAcls(param)"></button>
+                            <button pButton type="button" icon="fa-refresh" (click)="getAcls()"></button>
                         </div>
                     </div>
                     <p-dataTable [globalFilter]="searchByName" [(selection)]="selectedAcls" [value]="acls" [showHeaderCheckbox]="true"
