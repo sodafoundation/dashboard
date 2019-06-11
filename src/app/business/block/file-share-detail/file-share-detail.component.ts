@@ -110,9 +110,8 @@ export class FileShareDetailComponent implements OnInit{
             "description": ["", Validators.maxLength(200)]
         })
         this.availabilityAclLevel =[
-            {label: "Read", value: "Read"},
-            {label: "Write", value: "Write"},
-            {label: "Execute", value: "Execute"}
+            {label: "Read Only", value: "Read Only"},
+            {label: "Read Write", value: "Read Write"}
         ]
         this.availabilityip =[
             {label: "ip", value: "ip"},
@@ -157,7 +156,13 @@ export class FileShareDetailComponent implements OnInit{
         let dataArr = [];
         this.aclsItems.forEach(index=>{
             dataArr.push({
-                accessCapability: value['level'],
+                accessCapability: (()=>{
+                    if(value['level'] == "Read Only"){
+                        return ['Read'];
+                    }else if(value['level'] == "Read Write"){
+                        return ['Read','Write'];
+                    }
+                })(),
                 type: "ip",
                 accessTo: value['userInput'+index]
             })

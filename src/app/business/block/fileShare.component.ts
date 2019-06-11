@@ -1,7 +1,7 @@
 import { Router,ActivatedRoute } from '@angular/router';
 import { Component, OnInit, ViewContainerRef, ViewChild, Directive, ElementRef, HostBinding, HostListener, Input } from '@angular/core';
 import { I18NService, MsgBoxService, HttpService, Utils } from 'app/shared/api';
-import { ConfirmationService, ConfirmDialogModule, MenuItem} from '../../components/common/api';
+import { ConfirmationService, ConfirmDialogModule, MenuItem, Message} from '../../components/common/api';
 import { trigger, state, style, transition, animate} from '@angular/animations';
 import { I18nPluralPipe } from '@angular/common';
 import { FormGroup, Validators, FormBuilder, FormControl } from '@angular/forms';
@@ -40,6 +40,7 @@ export class FileShareComponent implements OnInit{
     availabilityip;
     menuItems: MenuItem[];
     menuDeleDisableItems : MenuItem[];
+    msgs: Message[];
 
     constructor(
         private ActivatedRoute: ActivatedRoute,
@@ -173,29 +174,39 @@ export class FileShareComponent implements OnInit{
                     arr.forEach((item,index)=> {
                         this.deleteFileShare(item)
                     })
-
                 },
                 reject:()=>{}
             })
         }
     }
     deleteFileShare(fileShare){
-        this.FileShareAclService.getFileShareAcl().subscribe(res=>{
-            let str = res.json();
-            str = str.filter(item=>{
+        this.SnapshotService.getSnapshot().subscribe(res=>{
+            let snapShot = res.json();
+            snapShot = snapShot.filter(item=>{
                 return item.fileshareId == fileShare;
             })
-            str.forEach((item, index)=>{
-                this.FileShareAclService.deleteFileShareAcl(item.id).subscribe((res)=>{
-                    if(index == str.length-1){
+            if(snapShot.length != 0){
+                let overHeadMsg = "<div>Fileshare contains snapshot. To remove fileshare, please remove snapshot first</div>";
+                this.msgs = [];
+                this.msgs.push({severity: 'error', summary: 'Error', detail: overHeadMsg});
+            }else{
+                this.FileShareAclService.getFileShareAcl().subscribe(res=>{
+                    let acls = res.json();
+                    acls = acls.filter(item=>{
+                        return item.fileshareId == fileShare;
+                    })
+                    if(acls.length != 0){
+                        let  overHeadMsg = "<div>Fileshare contains access. To remove fileshare, please remove access first</div>";
+                        this.msgs = [];
+                        this.msgs.push({severity: 'error', summary: 'Error', detail: overHeadMsg});
+                    }else{
                         this.FileShareService.deleteFileShare(fileShare).subscribe(res=>{
                             this.getFileShares();
                         })
                     }
                 })
-            })
+            }
         })
-        
     }
     createSnapshot(){
         if(!this.createSnapshotForm.valid){
@@ -212,6 +223,10 @@ export class FileShareComponent implements OnInit{
             this.createSnapshotShow = false;
             this.getProfile();
             this.showCreateSnapshot = false;
+        },
+        err=>{
+          this.msgs = [];
+          this.msgs.push({severity: 'error', summary: 'Error', detail: err.message});
         })
     }
 
