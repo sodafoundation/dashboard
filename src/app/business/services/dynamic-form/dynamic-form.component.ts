@@ -25,7 +25,7 @@ export class DynamicFormComponent implements OnInit {
   displayFormObject: any[];
   form: FormGroup;
   requestBody : any = {
-    "service_definition_id": "",
+    "service_id": "",
     "user_id": "",
     "action": "",
     "name" : "",
@@ -110,6 +110,10 @@ export class DynamicFormComponent implements OnInit {
             item['showThis'] = false;
             item['default'] = item['value'] = self.default_parameters[item['key']];
           }
+          if(item['key'] == 'auth_token'){
+            item['showThis'] = false;
+            item['validation'] = {required: false};
+          }
         }
 
         if(item['key']=='profile_id' && item['showThis']){
@@ -167,7 +171,7 @@ export class DynamicFormComponent implements OnInit {
 
       onSubmit(value) {
         let formObject = value;
-        this.requestBody.service_definition_id = this.serviceId;
+        this.requestBody.service_id = this.serviceId;
         this.requestBody.action = this.selectedService.action;
         this.requestBody.user_id = this.default_parameters['user_id'];
         this.requestBody.name = formObject.instanceName;
