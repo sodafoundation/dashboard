@@ -60,7 +60,7 @@ export class ServicesListComponent implements OnInit{
         // Get Instance count inside get service 
         this.instanceCount = [];
         this.wfservice.getInstances().subscribe(data => {
-            let tempCount = _.countBy(data, 'service_definition_id');
+            let tempCount = _.countBy(data, 'service_id');
             _.each(tempCount, function(key, value){
                 let counter = {
                     'serviceId' : value,
