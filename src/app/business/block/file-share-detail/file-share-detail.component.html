@@ -144,8 +144,7 @@
                         <form [grid]="{label: 'ui-g-4', content: 'ui-g-20'}" [formGroup]="createAclsFormGroup"
                             [errorMessage]="errorMessage">
                             <form-item label="{{label.aclLevel}}" [required]="true">
-                                <p-multiSelect [options]="availabilityAclLevel" [filter]="false" formControlName="level"
-                                    [style]="{'min-width':'150px'}" placeholder="Please choose"></p-multiSelect>
+                                <p-dropdown [options]="availabilityAclLevel" formControlName="level" [style]="{'min-width':96}" placeholder="Please choose"></p-dropdown>
                             </form-item>
                             <form-item [required]="true" label="{{label.user}}">
                                 <div *ngFor="let AclsItem of aclsItems;index as i">
