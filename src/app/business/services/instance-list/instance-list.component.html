@@ -1,0 +1,54 @@
+<p-growl [value]="msgs" [sticky]="false" [life]="6000"></p-growl>
+<div id="instance-list">
+  <div class="page-header">
+      <div class="breadcrumb-container">
+
+      </div>
+      <div class="page-title">Instance List</div>
+      <div class="page-subtitle">
+          List of instances of {{serviceName}} service.
+      </div>
+  </div>
+  
+    <div class="table-toolbar">
+        <div class="left">
+                <button pButton type="button" label="Create" icon="fa-play" class="ui-button-secondary" [routerLink]="['/services/createInstance']" [queryParams]="{serviceId: serviceId, serviceName: serviceName}"></button>
+        </div>
+        <div class="right">
+            <button type="button"  class="" pButton (click)="refreshTable()"  icon="fa fa-refresh" pTooltip="Refresh Table" tooltipPosition="top"></button>
+        </div>
+    </div>
+  <p-dataTable [value]="instances" [loading]="loading" loadingIcon="fa-spinner" expandableRows="false" resizableColumns="true" [rows]="10" [paginator]="true" [rowsPerPageOptions]="[5,10,20]">
+      <p-column field="name" header="Name" >
+        <ng-template pTemplate="body" let-instance="rowData">
+            <a>{{instance.name}}</a> 
+        </ng-template>
+      </p-column>
+      <p-column field="description" header="Description" >
+            <ng-template pTemplate="body" let-instance="rowData">
+                <a>{{instance.description}}</a> 
+            </ng-template>
+          </p-column>
+      <p-column field="status" header="Status">
+        <ng-template pTemplate="body" let-instance="rowData">
+          <span>{{instance.status}}</span>
+        </ng-template>
+      </p-column>
+      <p-column field="created_at" header="Start Time">
+        <ng-template pTemplate="body" let-instance="rowData">
+          {{instance.created_at | date: 'medium'}}
+        </ng-template>
+      </p-column>
+      <p-column header="{{I18N.keyID['sds_block_volume_operation']}}" [style]="{'width':'500px'}">
+          <ng-template pTemplate="body" let-instance="rowData">
+            <button *ngIf="false" [disabled]="instance.status=='requested'" pButton type="button" label="Run" icon="fa fa-play" styleClass="ui-button-success"  (click)="startInstance(instance.id)"></button>
+            <button *ngIf="false" [disabled]="instance.status!='requested'" pButton type="button" label="Re-Run" icon="fa fa-repeat" styleClass="ui-button-info"  (click)="restartInstance(instance.id)"></button>
+            <button *ngIf="false" pButton type="button" label="Pause" icon="fa fa-pause" styleClass="ui-button-info"  (click)="pauseInstance(instance.id)"></button>
+            <button pButton type="button" label="Delete" icon="fa fa-exclamation-triangle" styleClass="ui-button-danger"  (click)="deleteInstance(instance.id)"></button>
+          </ng-template>
+      </p-column>
+      
+  </p-dataTable>
+</div>
+
+

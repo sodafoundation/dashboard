@@ -53,7 +53,10 @@ export class MigrationDetailComponent implements OnInit {
   }
 
   getMigrationDetail(plan){
-    this.http.get('v1/{project_id}/jobs?planName='+this.plan.name).subscribe((res)=>{
+    let options: any = {};
+    //Close the details page to refresh the busy waiting box
+    options['mask'] = false;
+    this.http.get('v1/{project_id}/jobs?planName='+this.plan.name,options).subscribe((res)=>{
       let job = res.json().jobs ? res.json().jobs :[];
       
       if(job.length > 0) {

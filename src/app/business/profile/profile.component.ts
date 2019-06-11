@@ -63,47 +63,17 @@ export class ProfileComponent implements OnInit {
         }
     }
 
+    checkRep(){
+        this.getProfiles();
+    }
     getProfiles() {
         this.ProfileService.getProfiles().subscribe((res) => {
             this.profiles = res.json();
             this.profiles.forEach(item=>{
-                if(item.storageType && item.storageType == "File"){
+                if(item.storageType && item.storageType == "file"){
                     delete item.replicationProperties;
                 }
             })
         });
-    }
-
-    showWarningDialogFun(profile) {
-        let msg = "<div>Are you sure you want to delete the Profile?</div><h3>[ "+ profile.name +" ]</h3>";
-        let header ="Delete Profile";
-        let acceptLabel = "Delete";
-        let warming = true;
-        this.confirmDialog([msg,header,acceptLabel,warming,profile.id])
-    }
-    deleteProfile(id) {
-        this.ProfileService.deleteProfile(id).subscribe((res) => {
-            this.getProfiles();
-        });
-    }
-    confirmDialog([msg,header,acceptLabel,warming=true,func]){
-        this.confirmationService.confirm({
-            message: msg,
-            header: header,
-            acceptLabel: acceptLabel,
-            isWarning: warming,
-            accept: ()=>{
-                try {
-                    this.deleteProfile(func);
-                }
-                catch (e) {
-                    console.log(e);
-                }
-                finally {
-                    
-                }
-            },
-            reject:()=>{}
-        })
     }
 }

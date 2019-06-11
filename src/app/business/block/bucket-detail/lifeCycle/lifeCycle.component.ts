@@ -136,8 +136,9 @@ export class LifeCycleComponent implements OnInit {
     getLifeCycleRule(item) {
         let newTrans = [];
         let string;
-        if (item.Status == "enable") {
-            let trans = item.Transition;
+        let trans = item.Transition;
+        let cleanUp = item.AbortIncompleteMultipartUpload.DaysAfterInitiation;
+        if (trans || item.Expiration || cleanUp) {
             if (trans) {
                 if (_.isArray(item.Transition)) {
                     trans.forEach((arr) => {
@@ -153,7 +154,6 @@ export class LifeCycleComponent implements OnInit {
                 string = "Expired deletion:" + item.Expiration.Days;
                 newTrans.push(string);
             }
-            let cleanUp = item.AbortIncompleteMultipartUpload.DaysAfterInitiation;
             if (cleanUp && cleanUp != 0) {
                 string = "Clean up incomplete multipart uploads after " + cleanUp + "days";
                 newTrans.push(string);
@@ -169,10 +169,10 @@ export class LifeCycleComponent implements OnInit {
         //In the modified State, filter out the prefix of the selected lifeCycle 
         if (prefix != "" && (dialog != "update" || (cycle && cycle.Prefix != prefix))) {
             this.allLifeCycleCheckPrefix.push(prefix);
-            return prefix;
         } else if (prefix == "") {
-            return "--";
+            prefix ==  "--";
         }
+        return prefix;
     }
     //query lifeCycle list
     getLifeCycleList(dialog?, cycle?) {
@@ -271,7 +271,7 @@ export class LifeCycleComponent implements OnInit {
         this.backendShow[transIndex] = true;
         if (transIndex == 0) {
             let minDays;
-            if (event.value.transName != "GLACIER") {
+            if (event != "GLACIER" || (event.value && event.value.transName && event.value.transName != "GLACIER")) {
                 this.createLifeCycleForm.patchValue({ days0: 30 });
                 minDays = 30;
                 this.showAddTransRule = true;
@@ -304,15 +304,17 @@ export class LifeCycleComponent implements OnInit {
                 this.minDays.push(defaultDays + 30);
             }
             this.transDaysArr[transIndex] = defaultDays + 30;
-            if (event.value.transName == "GLACIER") {
+            if (event == "GLACIER" || (event.value && event.value.transName && event.value.transName != "GLACIER")) {
                 this.showAddTransRule = false;
             }
         }
-        if(event.value.transName == "GLACIER" && transIndex < this.lifeCycleItems.length -1){
+        if((event == "GLACIER" || (event.value && event.value.transName && event.value.transName != "GLACIER")) && transIndex < this.lifeCycleItems.length -1){
             this.deleteTransRules(transIndex+1);
             this.showAddTransRule = false;
         }
-        this.getBackets(event, transIndex);
+        if(event.value){
+            this.getBackets(event, transIndex);
+        }
     }
     getBackets(event, transIndex) {
         window['getAkSkList'](() => {
@@ -373,7 +375,19 @@ export class LifeCycleComponent implements OnInit {
                                 return item.Name == "GLACIER";
                             })
                         }
-                    } else if (transIndex && transIndex > 0) {
+                    //Add Rules under modified state
+                    } else if (this.showModifyLifeCycle){
+                        selectedTrans = this.createLifeCycleForm.value['transId' + (transIndex -1)];
+                        if(selectedTrans == "STANDARD"){
+                            array = array.filter((item, index) => {
+                                return item.Name != "STANDARD";
+                            })
+                        }else if(selectedTrans == "STANDARD_IA"){
+                            array = array.filter((item, index) => {
+                                return item.Name == "GLACIER";
+                            })
+                        }
+                    }else if(transIndex && transIndex > 0) {
                         selectedTrans = this.createLifeCycleForm.value['transId' + (transIndex - 1)].transName;
                         if (selectedTrans == "STANDARD") {
                             array = array.filter((item, index) => {
@@ -402,6 +416,10 @@ export class LifeCycleComponent implements OnInit {
                         }
                         transItem.push(transObj)
                     })
+                    if(this.showModifyLifeCycle && !cycle && transIndex > 0){
+                        this.createLifeCycleForm.controls['transId' + transIndex].value = transItem[0].label;
+                        this.typeChange(transItem[0].transName,transIndex);
+                    }
                     this.transOptions.push(transItem);
                 })
             })
@@ -433,6 +451,11 @@ export class LifeCycleComponent implements OnInit {
                 }
                 backendArr.push(backends);
             })
+            backendArr.push({
+                label: "Not set",
+                value: {id: null, backendName: null}
+            })
+            this.modifyBakend;
             //change the value of backends when modifying the selected storageClass
             if (this.backends[transIndex]) {
                 this.backends[transIndex] = backendArr;
@@ -796,10 +819,10 @@ export class LifeCycleComponent implements OnInit {
             let msg, arr = [];
             if (_.isArray(value)) {
                 arr = value;
-                msg = "<div>Are you sure you want to delete the selected LifeCycle?</div><h3>[ " + value.length + " FileShare ]</h3>";
+                msg = "<div>Are you sure you want to delete the selected LifeCycles?</div><h3>[ " + value.length + " LifeCycle ]</h3>";
             } else {
                 arr.push(value)
-                msg = "<div>Are you sure you want to delete the selected FileShare?</div><h3>[ " + value.ObjectKey + " ]</h3>";
+                msg = "<div>Are you sure you want to delete the selected LifeCycle?</div><h3>[ " + value.ObjectKey + " ]</h3>";
             }
             this.confirmationService.confirm({
                 message: msg,
@@ -847,7 +870,7 @@ export class LifeCycleComponent implements OnInit {
         this.transChecked = this.modifyTrans ? true : false;
         this.expirChecked = expir ? true : false;
         this.expirCleanUp = cleanUp && cleanUp != 0 ? true : false;
-        let ruleEnable = modifyCycle[0].Status == "enable" ? true : false;
+        let ruleEnable = (this.modifyTrans || expir)? true : false;
         this.ruleChecked = ruleEnable;
         this.createLifeCycleForm = this.fb.group({
             'name': new FormControl(modifyCycle[0].ID, { validators: [Validators.required, Utils.isExisted(this.allLifeCycleForCheck), Validators.pattern(this.validRule.name)], updateOn: 'change' }),

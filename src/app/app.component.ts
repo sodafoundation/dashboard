@@ -73,13 +73,23 @@ export class AppComponent implements OnInit, AfterViewInit {
         },
         {
             "title": "Resource",
-            "description": "Volumes / Buckets",
+            "description": "Volumes / Buckets / File Share",
             "routerLink": "/block"
         },
         {
             "title": "Dataflow",
             "description": "Through migration / replication capability.",
             "routerLink": "/dataflow"
+        },
+        {
+            "title": "Monitor",
+            "description": "Telemetry information.",
+            "routerLink": "/monitor"
+        },
+        {
+            "title": "Services",
+            "description": "Orchestration services.",
+            "routerLink": "/services"
         },
         {
             "title": "Profile",
@@ -96,7 +106,7 @@ export class AppComponent implements OnInit, AfterViewInit {
         },
         {
             "title": "Resource",
-            "description": "Volumes / Buckets",
+            "description": "Volumes / Buckets / File Share",
             "routerLink": "/block"
         },
         {
@@ -108,6 +118,11 @@ export class AppComponent implements OnInit, AfterViewInit {
             "title": "Monitor",
             "description": "Telemetry information.",
             "routerLink": "/monitor"
+        },
+	{
+            "title": "Services",
+            "description": "Orchestration services.",
+            "routerLink": "/services"
         },
         {
             "title": "Profile",
