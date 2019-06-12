@@ -22,9 +22,9 @@ export class LifeCycleComponent implements OnInit {
     showCreateLifeCycle = false;
     showModifyLifeCycle = false;
     createLifeCycleForm;
-    transForm;
     errorMessage = {
-        "name": { required: "name is required.", isExisted: "Name is existing" },
+        "name": { required: this.i18n.keyID['sds_profile_create_name_require'], 
+                  isExisted: this.i18n.keyID['sds_isExisted'] },
         "prefix": { isExisted: "prefix is existing" }
     };
     validRule = {
@@ -142,16 +142,16 @@ export class LifeCycleComponent implements OnInit {
             if (trans) {
                 if (_.isArray(item.Transition)) {
                     trans.forEach((arr) => {
-                        string = "Transition to" + arr.StorageClass + ":" + "days" + arr.Days + (arr.Backend != "" ? ",Backend:" + arr.Backend : "");
+                        string = "Transition to " + arr.StorageClass + ":" + "days" + arr.Days + (arr.Backend != "" ? ",Backend:" + arr.Backend : "");
                         newTrans.push(string);
                     })
                 } else {
-                    string = "Transition to" + trans.StorageClass + ":" + "days" + trans.Days + (trans.Backend != "" ? ",Backend:" + trans.Backend : "");
+                    string = "Transition to " + trans.StorageClass + ":" + "days" + trans.Days + (trans.Backend != "" ? ",Backend:" + trans.Backend : "");
                     newTrans.push(string);
                 }
             }
             if (item.Expiration) {
-                string = "Expired deletion:" + item.Expiration.Days;
+                string = "Expired deletion: " + item.Expiration.Days;
                 newTrans.push(string);
             }
             if (cleanUp && cleanUp != 0) {
@@ -224,6 +224,13 @@ export class LifeCycleComponent implements OnInit {
                             this.lifeCycleAlls = arr;
                         }
                     }
+                    this.lifeCycleAlls.forEach(item=>{
+                        if(item.ObjectKey.length > 15){
+                            item['name'] = item.ObjectKey.substr(0,15) + "...";
+                        }else{
+                            item['name'] = item.ObjectKey
+                        }
+                    })
                     this.submitObj = jsonObj;
                     //the state of the modification
                     if (dialog && dialog == "update") {
