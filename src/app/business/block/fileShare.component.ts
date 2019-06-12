@@ -24,7 +24,7 @@ export class FileShareComponent implements OnInit{
     errorMessage = {
         "level": { required: "Access Level is required." },
         "user": { required: "Ip/User is required." },
-        "name":  {required: "Name is required." },
+        "name":  {required: "Name is required.", isExisted: "Name is existing." },
         "userInput":{required: "Ip/User is required"},
         "accessCapability": { required: "Access Level is required." }
     }
@@ -41,6 +41,7 @@ export class FileShareComponent implements OnInit{
     menuItems: MenuItem[];
     menuDeleDisableItems : MenuItem[];
     msgs: Message[];
+    allFileShareNameForCheck = [];
 
     constructor(
         private ActivatedRoute: ActivatedRoute,
@@ -74,8 +75,9 @@ export class FileShareComponent implements OnInit{
                 "label": this.I18N.keyID['sds_block_volume_modify'],
                 command: () => {
                     this.modifyFileShareShow = true;
+                    this.getFileShares('modify',this.selectedFileShare.name);
                     this.modifyFileShareForm = this.fb.group({
-                        "name": [this.selectedFileShare.name],
+                        "name": [this.selectedFileShare.name,{ validators: [Validators.required, Utils.isExisted(this.allFileShareNameForCheck)], updateOn: 'change' }],
                         "description": [this.selectedFileShare.description, Validators.maxLength(200)]
                     })
                 },
@@ -94,8 +96,9 @@ export class FileShareComponent implements OnInit{
                 "label": this.I18N.keyID['sds_block_volume_modify'],
                 command: () => {
                     this.modifyFileShareShow = true;
+                    this.getFileShares('modify',this.selectedFileShare.name);
                     this.modifyFileShareForm = this.fb.group({
-                        "name": [this.selectedFileShare.name],
+                        "name": [this.selectedFileShare.name,{ validators: [Validators.required, Utils.isExisted(this.allFileShareNameForCheck)], updateOn: 'change' }],
                         "description": [this.selectedFileShare.description, Validators.maxLength(200)]
                     })
                 },
@@ -111,7 +114,7 @@ export class FileShareComponent implements OnInit{
         ];
         this.getProfile();
     }
-    getFileShares(){
+    getFileShares(dialog?,selectedFileName?){
         this.FileShareService.getFileShare().subscribe((res)=>{
             this.fileShares = res.json();
             this.fileShares.map(item=>{
@@ -121,7 +124,15 @@ export class FileShareComponent implements OnInit{
                 item['profileName'] = _profile != undefined ? _profile.name : '--';
                 item.size = Utils.getDisplayGBCapacity(item.size);
             })
-            this.selectedFileShares = [];
+            if(dialog){
+                this.fileShares.forEach(item=>{
+                    if(item.name != this.selectedFileShare.name){
+                        this.allFileShareNameForCheck.push(item.name);
+                    }
+                })
+            }else{
+                this.selectedFileShares = [];
+            }
         })
     }
     getProfile(){
@@ -147,6 +158,12 @@ export class FileShareComponent implements OnInit{
         this.selectedFileShare = selectedFileShare;
     }
     modifyFileShare(value){
+        if (!this.modifyFileShareForm.valid) {
+            for (let i in this.modifyFileShareForm.controls) {
+                this.modifyFileShareForm.controls[i].markAsTouched();
+            }
+            return;
+        };
         let dataArr = value;
         this.FileShareService.updateFileShare(this.selectedFileShare.id,dataArr).subscribe((res)=>{
             this.getFileShares();
