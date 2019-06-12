@@ -17,10 +17,11 @@ import { FileShareService } from '../fileShare.service';
     providers: [ConfirmationService, MsgBoxService]
 })
 export class CreateFileShareComponent implements OnInit{
-    fileShareForm;
+    fileShareForm: FormGroup;
     availabilityZones = [];
     errorMessage = {
-        "zone": { required: "Zone is required."} 
+        "zone": { required: "Zone is required."},
+        "name": { required: "Name is required" }
     };
     validRule= {
         'name':'^[a-zA-Z]{1}([a-zA-Z0-9]|[_]){0,127}$'
@@ -79,11 +80,12 @@ export class CreateFileShareComponent implements OnInit{
         ];
 
         this.fileShareForm.valueChanges.subscribe(
-            (value:string)=>{
+            (value: string) => {
                 this.setRepForm();
             }
-          );
-            this.setRepForm();
+        );
+        this.setRepForm();
+        this.getFileShares();
     }
     getFileShareDataArray(value){
         let unit = value['capacity'] === 'GB'? 1 : 1024;
@@ -151,6 +153,14 @@ export class CreateFileShareComponent implements OnInit{
         if(control.value.id == null){
             return {profileNull:true}
         }
+    }
+    getFileShares(){
+        this.FileShareService.getFileShare().subscribe((res)=>{
+            let fileShares = res.json();
+            fileShares.forEach(item=>{
+                this.allVolumeNameForCheck.push(item.name);
+            })
+        })
     }
     getErrorMessage(control,extraParam){
         let page = "";

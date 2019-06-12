@@ -84,7 +84,7 @@
     </p-dialog>
     
     <p-dialog *ngIf="modifyFileShareShow" styleClass="create-bucket-dialog"  header="Modify File Share" [(visible)]="modifyFileShareShow" [width]="600" modal="modal">
-        <form  [grid]="{label: 'ui-g-3', content:'ui-g-20'}" [formGroup]="modifyFileShareForm">
+        <form  [grid]="{label: 'ui-g-3', content:'ui-g-20'}" [formGroup]="modifyFileShareForm" [errorMessage]="errorMessage">
             <form-item label="Name">
                 <input type="text" pInputText formControlName="name" />
             </form-item>
