@@ -8,29 +8,37 @@
     <div class="volume-basic-info">
         <h3>{{i18n.keyID['sds_block_volume_base_info']}}</h3>
         <div class="ui-grid ui-grid-responsive ui-grid-pad ui-fluid volume-item">
-            <div class="ui-grid-row volume-basic-item-class">
+            <div *ngIf="fileShare" class="ui-grid-row volume-basic-item-class">
                 <div class="ui-grid-col-2" [innerHtml] = "label.Name"></div>
-                <div class="ui-grid-col-2 volume-basic-item-value-color" *ngIf="fileShare" [innerHtml] = "fileShare.name"></div>
+                <div class="ui-grid-col-2 volume-basic-item-value-color" [innerHtml] = "fileShare.name"></div>
                 <div class="ui-grid-col-2" [innerHtml] = "label.Profile"></div>
-                <div class="ui-grid-col-2 volume-basic-item-value-color" *ngIf="fileShare" [innerHtml] = "fileShare.profileName"></div>
+                <div class="ui-grid-col-2 volume-basic-item-value-color" [innerHtml] = "fileShare.profileName"></div>
                 <div class="ui-grid-col-2" [innerHtml] = "label.Status"></div>
-                <div class="ui-grid-col-2 volume-basic-item-value-color" *ngIf="fileShare" [innerHtml] = "fileShare.status"></div>
+                <div class="ui-grid-col-2 volume-basic-item-value-color" [innerHtml] = "fileShare.status"></div>
             </div>
-            <div class="ui-grid-row volume-basic-item-class">
-                <div class="ui-grid-col-2" [innerHtml] = "label.Description"></div>
-                <div class="ui-grid-col-2 volume-basic-item-value-color" *ngIf="fileShare" [innerHtml] = "fileShare.description"></div>
+            <div *ngIf="fileShare" class="ui-grid-row volume-basic-item-class">
                 <div class="ui-grid-col-2" [innerHtml] = "label.Capacity"></div>
-                <div class="ui-grid-col-2 volume-basic-item-value-color" *ngIf="fileShare" [innerHtml] = "fileShare.size"></div>
+                <div class="ui-grid-col-2 volume-basic-item-value-color" [innerHtml] = "fileShare.size"></div>
                 <div class="ui-grid-col-2" [innerHtml] = "label.CreatedAt"></div>
-                <div class="ui-grid-col-2 volume-basic-item-value-color" *ngIf="fileShare" [innerHtml] = "fileShare.createdAt"></div>
-            </div>
-            <div class="ui-grid-row volume-basic-item-class">
-                <div class="ui-grid-col-2" [innerHtml] = "label.AZ"></div>
-                <div class="ui-grid-col-2 volume-basic-item-value-color" *ngIf="fileShare" [innerHtml] = "fileShare.availabilityZone"></div>
-                <div class="ui-grid-col-2" [innerHtml] = "label.export"></div>
-                <div class="ui-grid-col-2 volume-basic-item-value-color" *ngIf="fileShare" [innerHtml] = "fileShare.exportLocations? fileShare.exportLocations[0]:'--' "></div>
+                <div class="ui-grid-col-2 volume-basic-item-value-color" [innerHtml] = "fileShare.createdAt"></div>
                 <div class="ui-grid-col-2" [innerHtml] = "label.updatedAt"></div>
-                <div class="ui-grid-col-2 volume-basic-item-value-color" *ngIf="fileShare" [innerHtml] = "fileShare.updatedAt? fileShare.updatedAt:'--' "></div>
+                <div class="ui-grid-col-2 volume-basic-item-value-color" [innerHtml] = "fileShare.updatedAt? fileShare.updatedAt:'--' "></div>
+            </div>
+            <div *ngIf="fileShare" class="ui-grid-row volume-basic-item-class">
+                <div class="ui-grid-col-2" [innerHtml] = "label.AZ"></div>
+                <div class="ui-grid-col-2 volume-basic-item-value-color" [innerHtml] = "fileShare.availabilityZone"></div>
+                <div *ngIf="!descriptBlock" class="ui-grid-col-2" [innerHtml] = "label.Description"></div>
+                <div *ngIf="!descriptBlock" class="ui-grid-col-2 volume-basic-item-value-color" [innerHtml] = "fileShare.description"></div>
+                <div *ngIf="!exportBlock" class="ui-grid-col-2" [innerHtml] = "label.export"></div>
+                <div *ngIf="!exportBlock" class="ui-grid-col-2 volume-basic-item-value-color" [innerHtml] = "fileShare.exportLocations? fileShare.exportLocations[0]:'--' "></div>
+            </div>
+            <div *ngIf="fileShare && descriptBlock" class="ui-grid-row volume-basic-item-class">
+                <div class="ui-grid-col-2" [innerHtml] = "label.Description"></div>
+                <div class="ui-grid-col-2 volume-basic-item-value-color" [innerHtml] = "fileShare.description"></div>
+            </div>
+            <div *ngIf="fileShare && exportBlock" class="ui-grid-row volume-basic-item-class">
+                <div class="ui-grid-col-2" [innerHtml] = "label.export"></div>
+                <div class="ui-grid-col-2 volume-basic-item-value-color" [innerHtml] = "fileShare.exportLocations? fileShare.exportLocations[0]:'--'"></div>
             </div>
         </div>
     </div>
@@ -147,15 +155,25 @@
                                 <p-dropdown [options]="availabilityAclLevel" formControlName="level" [style]="{'min-width':96}" placeholder="Please choose"></p-dropdown>
                             </form-item>
                             <form-item [required]="true" label="{{label.user}}">
-                                <div *ngFor="let AclsItem of aclsItems;index as i">
-                                    <div class="item-flex" style="padding: 0.5em 0;">
-                                        <!-- <p-dropdown [options]="availabilityip" formControlName="{{'user'+i}}" [style]="{'min-width':96}"></p-dropdown> -->
+                                <div class="ui-grid-row volume-item" *ngFor="let AclsItem of aclsItems;index as i">
+                                    <!-- <p-dropdown [options]="availabilityip" formControlName="{{'user'+i}}" [style]="{'min-width':96}"></p-dropdown> -->
+                                    <div class="ui-grid-col-9">
                                         <input type="text" pInputText formControlName="{{'userInput'+i}}" [style]="{'width':150}" />
+                                        <div class="ui-message-container" *ngIf="createAclsFormGroup.controls['userInput'+i] && !createAclsFormGroup.controls['userInput'+i].valid&&createAclsFormGroup.controls['userInput'+i].dirty">
+                                            <div class="ui-message ui-message-error ui-corner-all">
+                                                <i class="fa fa-exclamation-circle"></i>
+                                                <span class="ui-message-error-text">
+                                                    {{getErrorMessage(createAclsFormGroup.controls['userInput'+i],"ip")}}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="ui-grid-col-2">
                                         <div class="create-profile-img " (click)="deleteAclUsers(i)">
                                             <img style="vertical-align:middle; margin-left: 40px;"
                                                 src="assets/business/images/profile/u1065.png">
                                         </div>
-                                    </div>
+                                    </div>  
                                 </div>
                                 <div class="ui-grid-row volume-item">
                                     <a class="create-profile-img" (click)="addTransRules()">

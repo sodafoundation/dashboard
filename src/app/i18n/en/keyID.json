@@ -139,5 +139,6 @@
     "sds_lifeCycle_enable": "Enable lifecycle rules",
     "sds_lifeCycle_disable": "Disable the lifecycle rule",
     "sds_fileShare_export": "Export Location",
-    "sds_fileShare_update": "Updated At"
+    "sds_fileShare_update": "Updated At",
+    "sds_ippattern": "IP address must be (1~255). (0~255). (0~255). (0~255)/(1-32)"
 }
