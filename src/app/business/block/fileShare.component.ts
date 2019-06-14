@@ -28,6 +28,10 @@ export class FileShareComponent implements OnInit{
         "userInput":{required: "Ip/User is required"},
         "accessCapability": { required: "Access Level is required." }
     }
+    Regexp = '(1\\d{2}|2[0-4]\\d|25[0-5]|[1-9]\\d|';
+    validRule= {
+        'name':'^' + this.Regexp + '[1-9])\\.' + this.Regexp + '\\d)\\.' + this.Regexp + '\\d)\\.' + this.Regexp + '\\d)(\\/([1-9]|[1-2]\\d|3[0-2]))?$' 
+    };
     selectedFileShare;
     modifyFileShareForm;
     fileShares = [];
@@ -62,9 +66,8 @@ export class FileShareComponent implements OnInit{
     }
     ngOnInit(){
         this.availabilityAclLevel =[
-            {label: "Read", value: "Read"},
-            {label: "Write", value: "Write"},
-            {label: "Execute", value: "Execute"}
+            {label: "Read Only", value: "Read Only"},
+            {label: "Read Write", value: "Read Write"}
         ];
         this.availabilityip =[
             {label: "ip", value: "ip"},
@@ -123,6 +126,11 @@ export class FileShareComponent implements OnInit{
                 })[0];
                 item['profileName'] = _profile != undefined ? _profile.name : '--';
                 item.size = Utils.getDisplayGBCapacity(item.size);
+                if(item.name.length > 15){
+                    item['showName'] = item.name.substr(0,15) + "...";
+                }else{
+                    item['showName'] = item.name;
+                }
             })
             if(dialog){
                 this.fileShares.forEach(item=>{
@@ -151,7 +159,7 @@ export class FileShareComponent implements OnInit{
             this.createAclsFormGroup = this.fb.group({
                 "level":  ["", Validators.required],
                 "user":  ["ip", Validators.required],
-                "userInput0": ["", Validators.required],
+                "userInput0": ["", {validators: [Validators.required,Validators.pattern(this.validRule.name)]}],
                 "description": [""]
             })
         }
@@ -253,14 +261,12 @@ export class FileShareComponent implements OnInit{
           );
           this.aclsItems.forEach(index => {
             if(index !== 0){
-            //   this.createAclsFormGroup.addControl('user'+index, this.fb.control("", Validators.required));
               this.createAclsFormGroup.addControl('userInput'+index, this.fb.control("", Validators.required));
             }
         });
     }
     deleteAclUsers(index){
         this.aclsItems.splice(index, 1);
-        // this.createAclsFormGroup.removeControl('user'+index);
         this.createAclsFormGroup.removeControl('userInput'+index);
     }
     createAclsSubmit(value){
@@ -279,7 +285,13 @@ export class FileShareComponent implements OnInit{
         let dataArr = [];
         this.aclsItems.forEach(index=>{
             dataArr.push({
-                accessCapability: value['level'],
+                accessCapability: (()=>{
+                    if(value['level'] == "Read Only"){
+                        return ['Read'];
+                    }else if(value['level'] == "Read Write"){
+                        return ['Read','Write'];
+                    }
+                })(),
                 type: value['user'],
                 accessTo: value['userInput'+index]
             })
@@ -292,5 +304,14 @@ export class FileShareComponent implements OnInit{
             this.getProfile();
             this.aclCreateShow = false;
         })
+    }
+    getErrorMessage(control,extraParam){
+        let page = "", key;
+        if(control.errors.pattern){
+            key  = Utils.getErrorKey(control,extraParam);
+        }else{
+            key = Utils.getErrorKey(control,page);
+        }
+        return extraParam ? this.I18N.keyID[key].replace("{0}",extraParam):this.I18N.keyID[key];
     }
 }
