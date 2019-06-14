@@ -72,6 +72,11 @@ export class AppComponent implements OnInit, AfterViewInit {
             "routerLink": "/home"
         },
         {
+            "title": "Profile",
+            "description": "Profiles",
+            "routerLink": "/profile"
+        },
+        {
             "title": "Resource",
             "description": "Volumes / Buckets / File Share",
             "routerLink": "/block"
@@ -90,11 +95,6 @@ export class AppComponent implements OnInit, AfterViewInit {
             "title": "Services",
             "description": "Orchestration services.",
             "routerLink": "/services"
-        },
-        {
-            "title": "Profile",
-            "description": "Profiles",
-            "routerLink": "/profile"
         }
     ]
 
@@ -105,6 +105,11 @@ export class AppComponent implements OnInit, AfterViewInit {
             "routerLink": "/home"
         },
         {
+            "title": "Profile",
+            "description": "Profiles",
+            "routerLink": "/profile"
+        },
+        {
             "title": "Resource",
             "description": "Volumes / Buckets / File Share",
             "routerLink": "/block"
@@ -119,15 +124,10 @@ export class AppComponent implements OnInit, AfterViewInit {
             "description": "Telemetry information.",
             "routerLink": "/monitor"
         },
-	{
+	    {
             "title": "Services",
             "description": "Orchestration services.",
             "routerLink": "/services"
-        },
-        {
-            "title": "Profile",
-            "description": "Profiles",
-            "routerLink": "/profile"
         },
         {
             "title": "Infrastructure",
