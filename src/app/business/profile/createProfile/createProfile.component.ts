@@ -232,8 +232,7 @@ export class CreateProfileComponent implements OnInit {
         "datetime" :{ required: this.I18N.keyID['sds_required'].replace("{0}","Execution Time")},
         "snapNum" :{ required: this.I18N.keyID['sds_required'].replace("{0}","Retention")},
         "duration" :{ required: this.I18N.keyID['sds_required'].replace("{0}","Retention")},
-        "description":{maxlength:this.I18N.keyID['sds_validate_max_length']},
-        "storageAcl":{required:"Storage Access Capability is required"}
+        "description":{maxlength:this.I18N.keyID['sds_validate_max_length']}
     };
     snapshotRetentionOptions = [
         {
@@ -418,7 +417,6 @@ export class CreateProfileComponent implements OnInit {
                     ]
                     this.profileform.patchValue({protocol: 'NFS'});
                     this.profileform.patchValue({storageAcl: ''});
-                    this.profileform.controls['storageAcl'].setValidators(Validators.required);
                     this.isReplicationFlag = false;
                 }else{
                     this.protocolOptions = [
@@ -492,7 +490,9 @@ export class CreateProfileComponent implements OnInit {
             }
         }
         if(value.storageTypes == "file"){
-            this.param["provisioningProperties"].dataStorage.storageAccessCapability = value.storageAcl;
+            if(value.storageAc && value.storageAc !=""){
+                this.param["provisioningProperties"].dataStorage.storageAccessCapability = value.storageAcl;
+            }
             delete this.param["provisioningProperties"].dataStorage.provisioningPolicy;
         }
         if(this.replicationIsChecked){
