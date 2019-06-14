@@ -23,7 +23,7 @@
             <span><p-radioButton label="Thin" formControlName="storageType" name="typeRadioGroup" value="Thin"></p-radioButton></span>
             <span style="margin-left: 30px;"><p-radioButton label="Thick" formControlName="storageType" name="typeRadioGroup" value="Thick"></p-radioButton></span>
         </form-item>
-        <form-item label="{{label.storageAccess}}" [required]="true" *ngIf="!isReplicationFlag" >
+        <form-item label="{{label.storageAccess}}" *ngIf="!isReplicationFlag" >
             <p-multiSelect [options]="storgeAclOptions" [filter]="false" formControlName="storageAcl" [style]="{'min-width':'150px'}" placeholder="Please choose"></p-multiSelect>
             <div class="ui-message-container" *ngIf="showStorageAcl">
                 <div class="ui-message ui-message-error ui-corner-all">
