@@ -17,7 +17,7 @@ export class WorkflowService {
   project_id = this.paramStor.CURRENT_TENANT().split("|")[1];
   /* FIXME The endpoint  changes are to fix  Issue #106 in opensds/opensds-dashboard. 
   This is a temporary fix for the API not being reachable. The Orchestration API endpoint will be changed and this fix will be removed. */
-  url = "/orchestration/" + this.project_id + "/";
+  url = "/orch/" + this.project_id + "/orchestration/";
   
 
   constructor(private http: HttpClient,
