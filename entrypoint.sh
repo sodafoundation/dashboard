@@ -15,10 +15,16 @@
 # limitations under the License.
 
 OPENSDS_HOTPOT_URL=${OPENSDS_HOTPOT_URL:-http://127.0.0.1:50040}
+#FIXME The ORCHESTRATION_URL  changes are to fix  Issue #106 in opensds/opensds-dashboard. 
+#This is a temporary fix for the API not being reachable. The Orchestration API endpoint will be changed and this fix will be removed.
+OPENSDS_ORCHESTRATION_URL=${OPENSDS_ORCHESTRATION_URL:-http://127.0.0.1:5000}
 OPENSDS_GELATO_URL=${OPENSDS_GELATO_URL:-http://127.0.0.1:8089}
 OPENSDS_AUTH_URL=${OPENSDS_AUTH_URL:-http://127.0.0.1/identity}
 
 OPENSDS_HOTPOT_API_VERSION=${OPENSDS_HOTPOT_API_VERSION:-v1beta}
+#FIXME The ORCHESTRATION_URL  changes are to fix  Issue #106 in opensds/opensds-dashboard. 
+#This is a temporary fix for the API not being reachable. The Orchestration API endpoint will be changed and this fix will be removed.
+OPENSDS_ORCHESTRATION_API_VERSION=${OPENSDS_ORCHESTRATION_API_VERSION:-orchestration}
 OPENSDS_GELATO_API_VERSION=${OPENSDS_GELATO_API_VERSION:-v1}
 OPENSDS_AUTH_API_VERSION=${OPENSDS_AUTH_API_VERSION:-v3}
 
@@ -36,6 +42,10 @@ cat > /etc/nginx/conf.d/default.conf <<EOF
 
         location /${OPENSDS_HOTPOT_API_VERSION}/ {
             proxy_pass ${OPENSDS_HOTPOT_URL}/${OPENSDS_HOTPOT_API_VERSION}/;
+        }
+
+        location /${OPENSDS_ORCHESTRATION_API_VERSION}/ {
+            proxy_pass ${OPENSDS_ORCHESTRATION_URL}/${OPENSDS_ORCHESTRATION_API_VERSION}/;
         }
 
         location /${OPENSDS_GELATO_API_VERSION}/ {
