@@ -624,7 +624,7 @@ export class LifeCycleComponent implements OnInit {
             jsonObj = jsonObj + Incomplete;
         }
         let newLifeCycle = jsonObj + ruleXml;
-        xmlStr = xmlStr + defaultLifeCycle + newLifeCycle + `</LifecycleConfiguration>`;
+        xmlStr = xmlStr + newLifeCycle + `</LifecycleConfiguration>`;
         return xmlStr;
     }
     checkStorageClass(control: FormControl): { [s: string]: boolean } {
