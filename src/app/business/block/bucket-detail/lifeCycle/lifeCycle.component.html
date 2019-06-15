@@ -21,7 +21,7 @@
                 <span title="{{cycle.ObjectKey}}">{{cycle.name}}</span>
             </ng-template>
         </p-column>
-        <p-column field="Status" header="Status" [style]="{'width': '120px'}" ></p-column>
+        <p-column field="Status" header="Status" [style]="{'width': '100px'}" ></p-column>
         <p-column field="Prefix" header="Prefix" [style]="{'width': '100px'}"></p-column>
         <p-column field="Rules" header="Rules">
             <ng-template let-col pTemplate="body" let-cycle="rowData" let-i="rowIndex">
@@ -51,7 +51,7 @@
                 <p-inputSwitch formControlName="enabled" (onChange)="ruleSwitch()"></p-inputSwitch>
             </form-item>
             <form-item label="Storage class transition" *ngIf="ruleChecked">
-                <p-checkbox formControlName="transEnabled" (onChange)="transClick()" name="transChecke" value="trans"></p-checkbox>
+                <p-checkbox class="text-only" formControlName="transEnabled" (onChange)="transClick()" name="transChecke" value="trans"></p-checkbox>
             </form-item>
             <div class="ui-grid-row volume-item" *ngIf="ruleChecked && transChecked" [ngClass]="{'a-rep-disabled': !showAddTransRule}">
                 <a class="create-profile-img" (click)="addTransRules()">
@@ -79,17 +79,25 @@
                             <div class="ui-message ui-message-error ui-corner-all">
                                 <i class="fa fa-exclamation-circle"></i>
                                 <span class="ui-message-error-text">
-                                {{getErrorMessage(createLifeCycleForm.controls['transId'+i],"transistion")}}
+                                {{getErrorMessage(createLifeCycleForm.controls['transId'+i],"transition")}}
                                 </span>
                             </div>
                         </div>
                     </div>
                     <div class="ui-grid-col-4" *ngIf="backendShow[i]" >
                         <p-spinner formControlName="{{'days'+i}}" [min]="minDays[i]" [(ngModel)]="transDaysArr[i]" (onChange)="transDaysChange(i)"></p-spinner>
+                        <div class="ui-message-container" *ngIf="createLifeCycleForm.controls['days'+i] && !createLifeCycleForm.controls['days'+i].valid &&(createLifeCycleForm.controls['days'+i].dirty || createLifeCycleForm.controls['days'+i].touched)">
+                            <div class="ui-message ui-message-error ui-corner-all">
+                                <i class="fa fa-exclamation-circle"></i>
+                                <span class="ui-message-error-text">
+                                {{getErrorMessage(createLifeCycleForm.controls['days'+i],"days")}}
+                                </span>
+                            </div>
+                        </div>
                     </div>
                     <div class="ui-grid-col-3" *ngIf="backendShow[i]">
                         <p-dropdown *ngIf="modifyBakend.length == 0 || modifyBakend[i] == ''" [style]="{'width':'134px'}" [options]="backends[i]" formControlName="{{'backendId'+i}}" placeholder="please select"></p-dropdown>
-                        <p-dropdown *ngIf="modifyBakend.length != 0 && modifyBakend[i] != ''" value="modifyBakend[i]" [style]="{'width':'134px'}" [options]="backends[i]" formControlName="{{'backendId'+i}}"></p-dropdown>
+                        <p-dropdown *ngIf="modifyBakend.length != 0 && modifyBakend[i] != ''" [style]="{'width':'134px'}" [options]="backends[i]" formControlName="{{'backendId'+i}}"></p-dropdown>
                     </div>
                     <div class="ui-grid-col-1">
                         <div class="create-profile-img " (click)="deleteTransRules(i)">
@@ -100,13 +108,21 @@
             </div>
             <div *ngIf="ruleChecked && transChecked && transOptions.length ==0 && transDaysArr.length ==0">You don’t have any transitions set up for current version of objects.</div>
             <form-item label="Configure expiration" *ngIf="ruleChecked">
-                <p-checkbox formControlName="expirEnabled" name="expirChecke" value="expir" (onChange)="checkExpir()"></p-checkbox>
+                <p-checkbox class="text-only" formControlName="expirEnabled" name="expirChecke" value="expir" (onChange)="checkExpir()"></p-checkbox>
             </form-item>
-            <div *ngIf="expirChecked">
-                <div class="input-text-vertical-align">
+            <div class="ui-grid-row volume-item" *ngIf="expirChecked">
+                <div class="ui-grid-col-5">
                     <p-spinner formControlName="expirDays" [(ngModel)]="newExpirDays" [min]="minExpirDays"></p-spinner>
-                    <span [innerHtml]="label.expirDelete"></span>
+                    <div class="ui-message-container" *ngIf="createLifeCycleForm.controls['expirDays'] && !createLifeCycleForm.controls['expirDays'].valid &&(createLifeCycleForm.controls['expirDays'].dirty || createLifeCycleForm.controls['expirDays'].touched)">
+                        <div class="ui-message ui-message-error ui-corner-all">
+                            <i class="fa fa-exclamation-circle"></i>
+                            <span class="ui-message-error-text">
+                            {{getErrorMessage(createLifeCycleForm.controls['expirDays'],"expirDays")}}
+                            </span>
+                        </div>
+                    </div>
                 </div>
+                <div class="ui-grid-col-6" [innerHtml]="label.expirDelete"></div>
             </div>
             <div *ngIf="ruleChecked">
                 <div class="volume-item">
@@ -116,10 +132,18 @@
                 <div class="ui-grid ui-grid-responsive ui-grid-pad ui-fluid volume-item">
                     <div class="ui-grid-row volume-item" *ngIf="expirCleanUp">
                         <span class="ui-grid-col-2">Elapsed time</span>
-                        <div class="ui-grid-col-2" style="display: inline-block;">
+                        <div class="ui-grid-col-4" style="display: inline-block;">
                             <p-spinner formControlName="cleanDays" [min]="1"></p-spinner>
+                            <div class="ui-message-container" *ngIf="createLifeCycleForm.controls['cleanDays'] && !createLifeCycleForm.controls['cleanDays'].valid &&(createLifeCycleForm.controls['cleanDays'].dirty || createLifeCycleForm.controls['cleanDays'].touched)">
+                                    <div class="ui-message ui-message-error ui-corner-all">
+                                        <i class="fa fa-exclamation-circle"></i>
+                                        <span class="ui-message-error-text">
+                                        {{getErrorMessage(createLifeCycleForm.controls['cleanDays'],"cleanDays")}}
+                                        </span>
+                                    </div>
+                                </div>
                         </div>
-                        <span class="ui-grid-col-8">From the very beginning of uploading</span>
+                        <span class="ui-grid-col-6">From the very beginning of uploading</span>
                     </div>
                 </div>
             </div>

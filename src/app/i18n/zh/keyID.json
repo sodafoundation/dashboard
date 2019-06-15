@@ -115,7 +115,7 @@
     "sds_login_error_msg_default":"Internal Server Error!",
     "sds_isExisted": "Name is existing.",
     "sds_lifeCycleDays": "Days after Creation",
-    "sds_lifeCycleTrans": "Transistion to",
+    "sds_lifeCycleTrans": "Transition to",
     "sds_lifeCycle_expiration_delete": "Days after creation delete object",
     "sds_lifeCycle_expiration_cleanUp": "Clean up unfinished staging uploads",
     "sds_lifeCycle_edit": "Edit",
