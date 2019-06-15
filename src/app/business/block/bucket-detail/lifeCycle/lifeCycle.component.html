@@ -96,8 +96,8 @@
                         </div>
                     </div>
                     <div class="ui-grid-col-3" *ngIf="backendShow[i]">
-                        <p-dropdown *ngIf="modifyBakend.length == 0 || modifyBakend[i] == ''" [style]="{'width':'134px'}" [options]="backends[i]" formControlName="{{'backendId'+i}}" placeholder="please select"></p-dropdown>
-                        <p-dropdown *ngIf="modifyBakend.length != 0 && modifyBakend[i] != ''" [style]="{'width':'134px'}" [options]="backends[i]" formControlName="{{'backendId'+i}}"></p-dropdown>
+                        <p-dropdown *ngIf="modifyBakend.length <= i" [style]="{'width':'134px'}" [options]="backends[i]" formControlName="{{'backendId'+i}}" placeholder="please select"></p-dropdown>
+                        <p-dropdown *ngIf="modifyBakend.length > i" [style]="{'width':'134px'}" [options]="backends[i]" formControlName="{{'backendId'+i}}"></p-dropdown>
                     </div>
                     <div class="ui-grid-col-1">
                         <div class="create-profile-img " (click)="deleteTransRules(i)">
