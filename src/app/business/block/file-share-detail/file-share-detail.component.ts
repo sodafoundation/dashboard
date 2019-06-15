@@ -55,14 +55,20 @@ export class FileShareDetailComponent implements OnInit{
     profiles;
     showCreateSnapshot = true;
     aclfilter;
+    descriptBlock = false;
+    exportBlock = false;
     errorMessage = {
         "level": { required: "Access Level is required." },
         "user": { required: "Ip/User is required." },
         "name":{ required: "Name is required." },
-        "userInput":{required: "Ip/User is required"},
+        "userInput":{required: "Ip is required"},
         "accessCapability": { required: "Access Level is required." },
         "accessTo": {required: "Access is required."}
     }
+    Regexp = '(1\\d{2}|2[0-4]\\d|25[0-5]|[1-9]\\d|';
+    validRule= {
+        'name':'^' + this.Regexp + '[1-9])\\.' + this.Regexp + '\\d)\\.' + this.Regexp + '\\d)\\.' + this.Regexp +'\\d)(\\/([1-9]|[1-2]\\d|3[0-2]))?$' 
+    };
     
     constructor(
         private ActivatedRoute: ActivatedRoute,
@@ -128,7 +134,7 @@ export class FileShareDetailComponent implements OnInit{
         this.createAclsFormGroup = this.fb.group({
             "level":  ["", Validators.required],
             "user":  ["ip"],
-            "userInput0": ["", Validators.required],
+            "userInput0": ["", {validators: [Validators.required,Validators.pattern(this.validRule.name)]}],
             "description": [""]
         })
     }
@@ -147,8 +153,21 @@ export class FileShareDetailComponent implements OnInit{
             })[0];
             this.fileShare.profileName = _profile != undefined ? _profile.name: '--';
             this.fileShare.size = Utils.getDisplayGBCapacity(res.json().size);
-            this.fileShare.createdAt = Utils.formatDate(res.json().createdAt),
-            this.fileShare.updatedAt = Utils.formatDate(res.json().updatedAt),
+            this.fileShare.createdAt = Utils.formatDate(res.json().createdAt);
+            this.fileShare.updatedAt = Utils.formatDate(res.json().updatedAt);
+            if(this.fileShare.exportLocations){
+                this.fileShare.exportLocations[0] = "(" + this.fileShare.exportLocations[0] + ")";
+            }
+            if(this.fileShare.description.length > 20){
+                this.descriptBlock = true;
+            }else{
+                this.descriptBlock = false;
+            }
+            if(this.fileShare.exportLocations[0].length > 20){
+                this.exportBlock = true;
+            }else{
+                this.exportBlock = false;
+            }
             this.getSnapshots(this.fromFileShareId);
         })
     }
@@ -171,7 +190,6 @@ export class FileShareDetailComponent implements OnInit{
     }
     deleteAclUsers(index){
         this.aclsItems.splice(index, 1);
-        // this.createAclsFormGroup.removeControl('user'+index);
         this.createAclsFormGroup.removeControl('userInput'+index);
     }
     addTransRules(){
@@ -369,5 +387,14 @@ export class FileShareDetailComponent implements OnInit{
             this.getAcls();
             this.aclModifyShow = false;
         })
+    }
+    getErrorMessage(control,extraParam){
+        let page = "", key;
+        if(control.errors.pattern){
+            key  = Utils.getErrorKey(control,extraParam);
+        }else{
+            key = Utils.getErrorKey(control,page);
+        }
+        return extraParam ? this.i18n.keyID[key].replace("{0}",extraParam):this.i18n.keyID[key];
     }
 }

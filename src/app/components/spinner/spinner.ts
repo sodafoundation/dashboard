@@ -200,7 +200,9 @@ export class Spinner implements OnInit,ControlValueAccessor {
         }    
     }
 
-    onInputKeyup(event: KeyboardEvent) {
+    onInputKeyup(event: KeyboardEvent) {}
+    
+    onInputBlur(event) {
         let inputValue = (<HTMLInputElement> event.target).value;
         if (event.key !== this.decimalSeparator && event.key !== this.thousandSeparator) {
             this.value = this.parseValue(inputValue);
@@ -209,9 +211,6 @@ export class Spinner implements OnInit,ControlValueAccessor {
        
         this.onModelChange(this.value);
         this.updateFilledState();
-    }
-    
-    onInputBlur(event) {
         this.focus = false;
         this.onModelTouched();
         this.onBlur.emit(event);

@@ -91,7 +91,7 @@ export class ServicesListComponent implements OnInit{
                         }
                     })
                 } else{
-                    this.serviceCatalog = []
+                    this.serviceCatalog = [];
                 }
             }, error => {
                 this.serviceCatalog = [];

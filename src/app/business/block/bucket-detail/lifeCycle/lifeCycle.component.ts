@@ -22,9 +22,9 @@ export class LifeCycleComponent implements OnInit {
     showCreateLifeCycle = false;
     showModifyLifeCycle = false;
     createLifeCycleForm;
-    transForm;
     errorMessage = {
-        "name": { required: "name is required.", isExisted: "Name is existing" },
+        "name": { required: this.i18n.keyID['sds_profile_create_name_require'], 
+                  isExisted: this.i18n.keyID['sds_isExisted'] },
         "prefix": { isExisted: "prefix is existing" }
     };
     validRule = {
@@ -101,7 +101,7 @@ export class LifeCycleComponent implements OnInit {
             "expirDays": new FormControl(1),
             "cleanDays": new FormControl(7),
             "expirCleanUp": new FormControl([]),
-            "days0": new FormControl(30),
+            "days0": new FormControl(30,{ validators: [Validators.required], updateOn: 'change' }),
             "transId0": new FormControl(""),
             "backendId0": new FormControl(this.defaultBackend)
         });
@@ -142,20 +142,20 @@ export class LifeCycleComponent implements OnInit {
             if (trans) {
                 if (_.isArray(item.Transition)) {
                     trans.forEach((arr) => {
-                        string = "Transition to" + arr.StorageClass + ":" + "days" + arr.Days + (arr.Backend != "" ? ",Backend:" + arr.Backend : "");
+                        string = "Transition to " + arr.StorageClass + " after: " + arr.Days + " days" + (arr.Backend != "" ? ", Backend:" + arr.Backend : "");
                         newTrans.push(string);
                     })
                 } else {
-                    string = "Transition to" + trans.StorageClass + ":" + "days" + trans.Days + (trans.Backend != "" ? ",Backend:" + trans.Backend : "");
+                    string = "Transition to " + trans.StorageClass + " after: " + trans.Days + " days" + (trans.Backend != "" ? ", Backend:" + trans.Backend : "");
                     newTrans.push(string);
                 }
             }
             if (item.Expiration) {
-                string = "Expired deletion:" + item.Expiration.Days;
+                string = "Delete after: " + item.Expiration.Days + " days";
                 newTrans.push(string);
             }
             if (cleanUp && cleanUp != 0) {
-                string = "Clean up incomplete multipart uploads after " + cleanUp + "days";
+                string = "Clean up incomplete multipart uploads after: " + cleanUp + " days";
                 newTrans.push(string);
             }
         } else {
@@ -170,7 +170,7 @@ export class LifeCycleComponent implements OnInit {
         if (prefix != "" && (dialog != "update" || (cycle && cycle.Prefix != prefix))) {
             this.allLifeCycleCheckPrefix.push(prefix);
         } else if (prefix == "") {
-            prefix ==  "--";
+            prefix =  "--";
         }
         return prefix;
     }
@@ -224,6 +224,13 @@ export class LifeCycleComponent implements OnInit {
                             this.lifeCycleAlls = arr;
                         }
                     }
+                    this.lifeCycleAlls.forEach(item=>{
+                        if(item.ObjectKey.length > 15){
+                            item['name'] = item.ObjectKey.substr(0,15) + "...";
+                        }else{
+                            item['name'] = item.ObjectKey
+                        }
+                    })
                     this.submitObj = jsonObj;
                     //the state of the modification
                     if (dialog && dialog == "update") {
@@ -233,7 +240,7 @@ export class LifeCycleComponent implements OnInit {
             })
         })
     }
-    // Transistion Rules checkbox click
+    // Transition Rules checkbox click
     transClick() {
         if(this.modifyBakend.length > 0){
             this.modifyBakend = [];
@@ -305,12 +312,13 @@ export class LifeCycleComponent implements OnInit {
             }
             this.transDaysArr[transIndex] = defaultDays + 30;
             if (event == "GLACIER" || (event.value && event.value.transName && event.value.transName != "GLACIER")) {
+                this.showAddTransRule = true;
+            }else{
                 this.showAddTransRule = false;
             }
         }
         if((event == "GLACIER" || (event.value && event.value.transName && event.value.transName != "GLACIER")) && transIndex < this.lifeCycleItems.length -1){
             this.deleteTransRules(transIndex+1);
-            this.showAddTransRule = false;
         }
         if(event.value){
             this.getBackets(event, transIndex);
@@ -377,7 +385,7 @@ export class LifeCycleComponent implements OnInit {
                         }
                     //Add Rules under modified state
                     } else if (this.showModifyLifeCycle){
-                        selectedTrans = this.createLifeCycleForm.value['transId' + (transIndex -1)];
+                        selectedTrans = this.createLifeCycleForm.value['transId' + (transIndex -1)].transName;
                         if(selectedTrans == "STANDARD"){
                             array = array.filter((item, index) => {
                                 return item.Name != "STANDARD";
@@ -455,7 +463,20 @@ export class LifeCycleComponent implements OnInit {
                 label: "Not set",
                 value: {id: null, backendName: null}
             })
-            this.modifyBakend;
+            if(this.modifyBakend.length > 0){
+                this.modifyBakend.forEach((item,index)=>{
+                    if(index == transIndex){
+                        backendArr.forEach((it,index)=>{
+                            let firstItem = backendArr[0];
+                            if(item == it.label){
+                                backendArr[0]= it;
+                                backendArr[index] = firstItem;
+                            }
+                        })
+                    }
+                    
+                });
+            }
             //change the value of backends when modifying the selected storageClass
             if (this.backends[transIndex]) {
                 this.backends[transIndex] = backendArr;
@@ -617,7 +638,7 @@ export class LifeCycleComponent implements OnInit {
             jsonObj = jsonObj + Incomplete;
         }
         let newLifeCycle = jsonObj + ruleXml;
-        xmlStr = xmlStr + defaultLifeCycle + newLifeCycle + `</LifecycleConfiguration>`;
+        xmlStr = xmlStr + newLifeCycle + `</LifecycleConfiguration>`;
         return xmlStr;
     }
     checkStorageClass(control: FormControl): { [s: string]: boolean } {

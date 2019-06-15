@@ -32,7 +32,8 @@ export class MonitorService {
     let detailUrl = this.url + this.project_id +  '/metrics/uploadconf?conftype=' + configType;
     const uploadReq = new HttpRequest('POST', detailUrl, formData, {
       reportProgress: true,
-      headers: new HttpHeaders().set('X-Auth-Token' , this.options.headers['X-Auth-Token'])
+      headers: new HttpHeaders().set('X-Auth-Token' , this.options.headers['X-Auth-Token']),
+      responseType: 'text'
     });
     return this.http.request(uploadReq);
   }

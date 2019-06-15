@@ -108,12 +108,12 @@ export class ConfigComponent implements OnInit {
         this.progress = Math.round(100 * event.loaded / event.total);
       }
       else if (event.type === HttpEventType.Response){
-        this.message = event.body.toString();
         this.msgs = [];
-        this.msgs.push({severity: 'success', summary: 'Success', detail: 'File Uploaded! The service will be restarted shortly.'});
+        this.msgs.push({severity: 'success', summary: 'Success', detail: 'Configuration Uploaded! The service will be restarted shortly.'});
       }  
     },
     err=>{
+      console.log("Something went wrong. File upload may have failed.", err);
       this.msgs = [];
       this.msgs.push({severity: 'error', summary: 'Error', detail: err.message});
     });
@@ -125,6 +125,7 @@ export class ConfigComponent implements OnInit {
     this.monitor.downloadConfig(configType).subscribe(respData => {
         this.downLoadFile(respData, respData.type, configType);
     }, error => {
+      console.log("Something went wrong. There was an error while getting the file.", error)
       this.msgs = [];
       this.msgs.push({severity: 'error', summary: 'Error', detail: 'File could not be dowloaded.'});
     });
