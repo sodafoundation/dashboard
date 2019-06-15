@@ -385,7 +385,7 @@ export class LifeCycleComponent implements OnInit {
                         }
                     //Add Rules under modified state
                     } else if (this.showModifyLifeCycle){
-                        selectedTrans = this.createLifeCycleForm.value['transId' + (transIndex -1)];
+                        selectedTrans = this.createLifeCycleForm.value['transId' + (transIndex -1)].transName;
                         if(selectedTrans == "STANDARD"){
                             array = array.filter((item, index) => {
                                 return item.Name != "STANDARD";
@@ -466,9 +466,11 @@ export class LifeCycleComponent implements OnInit {
             if(this.modifyBakend.length > 0){
                 this.modifyBakend.forEach((item,index)=>{
                     if(index == transIndex){
-                        backendArr.forEach(it=>{
+                        backendArr.forEach((it,index)=>{
+                            let firstItem = backendArr[0];
                             if(item == it.label){
                                 backendArr[0]= it;
+                                backendArr[index] = firstItem;
                             }
                         })
                     }
