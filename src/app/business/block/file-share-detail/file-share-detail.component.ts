@@ -211,6 +211,9 @@ export class FileShareDetailComponent implements OnInit{
             str.forEach(item=>{
                 if(item.fileshareId == fileShareId){
                     item.createdAt = Utils.formatDate(item.createdAt);
+                    if(!item.description){
+                        item.description = "--";
+                    }
                     this.snapshots.push(item); 
                 }
             })
