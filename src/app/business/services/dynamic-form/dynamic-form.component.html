@@ -48,14 +48,12 @@
                   <span *ngFor="let option of prop.options">
                       <p-radioButton [label]="option.label" [formControlName]="prop.key" name="typeRadioGroup" [value]="option.value"></p-radioButton>
                   </span>
-                  <i class="icon fa fa-info-circle" pTooltip="{{prop.description}}" tooltipPosition="top"></i>
               </form-item>
             </div>
 
             <div class="form-item-container" *ngSwitchCase="'select'">
                 <form-item label="{{prop.label}}" [required]="true">
                     <p-dropdown [options]="prop.options" [formControlName]="prop.key" placeholder="Select"></p-dropdown>
-                    <i class="icon fa fa-info-circle" pTooltip="{{prop.description}}" tooltipPosition="top"></i>
                 </form-item>      
             </div>
           </div>

@@ -61,7 +61,6 @@ export class WorkflowService {
 
   public createInstance(param) {
     let detailUrl = this.url + 'instances';
-    console.log("Final Param to post", param);
     return this.http.post(detailUrl, param, this.options);
   }
 

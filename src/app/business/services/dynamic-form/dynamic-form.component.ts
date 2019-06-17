@@ -62,7 +62,7 @@ export class DynamicFormComponent implements OnInit {
 
   ngOnInit() {
     let self = this;
-
+    self.getProfiles();
     this.dataObject['instanceName'] = {
       "description": "Name of the Instance",
       "required": true,
@@ -91,18 +91,38 @@ export class DynamicFormComponent implements OnInit {
       
       // setup the form
       const formGroup = {};
-
       _.each(this.objectProps, function(item){
         item['showThis'] = true;
-        item['label'] = item['key'].replace(/_/g, ' ').replace(/(?: |\b)(\w)/g, function(key, p1) {
+        item['label'] = item['key'].replace(/_/g, '  ').replace(/(?: |\b)(\w)/g, function(key, p1) {
               return key.toUpperCase();    
         });
         if(item['key']=='timeout'){
           item['required'] = false;
         }
+        
         if(item['type']=='object' || item['required'] == false || !_.has(item, 'required')){
           item['showThis'] = false;
         }
+        /* Adding host info object for volume provisioning.  */
+        if(item['key'] == 'host_info'){
+          item['label'] = "Host IP";
+          item['showThis'] = true;
+          item['validation'] = {required: true};
+          item['required'] = true;
+          item['type'] = 'string';
+        }
+
+        if(item['key'] == 'port'){
+          item['showThis'] = false;
+          item['required'] = false;
+          item['validation'] = {required: false};
+        }
+        if(item['key'] == 'ip_addr'){
+          item['showThis'] = false;
+          item['required'] = false;
+          item['validation'] = {required: false};
+        }
+        
         //Check if the key is a default parameter and can be passed from code. User need not enter.
         if(item['required'] == true){
           item['validation'] = {required: true};
@@ -116,11 +136,12 @@ export class DynamicFormComponent implements OnInit {
           }
         }
 
-        if(item['key']=='profile_id' && item['showThis']){
-          self.getProfiles();
-          item['inputType'] = "select";
+        if(item['key']=='profile_id'){
+          item['inputType'] = "select";        
           item['options'] = self.profileOptions;
+          formGroup[item['key']] = new FormControl(item['value'] || '', self.mapValidators(item['validation']));
         }
+
         
         if(item['type'] == "string" && item['key'] != 'profile_id'){
           item['inputType'] = "text";
@@ -166,11 +187,21 @@ export class DynamicFormComponent implements OnInit {
               value: profile.id
             });
           });
+        }, error =>{
+          console.log("Something went wrong. Could not fetch profiles.", error);
+          this.msgs = [];
+          this.msgs.push({severity: 'error', summary: 'Error', detail: error._body});
         });
       }
 
       onSubmit(value) {
         let formObject = value;
+        if(_.has(formObject, 'host_info')){
+          let val = {
+            "ip" : formObject['host_info']
+          }
+          formObject['host_info'] =  val;
+        }
         this.requestBody.service_id = this.serviceId;
         this.requestBody.action = this.selectedService.action;
         this.requestBody.user_id = this.default_parameters['user_id'];
