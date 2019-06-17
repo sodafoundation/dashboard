@@ -158,12 +158,12 @@ export class FileShareDetailComponent implements OnInit{
             if(this.fileShare.exportLocations){
                 this.fileShare.exportLocations[0] = "(" + this.fileShare.exportLocations[0] + ")";
             }
-            if(this.fileShare.description.length > 20){
+            if(this.fileShare.description && this.fileShare.description.length > 20){
                 this.descriptBlock = true;
             }else{
                 this.descriptBlock = false;
             }
-            if(this.fileShare.exportLocations[0].length > 20){
+            if(this.fileShare.exportLocations && this.fileShare.exportLocations[0] && this.fileShare.exportLocations[0].length > 20){
                 this.exportBlock = true;
             }else{
                 this.exportBlock = false;
@@ -211,9 +211,13 @@ export class FileShareDetailComponent implements OnInit{
             str.forEach(item=>{
                 if(item.fileshareId == fileShareId){
                     item.createdAt = Utils.formatDate(item.createdAt);
+                    if(!item.description){
+                        item.description = "--";
+                    }
                     this.snapshots.push(item); 
                 }
             })
+            this.selectedSnapshots = [];
         })
     }
     getAcls(){
@@ -233,11 +237,13 @@ export class FileShareDetailComponent implements OnInit{
                     this.acls.push(acl);
                 }
             })
+            this.selectedAcls = [];
         })
     }
     showSnapshotPropertyDialog(dialog, selectedSnapshot?){
         if(dialog == 'create'){
             this.snapshotCreateShow = true;
+            this.createSnapshotFormGroup.reset();
         }else if(dialog == 'modify'){
             this.snapshotModifyShow = true;
             this.modifySnapshotFormGroup.patchValue({name: selectedSnapshot.name});
