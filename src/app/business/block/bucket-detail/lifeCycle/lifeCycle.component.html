@@ -31,9 +31,9 @@
         <p-column header="{{i18n.keyID['sds_block_volume_operation']}}" [style]="{'width': '180px'}">
             <ng-template pTemplate="body" let-cycle="rowData" let-i="rowIndex">
                 <a (click)="createLifeCycle('update',cycle)" [innerHtml]="i18n.keyID['sds_lifeCycle_edit']"></a>
-                <a *ngIf="cycle.Status == 'disable'" (click)="enableLifeCycle(cycle)" [innerHtml]="i18n.keyID['sds_profile_enable']"></a>
-                <a *ngIf="cycle.Status == 'enable'" (click)="disableLifeCycle(cycle)" [innerHtml]="i18n.keyID['sds_block_volume_replication_disable']"></a>
-                <a [ngClass]="{'a-rep-disabled':cycle['disabled']}" (click)="bathDelete(cycle)" [innerHtml]="i18n.keyID['sds_block_volume_delete']"></a>
+                <a *ngIf="cycle.Status == 'Disabled'" (click)="enableLifeCycle(cycle)" [innerHtml]="i18n.keyID['sds_profile_enable']"></a>
+                <a *ngIf="cycle.Status == 'Enabled'" (click)="disableLifeCycle(cycle)" [innerHtml]="i18n.keyID['sds_block_volume_replication_disable']"></a>
+                <a [ngClass]="{'a-rep-disabled':cycle['Disabled']}" (click)="bathDelete(cycle)" [innerHtml]="i18n.keyID['sds_block_volume_delete']"></a>
             </ng-template>
         </p-column>
     </p-dataTable>

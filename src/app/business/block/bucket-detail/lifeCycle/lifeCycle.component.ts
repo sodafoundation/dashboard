@@ -561,8 +561,8 @@ export class LifeCycleComponent implements OnInit {
             Rule: {
                 ID: value.name,
                 Filter: { Prefix: value.Prefix ? value.Prefix : value.prefix },
-                Status: ((this.transChecked || this.expirChecked || this.expirCleanUp) && value.enabled) ? "enable" :
-                    value.Status ? value.Status : "disable"
+                Status: ((this.transChecked || this.expirChecked || this.expirCleanUp) && value.enabled) ? "Enabled" :
+                    value.Status ? value.Status : "Disabled"
             }
         }
         let jsonObj = x2js.json2xml_str(Rules);
