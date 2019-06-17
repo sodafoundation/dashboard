@@ -240,6 +240,7 @@ export class FileShareDetailComponent implements OnInit{
     showSnapshotPropertyDialog(dialog, selectedSnapshot?){
         if(dialog == 'create'){
             this.snapshotCreateShow = true;
+            this.createSnapshotFormGroup.reset();
         }else if(dialog == 'modify'){
             this.snapshotModifyShow = true;
             this.modifySnapshotFormGroup.patchValue({name: selectedSnapshot.name});
