@@ -22,7 +22,7 @@
             </ng-template>
         </p-column>
         <p-column field="Status" header="Status" [style]="{'width': '100px'}" ></p-column>
-        <p-column field="Prefix" header="Prefix" [style]="{'width': '100px'}"></p-column>
+        <p-column field="newPrefix" header="Prefix" [style]="{'width': '100px'}"></p-column>
         <p-column field="Rules" header="Rules">
             <ng-template let-col pTemplate="body" let-cycle="rowData" let-i="rowIndex">
                 <p *ngFor="let col of cycle[col.field]">{{col}}</p>
@@ -96,8 +96,8 @@
                         </div>
                     </div>
                     <div class="ui-grid-col-3" *ngIf="backendShow[i]">
-                        <p-dropdown *ngIf="modifyBakend.length <= i" [style]="{'width':'134px'}" [options]="backends[i]" formControlName="{{'backendId'+i}}" placeholder="please select"></p-dropdown>
-                        <p-dropdown *ngIf="modifyBakend.length > i" [style]="{'width':'134px'}" [options]="backends[i]" formControlName="{{'backendId'+i}}"></p-dropdown>
+                        <p-dropdown *ngIf="modifyBakend.length <= i || modifyBakend[i] ==''" [style]="{'width':'134px'}" [options]="backends[i]" formControlName="{{'backendId'+i}}" placeholder="please select"></p-dropdown>
+                        <p-dropdown *ngIf="modifyBakend.length > i && modifyBakend[i] !=''" [style]="{'width':'134px'}" [options]="backends[i]" formControlName="{{'backendId'+i}}"></p-dropdown>
                     </div>
                     <div class="ui-grid-col-1">
                         <div class="create-profile-img " (click)="deleteTransRules(i)">
