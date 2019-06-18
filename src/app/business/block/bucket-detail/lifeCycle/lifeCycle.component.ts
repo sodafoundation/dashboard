@@ -202,7 +202,7 @@ export class LifeCycleComponent implements OnInit {
                                 let lifeCycleAll = {
                                     ObjectKey: item.ID,
                                     Status: item.Status,
-                                    Prefix: this.getLifeCyclePrefix(item, dialog, cycle),
+                                    newPrefix: this.getLifeCyclePrefix(item, dialog, cycle),
                                     Rules: this.getLifeCycleRule(item)
                                 }
                                 arr.push(lifeCycleAll);
@@ -217,7 +217,7 @@ export class LifeCycleComponent implements OnInit {
                             let lifeCycleAll = {
                                 ObjectKey: lifeCycleArr.ID,
                                 Status: lifeCycleArr.Status,
-                                Prefix: this.getLifeCyclePrefix(lifeCycleArr, dialog, cycle),
+                                newPrefix: this.getLifeCyclePrefix(lifeCycleArr, dialog, cycle),
                                 Rules: this.getLifeCycleRule(lifeCycleArr)
                             }
                             arr.push(lifeCycleAll);
@@ -473,7 +473,7 @@ export class LifeCycleComponent implements OnInit {
                 label: "Not set",
                 value: {id: null, backendName: null}
             })
-            if(this.modifyBakend.length > transIndex){
+            if(this.modifyBakend.length > transIndex && this.modifyBakend[transIndex] != ""){
                 this.modifyBakend.forEach((item,index)=>{
                     if(index == transIndex){
                         backendArr.forEach((it,index)=>{
@@ -945,9 +945,7 @@ export class LifeCycleComponent implements OnInit {
         this.createLifeCycleForm.addControl('days' + index, this.fb.control(item.Days, Validators.required));
         this.createLifeCycleForm.addControl('transId' + index, this.fb.control(item.StorageClass, Validators.required));
         this.createLifeCycleForm.addControl('backendId' + index, this.fb.control(item.Backend));
-        if(item.Backend && item.Backend != ""){
-            this.modifyBakend.push(item.Backend);
-        }
+        this.modifyBakend.push(item.Backend);
         this.transDaysArr[index] = parseInt(item.Days);
         this.backendShow.push(true)
         if (index == 0) {
