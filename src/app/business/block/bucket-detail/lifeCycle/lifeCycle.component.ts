@@ -167,7 +167,7 @@ export class LifeCycleComponent implements OnInit {
     getLifeCyclePrefix(item, dialog, cycle) {
         let prefix = item.Filter.Prefix;
         //In the modified State, filter out the prefix of the selected lifeCycle 
-        if (prefix != "" && (dialog != "update" || (cycle && cycle.Prefix != prefix))) {
+        if (prefix != "" && (dialog != "update" || (cycle && cycle.newPrefix != prefix))) {
             this.allLifeCycleCheckPrefix.push(prefix);
         } else if (prefix == "") {
             prefix =  "--";
