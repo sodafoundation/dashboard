@@ -490,7 +490,7 @@ export class CreateProfileComponent implements OnInit {
             }
         }
         if(value.storageTypes == "file"){
-            if(value.storageAc && value.storageAc !=""){
+            if(value.storageAcl && value.storageAcl !=""){
                 this.param["provisioningProperties"].dataStorage.storageAccessCapability = value.storageAcl;
             }
             delete this.param["provisioningProperties"].dataStorage.provisioningPolicy;

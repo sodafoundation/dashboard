@@ -558,11 +558,14 @@ export class LifeCycleComponent implements OnInit {
             }
         }
         let defaultLifeCycle = x2js.json2xml_str(arr);
+        if(value.Status){
+            value.Status = value.Status == "enable" ? "Enabled" : "Disabled";
+        }
         let Rules = {
             Rule: {
                 ID: value.name,
                 Filter: { Prefix: value.Prefix ? value.Prefix : value.prefix },
-                Status: ((this.transChecked || this.expirChecked || this.expirCleanUp) && value.enabled) ? "Enabled" :
+                Status: (((this.transChecked && this.transOptions.length != 0) || this.expirChecked || this.expirCleanUp) && value.enabled) ? "Enabled" :
                     value.Status ? value.Status : "Disabled"
             }
         }
