@@ -88,7 +88,13 @@ export class ResourceComponent implements OnInit{
                             let [name,ip,status,description,region,az,type] = [ele.name, ele.endpoint.split(":")[0], "Enabled", ele.description, "default_region", zone, ele.storageType];
                         
                             if(!ele.storageType || ele.storageType == "" || ele.storageType == "block"){
-                                this.blockStorages.push({name,ip,status,description,region,az,type});
+                                let newDescript;
+                                if(description.length > 20){
+                                    newDescript = description.substr(0,20) + "...";
+                                }else{
+                                    newDescript = description;
+                                }
+                                this.blockStorages.push({name,ip,status,description,newDescript,region,az,type});
                             }
                         }
                         
