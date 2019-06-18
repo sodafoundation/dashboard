@@ -359,26 +359,22 @@ export class HomeComponent implements OnInit {
             }
             return;
         }
-        let param: any = null;
+        let reg: any = null;
         if (this.backendForm.value.type=='ceph-s3'){
-            param = {
-              "name": this.backendForm.value.name,
-              "type": this.backendForm.value.type,
-              "region": "-",
-              "endpoint": this.backendForm.value.endpoint,
-              "bucketName": this.backendForm.value.bucket,
-              "security": this.backendForm.value.sk,
-              "access": this.backendForm.value.ak};
+            reg = "-";
         }else{
-            param = {
+            reg = this.backendForm.value.region;
+        }
+        let param: any = null;
+        param = {
               "name": this.backendForm.value.name,
               "type": this.backendForm.value.type,
-              "region": this.backendForm.value.region,
+              "region": reg,
               "endpoint": this.backendForm.value.endpoint,
               "bucketName": this.backendForm.value.bucket,
               "security": this.backendForm.value.sk,
               "access": this.backendForm.value.ak};
-        }
+        
         let options = {
         timeout:18000
         };
