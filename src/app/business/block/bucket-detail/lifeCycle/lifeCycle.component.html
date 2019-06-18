@@ -22,7 +22,7 @@
             </ng-template>
         </p-column>
         <p-column field="Status" header="Status" [style]="{'width': '100px'}" ></p-column>
-        <p-column field="Prefix" header="Prefix" [style]="{'width': '100px'}"></p-column>
+        <p-column field="newPrefix" header="Prefix" [style]="{'width': '100px'}"></p-column>
         <p-column field="Rules" header="Rules">
             <ng-template let-col pTemplate="body" let-cycle="rowData" let-i="rowIndex">
                 <p *ngFor="let col of cycle[col.field]">{{col}}</p>
@@ -31,9 +31,9 @@
         <p-column header="{{i18n.keyID['sds_block_volume_operation']}}" [style]="{'width': '180px'}">
             <ng-template pTemplate="body" let-cycle="rowData" let-i="rowIndex">
                 <a (click)="createLifeCycle('update',cycle)" [innerHtml]="i18n.keyID['sds_lifeCycle_edit']"></a>
-                <a *ngIf="cycle.Status == 'disable'" (click)="enableLifeCycle(cycle)" [innerHtml]="i18n.keyID['sds_profile_enable']"></a>
-                <a *ngIf="cycle.Status == 'enable'" (click)="disableLifeCycle(cycle)" [innerHtml]="i18n.keyID['sds_block_volume_replication_disable']"></a>
-                <a [ngClass]="{'a-rep-disabled':cycle['disabled']}" (click)="bathDelete(cycle)" [innerHtml]="i18n.keyID['sds_block_volume_delete']"></a>
+                <a *ngIf="cycle.Status == 'Disabled'" (click)="enableLifeCycle(cycle)" [innerHtml]="i18n.keyID['sds_profile_enable']"></a>
+                <a *ngIf="cycle.Status == 'Enabled'" (click)="disableLifeCycle(cycle)" [innerHtml]="i18n.keyID['sds_block_volume_replication_disable']"></a>
+                <a [ngClass]="{'a-rep-disabled':cycle['Disabled']}" (click)="bathDelete(cycle)" [innerHtml]="i18n.keyID['sds_block_volume_delete']"></a>
             </ng-template>
         </p-column>
     </p-dataTable>
@@ -85,7 +85,7 @@
                         </div>
                     </div>
                     <div class="ui-grid-col-4" *ngIf="backendShow[i]" >
-                        <p-spinner formControlName="{{'days'+i}}" [min]="minDays[i]" [(ngModel)]="transDaysArr[i]" (onChange)="transDaysChange(i)"></p-spinner>
+                        <p-spinner formControlName="{{'days'+i}}" [min]="minDays[i]" [(ngModel)]="transDaysArr[i]" (onBlur)="transDaysChange(i)"></p-spinner>
                         <div class="ui-message-container" *ngIf="createLifeCycleForm.controls['days'+i] && !createLifeCycleForm.controls['days'+i].valid &&(createLifeCycleForm.controls['days'+i].dirty || createLifeCycleForm.controls['days'+i].touched)">
                             <div class="ui-message ui-message-error ui-corner-all">
                                 <i class="fa fa-exclamation-circle"></i>
@@ -96,8 +96,8 @@
                         </div>
                     </div>
                     <div class="ui-grid-col-3" *ngIf="backendShow[i]">
-                        <p-dropdown *ngIf="modifyBakend.length == 0 || modifyBakend[i] == ''" [style]="{'width':'134px'}" [options]="backends[i]" formControlName="{{'backendId'+i}}" placeholder="please select"></p-dropdown>
-                        <p-dropdown *ngIf="modifyBakend.length != 0 && modifyBakend[i] != ''" [style]="{'width':'134px'}" [options]="backends[i]" formControlName="{{'backendId'+i}}"></p-dropdown>
+                        <p-dropdown *ngIf="modifyBakend.length <= i || modifyBakend[i] ==''" [style]="{'width':'134px'}" [options]="backends[i]" formControlName="{{'backendId'+i}}" placeholder="please select"></p-dropdown>
+                        <p-dropdown *ngIf="modifyBakend.length > i && modifyBakend[i] !=''" [style]="{'width':'134px'}" [options]="backends[i]" formControlName="{{'backendId'+i}}"></p-dropdown>
                     </div>
                     <div class="ui-grid-col-1">
                         <div class="create-profile-img " (click)="deleteTransRules(i)">

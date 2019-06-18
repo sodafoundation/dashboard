@@ -83,6 +83,14 @@
                         </form-item>
                         <form-item label="{{label.Name}}" [required]="true">
                             <input type="text" pInputText formControlName="name"/>
+                            <div class="ui-message-container" *ngIf="checkSnapshotName">
+                                <div class="ui-message ui-message-error ui-corner-all">
+                                    <i class="fa fa-exclamation-circle"></i>
+                                    <span class="ui-message-error-text">
+                                        snapshot name shouldn't be starting with prefix "snapshot".
+                                    </span>
+                                </div>
+                            </div>
                         </form-item>
                         <form-item label="{{label.Description}}">
                             <textarea [rows]="3" [cols]="27" pInputTextarea formControlName="description" ></textarea>
@@ -101,6 +109,14 @@
                         </form-item>
                         <form-item label="{{label.Name}}" [required]="true">
                             <input type="text" pInputText formControlName="name" value="{{selectedSnapshotObj.name}}"/>
+                            <div class="ui-message-container" *ngIf="checkSnapshotName">
+                                <div class="ui-message ui-message-error ui-corner-all">
+                                    <i class="fa fa-exclamation-circle"></i>
+                                    <span class="ui-message-error-text">
+                                        snapshot name shouldn't be starting with prefix "snapshot".
+                                    </span>
+                                </div>
+                            </div>
                         </form-item>
                         <form-item label="{{label.Description}}" [required]="false">
                             <textarea [rows]="3" [cols]="27" pInputTextarea formControlName="description" value="{{selectedSnapshotObj.description}}"></textarea>

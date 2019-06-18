@@ -57,6 +57,7 @@ export class FileShareDetailComponent implements OnInit{
     aclfilter;
     descriptBlock = false;
     exportBlock = false;
+    checkSnapshotName = false;
     errorMessage = {
         "level": { required: "Access Level is required." },
         "user": { required: "Ip/User is required." },
@@ -158,12 +159,12 @@ export class FileShareDetailComponent implements OnInit{
             if(this.fileShare.exportLocations){
                 this.fileShare.exportLocations[0] = "(" + this.fileShare.exportLocations[0] + ")";
             }
-            if(this.fileShare.description.length > 20){
+            if(this.fileShare.description && this.fileShare.description.length > 20){
                 this.descriptBlock = true;
             }else{
                 this.descriptBlock = false;
             }
-            if(this.fileShare.exportLocations[0].length > 20){
+            if(this.fileShare.exportLocations && this.fileShare.exportLocations[0] && this.fileShare.exportLocations[0].length > 20){
                 this.exportBlock = true;
             }else{
                 this.exportBlock = false;
@@ -211,9 +212,13 @@ export class FileShareDetailComponent implements OnInit{
             str.forEach(item=>{
                 if(item.fileshareId == fileShareId){
                     item.createdAt = Utils.formatDate(item.createdAt);
+                    if(!item.description){
+                        item.description = "--";
+                    }
                     this.snapshots.push(item); 
                 }
             })
+            this.selectedSnapshots = [];
         })
     }
     getAcls(){
@@ -233,18 +238,38 @@ export class FileShareDetailComponent implements OnInit{
                     this.acls.push(acl);
                 }
             })
+            this.selectedAcls = [];
         })
     }
     showSnapshotPropertyDialog(dialog, selectedSnapshot?){
         if(dialog == 'create'){
             this.snapshotCreateShow = true;
+            this.createSnapshotFormGroup.reset();
+            this.getSnapshotNameCheck(this.createSnapshotFormGroup);
         }else if(dialog == 'modify'){
             this.snapshotModifyShow = true;
             this.modifySnapshotFormGroup.patchValue({name: selectedSnapshot.name});
             this.selectedSnapshotObj.name  = selectedSnapshot.name;
-            this.selectedSnapshotObj.description = selectedSnapshot.description;
+            this.selectedSnapshotObj.description = selectedSnapshot.description != "--"? selectedSnapshot.description : "";
             this.selectedSnapshotObj['id'] = selectedSnapshot.id;
+            this.getSnapshotNameCheck(this.modifySnapshotFormGroup);
         }
+    };
+    getSnapshotNameCheck(group){
+        this.checkSnapshotName = false; 
+        group.get("name").valueChanges.subscribe((value: string)=>{
+            let defaultLength = "snapshot".length;
+            if( value && value.length >= defaultLength){
+                let sub = value.substr(0,8);
+                if(sub == "snapshot"){
+                    this.checkSnapshotName = true;
+                }else{
+                    this.checkSnapshotName = false;
+                }
+            }else{
+                this.checkSnapshotName = false;
+            }
+        })
     }
     showAclPropertyDialog(dialog, acl?){
         if(dialog == 'create'){
@@ -324,7 +349,7 @@ export class FileShareDetailComponent implements OnInit{
     }
     createSnapshot(){
         // validate
-        if(!this.createSnapshotFormGroup.valid){
+        if(!this.createSnapshotFormGroup.valid || this.checkSnapshotName){
             for(let i in this.createSnapshotFormGroup.controls){
                 this.createSnapshotFormGroup.controls[i].markAsTouched();
             }
@@ -340,7 +365,7 @@ export class FileShareDetailComponent implements OnInit{
     }
     modifySnapshot(){
         // validate
-        if(!this.modifySnapshotFormGroup.valid){
+        if(!this.modifySnapshotFormGroup.valid || this.checkSnapshotName){
             for(let i in this.modifySnapshotFormGroup.controls){
                 this.modifySnapshotFormGroup.controls[i].markAsTouched();
             }

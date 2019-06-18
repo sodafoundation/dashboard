@@ -1,16 +1,23 @@
 <p-tabView styleClass="ui-tabview-large" (onChange)="tabChange($event)">
     <p-tabPanel header="Block"></p-tabPanel>
     <p-tabPanel header="Object"></p-tabPanel>
+    <p-tabPanel header="File"></p-tabPanel>
 </p-tabView>
 <div class="infras-content">
     <div class="table-toolbar">
         <div class="left">
             <div *ngIf="tabPrimary=='block'">
-            <p-tabView styleClass="ui-tabview-special" (onChange)="tabSecondChange($event)">
+            <p-tabView styleClass="ui-tabview-special" (onChange)="tabSecondChange($event, 'block')">
                 <p-tabPanel header="Storage({{countStorage}})"></p-tabPanel>
                 <p-tabPanel header="Region({{countRegion}})"></p-tabPanel>
                 <p-tabPanel header="Availability Zone({{countAZ}})"></p-tabPanel>
             </p-tabView>
+            </div>
+            <div *ngIf="tabPrimary=='file'">
+                <p-tabView styleClass="ui-tabview-special" (onChange)="tabSecondChange($event, 'file')">
+                    <p-tabPanel header="Storage({{countStorage}})"></p-tabPanel>
+                    <p-tabPanel header="Availability Zone({{countAZ}})"></p-tabPanel>
+                </p-tabView>
             </div>
         </div>
         <div class="right">
@@ -18,7 +25,7 @@
                 <input #searchByName type="text" pInputText placeholder="search">
                 <button pButton type="button" icon="fa-search"></button>
             </div>
-            <button class="" pButton type="button" icon="fa-refresh"></button>
+            <button class="" pButton type="button" (click)="listStorage()" icon="fa-refresh"></button>
         </div>
     </div>
 
@@ -27,7 +34,11 @@
             <p-column field="name" header="{{I18N.keyID['sds_block_volume_name']}}" [style]="{'width': '20%'}"></p-column>
             <p-column field="ip" [style]="{'width':'auto'}" header="IP Address"></p-column>
             <p-column field="status" header="{{I18N.keyID['sds_block_volume_status']}}"></p-column>
-            <p-column field="description" header="{{I18N.keyID['sds_block_volume_descri']}}"></p-column>
+            <p-column field="description" header="{{I18N.keyID['sds_block_volume_descri']}}">
+                <ng-template pTemplate="body" let-block="rowData" let-i="rowIndex">
+                    <span title="{{block.description}}">{{block.newDescript}}</span>
+                </ng-template> 
+            </p-column>
             <p-column field="region" header="{{I18N.keyID['sds_resource_region']}}"></p-column>
             <p-column field="az" header="{{I18N.keyID['sds_block_volume_az']}}"></p-column>
         </p-dataTable>
@@ -40,7 +51,7 @@
         </p-dataTable>
     </div>
 
-    <div *ngIf="tabPrimary=='block'&&tabSecond=='az'">
+    <div *ngIf="(tabPrimary=='block' || tabPrimary=='file')&&tabSecond=='az'">
         <p-dataTable [immutable]="false" [value]="zones" [paginator]="false" >
             <p-column field="name" header="{{I18N.keyID['sds_block_volume_name']}}" [style]="{'width': '20%'}"></p-column>
             <p-column field="region" header="{{I18N.keyID['sds_resource_region']}}"></p-column>
@@ -56,5 +67,20 @@
         <p-column field="endpoint" [style]="{'width':'auto'}" header="Endpoint"></p-column>
         <p-column field="region" header="{{I18N.keyID['sds_resource_region']}}"></p-column>
     </p-dataTable>
+    </div>
+
+    <div *ngIf="tabPrimary=='file'&&tabSecond=='storage'">
+        <p-dataTable [immutable]="false" [globalFilter]="searchByName" [value]="fileStorages" [rows]="10" [paginator]="true" [pageLinks]="3" [rowsPerPageOptions]="[10,20,50]">
+            <p-column field="name" header="{{I18N.keyID['sds_block_volume_name']}}" [style]="{'width': '20%'}"></p-column>
+            <p-column field="ip" [style]="{'width':'auto'}" header="IP Address"></p-column>
+            <p-column field="status" header="{{I18N.keyID['sds_block_volume_status']}}"></p-column>
+            <p-column field="description" header="{{I18N.keyID['sds_block_volume_descri']}}">
+                <ng-template pTemplate="body" let-file="rowData" let-i="rowIndex">
+                    <span title="{{file.description}}">{{file.newDescript}}</span>
+                </ng-template> 
+            </p-column>
+            <p-column field="region" header="{{I18N.keyID['sds_resource_region']}}"></p-column>
+            <p-column field="az" header="{{I18N.keyID['sds_block_volume_az']}}"></p-column>
+        </p-dataTable>
     </div>
 </div>

@@ -37,6 +37,7 @@ import { AvailabilityZonesService } from './resource.service';
 })
 export class ResourceComponent implements OnInit{
     blockStorages = [];
+    fileStorages = [];
     objectStorages = [];
     regions = [];
     zones = [];
@@ -63,6 +64,7 @@ export class ResourceComponent implements OnInit{
     
     listStorage(){
         this.blockStorages = [];
+        this.fileStorages = [];
         this.objectStorages = [];
         let reqUser: any = { params:{} };
         let user_id = this.paramStor.CURRENT_USER().split("|")[1];
@@ -87,13 +89,21 @@ export class ResourceComponent implements OnInit{
                             let zone = pool[0].availabilityZone;
                             let [name,ip,status,description,region,az,type] = [ele.name, ele.endpoint.split(":")[0], "Enabled", ele.description, "default_region", zone, ele.storageType];
                         
-                            if(!ele.storageType || ele.storageType == "" || ele.storageType == "block"){
-                                this.blockStorages.push({name,ip,status,description,region,az,type});
+                                let newDescript;
+                                if(description.length > 20){
+                                    newDescript = description.substr(0,20) + "...";
+                                }else{
+                                    newDescript = description;
+                                }
+                            if(pool[0].storageType == "block"){
+                                this.blockStorages.push({name,ip,status,description,newDescript,region,az,type});
+                            }else if(pool[0].storageType == "file"){
+                                this.fileStorages.push({name,ip,status,description,newDescript,region,az,type});
                             }
                         }
                         
                     });
-                    this.countStorage = this.blockStorages.length;
+                    this.countStorage = this.blockStorages.length != 0 ?this.blockStorages.length : (this.fileStorages.length != 0 ? this.fileStorages.length : 0 );
                 });
             })
         })
@@ -116,7 +126,8 @@ export class ResourceComponent implements OnInit{
     tabChange(e) {
         if(e.index == 0){
             this.tabPrimary = "block";
-        }else{
+            this.tabSecond = "storage";
+        }else if(e.index == 1){
             this.tabPrimary = "object";
             this.http.get('v1/{project_id}/backends').subscribe((res)=>{
                 this.objectStorages = res.json().backends ? res.json().backends :[];
@@ -126,16 +137,30 @@ export class ResourceComponent implements OnInit{
                     element['status'] = "Enable";
                 })
             })
+        }else{
+            this.tabPrimary = "file";
+            this.tabSecond = "storage";
+        }
+        if(e.index != 1){
+            this.listAZ();
         }
     }
 
-    tabSecondChange(e) {
-        if(e.index == 0){
-            this.tabSecond = "storage";
-        }else if(e.index == 1){
-            this.tabSecond = "region";
-        }else if(e.index == 2){
-            this.tabSecond = "az";
+    tabSecondChange(e, dialog) {
+        if(dialog == "block"){
+            if(e.index == 0){
+                this.tabSecond = "storage";
+            }else if(e.index == 1){
+                this.tabSecond = "region";
+            }else if(e.index == 2){
+                this.tabSecond = "az";
+            }
+        }else if(dialog == "file"){
+            if(e.index == 0){
+                this.tabSecond = "storage";
+            }else if(e.index == 1){
+                this.tabSecond = "az";
+            }
         }
     }
 }
