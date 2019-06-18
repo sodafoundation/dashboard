@@ -46,6 +46,7 @@ export class FileShareComponent implements OnInit{
     menuDeleDisableItems : MenuItem[];
     msgs: Message[];
     allFileShareNameForCheck = [];
+    checkSnapshotName = false;
 
     constructor(
         private ActivatedRoute: ActivatedRoute,
@@ -154,6 +155,20 @@ export class FileShareComponent implements OnInit{
         if(dialog == 'snapshot'){
             this.createSnapshotShow = true;
             this.createSnapshotForm.reset();
+            this.checkSnapshotName = false;
+            this.createSnapshotForm.get("name").valueChanges.subscribe((value: string)=>{
+                let defaultLength = "snapshot".length;
+                if( value && value.length >= defaultLength){
+                    let sub = value.substr(0,8);
+                    if(sub == "snapshot"){
+                        this.checkSnapshotName = true;
+                    }else{
+                        this.checkSnapshotName = false;
+                    }
+                }else{
+                    this.checkSnapshotName = false;
+                }
+            })
         }else if(dialog == 'acl'){
             this.aclCreateShow = true;
             this.createAclsFormGroup = this.fb.group({
@@ -234,7 +249,7 @@ export class FileShareComponent implements OnInit{
         })
     }
     createSnapshot(){
-        if(!this.createSnapshotForm.valid){
+        if(!this.createSnapshotForm.valid || this.checkSnapshotName){
             for(let i in this.createSnapshotForm.controls){
                 this.createSnapshotForm.controls[i].markAsTouched();
             }
