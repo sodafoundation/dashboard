@@ -18,7 +18,7 @@
                 <input #searchByName type="text" pInputText placeholder="search">
                 <button pButton type="button" icon="fa-search"></button>
             </div>
-            <button class="" pButton type="button" icon="fa-refresh"></button>
+            <button class="" pButton type="button" (click)="listStorage()" icon="fa-refresh"></button>
         </div>
     </div>
 
@@ -27,7 +27,11 @@
             <p-column field="name" header="{{I18N.keyID['sds_block_volume_name']}}" [style]="{'width': '20%'}"></p-column>
             <p-column field="ip" [style]="{'width':'auto'}" header="IP Address"></p-column>
             <p-column field="status" header="{{I18N.keyID['sds_block_volume_status']}}"></p-column>
-            <p-column field="description" header="{{I18N.keyID['sds_block_volume_descri']}}"></p-column>
+            <p-column field="description" header="{{I18N.keyID['sds_block_volume_descri']}}">
+                <ng-template pTemplate="body" let-block="rowData" let-i="rowIndex">
+                    <span title="{{block.description}}">{{block.newDescript}}</span>
+                </ng-template> 
+            </p-column>
             <p-column field="region" header="{{I18N.keyID['sds_resource_region']}}"></p-column>
             <p-column field="az" header="{{I18N.keyID['sds_block_volume_az']}}"></p-column>
         </p-dataTable>
