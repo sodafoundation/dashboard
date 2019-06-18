@@ -317,6 +317,7 @@ export class LifeCycleComponent implements OnInit {
                 this.showAddTransRule = false;
             }
         }
+        this.transDaysChange(transIndex);
         if(((dialog && event == "GLACIER") || (event.value && event.value.transName && event.value.transName != "GLACIER")) && transIndex < this.lifeCycleItems.length -1){
             this.deleteTransRules(transIndex+1);
         }
