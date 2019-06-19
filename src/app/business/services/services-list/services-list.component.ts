@@ -60,7 +60,7 @@ export class ServicesListComponent implements OnInit{
         // Get Instance count inside get service 
         this.instanceCount = [];
         this.wfservice.getInstances().subscribe(data => {
-            let tempCount = _.countBy(data, 'service_id');
+            let tempCount = _.countBy(data.json(), 'service_id');
             _.each(tempCount, function(key, value){
                 let counter = {
                     'serviceId' : value,
@@ -69,8 +69,8 @@ export class ServicesListComponent implements OnInit{
                 self.instanceCount.push(counter);
             })
             this.wfservice.getServices().subscribe(data=>{
-                if(data){
-                    this.services = data;
+                if(data.json()){
+                    this.services = data.json();
                     _.each(this.services, function(item){
                         item['action'] = item['workflows'][0].definition_source;
                         _.each(self.instanceCount, function(ele){

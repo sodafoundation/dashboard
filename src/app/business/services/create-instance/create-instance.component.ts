@@ -77,7 +77,7 @@ export class CreateInstanceComponent implements OnInit {
     getServicesList(serviceId){
       let self = this;
       this.wfservice.getServices().subscribe(data=>{
-          this.services = data;
+        this.services = data.json();
           _.each(this.services, function(item){
             item['action'] = item['workflows'][0].definition_source;
           })

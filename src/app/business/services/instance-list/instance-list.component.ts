@@ -45,7 +45,8 @@ export class InstanceListComponent implements OnInit {
 
   getServiceDetails(id){
       this.wfservice.getServiceById(id).subscribe(data =>{
-        this.serviceName = data.name;
+        let service = data.json();
+        this.serviceName = service.name;
       }, error => {
         console.log("Something went wrong.Could not fetch service details.", error);
       });
@@ -53,8 +54,9 @@ export class InstanceListComponent implements OnInit {
 
   getInstances(serviceId){
       this.wfservice.getInstancesById(serviceId).subscribe(data=>{
-        if(data)
-            this.instances = data;
+        let service = data.json();
+        if(service)
+            this.instances = service;
         else
             this.instances = [];
       }, err => {
@@ -64,6 +66,7 @@ export class InstanceListComponent implements OnInit {
   }
   getInstanceDetails(event){
       this.wfservice.getTasks(event.data.workflow_id).subscribe(data =>{
+        let instanceDetails = data.json();
       }, error=>{
         console.log("Something went wrong. Tasks could not be fetched.");
       });
@@ -90,6 +93,7 @@ export class InstanceListComponent implements OnInit {
 
   deleteInstance(instanceId){
     this.wfservice.deleteInstance(instanceId).subscribe(data=>{
+        let instance = data.json();
         this.msgs = [];
         this.msgs.push({severity: 'success', summary: 'Success', detail: 'Instance Deleted Successfully.'});
         this.refreshTable();
