@@ -26,6 +26,14 @@ export class SharedConfig{
             })
         })
 
+        let p4 = new Promise((resolve, reject) => {
+            //应用I18N配置
+            httpService.get("src/app/i18n/"+ I18NService.language + "/dynamicForm.json").subscribe((r) => {
+                Object.assign(I18NService.keyID, r.json());
+                resolve();
+            })
+        })
+
         let p2 = new Promise((resolve, reject) => {
             //异常I18N配置
             httpService.get("src/app/i18n/"+ I18NService.language + "/exception.json").subscribe((r) => {
@@ -43,7 +51,7 @@ export class SharedConfig{
                 resolve();
             })
         })
-        return Promise.all([p1, p2, p3]);
+        return Promise.all([p1, p2, p3, p4]);
     }
 
     static AutoDeploy(httpService) {
