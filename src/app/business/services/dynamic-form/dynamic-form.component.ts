@@ -93,7 +93,9 @@ export class DynamicFormComponent implements OnInit {
       const formGroup = {};
       _.each(this.objectProps, function(item){
         item['showThis'] = true;
-        item['label'] = self.i18n.keyID[item['key']];
+        item['label'] = self.i18n.keyID[item['key']] ? self.i18n.keyID[item['key']] : item['key'].replace(/_/g, '  ').replace(/(?: |\b)(\w)/g, function(key, p1) {
+          return key.toUpperCase();    
+    });
         if(item['key']=='timeout'){
           item['required'] = false;
         }
