@@ -580,7 +580,7 @@ export class LifeCycleComponent implements OnInit {
                     Transition: {
                         StorageClass: value['transId' + index].transName ? value['transId' + index].transName : value['transId' + index],
                         Days: value['days' + index],
-                        Backend: value['backendId' + index].backendName
+                        Backend: value['backendId' + index].backendName ? value['backendId' + index].backendName : value['backendId' + index]
                     }
                 }
                 trans = x2js.json2xml_str(trans);
@@ -599,6 +599,8 @@ export class LifeCycleComponent implements OnInit {
                             Backend: item.Backend
                         }
                     }
+                    trans = x2js.json2xml_str(trans);
+                    jsonObj = jsonObj + trans;
                 })
             } else {
                 trans = {
@@ -608,9 +610,9 @@ export class LifeCycleComponent implements OnInit {
                         Backend: newModifyTrans.Backend
                     }
                 }
+                trans = x2js.json2xml_str(trans);
+                jsonObj = jsonObj + trans;
             }
-            trans = x2js.json2xml_str(trans);
-            jsonObj = jsonObj + trans;
         }
         if ((dialog == "create" || dialog == "update") && this.expirChecked) {
             //In the create/modify state
@@ -749,6 +751,7 @@ export class LifeCycleComponent implements OnInit {
                 if (gapDays < 30) {
                     let defaultDays = this.transDaysArr[index];
                     this.transDaysArr[i] = defaultDays + 30;
+                    this.createLifeCycleForm.value['days'+i] = this.transDaysArr[i];
                     index++;
                 }
             }
