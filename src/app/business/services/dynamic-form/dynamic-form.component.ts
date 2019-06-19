@@ -1,6 +1,6 @@
 import { Router,ActivatedRoute, NavigationExtras } from '@angular/router';
 import { Component, OnInit, Input } from '@angular/core';
-import { Message} from '../../../components/common/api';
+import { Message, I18N} from '../../../components/common/api';
 import { I18NService, MsgBoxService, Utils, ParamStorService } from '../../../shared/api';
 import { Validators, FormControl, FormGroup, FormBuilder } from '@angular/forms';
 import { WorkflowService } from '../workflow.service';
@@ -93,9 +93,7 @@ export class DynamicFormComponent implements OnInit {
       const formGroup = {};
       _.each(this.objectProps, function(item){
         item['showThis'] = true;
-        item['label'] = item['key'].replace(/_/g, '  ').replace(/(?: |\b)(\w)/g, function(key, p1) {
-              return key.toUpperCase();    
-        });
+        item['label'] = self.i18n.keyID[item['key']];
         if(item['key']=='timeout'){
           item['required'] = false;
         }
