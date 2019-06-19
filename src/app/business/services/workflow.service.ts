@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpRequest, HttpEvent, HttpEventType, HttpResponse, HttpHeaders, HttpErrorResponse } from '@angular/common/http'
 import { Observable } from 'rxjs';
 import { finalize, tap, map, last } from 'rxjs/operators';
-import { I18NService, ParamStorService } from '../../shared/api';
+import { I18NService, HttpService, ParamStorService } from '../../shared/api';
 
 @Injectable()
 export class WorkflowService {
@@ -17,10 +17,11 @@ export class WorkflowService {
   project_id = this.paramStor.CURRENT_TENANT().split("|")[1];
   /* FIXME The endpoint  changes are to fix  Issue #106 in opensds/opensds-dashboard. 
   This is a temporary fix for the API not being reachable. The Orchestration API endpoint will be changed and this fix will be removed. */
-  url = "/orch/" + this.project_id + "/orchestration/";
+  url = "/orch/{project_id}/orchestration/";
   
 
-  constructor(private http: HttpClient,
+  constructor(
+    private http: HttpService,
     private paramStor: ParamStorService) { 
   }
 
@@ -61,7 +62,10 @@ export class WorkflowService {
 
   public createInstance(param) {
     let detailUrl = this.url + 'instances';
-    return this.http.post(detailUrl, param, this.options);
+    param['headers'] = {
+          'X-Auth-Token': localStorage['auth-token']
+      };
+    return this.http.post(detailUrl, param);
   }
 
 }
