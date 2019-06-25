@@ -182,10 +182,12 @@ export class DynamicFormComponent implements OnInit {
         this.profileService.getProfiles().subscribe((res) => {
           let profiles = res.json();
           profiles.forEach(profile => {
-            this.profileOptions.push({
-              label: profile.name,
-              value: profile.id
-            });
+            if(profile.storageType=='block'){
+              this.profileOptions.push({
+                label: profile.name,
+                value: profile.id
+              });
+            }
           });
         }, error =>{
           console.log("Something went wrong. Could not fetch profiles.", error);
