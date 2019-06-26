@@ -10,7 +10,7 @@
                 <form-item label="{{item.label}}" [required]="true">
                     <input pInputText size="80" 
                       [formControlName]="item.key"
-                      [id]="item.key" [type]="item.type" [value]="item.default ? item.default || item.value : ''">
+                      [id]="item.key" [type]="item.type" [value]="item.default ? item.default || item.value : ''" [title]="item.description ? item.description : ''" [placeholder]="item.description ? item.description : ''">
                   </form-item>
               </div>
             </div>
@@ -31,7 +31,7 @@
               <form-item *ngIf="prop.showThis && !prop.instanceInfo" label="{{prop.label}}" [required]="true">
                   <input pInputText size="80" 
                     [formControlName]="prop.key"
-                    [id]="prop.key" [type]="prop.type" [value]="prop.default ? prop.default || prop.value : ''">
+                    [id]="prop.key" [type]="prop.type" [value]="prop.default ? prop.default || prop.value : ''" [title]="prop.description ? prop.description : ''" [placeholder]="prop.description ? prop.description : ''">
                 </form-item>
             </div>
 
@@ -39,13 +39,13 @@
                 <form-item *ngIf="prop.showThis && !prop.instanceInfo" label="{{prop.label}}" [required]="true">
                     <input pInputText size="80" 
                       [formControlName]="prop.key"
-                      [id]="prop.key" [type]="prop.type" [value]="prop.default ? prop.default || prop.value : ''" min="1" step="1">
+                      [id]="prop.key" [type]="prop.type" [value]="prop.default ? prop.default || prop.value : ''" min="1" step="1" [title]="prop.description ? prop.description : ''" [placeholder]="prop.description ? prop.description : ''">
                   </form-item>
               </div>
             
             <div class="form-item-container" *ngSwitchCase="'radio'">
               <form-item label="{{prop.label}}" [required]="true">
-                  <span *ngFor="let option of prop.options">
+                  <span *ngFor="let option of prop.options" [title]="prop.description ? prop.description : ''">
                       <p-radioButton [label]="option.label" [formControlName]="prop.key" name="typeRadioGroup" [value]="option.value"></p-radioButton>
                   </span>
               </form-item>
@@ -53,7 +53,7 @@
 
             <div class="form-item-container" *ngSwitchCase="'select'">
                 <form-item label="{{prop.label}}" [required]="true">
-                    <p-dropdown [options]="prop.options" [formControlName]="prop.key" placeholder="Select"></p-dropdown>
+                    <p-dropdown [options]="prop.options" [required]="true" [formControlName]="prop.key" [placeholder]="prop.description ? prop.description : ''"></p-dropdown>
                 </form-item>      
             </div>
           </div>
