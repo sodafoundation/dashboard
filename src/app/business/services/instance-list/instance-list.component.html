@@ -44,11 +44,18 @@
             <button *ngIf="false" [disabled]="instance.status=='requested'" pButton type="button" label="Run" icon="fa fa-play" styleClass="ui-button-success"  (click)="startInstance(instance.id)"></button>
             <button *ngIf="false" [disabled]="instance.status!='requested'" pButton type="button" label="Re-Run" icon="fa fa-repeat" styleClass="ui-button-info"  (click)="restartInstance(instance.id)"></button>
             <button *ngIf="false" pButton type="button" label="Pause" icon="fa fa-pause" styleClass="ui-button-info"  (click)="pauseInstance(instance.id)"></button>
-            <button pButton type="button" label="Delete" icon="fa fa-exclamation-triangle" styleClass="ui-button-danger"  (click)="deleteInstance(instance.id)"></button>
+            <button pButton type="button" label="Delete" icon="fa fa-exclamation-triangle" styleClass="ui-button-danger"  (click)="showWarningDialogFun(instance)"></button>
           </ng-template>
       </p-column>
       
   </p-dataTable>
 </div>
+<p-dialog header="Warning" [(visible)]="showWarningDialog" [width]="500" modal="modal">
+    <p-footer>
+        <button type="button" pButton label="OK"></button>
+        <button type="button" pButton (click)="showWarningDialog=false" label="Cancel"></button>
+    </p-footer>
+</p-dialog>
+<p-confirmDialog></p-confirmDialog>
 
 
