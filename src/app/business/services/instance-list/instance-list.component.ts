@@ -102,12 +102,12 @@ export class InstanceListComponent implements OnInit {
     this.confirmDialog([msg,header,acceptLabel,warning,instance.id])
   }
 
-  confirmDialog([msg,header,acceptLabel,warming=true,func]){
+  confirmDialog([msg,header,acceptLabel,warning=true,func]){
       this.confirmationService.confirm({
           message: msg,
           header: header,
           acceptLabel: acceptLabel,
-          isWarning: warming,
+          isWarning: warning,
           accept: ()=>{
               try {
                   this.deleteInstance(func);
