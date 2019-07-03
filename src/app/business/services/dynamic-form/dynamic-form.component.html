@@ -63,10 +63,14 @@
             </div>
           </div>
         </div>
-
+        <div *ngIf="showAnalysis">
+            <create-cluster #createCluster [serviceId]="serviceId" [selectedService]="selectedService"></create-cluster>
+        </div>
+        
     </div>
     <div class="form-submit-button">
-        <button pButton type="submit" class="ui-button-secondary ui-button-large" label="OK" [disabled]="!form.valid"></button>
+        <button pButton type="submit" class="ui-button-secondary ui-button-large" label="OK" [disabled]="!form.valid" *ngIf="!showAnalysis"></button>
+        <button pButton type="submit" class="ui-button-secondary ui-button-large" label="OK" *ngIf="showAnalysis"></button>
         <button pButton type="button" class="ui-button-large" label="Cancel" [routerLink]="['/services']"></button>
     </div>
 </form>

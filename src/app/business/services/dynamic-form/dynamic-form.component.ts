@@ -1,11 +1,12 @@
 import { Router,ActivatedRoute, NavigationExtras } from '@angular/router';
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, ViewChild } from '@angular/core';
 import { Message, I18N} from '../../../components/common/api';
 import { I18NService, MsgBoxService, Utils, ParamStorService } from '../../../shared/api';
 import { Validators, FormControl, FormGroup, FormBuilder } from '@angular/forms';
 import { WorkflowService } from '../workflow.service';
 import { ProfileService } from '../../profile/profile.service';
 import { trigger, state, style, transition, animate } from '@angular/animations';
+import { CreateClusterComponent } from '../create-cluster/create-cluster.component'
 import * as _ from "underscore";
 
 @Component({
@@ -15,6 +16,7 @@ import * as _ from "underscore";
   styleUrls: ['./dynamic-form.component.css']
 })
 export class DynamicFormComponent implements OnInit {
+  @ViewChild('createCluster') createCluster: CreateClusterComponent;
   @Input() dataObject: any;
   @Input() serviceId: any;
   @Input() selectedService: any;
@@ -24,6 +26,7 @@ export class DynamicFormComponent implements OnInit {
   objectProps: any;
   displayFormObject: any[];
   form: FormGroup;
+  showAnalysis = false;
   requestBody : any = {
     "service_id": "",
     "user_id": "",
@@ -160,6 +163,11 @@ export class DynamicFormComponent implements OnInit {
         
       })
       this.form = new FormGroup(formGroup);
+      if(this.selectedService.group == 'bigdata-analysis'){
+        this.showAnalysis = true;
+      }else{
+        this.showAnalysis = false;
+      }
     }
       
 
@@ -207,8 +215,85 @@ export class DynamicFormComponent implements OnInit {
         this.requestBody.user_id = this.default_parameters['user_id'];
         this.requestBody.name = formObject.instanceName;
         this.requestBody.description = formObject.instanceDescription;
-        this.requestBody.parameters = _.omit(formObject, ['instanceName', 'instanceDescription']);
+        if(this.showAnalysis){
+          let analysisParam = this.checkAnalysisParameters(formObject);
+          this.requestBody.parameters = analysisParam;
+        }else{
+          this.requestBody.parameters = _.omit(formObject, ['instanceName', 'instanceDescription']);
+        }
         this.createInstance(this.requestBody);
+      }
+
+      checkAnalysisParameters(formObject){
+        if(!this.createCluster.clusterForm.valid){
+          for(let i in this.createCluster.clusterForm.controls){
+              this.createCluster.clusterForm.controls[i].markAsTouched();
+          }
+          return;
+        }
+        let requestParams = this.getRequestParam(this.createCluster.clusterForm.value,formObject);
+        return requestParams;
+      }
+      getRequestParam(value,formObject){
+        let configureValue = this.createCluster.setConfigureForm.value;
+        let actionOnFailure;
+        if(configureValue['action'] == "Cancel and wait"){
+          actionOnFailure = "CANCEL_AND_WAIT";
+        }else if(configureValue['action'] == "Terminate cluster"){
+          actionOnFailure = "TERMINATE_CLUSTER";
+        }else{
+          actionOnFailure = configureValue['action'].toUpperCase();
+        }
+        let params = {
+          ip_addr: location.hostname,
+          port: location.port,
+          name: formObject.instanceName,
+          tenant_id: this.paramStor.CURRENT_TENANT().split("|")[1],
+          analysis_engine_type: formObject.analysis_engine_type,
+          dest_backend_name: formObject.dest_backend_name,
+          src_bucket_name: formObject.src_bucket_name,
+          dest_bucket_name: formObject.dest_bucket_name,
+          analysis_args:{
+            Name: value.clusterName,
+            AK: value.ak,
+            SK: value.sk,
+            Region: value.region,
+            ReleaseLabel: value.releaseLabel,
+            Instances:{
+              MasterInstanceType: value.masterInstanceType,
+              InstanceCount: value.instanceCount,
+              KeepJobFlowAliveWhenNoSteps: false,
+              TerminationProtected: false
+            },
+            JobFlowRole: value.jobFlowRole,
+            ServiceRole: value.serviceRole,
+            VisibleToAllUsers: true,
+            Applications:[
+              {Name: value.application}
+            ],
+            Steps:[
+              {
+                Name: 'default boot',
+                ActionOnFailure: "TERMINATE_CLUSTER",
+                HadoopJarStep:{
+                  Args:["state-pusher-script"],
+                  Jar:"command-runner.jar"
+                }
+              },{
+                Name: configureValue['name'],
+                ActionOnFailure: actionOnFailure,
+                HadoopJarStep:{
+                  Args: configureValue.arguments.split(' '),
+                  Jar: configureValue.location
+                }
+              }
+            ]
+          }
+        }
+        if(this.createCluster.showSlaveType){
+          params.analysis_args.Instances['SlaveInstanceType'] = value.slaveInstanceType;
+        }
+        return params;
       }
 
       createInstance(param){
