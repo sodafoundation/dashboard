@@ -171,6 +171,7 @@ export class FileShareComponent implements OnInit{
             })
         }else if(dialog == 'acl'){
             this.aclCreateShow = true;
+            this.aclsItems = [0];
             this.createAclsFormGroup = this.fb.group({
                 "level":  ["", Validators.required],
                 "user":  ["ip", Validators.required],
@@ -266,7 +267,8 @@ export class FileShareComponent implements OnInit{
         },
         err=>{
           this.msgs = [];
-          this.msgs.push({severity: 'error', summary: 'Error', detail: err.message});
+          this.createSnapshotShow = false;
+          this.msgs.push({severity: 'error', summary: 'Error', detail: err.message ? err.message : err.json().message});
         })
     }
 
@@ -318,6 +320,11 @@ export class FileShareComponent implements OnInit{
         this.FileShareAclService.createFileShareAcl(param,this.selectedFileShare.id).subscribe((res)=>{
             this.getProfile();
             this.aclCreateShow = false;
+        },
+        err=>{
+          this.msgs = [];
+          this.aclCreateShow = false;
+          this.msgs.push({severity: 'error', summary: 'Error', detail: err.message ? err.message : err.json().message});
         })
     }
     getErrorMessage(control,extraParam){
