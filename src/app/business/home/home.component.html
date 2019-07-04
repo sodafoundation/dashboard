@@ -127,10 +127,10 @@
                 <input id="name" type="text" name="name" formControlName="name"  pInputText />
             </form-item>
             <form-item label="Type" [required]="true">
-                <p-dropdown [style]="{'min-width':'220px'}" placeholder="Please select" formControlName="type" [options]="allTypes"  ></p-dropdown>
-            </form-item>
-            <form-item label="Region" [required]="true">
-                <input id="region" type="text" name="region"  formControlName="region"  pInputText />
+                <p-dropdown (onChange)="onChange($event)" [style]="{'min-width':'220px'}" placeholder="Please select" formControlName="type" [options]="allTypes"  ></p-dropdown>
+            </form-item>  
+            <form-item id="hide_region" label="Region" [required]="true"  [class.disabled]="isLocalCloud">
+                <input id="region" type="text" name="region"  formControlName="region" [class.disabled]="isLocalCloud"  pInputText />
             </form-item>
             <form-item label="Endpoint" [required]="true">
                 <input id="endpoint" type="text" name="endpoint"  formControlName="endpoint"  pInputText />

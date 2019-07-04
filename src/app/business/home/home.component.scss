@@ -4,6 +4,10 @@
     margin: 2em;
 }
 
+.disabled{
+cursor: not-allowed;
+display:none;
+}
 .statisBg{
     background: #f3f6f7;
     border-radius: 12px;
