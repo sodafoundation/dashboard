@@ -171,7 +171,7 @@ export class CreateClusterComponent implements OnInit{
         "name": new FormControl('',Validators.required),
         "location": new FormControl('',Validators.required),
         "arguments": new FormControl(''),
-        "action": new FormControl()
+        "action": new FormControl('')
       })
       this.nodesCount = 2;
       this.releaseValue.forEach(item=>{
@@ -194,7 +194,8 @@ export class CreateClusterComponent implements OnInit{
       this.setConfigureForm.reset();
       this.setConfigureForm.patchValue({
         stepType: this.stepName,
-        name: this.stepName
+        name: this.stepName,
+        action: 'Continue'
       })
     }
     instanceCountChange(){
