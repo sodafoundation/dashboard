@@ -1,6 +1,6 @@
 <div id="create-cluster">
     <div class="create-instance-form">
-        <form [formGroup]="clusterForm" [grid]="{label: 'ui-g-2', content:'ui-g-20'}" (ngSubmit)="onSubmit(clusterForm.value)" [errorMessage]="errorMessage">
+        <form [formGroup]="clusterForm" [grid]="{label: 'ui-g-2', content:'ui-g-20'}" [errorMessage]="errorMessage">
             <div class="ui-grid ui-grid-responsive ui-grid-pad ui-fluid">
                 <h3>General Configuration</h3>
                 <div class="ui-grid-col-9 line"></div>
@@ -145,7 +145,7 @@
                 <p-dropdown [options]="actions" formControlName="action" [style]="{'min-width':'150px'}"></p-dropdown>
             </form-item>
             <div class="ui-grid-row" style="width:20%">
-                <button pButton class="ui-button-secondary" label="Add" (click)="onSubmitConfigure(setConfigureForm.value)"></button>             
+                <button pButton class="ui-button-secondary" label="Add" (click)="onSubmitConfigure()"></button>             
                 <button pButton label="{{I18N.keyID['cancel']}}" (click)="showConfigure = false"></button>
             </div>
         </form>
