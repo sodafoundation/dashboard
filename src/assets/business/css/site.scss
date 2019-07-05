@@ -261,8 +261,28 @@ body{
     margin: 0.1rem 0 0;
     padding: 0 0.3rem 0 0.4rem;
     height: 100%;
-    // overflow: scroll;
+    overflow-y: auto;
+    
 }
+/* width */
+::-webkit-scrollbar {
+    width:10px;
+  }
+  
+  /* Track */
+  ::-webkit-scrollbar-track {
+    background: #f1f1f1; 
+  }
+   
+  /* Handle */
+  ::-webkit-scrollbar-thumb {
+    background: #888; 
+  }
+  
+  /* Handle on hover */
+  ::-webkit-scrollbar-thumb:hover {
+    background: #555; 
+  }
 
 .topbar-menu>li:first-of-type {
     border-top: 1px solid #323d54;

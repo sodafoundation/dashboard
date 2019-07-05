@@ -8,7 +8,7 @@ import { TabViewModule, ButtonModule, SplitButtonModule,
   DataTableModule, OverlayPanelModule, InputTextModule,
   InputTextareaModule, CheckboxModule, FormModule,
   DropdownModule, RadioButtonModule,
-  SelectButtonModule, SpinnerModule} from '../../components/common/api';
+  SelectButtonModule, ConfirmationService, SpinnerModule} from '../../components/common/api';
 import {CardModule} from '../../components/card/card';
 import {GrowlModule} from '../../components/growl/growl';
 import {TooltipModule} from '../../components/tooltip/tooltip';
@@ -57,6 +57,6 @@ import { DynamicFormComponent } from './dynamic-form/dynamic-form.component';
     HttpClientModule,
     SpinnerModule],
   exports: [ServicesRoutingModule],
-  providers: [WorkflowService, ProfileService]
+  providers: [WorkflowService, ProfileService, ConfirmationService]
 })
 export class ServicesModule { }

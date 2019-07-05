@@ -45,6 +45,7 @@ export class HomeComponent implements OnInit {
     selectedBackend:any;
     cloud_type = [];
     allBackendNameForCheck=[];
+    isLocalCloud=true;
 
     @ViewChild("path") path: ElementRef;
     @ViewChild("cloud_aws") c_AWS: ElementRef;
@@ -83,22 +84,31 @@ export class HomeComponent implements OnInit {
         
         this.getCounts();
         this.getType();
-        
-        this.backendForm = this.fb.group({
+        if(this.isLocalCloud){this.backendForm = this.fb.group({
             "name":['', {validators:[Validators.required,Utils.isExisted(this.allBackendNameForCheck)]}],
             "type":['',{validators:[Validators.required]}],
-            "region":['',{validators:[Validators.required], updateOn:'change'}],
+            "region":['',{updateOn:'change'}],
             "endpoint":['',{validators:[Validators.required], updateOn:'change'}],
             "bucket":['',{validators:[Validators.required], updateOn:'change'}],
             "ak":['',{validators:[Validators.required], updateOn:'change'}],
             "sk":['',{validators:[Validators.required], updateOn:'change'}],
         });
+        }else{
+        this.backendForm = this.fb.group({
+            "name":['', {validators:[Validators.required,Utils.isExisted(this.allBackendNameForCheck)]}],
+            "type":['',{validators:[Validators.required]}],
+            "region":['',{validators:[Validators.required],updateOn:'change'}],
+            "endpoint":['',{validators:[Validators.required], updateOn:'change'}],
+            "bucket":['',{validators:[Validators.required], updateOn:'change'}],
+            "ak":['',{validators:[Validators.required], updateOn:'change'}],
+            "sk":['',{validators:[Validators.required], updateOn:'change'}],
+        });
+        }
         this.modifyBackendForm = this.fb.group({
             "ak":['',{validators:[Validators.required], updateOn:'change'}],
             "sk":['',{validators:[Validators.required], updateOn:'change'}],
         });
         
-
         this.lineOption = {
             title: {
                 display: false,
@@ -151,6 +161,15 @@ export class HomeComponent implements OnInit {
         this.initBucket2backendAnd2Type();
     }
 
+/* ---- to hide region textbox on selection of 'CEPH" type -----*/    
+    onChange(event) {
+        let strUser = event.value;
+        if(strUser == 'ceph-s3'){
+            this.isLocalCloud=true;
+        } else {
+ 	this.isLocalCloud=false; 
+        }
+    } 
     initBucket2backendAnd2Type(){
         window['getAkSkList'](()=>{
             let requestMethod = "GET";
@@ -346,15 +365,22 @@ export class HomeComponent implements OnInit {
             }
             return;
         }
-        let param = {
-            "name": this.backendForm.value.name,
-            "type": this.backendForm.value.type,
-            "region": this.backendForm.value.region,
-            "endpoint": this.backendForm.value.endpoint,
-            "bucketName": this.backendForm.value.bucket,
-            "security": this.backendForm.value.sk,
-            "access": this.backendForm.value.ak
-        };
+        let reg: any = null;
+        if (this.backendForm.value.type=='ceph-s3'){
+            reg = "-";
+        }else{
+            reg = this.backendForm.value.region;
+        }
+        let param: any = null;
+        param = {
+              "name": this.backendForm.value.name,
+              "type": this.backendForm.value.type,
+              "region": reg,
+              "endpoint": this.backendForm.value.endpoint,
+              "bucketName": this.backendForm.value.bucket,
+              "security": this.backendForm.value.sk,
+              "access": this.backendForm.value.ak};
+        
         let options = {
         timeout:18000
         };

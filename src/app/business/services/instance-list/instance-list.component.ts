@@ -3,6 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import {OverlayPanelModule, Message} from '../../../components/common/api';
 import { I18NService, MsgBoxService } from '../../../shared/api';
 import { WorkflowService } from '../workflow.service';
+import { ConfirmationService,ConfirmDialogModule} from '../../../components/common/api';
 import * as _ from "underscore";
 
 @Component({
@@ -14,16 +15,18 @@ import * as _ from "underscore";
 export class InstanceListComponent implements OnInit {
   
 
-    msgs: Message[] = [];
+  msgs: Message[] = [];
   instances: any[] ;
   first: number = 0;
   serviceId: any;
   serviceName: any;
   loading: boolean;
+  showWarningDialog = false;
   constructor( private router: Router,
     private ActivatedRoute:ActivatedRoute,
     public I18N: I18NService,
-    public wfservice: WorkflowService
+    public wfservice: WorkflowService,
+    private confirmationService:ConfirmationService,
     ) {
         let self = this;
         this.ActivatedRoute.queryParamMap.subscribe(params => {
@@ -89,6 +92,35 @@ export class InstanceListComponent implements OnInit {
 
   pauseInstance(instanceId){
     console.log("Pausing Instance:", instanceId);
+  }
+
+  showWarningDialogFun(instance) {
+    let msg = "<div>Are you sure you want to delete the Instance?</div><h3>[ "+ instance.name +" ]</h3>";
+    let header ="Delete Instance";
+    let acceptLabel = "Delete";
+    let warning = true;
+    this.confirmDialog([msg,header,acceptLabel,warning,instance.id])
+  }
+
+  confirmDialog([msg,header,acceptLabel,warning=true,func]){
+      this.confirmationService.confirm({
+          message: msg,
+          header: header,
+          acceptLabel: acceptLabel,
+          isWarning: warning,
+          accept: ()=>{
+              try {
+                  this.deleteInstance(func);
+              }
+              catch (e) {
+                  console.log(e);
+              }
+              finally {
+                  
+              }
+          },
+          reject:()=>{}
+      })
   }
 
   deleteInstance(instanceId){
