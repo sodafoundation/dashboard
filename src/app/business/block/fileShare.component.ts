@@ -1,7 +1,7 @@
 import { Router,ActivatedRoute } from '@angular/router';
 import { Component, OnInit, ViewContainerRef, ViewChild, Directive, ElementRef, HostBinding, HostListener, Input } from '@angular/core';
 import { I18NService, MsgBoxService, HttpService, Utils } from 'app/shared/api';
-import { ConfirmationService, ConfirmDialogModule, MenuItem} from '../../components/common/api';
+import { ConfirmationService, ConfirmDialogModule, MenuItem, Message} from '../../components/common/api';
 import { trigger, state, style, transition, animate} from '@angular/animations';
 import { I18nPluralPipe } from '@angular/common';
 import { FormGroup, Validators, FormBuilder, FormControl } from '@angular/forms';
@@ -24,10 +24,14 @@ export class FileShareComponent implements OnInit{
     errorMessage = {
         "level": { required: "Access Level is required." },
         "user": { required: "Ip/User is required." },
-        "name":  {required: "Name is required." },
+        "name":  {required: "Name is required.", isExisted: "Name is existing." },
         "userInput":{required: "Ip/User is required"},
         "accessCapability": { required: "Access Level is required." }
     }
+    Regexp = '(1\\d{2}|2[0-4]\\d|25[0-5]|[1-9]\\d|';
+    validRule= {
+        'name':'^' + this.Regexp + '[1-9])\\.' + this.Regexp + '\\d)\\.' + this.Regexp + '\\d)\\.' + this.Regexp + '\\d)(\\/([1-9]|[1-2]\\d|3[0-2]))?$' 
+    };
     selectedFileShare;
     modifyFileShareForm;
     fileShares = [];
@@ -40,6 +44,9 @@ export class FileShareComponent implements OnInit{
     availabilityip;
     menuItems: MenuItem[];
     menuDeleDisableItems : MenuItem[];
+    msgs: Message[];
+    allFileShareNameForCheck = [];
+    checkSnapshotName = false;
 
     constructor(
         private ActivatedRoute: ActivatedRoute,
@@ -60,9 +67,8 @@ export class FileShareComponent implements OnInit{
     }
     ngOnInit(){
         this.availabilityAclLevel =[
-            {label: "Read", value: "Read"},
-            {label: "Write", value: "Write"},
-            {label: "Execute", value: "Execute"}
+            {label: "Read Only", value: "Read Only"},
+            {label: "Read Write", value: "Read Write"}
         ];
         this.availabilityip =[
             {label: "ip", value: "ip"},
@@ -73,9 +79,10 @@ export class FileShareComponent implements OnInit{
                 "label": this.I18N.keyID['sds_block_volume_modify'],
                 command: () => {
                     this.modifyFileShareShow = true;
+                    this.getFileShares('modify',this.selectedFileShare.name);
                     this.modifyFileShareForm = this.fb.group({
-                        "name": [this.selectedFileShare.name],
-                        "descript": ["", Validators.maxLength(200)]
+                        "name": [this.selectedFileShare.name,{ validators: [Validators.required, Utils.isExisted(this.allFileShareNameForCheck)], updateOn: 'change' }],
+                        "description": [this.selectedFileShare.description, Validators.maxLength(200)]
                     })
                 },
                 disabled:false
@@ -93,9 +100,10 @@ export class FileShareComponent implements OnInit{
                 "label": this.I18N.keyID['sds_block_volume_modify'],
                 command: () => {
                     this.modifyFileShareShow = true;
+                    this.getFileShares('modify',this.selectedFileShare.name);
                     this.modifyFileShareForm = this.fb.group({
-                        "name": [this.selectedFileShare.name],
-                        "descript": ["", Validators.maxLength(200)]
+                        "name": [this.selectedFileShare.name,{ validators: [Validators.required, Utils.isExisted(this.allFileShareNameForCheck)], updateOn: 'change' }],
+                        "description": [this.selectedFileShare.description, Validators.maxLength(200)]
                     })
                 },
                 disabled:false
@@ -110,7 +118,7 @@ export class FileShareComponent implements OnInit{
         ];
         this.getProfile();
     }
-    getFileShares(){
+    getFileShares(dialog?,selectedFileName?){
         this.FileShareService.getFileShare().subscribe((res)=>{
             this.fileShares = res.json();
             this.fileShares.map(item=>{
@@ -119,7 +127,21 @@ export class FileShareComponent implements OnInit{
                 })[0];
                 item['profileName'] = _profile != undefined ? _profile.name : '--';
                 item.size = Utils.getDisplayGBCapacity(item.size);
+                if(item.name.length > 15){
+                    item['showName'] = item.name.substr(0,15) + "...";
+                }else{
+                    item['showName'] = item.name;
+                }
             })
+            if(dialog){
+                this.fileShares.forEach(item=>{
+                    if(item.name != this.selectedFileShare.name){
+                        this.allFileShareNameForCheck.push(item.name);
+                    }
+                })
+            }else{
+                this.selectedFileShares = [];
+            }
         })
     }
     getProfile(){
@@ -133,18 +155,39 @@ export class FileShareComponent implements OnInit{
         if(dialog == 'snapshot'){
             this.createSnapshotShow = true;
             this.createSnapshotForm.reset();
+            this.checkSnapshotName = false;
+            this.createSnapshotForm.get("name").valueChanges.subscribe((value: string)=>{
+                let defaultLength = "snapshot".length;
+                if( value && value.length >= defaultLength){
+                    let sub = value.substr(0,8);
+                    if(sub == "snapshot"){
+                        this.checkSnapshotName = true;
+                    }else{
+                        this.checkSnapshotName = false;
+                    }
+                }else{
+                    this.checkSnapshotName = false;
+                }
+            })
         }else if(dialog == 'acl'){
             this.aclCreateShow = true;
+            this.aclsItems = [0];
             this.createAclsFormGroup = this.fb.group({
                 "level":  ["", Validators.required],
                 "user":  ["ip", Validators.required],
-                "userInput0": ["", Validators.required],
+                "userInput0": ["", {validators: [Validators.required,Validators.pattern(this.validRule.name)]}],
                 "description": [""]
             })
         }
         this.selectedFileShare = selectedFileShare;
     }
     modifyFileShare(value){
+        if (!this.modifyFileShareForm.valid) {
+            for (let i in this.modifyFileShareForm.controls) {
+                this.modifyFileShareForm.controls[i].markAsTouched();
+            }
+            return;
+        };
         let dataArr = value;
         this.FileShareService.updateFileShare(this.selectedFileShare.id,dataArr).subscribe((res)=>{
             this.getFileShares();
@@ -172,19 +215,42 @@ export class FileShareComponent implements OnInit{
                     arr.forEach((item,index)=> {
                         this.deleteFileShare(item)
                     })
-
                 },
                 reject:()=>{}
             })
         }
     }
     deleteFileShare(fileShare){
-        this.FileShareService.deleteFileShare(fileShare).subscribe(res=>{
-            this.getFileShares();
+        this.SnapshotService.getSnapshot().subscribe(res=>{
+            let snapShot = res.json();
+            snapShot = snapShot.filter(item=>{
+                return item.fileshareId == fileShare;
+            })
+            if(snapShot.length != 0){
+                let overHeadMsg = "<div>Fileshare contains snapshot. To remove fileshare, please remove snapshot first</div>";
+                this.msgs = [];
+                this.msgs.push({severity: 'error', summary: 'Error', detail: overHeadMsg});
+            }else{
+                this.FileShareAclService.getFileShareAcl().subscribe(res=>{
+                    let acls = res.json();
+                    acls = acls.filter(item=>{
+                        return item.fileshareId == fileShare;
+                    })
+                    if(acls.length != 0){
+                        let  overHeadMsg = "<div>Fileshare contains access. To remove fileshare, please remove access first</div>";
+                        this.msgs = [];
+                        this.msgs.push({severity: 'error', summary: 'Error', detail: overHeadMsg});
+                    }else{
+                        this.FileShareService.deleteFileShare(fileShare).subscribe(res=>{
+                            this.getFileShares();
+                        })
+                    }
+                })
+            }
         })
     }
     createSnapshot(){
-        if(!this.createSnapshotForm.valid){
+        if(!this.createSnapshotForm.valid || this.checkSnapshotName){
             for(let i in this.createSnapshotForm.controls){
                 this.createSnapshotForm.controls[i].markAsTouched();
             }
@@ -198,6 +264,11 @@ export class FileShareComponent implements OnInit{
             this.createSnapshotShow = false;
             this.getProfile();
             this.showCreateSnapshot = false;
+        },
+        err=>{
+          this.msgs = [];
+          this.createSnapshotShow = false;
+          this.msgs.push({severity: 'error', summary: 'Error', detail: err.message ? err.message : err.json().message});
         })
     }
 
@@ -207,14 +278,12 @@ export class FileShareComponent implements OnInit{
           );
           this.aclsItems.forEach(index => {
             if(index !== 0){
-            //   this.createAclsFormGroup.addControl('user'+index, this.fb.control("", Validators.required));
               this.createAclsFormGroup.addControl('userInput'+index, this.fb.control("", Validators.required));
             }
         });
     }
     deleteAclUsers(index){
         this.aclsItems.splice(index, 1);
-        // this.createAclsFormGroup.removeControl('user'+index);
         this.createAclsFormGroup.removeControl('userInput'+index);
     }
     createAclsSubmit(value){
@@ -233,7 +302,13 @@ export class FileShareComponent implements OnInit{
         let dataArr = [];
         this.aclsItems.forEach(index=>{
             dataArr.push({
-                accessCapability: value['level'],
+                accessCapability: (()=>{
+                    if(value['level'] == "Read Only"){
+                        return ['Read'];
+                    }else if(value['level'] == "Read Write"){
+                        return ['Read','Write'];
+                    }
+                })(),
                 type: value['user'],
                 accessTo: value['userInput'+index]
             })
@@ -245,6 +320,20 @@ export class FileShareComponent implements OnInit{
         this.FileShareAclService.createFileShareAcl(param,this.selectedFileShare.id).subscribe((res)=>{
             this.getProfile();
             this.aclCreateShow = false;
+        },
+        err=>{
+          this.msgs = [];
+          this.aclCreateShow = false;
+          this.msgs.push({severity: 'error', summary: 'Error', detail: err.message ? err.message : err.json().message});
         })
+    }
+    getErrorMessage(control,extraParam){
+        let page = "", key;
+        if(control.errors.pattern){
+            key  = Utils.getErrorKey(control,extraParam);
+        }else{
+            key = Utils.getErrorKey(control,page);
+        }
+        return extraParam ? this.I18N.keyID[key].replace("{0}",extraParam):this.I18N.keyID[key];
     }
 }

@@ -2,8 +2,10 @@
     "sds_required":"{0} is required.",
     "sds_pattern":"Beginning with a letter with a length of 1-128, it can contain letters / numbers / underlines.",
     "sds_profileNull":"profile is required",
-    "sds_block_volumes_descrip":"View and manage resources that have been manually created or applied for through service templates.",
-    "sds_block_volumesGroup_descrip":"View and manage resources that have been manually created or applied for through service templates.",
+    "sds_block_buckets_descrip":"View and manage Buckets that have been manually created or applied for through service templates.",
+    "sds_block_volumes_descrip":"View and manage Volumes that have been manually created or applied for through service templates.",
+    "sds_block_volumesGroup_descrip":"View and manage Volume Groups that have been manually created or applied for through service templates.",
+    "sds_block_fileShare_descrip":"View and manage File Shares that have been manually created or applied for through service templates.",
     "sds_home_tenants":"Tenants",
     "sds_home_users":"Users",
     "sds_home_volumes":"Volumes",
@@ -115,7 +117,7 @@
     "sds_login_error_msg_default":"Internal Server Error!",
     "sds_isExisted": "Name is existing.",
     "sds_lifeCycleDays": "Days after Creation",
-    "sds_lifeCycleTrans": "Transistion to",
+    "sds_lifeCycleTrans": "Transition to",
     "sds_lifeCycle_expiration_delete": "Days after creation delete object",
     "sds_lifeCycle_expiration_cleanUp": "Clean up unfinished staging uploads",
     "sds_lifeCycle_edit": "Edit",
@@ -126,7 +128,7 @@
     "sds_fileShare_shareSize": "shareSize",
     "sds_fileShare_title": "File Share",
     "sds_fileShare_access": "Access",
-    "sds_fileShare_acl_user": "Add Ip/User",
+    "sds_fileShare_acl_user": "Add Ip",
     "sds_fileShare_acl_level": "Access Level",
     "sds_fileShare_delete_acl": "Delete Access",
     "sds_fileShare_addRule": "Add Rule",
@@ -138,5 +140,8 @@
     "sds_storageClassNull": "storageClass is required",
     "sds_lifeCycle_enable": "Enable lifecycle rules",
     "sds_lifeCycle_disable": "Disable the lifecycle rule",
-    "sds_lifeCycle_restore": "Restore"
+    "sds_lifeCycle_restore": "Restore"，
+    "sds_fileShare_export": "Export Location",
+    "sds_fileShare_update": "Updated At",
+    "sds_ippattern": "IP address must be (1~255). (0~255). (0~255). (0~255)/(1-32)"
 }

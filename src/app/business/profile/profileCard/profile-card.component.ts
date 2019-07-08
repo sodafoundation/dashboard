@@ -1,13 +1,13 @@
 import { Router } from '@angular/router';
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
-import { I18NService, MsgBoxService, Utils } from 'app/shared/api';
+import { I18NService, MsgBoxService, Utils ,ParamStorService } from 'app/shared/api';
 import { AppService } from 'app/app.service';
 import { trigger, state, style, transition, animate } from '@angular/animations';
 import { I18nPluralPipe } from '@angular/common';
 import { HttpService } from './../../../shared/api';
 import { FormControl, FormGroup, FormBuilder, Validators, ValidatorFn, AbstractControl } from '@angular/forms';
 
-import { ButtonModule } from './../../../components/common/api';
+import { ButtonModule ,ConfirmationService} from './../../../components/common/api';
 import { ProfileService } from './../profile.service';
 
 // import {CardModule} from 'primeng/card';
@@ -54,6 +54,8 @@ export class ProfileCardComponent implements OnInit {
     showModifyProfile = false;
     modifyProfileForm: FormGroup;
     allProfileNameForCheck = [];
+    dropMenuItems = [];
+    isAdministrator = true;
     @Input() 
     set cardData(data: any) {
         this.data = data;
@@ -96,7 +98,9 @@ export class ProfileCardComponent implements OnInit {
         private router: Router,
         private http: HttpService,
         private fb: FormBuilder,
-        private ProfileService: ProfileService
+        private ProfileService: ProfileService,
+        private paramStor: ParamStorService,
+        private confirmationService:ConfirmationService
     ) { }
     option = {};
     pools = [];
@@ -124,6 +128,24 @@ export class ProfileCardComponent implements OnInit {
                 fontSize: 12
             }
         };
+        this.dropMenuItems = [
+            {
+                label: "Modify",
+                command: ()=>{
+                    this.modifyPorfile(this.data);
+                }
+            },
+            {
+                label: "Delete",
+                command: () => { this.showWarningDialogFun(this.data) }
+            }
+        ];
+        let username = this.paramStor.CURRENT_USER().split("|")[0];
+        if(username == "admin"){
+            this.isAdministrator = true;
+        }else{
+            this.isAdministrator = false;
+        }
     }
 
     index;
@@ -198,10 +220,14 @@ export class ProfileCardComponent implements OnInit {
     modifyPorfile(policyId){
         let id = policyId.id;
         this.showModifyProfile = true;
+        let modifyNameForCheck = lodash.cloneDeep(this.allProfileNameForCheck);
+        modifyNameForCheck = modifyNameForCheck.filter(item=>{
+            return item != policyId.name;
+        })
         this.modifyProfileForm = this.fb.group({
             "id": [id],
-            "name": [policyId.name,{validators:[Validators.required,Utils.isExisted(this.allProfileNameForCheck)]}],
-            "descript":  [policyId.descript, Validators.maxLength(200)]
+            "name": [policyId.name,{validators:[Validators.required,Utils.isExisted(modifyNameForCheck)]}],
+            "descript":  [policyId.description, Validators.maxLength(200)]
         })
         
     }
@@ -219,9 +245,40 @@ export class ProfileCardComponent implements OnInit {
             description: value.descript
         }
         this.http.put(url,param).subscribe((res)=>{
-             this.getProfiles();
             this.checkParam.emit(false);
             this.showModifyProfile = false;
+        })
+    }
+    showWarningDialogFun(profile) {
+        let msg = "<div>Are you sure you want to delete the Profile?</div><h3>[ "+ profile.name +" ]</h3>";
+        let header ="Delete Profile";
+        let acceptLabel = "Delete";
+        let warming = true;
+        this.confirmDialog([msg,header,acceptLabel,warming,profile.id])
+    }
+    deleteProfile(id) {
+        this.ProfileService.deleteProfile(id).subscribe((res) => {
+            this.checkParam.emit(false);
+        });
+    }
+    confirmDialog([msg,header,acceptLabel,warming=true,func]){
+        this.confirmationService.confirm({
+            message: msg,
+            header: header,
+            acceptLabel: acceptLabel,
+            isWarning: warming,
+            accept: ()=>{
+                try {
+                    this.deleteProfile(func);
+                }
+                catch (e) {
+                    console.log(e);
+                }
+                finally {
+                    
+                }
+            },
+            reject:()=>{}
         })
     }
 }

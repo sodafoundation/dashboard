@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# Copyright (c) 2018 Huawei Technologies Co., Ltd. All Rights Reserved.
+# Copyright 2018 The OpenSDS Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,10 +15,12 @@
 # limitations under the License.
 
 OPENSDS_HOTPOT_URL=${OPENSDS_HOTPOT_URL:-http://127.0.0.1:50040}
+OPENSDS_ORCHESTRATION_URL=${OPENSDS_ORCHESTRATION_URL:-http://127.0.0.1:5000}
 OPENSDS_GELATO_URL=${OPENSDS_GELATO_URL:-http://127.0.0.1:8089}
 OPENSDS_AUTH_URL=${OPENSDS_AUTH_URL:-http://127.0.0.1/identity}
 
 OPENSDS_HOTPOT_API_VERSION=${OPENSDS_HOTPOT_API_VERSION:-v1beta}
+OPENSDS_ORCHESTRATION_API_VERSION=${OPENSDS_ORCHESTRATION_API_VERSION:-orch}
 OPENSDS_GELATO_API_VERSION=${OPENSDS_GELATO_API_VERSION:-v1}
 OPENSDS_AUTH_API_VERSION=${OPENSDS_AUTH_API_VERSION:-v3}
 
@@ -36,6 +38,10 @@ cat > /etc/nginx/conf.d/default.conf <<EOF
 
         location /${OPENSDS_HOTPOT_API_VERSION}/ {
             proxy_pass ${OPENSDS_HOTPOT_URL}/${OPENSDS_HOTPOT_API_VERSION}/;
+        }
+
+        location /${OPENSDS_ORCHESTRATION_API_VERSION}/ {
+            proxy_pass ${OPENSDS_ORCHESTRATION_URL}/${OPENSDS_HOTPOT_API_VERSION}/;
         }
 
         location /${OPENSDS_GELATO_API_VERSION}/ {

@@ -36,17 +36,14 @@
                     </div>
                     <app-suspension-frame [policy]="[policy,data]" [ngStyle]="{'display':i === index && isHover ? 'block' : 'none'}"></app-suspension-frame>
                 </div>
-                <div class="fa fa-check icon-color-class margin-right-class">
-                    <a (click)="modifyPorfile(policyId)">Modify</a>
-                </div>
-            </div>
-            <div *ngIf="policys.length == 0" class="fa fa-check icon-color-class margin-right-class">
-                    <a (click)="modifyPorfile(policyId)">Modify</a>
             </div>
         </div>
     </div>
-    <div class="ui-g-12 ui-md-5">
+    <div class="ui-g-12 ui-md-4">
         <p-chart [options]="option" type="doughnut" [data]="chartDatas"></p-chart>
+    </div>
+    <div class="ui-g-12 ui-md-1" *ngIf="isAdministrator">
+        <p-dropmenu icon="fa-ellipsis-v" [model]="dropMenuItems" styleClass="ui-dropmenu-large"></p-dropmenu>
     </div>
     <div class="ui-helper-clearfix"></div>
 

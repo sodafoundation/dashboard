@@ -98,10 +98,12 @@ export class ReplicationGroupComponent implements OnInit {
     this.ProfileService.getProfiles().subscribe((res) => {
       let profiles = res.json();
       profiles.forEach(profile => {
-        this.profileOptions.push({
-          label: profile.name,
-          value: profile.id
-        });
+        if(profile.storageType =="block"){
+          this.profileOptions.push({
+            label: profile.name,
+            value: profile.id
+          });
+        }
       });
     });
   }

@@ -22,9 +22,9 @@ export class LifeCycleComponent implements OnInit {
     showCreateLifeCycle = false;
     showModifyLifeCycle = false;
     createLifeCycleForm;
-    transForm;
     errorMessage = {
-        "name": { required: "name is required.", isExisted: "Name is existing" },
+        "name": { required: this.i18n.keyID['sds_profile_create_name_require'], 
+                  isExisted: this.i18n.keyID['sds_isExisted'] },
         "prefix": { isExisted: "prefix is existing" }
     };
     validRule = {
@@ -101,7 +101,7 @@ export class LifeCycleComponent implements OnInit {
             "expirDays": new FormControl(1),
             "cleanDays": new FormControl(7),
             "expirCleanUp": new FormControl([]),
-            "days0": new FormControl(30),
+            "days0": new FormControl(30,{ validators: [Validators.required], updateOn: 'change' }),
             "transId0": new FormControl(""),
             "backendId0": new FormControl(this.defaultBackend)
         });
@@ -136,26 +136,26 @@ export class LifeCycleComponent implements OnInit {
     getLifeCycleRule(item) {
         let newTrans = [];
         let string;
-        if (item.Status == "enable") {
-            let trans = item.Transition;
+        let trans = item.Transition;
+        let cleanUp = item.AbortIncompleteMultipartUpload.DaysAfterInitiation;
+        if (trans || item.Expiration || cleanUp) {
             if (trans) {
                 if (_.isArray(item.Transition)) {
                     trans.forEach((arr) => {
-                        string = "Transition to" + arr.StorageClass + ":" + "days" + arr.Days + (arr.Backend != "" ? ",Backend:" + arr.Backend : "");
+                        string = "Transition to " + arr.StorageClass + " after: " + arr.Days + " days" + (arr.Backend != "" ? ", Backend:" + arr.Backend : "");
                         newTrans.push(string);
                     })
                 } else {
-                    string = "Transition to" + trans.StorageClass + ":" + "days" + trans.Days + (trans.Backend != "" ? ",Backend:" + trans.Backend : "");
+                    string = "Transition to " + trans.StorageClass + " after: " + trans.Days + " days" + (trans.Backend != "" ? ", Backend:" + trans.Backend : "");
                     newTrans.push(string);
                 }
             }
             if (item.Expiration) {
-                string = "Expired deletion:" + item.Expiration.Days;
+                string = "Delete after: " + item.Expiration.Days + " days";
                 newTrans.push(string);
             }
-            let cleanUp = item.AbortIncompleteMultipartUpload.DaysAfterInitiation;
             if (cleanUp && cleanUp != 0) {
-                string = "Clean up incomplete multipart uploads after " + cleanUp + "days";
+                string = "Clean up incomplete multipart uploads after: " + cleanUp + " days";
                 newTrans.push(string);
             }
         } else {
@@ -167,12 +167,12 @@ export class LifeCycleComponent implements OnInit {
     getLifeCyclePrefix(item, dialog, cycle) {
         let prefix = item.Filter.Prefix;
         //In the modified State, filter out the prefix of the selected lifeCycle 
-        if (prefix != "" && (dialog != "update" || (cycle && cycle.Prefix != prefix))) {
+        if (prefix != "" && (dialog != "update" || (cycle && cycle.newPrefix != prefix))) {
             this.allLifeCycleCheckPrefix.push(prefix);
-            return prefix;
         } else if (prefix == "") {
-            return "--";
+            prefix =  "--";
         }
+        return prefix;
     }
     //query lifeCycle list
     getLifeCycleList(dialog?, cycle?) {
@@ -202,7 +202,7 @@ export class LifeCycleComponent implements OnInit {
                                 let lifeCycleAll = {
                                     ObjectKey: item.ID,
                                     Status: item.Status,
-                                    Prefix: this.getLifeCyclePrefix(item, dialog, cycle),
+                                    newPrefix: this.getLifeCyclePrefix(item, dialog, cycle),
                                     Rules: this.getLifeCycleRule(item)
                                 }
                                 arr.push(lifeCycleAll);
@@ -217,13 +217,20 @@ export class LifeCycleComponent implements OnInit {
                             let lifeCycleAll = {
                                 ObjectKey: lifeCycleArr.ID,
                                 Status: lifeCycleArr.Status,
-                                Prefix: this.getLifeCyclePrefix(lifeCycleArr, dialog, cycle),
+                                newPrefix: this.getLifeCyclePrefix(lifeCycleArr, dialog, cycle),
                                 Rules: this.getLifeCycleRule(lifeCycleArr)
                             }
                             arr.push(lifeCycleAll);
                             this.lifeCycleAlls = arr;
                         }
                     }
+                    this.lifeCycleAlls.forEach(item=>{
+                        if(item.ObjectKey.length > 15){
+                            item['name'] = item.ObjectKey.substr(0,15) + "...";
+                        }else{
+                            item['name'] = item.ObjectKey
+                        }
+                    })
                     this.submitObj = jsonObj;
                     //the state of the modification
                     if (dialog && dialog == "update") {
@@ -233,7 +240,7 @@ export class LifeCycleComponent implements OnInit {
             })
         })
     }
-    // Transistion Rules checkbox click
+    // Transition Rules checkbox click
     transClick() {
         if(this.modifyBakend.length > 0){
             this.modifyBakend = [];
@@ -267,11 +274,11 @@ export class LifeCycleComponent implements OnInit {
     }
 
     //storageClass change
-    typeChange(event, transIndex) {
+    typeChange(event, transIndex, dialog?) {
         this.backendShow[transIndex] = true;
         if (transIndex == 0) {
             let minDays;
-            if (event.value.transName != "GLACIER") {
+            if (event != "GLACIER" || (event.value && event.value.transName && event.value.transName != "GLACIER")) {
                 this.createLifeCycleForm.patchValue({ days0: 30 });
                 minDays = 30;
                 this.showAddTransRule = true;
@@ -304,13 +311,15 @@ export class LifeCycleComponent implements OnInit {
                 this.minDays.push(defaultDays + 30);
             }
             this.transDaysArr[transIndex] = defaultDays + 30;
-            if (event.value.transName == "GLACIER") {
+            if ((dialog && event == "GLACIER") || (event.value && event.value.transName && event.value.transName != "GLACIER")) {
+                this.showAddTransRule = true;
+            }else{
                 this.showAddTransRule = false;
             }
         }
-        if(event.value.transName == "GLACIER" && transIndex < this.lifeCycleItems.length -1){
+        this.transDaysChange(transIndex);
+        if(((dialog && event == "GLACIER") || (event.value && event.value.transName && event.value.transName != "GLACIER")) && transIndex < this.lifeCycleItems.length -1){
             this.deleteTransRules(transIndex+1);
-            this.showAddTransRule = false;
         }
         this.getBackets(event, transIndex);
     }
@@ -338,7 +347,7 @@ export class LifeCycleComponent implements OnInit {
                                 newBackend = item.LocationConstraint
                             }
                         });
-                        let selectedTrans = event.value.transName;
+                        let selectedTrans = event.value ? event.value.transName : event;
                         let tierId = event.value.id;
                         this.getBackends(selectedTrans, tierId, newBackend, transIndex);
                     });
@@ -364,16 +373,39 @@ export class LifeCycleComponent implements OnInit {
                     //the state of the modification
                     if (cycle && cycle.ObjectKey) {
                         selectedTrans = this.createLifeCycleForm.value['transId' + (transIndex)];
-                        if (selectedTrans == "STANDARD_IA") {
+                        if(this.lifeCycleItems.length >1){
+                            if (selectedTrans == "STANDARD_IA") {
+                                array = array.filter((item, index) => {
+                                    return item.Name != "STANDARD";
+                                })
+                            } else if (selectedTrans == "GLACIER") {
+                                array = array.filter((item, index) => {
+                                    return item.Name == "GLACIER";
+                                })
+                            }
+                        }else if(this.lifeCycleItems.length == 1){
+                            array.forEach((item, index)=>{
+                                let firstItem = array[0];
+                                if(item.Name == selectedTrans){
+                                    array[0] = item;
+                                    array[index] = firstItem;
+                                }
+                            })
+                        }
+                    //Add Rules under modified state
+                    } else if (this.showModifyLifeCycle){
+                        let trans = this.createLifeCycleForm.value['transId' + (transIndex -1)];
+                        selectedTrans = trans?(trans.transName ? trans.transName : trans) : "--";
+                        if(selectedTrans == "STANDARD"){
                             array = array.filter((item, index) => {
                                 return item.Name != "STANDARD";
                             })
-                        } else if (selectedTrans == "GLACIER") {
+                        }else if(selectedTrans == "STANDARD_IA"){
                             array = array.filter((item, index) => {
                                 return item.Name == "GLACIER";
                             })
                         }
-                    } else if (transIndex && transIndex > 0) {
+                    }else if(transIndex && transIndex > 0) {
                         selectedTrans = this.createLifeCycleForm.value['transId' + (transIndex - 1)].transName;
                         if (selectedTrans == "STANDARD") {
                             array = array.filter((item, index) => {
@@ -402,6 +434,10 @@ export class LifeCycleComponent implements OnInit {
                         }
                         transItem.push(transObj)
                     })
+                    if(this.showModifyLifeCycle && !cycle && transIndex > 0){
+                        this.createLifeCycleForm.patchValue({['transId' + transIndex]: transItem[0].value.transName});
+                        this.typeChange(transItem[0],transIndex, 'update');
+                    }
                     this.transOptions.push(transItem);
                 })
             })
@@ -433,6 +469,24 @@ export class LifeCycleComponent implements OnInit {
                 }
                 backendArr.push(backends);
             })
+            backendArr.push({
+                label: "Not set",
+                value: {id: null, backendName: null}
+            })
+            if(this.modifyBakend.length > transIndex && this.modifyBakend[transIndex] != ""){
+                this.modifyBakend.forEach((item,index)=>{
+                    if(index == transIndex){
+                        backendArr.forEach((it,index)=>{
+                            let firstItem = backendArr[0];
+                            if(item == it.label){
+                                backendArr[0]= it;
+                                backendArr[index] = firstItem;
+                            }
+                        })
+                    }
+                    
+                });
+            }
             //change the value of backends when modifying the selected storageClass
             if (this.backends[transIndex]) {
                 this.backends[transIndex] = backendArr;
@@ -504,12 +558,15 @@ export class LifeCycleComponent implements OnInit {
             }
         }
         let defaultLifeCycle = x2js.json2xml_str(arr);
+        if(value.Status){
+            value.Status = value.Status == "enable" ? "Enabled" : "Disabled";
+        }
         let Rules = {
             Rule: {
                 ID: value.name,
                 Filter: { Prefix: value.Prefix ? value.Prefix : value.prefix },
-                Status: ((this.transChecked || this.expirChecked || this.expirCleanUp) && value.enabled) ? "enable" :
-                    value.Status ? value.Status : "disable"
+                Status: (((this.transChecked && this.transOptions.length != 0) || this.expirChecked || this.expirCleanUp) && value.enabled) ? "Enabled" :
+                    value.Status ? value.Status : "Disabled"
             }
         }
         let jsonObj = x2js.json2xml_str(Rules);
@@ -523,7 +580,7 @@ export class LifeCycleComponent implements OnInit {
                     Transition: {
                         StorageClass: value['transId' + index].transName ? value['transId' + index].transName : value['transId' + index],
                         Days: value['days' + index],
-                        Backend: value['backendId' + index].backendName
+                        Backend: value['backendId' + index].backendName ? value['backendId' + index].backendName : value['backendId' + index]
                     }
                 }
                 trans = x2js.json2xml_str(trans);
@@ -542,6 +599,8 @@ export class LifeCycleComponent implements OnInit {
                             Backend: item.Backend
                         }
                     }
+                    trans = x2js.json2xml_str(trans);
+                    jsonObj = jsonObj + trans;
                 })
             } else {
                 trans = {
@@ -551,9 +610,9 @@ export class LifeCycleComponent implements OnInit {
                         Backend: newModifyTrans.Backend
                     }
                 }
+                trans = x2js.json2xml_str(trans);
+                jsonObj = jsonObj + trans;
             }
-            trans = x2js.json2xml_str(trans);
-            jsonObj = jsonObj + trans;
         }
         if ((dialog == "create" || dialog == "update") && this.expirChecked) {
             //In the create/modify state
@@ -692,6 +751,7 @@ export class LifeCycleComponent implements OnInit {
                 if (gapDays < 30) {
                     let defaultDays = this.transDaysArr[index];
                     this.transDaysArr[i] = defaultDays + 30;
+                    this.createLifeCycleForm.value['days'+i] = this.transDaysArr[i];
                     index++;
                 }
             }
@@ -718,12 +778,17 @@ export class LifeCycleComponent implements OnInit {
         this.lifeCycleDeleteControl(index);
         if (index == 0) {
             this.transOptions = [];
-            if((_.isArray(this.modifyTrans) && this.modifyTrans.length > 0)|| Object.keys(this.modifyTrans.length != 0)){
+            if(this.modifyTrans && ((_.isArray(this.modifyTrans) && this.modifyTrans.length > 0)|| Object.keys(this.modifyTrans.length != 0))){
                 this.modifyTrans = [];
             }
             
         }
         this.showAddTransRule = true;
+        if(this.modifyBakend){
+            this.modifyBakend = this.modifyBakend.filter((item,itemIndex)=>{
+                return itemIndex != index;
+            })
+        }
     }
     // lifeCycle add control
     lifeCycleAddControl(index) {
@@ -796,10 +861,10 @@ export class LifeCycleComponent implements OnInit {
             let msg, arr = [];
             if (_.isArray(value)) {
                 arr = value;
-                msg = "<div>Are you sure you want to delete the selected LifeCycle?</div><h3>[ " + value.length + " FileShare ]</h3>";
+                msg = "<div>Are you sure you want to delete the selected LifeCycles?</div><h3>[ " + value.length + " LifeCycle ]</h3>";
             } else {
                 arr.push(value)
-                msg = "<div>Are you sure you want to delete the selected FileShare?</div><h3>[ " + value.ObjectKey + " ]</h3>";
+                msg = "<div>Are you sure you want to delete the selected LifeCycle?</div><h3>[ " + value.ObjectKey + " ]</h3>";
             }
             this.confirmationService.confirm({
                 message: msg,
@@ -847,7 +912,7 @@ export class LifeCycleComponent implements OnInit {
         this.transChecked = this.modifyTrans ? true : false;
         this.expirChecked = expir ? true : false;
         this.expirCleanUp = cleanUp && cleanUp != 0 ? true : false;
-        let ruleEnable = modifyCycle[0].Status == "enable" ? true : false;
+        let ruleEnable = (this.modifyTrans || expir)? true : false;
         this.ruleChecked = ruleEnable;
         this.createLifeCycleForm = this.fb.group({
             'name': new FormControl(modifyCycle[0].ID, { validators: [Validators.required, Utils.isExisted(this.allLifeCycleForCheck), Validators.pattern(this.validRule.name)], updateOn: 'change' }),

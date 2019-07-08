@@ -72,31 +72,13 @@ export class AppComponent implements OnInit, AfterViewInit {
             "routerLink": "/home"
         },
         {
-            "title": "Resource",
-            "description": "Volumes / Buckets",
-            "routerLink": "/block"
-        },
-        {
-            "title": "Dataflow",
-            "description": "Through migration / replication capability.",
-            "routerLink": "/dataflow"
-        },
-        {
             "title": "Profile",
             "description": "Profiles",
             "routerLink": "/profile"
-        }
-    ]
-
-    menuItems_admin = [
-        {
-            "title": "Home",
-            "description": "Resource statistics",
-            "routerLink": "/home"
         },
         {
             "title": "Resource",
-            "description": "Volumes / Buckets",
+            "description": "Volumes / Buckets / File Share",
             "routerLink": "/block"
         },
         {
@@ -110,9 +92,42 @@ export class AppComponent implements OnInit, AfterViewInit {
             "routerLink": "/monitor"
         },
         {
+            "title": "Services",
+            "description": "Orchestration services.",
+            "routerLink": "/services"
+        }
+    ]
+
+    menuItems_admin = [
+        {
+            "title": "Home",
+            "description": "Resource statistics",
+            "routerLink": "/home"
+        },
+        {
             "title": "Profile",
             "description": "Profiles",
             "routerLink": "/profile"
+        },
+        {
+            "title": "Resource",
+            "description": "Volumes / Buckets / File Share",
+            "routerLink": "/block"
+        },
+        {
+            "title": "Dataflow",
+            "description": "Through migration / replication capability.",
+            "routerLink": "/dataflow"
+        },
+        {
+            "title": "Monitor",
+            "description": "Telemetry information.",
+            "routerLink": "/monitor"
+        },
+	    {
+            "title": "Services",
+            "description": "Orchestration services.",
+            "routerLink": "/services"
         },
         {
             "title": "Infrastructure",
