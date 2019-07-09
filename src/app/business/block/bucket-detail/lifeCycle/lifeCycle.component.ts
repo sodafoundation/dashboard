@@ -68,6 +68,7 @@ export class LifeCycleComponent implements OnInit {
     enableCycle = false;
     disableCycle = false;
     lifeCycleTitle;
+    sameTransition = false;
     label = {
         header: "The data in the bucket will flow automatically according to the following rules.",
         days: this.i18n.keyID['sds_lifeCycleDays'] + ":",
@@ -224,13 +225,6 @@ export class LifeCycleComponent implements OnInit {
                             this.lifeCycleAlls = arr;
                         }
                     }
-                    this.lifeCycleAlls.forEach(item=>{
-                        if(item.ObjectKey.length > 15){
-                            item['name'] = item.ObjectKey.substr(0,15) + "...";
-                        }else{
-                            item['name'] = item.ObjectKey
-                        }
-                    })
                     this.submitObj = jsonObj;
                     //the state of the modification
                     if (dialog && dialog == "update") {
@@ -278,7 +272,7 @@ export class LifeCycleComponent implements OnInit {
         this.backendShow[transIndex] = true;
         if (transIndex == 0) {
             let minDays;
-            if (event != "GLACIER" || (event.value && event.value.transName && event.value.transName != "GLACIER")) {
+            if ((dialog && event != "GLACIER") || (event.value && event.value.transName && event.value.transName != "GLACIER")) {
                 this.createLifeCycleForm.patchValue({ days0: 30 });
                 minDays = 30;
                 this.showAddTransRule = true;
@@ -318,10 +312,15 @@ export class LifeCycleComponent implements OnInit {
             }
         }
         this.transDaysChange(transIndex);
-        if(((dialog && event == "GLACIER") || (event.value && event.value.transName && event.value.transName != "GLACIER")) && transIndex < this.lifeCycleItems.length -1){
+        if(((dialog && event == "GLACIER") || (event.value && event.value.transName && event.value.transName == "GLACIER")) && transIndex < this.lifeCycleItems.length -1){
             this.deleteTransRules(transIndex+1);
         }
         this.getBackets(event, transIndex);
+        this.getTransValue(this.createLifeCycleForm.value);
+    }
+    //backend change
+    backendChange(){
+        this.getTransValue(this.createLifeCycleForm.value); 
     }
     getBackets(event, transIndex) {
         window['getAkSkList'](() => {
@@ -515,6 +514,7 @@ export class LifeCycleComponent implements OnInit {
         this.allLifeCycleForCheck = [];
         this.allLifeCycleCheckPrefix = [];
         this.modifyTrans = [];
+        this.sameTransition = false;
         if (dialog == "create") {
             this.lifeCycleTitle = "Create LifeCycle Rule";
             this.showCreateLifeCycle = true;
@@ -775,6 +775,9 @@ export class LifeCycleComponent implements OnInit {
     }
     deleteTransRules(index) {
         this.lifeCycleItems.splice(index, 1);
+        if(this.lifeCycleItems.length == 1){
+            this.sameTransition = false;
+        }
         this.lifeCycleDeleteControl(index);
         if (index == 0) {
             this.transOptions = [];
@@ -829,10 +832,40 @@ export class LifeCycleComponent implements OnInit {
             })
         })
     }
-    
+    //Determining whether the values for transition and backend are the same is not recommended for user creation
+    getTransValue(value){
+        if(this.lifeCycleItems.length > 1){
+            let defaultSameTrans;
+            this.lifeCycleItems.forEach((item,index)=>{
+                if(index < this.lifeCycleItems.length-1){
+                    let [trans1,trans2,backend1,backend2] = ['transId'+index, 'transId'+(index+1), 'backendId'+index, 'backendId'+(index+1)];
+                    let newTrans1 = value[trans1].transName? value[trans1].transName : value[trans1];
+                    let newTrans2 = value[trans2].transName? value[trans2].transName : value[trans2];
+                    let newBackend1 = value[backend1].backendName ? value[backend1].backendName : value[backend1];
+                    let newBackend2 = value[backend2].backendName ? value[backend2].backendName : value[backend2];
+                    let transTrue = newTrans1 && newTrans2 && newTrans1 == newTrans2;
+                    if(transTrue && ((newBackend1 && newBackend2 && newBackend1 == newBackend2) || !newBackend1 || !newBackend2)){
+                        this.sameTransition = true;
+                    }else{
+                        this.sameTransition = false;
+                    }
+                    if(!defaultSameTrans){
+                        defaultSameTrans = this.sameTransition;
+                    }
+                }
+            })
+            if(defaultSameTrans != this.sameTransition || (defaultSameTrans && this.sameTransition)){
+                this.sameTransition = true;
+            }else{
+                this.sameTransition = false;
+            }
+        }else{
+            this.sameTransition = false;
+        }
+    }
     onSubmit(value,dialog?) {
         //this dialog here is used to distinguish whether the Enable or disable operation
-        if (!dialog && !this.createLifeCycleForm.valid) {
+        if (this.sameTransition || (!dialog && !this.createLifeCycleForm.valid)) {
             for (let i in this.createLifeCycleForm.controls) {
                 this.createLifeCycleForm.controls[i].markAsTouched();
             }
@@ -906,9 +939,9 @@ export class LifeCycleComponent implements OnInit {
         });
         this.modifyTrans = modifyCycle[0].Transition;
         let expir = modifyCycle[0].Expiration;
-        let expirDays = expir ? expir.Days : 1;
+        let expirDays = expir ? parseInt(expir.Days) : 1;
         let cleanUp = modifyCycle[0].AbortIncompleteMultipartUpload.DaysAfterInitiation;
-        let cleanUpDay = cleanUp != 0 ? cleanUp : 7;
+        let cleanUpDay = parseInt(cleanUp) != 0 ? parseInt(cleanUp) : 7;
         this.transChecked = this.modifyTrans ? true : false;
         this.expirChecked = expir ? true : false;
         this.expirCleanUp = cleanUp && cleanUp != 0 ? true : false;
@@ -924,7 +957,7 @@ export class LifeCycleComponent implements OnInit {
             "cleanDays": new FormControl(cleanUpDay),
             "expirCleanUp": new FormControl(this.expirCleanUp && ruleEnable ? ['cleanUp'] : []),
         })
-        this.newExpirDays = parseInt(expirDays);
+        this.newExpirDays = expirDays;
         if (ruleEnable && this.modifyTrans) {
             let lastTrans;
             if (_.isArray(this.modifyTrans)) {
