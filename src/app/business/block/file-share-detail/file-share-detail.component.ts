@@ -57,6 +57,7 @@ export class FileShareDetailComponent implements OnInit{
     aclfilter;
     descriptBlock = false;
     exportBlock = false;
+    nameBlock = false;
     checkSnapshotName = false;
     msgs: Message[];
     errorMessage = {
@@ -160,16 +161,9 @@ export class FileShareDetailComponent implements OnInit{
             if(this.fileShare.exportLocations){
                 this.fileShare.exportLocations[0] = "(" + this.fileShare.exportLocations[0] + ")";
             }
-            if(this.fileShare.description && this.fileShare.description.length > 20){
-                this.descriptBlock = true;
-            }else{
-                this.descriptBlock = false;
-            }
-            if(this.fileShare.exportLocations && this.fileShare.exportLocations[0] && this.fileShare.exportLocations[0].length > 20){
-                this.exportBlock = true;
-            }else{
-                this.exportBlock = false;
-            }
+            this.nameBlock = this.fileShare.name && (this.fileShare.name.length > 20);
+            this.descriptBlock = this.fileShare.description && (this.fileShare.description.length > 20);
+            this.exportBlock = this.fileShare.exportLocations && this.fileShare.exportLocations[0] && (this.fileShare.exportLocations[0].length > 20);
             this.getSnapshots(this.fromFileShareId);
         })
     }
@@ -195,13 +189,17 @@ export class FileShareDetailComponent implements OnInit{
         this.createAclsFormGroup.removeControl('userInput'+index);
     }
     addTransRules(){
-        this.aclsItems.push(
-            this.aclsItems[this.aclsItems.length-1] + 1
-          );
-          this.aclsItems.forEach(index => {
-            if(index !== 0){
+        if(this.aclsItems.length > 0){
+            this.aclsItems.push(
+                this.aclsItems[this.aclsItems.length-1] + 1
+            );
+        }else{
+            this.aclsItems = [0];
+        }
+        this.aclsItems.forEach(index => {
+            if((this.aclsItems.length > 1 && index !== 0) || (this.aclsItems.length ==1)){
             //   this.createAclsFormGroup.addControl('user'+index, this.fb.control("", Validators.required));
-              this.createAclsFormGroup.addControl('userInput'+index, this.fb.control("", Validators.required));
+              this.createAclsFormGroup.addControl('userInput'+index, this.fb.control("", [Validators.required,Validators.pattern(this.validRule.name)]));
             }
         });
     }

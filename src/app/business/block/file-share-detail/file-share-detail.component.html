@@ -9,9 +9,13 @@
     <div class="volume-basic-info">
         <h3>{{i18n.keyID['sds_block_volume_base_info']}}</h3>
         <div class="ui-grid ui-grid-responsive ui-grid-pad ui-fluid volume-item">
-            <div *ngIf="fileShare" class="ui-grid-row volume-basic-item-class">
+            <div *ngIf="fileShare && nameBlock" class="ui-grid-row volume-basic-item-class">
                 <div class="ui-grid-col-2" [innerHtml] = "label.Name"></div>
                 <div class="ui-grid-col-2 volume-basic-item-value-color" [innerHtml] = "fileShare.name"></div>
+            </div>
+            <div *ngIf="fileShare" class="ui-grid-row volume-basic-item-class">
+                <div *ngIf="!nameBlock" class="ui-grid-col-2" [innerHtml] = "label.Name"></div>
+                <div *ngIf="!nameBlock" class="ui-grid-col-2 volume-basic-item-value-color" [innerHtml] = "fileShare.name"></div>
                 <div class="ui-grid-col-2" [innerHtml] = "label.Profile"></div>
                 <div class="ui-grid-col-2 volume-basic-item-value-color" [innerHtml] = "fileShare.profileName"></div>
                 <div class="ui-grid-col-2" [innerHtml] = "label.Status"></div>
@@ -164,17 +168,17 @@
                         </p-column>
                     </p-dataTable>
                 
-                    <p-dialog *ngIf="aclCreateShow" header="{{i18n.keyID['sds_fileShare_addRule']}}" [(visible)]="aclCreateShow"
+                    <p-dialog styleClass="create-bucket-dialog" *ngIf="aclCreateShow" header="{{i18n.keyID['sds_fileShare_addRule']}}" [(visible)]="aclCreateShow"
                         [width]="600" modal="modal">
                         <form [grid]="{label: 'ui-g-4', content: 'ui-g-20'}" [formGroup]="createAclsFormGroup"
                             [errorMessage]="errorMessage">
                             <form-item label="{{label.aclLevel}}" [required]="true">
-                                <p-dropdown [options]="availabilityAclLevel" formControlName="level" [style]="{'min-width':96}" placeholder="Please choose"></p-dropdown>
+                                <p-dropdown [options]="availabilityAclLevel" formControlName="level" [style]="{'width':'220px'}" placeholder="Please choose"></p-dropdown>
                             </form-item>
                             <form-item [required]="true" label="{{label.user}}">
                                 <div class="ui-grid-row volume-item" *ngFor="let AclsItem of aclsItems;index as i">
                                     <!-- <p-dropdown [options]="availabilityip" formControlName="{{'user'+i}}" [style]="{'min-width':96}"></p-dropdown> -->
-                                    <div class="ui-grid-col-9">
+                                    <div class="ui-grid-col-9" style="margin-bottom: -10px">
                                         <input type="text" pInputText formControlName="{{'userInput'+i}}" [style]="{'width':150}" />
                                         <div class="ui-message-container" *ngIf="createAclsFormGroup.controls['userInput'+i] && !createAclsFormGroup.controls['userInput'+i].valid&&createAclsFormGroup.controls['userInput'+i].dirty">
                                             <div class="ui-message ui-message-error ui-corner-all">

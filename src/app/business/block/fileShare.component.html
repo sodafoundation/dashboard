@@ -13,11 +13,11 @@
             <button class="" pButton type="button" (click)="getFileShares()" icon="fa-refresh"></button>
         </div>
     </div>
-    <p-dataTable [value]="fileShares" [globalFilter]="searchByName" [(selection)]="selectedFileShares" [showHeaderCheckbox]="true" [rows]="10" [paginator]="true" [pageLinks]="3" [rowsPerPageOptions]="[10,20,50,100]">
+    <p-dataTable [value]="fileShares" [globalFilter]="searchByName" [(selection)]="selectedFileShares" [showHeaderCheckbox]="true" resizableColumns="true" [rows]="10" [paginator]="true" [pageLinks]="3" [rowsPerPageOptions]="[10,20,50,100]">
         <p-column selectionMode="multiple" [style]="{'width': '60px'}"></p-column>
         <p-column field="name" header="{{I18N.keyID['sds_block_volume_name']}}" [style]="{'width': '140px'}" >
             <ng-template pTemplate="body" let-fileShare="rowData">
-                <a [routerLink]="['/fileShareDetail/' + fileShare.id]"  title="{{fileShare.name}}">{{fileShare.showName}}</a>
+                <a [routerLink]="['/fileShareDetail/' + fileShare.id]"  title="{{fileShare.name}}">{{fileShare.name}}</a>
             </ng-template>
         </p-column>
         <p-column field="size" header="Capacity" ></p-column>
@@ -59,16 +59,16 @@
         </p-footer>
     </p-dialog>
 
-    <p-dialog *ngIf="aclCreateShow" header="{{I18N.keyID['sds_fileShare_addRule']}}" [(visible)]="aclCreateShow" [width]="600" modal="modal">
+    <p-dialog styleClass="create-bucket-dialog" *ngIf="aclCreateShow" header="{{I18N.keyID['sds_fileShare_addRule']}}" [(visible)]="aclCreateShow" [width]="600" modal="modal">
         <form [grid]="{label: 'ui-g-4', content: 'ui-g-20'}" [formGroup]="createAclsFormGroup" [errorMessage]="errorMessage">
             <form-item label="{{I18N.keyID['sds_fileShare_acl_level']}}" [required]="true" >
-                <p-dropdown [options]="availabilityAclLevel" formControlName="level" [style]="{'min-width':150}" placeholder="Please choose"></p-dropdown>
+                <p-dropdown [options]="availabilityAclLevel" formControlName="level" [style]="{'width':'220px'}" placeholder="Please choose"></p-dropdown>
             </form-item>
             <form-item [required]="true" label="{{I18N.keyID['sds_fileShare_acl_user']}}">
                 <div class="ui-grid-row volume-item" *ngFor="let AclsItem of aclsItems;index as i">
                     <!-- <p-dropdown [options]="availabilityip" formControlName="{{'user'+i}}" [style]="{'min-width':96}"></p-dropdown> -->
-                    <div class="ui-grid-col-9">
-                        <input type="text" pInputText formControlName="{{'userInput'+i}}" [style]="{'width':150}"/>
+                    <div class="ui-grid-col-9" style="margin-top: -10px">
+                        <input type="text" pInputText formControlName="{{'userInput'+i}}"/>
                         <div class="ui-message-container" *ngIf="createAclsFormGroup.controls['userInput'+i] && !createAclsFormGroup.controls['userInput'+i].valid&&createAclsFormGroup.controls['userInput'+i].dirty">
                             <div class="ui-message ui-message-error ui-corner-all">
                                 <i class="fa fa-exclamation-circle"></i>
