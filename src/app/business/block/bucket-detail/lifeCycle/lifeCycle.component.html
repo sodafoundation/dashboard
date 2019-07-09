@@ -14,11 +14,11 @@
             <button class="" pButton type="button" (click)="getLifeCycleList()" icon="fa-refresh"></button>
         </div>
     </div>
-    <p-dataTable [value]="lifeCycleAlls" (click)="checkBoxClick(selectedLifeCycle)" [globalFilter]="searchByName" [(selection)]="selectedLifeCycle"  [showHeaderCheckbox]="true" [rows]="10" [paginator]="true" [pageLinks]="3" [rowsPerPageOptions]="[10,20,50,100]">
+    <p-dataTable [value]="lifeCycleAlls" (click)="checkBoxClick(selectedLifeCycle)" [globalFilter]="searchByName" [(selection)]="selectedLifeCycle"  [showHeaderCheckbox]="true" resizableColumns="true" [rows]="10" [paginator]="true" [pageLinks]="3" [rowsPerPageOptions]="[10,20,50,100]">
         <p-column selectionMode="multiple" [style]="{'width': '60px'}"></p-column>
         <p-column field="ObjectKey" header="{{i18n.keyID['sds_block_volume_name']}}" [style]="{'width': '150px'}" >
             <ng-template pTemplate="body" let-cycle="rowData" let-i="rowIndex">
-                <span title="{{cycle.ObjectKey}}">{{cycle.name}}</span>
+                <span title="{{cycle.ObjectKey}}">{{cycle.ObjectKey}}</span>
             </ng-template>
         </p-column>
         <p-column field="Status" header="Status" [style]="{'width': '100px'}" ></p-column>
@@ -73,8 +73,8 @@
                 </div>
                 <div class="ui-grid-row volume-item" *ngFor="let lifeCycleItem of lifeCycleItems;index as i">
                     <div class="ui-grid-col-4">
-                        <p-dropdown *ngIf="!modifyTrans ||modifyTrans.length == 0" [style]="{'width':'166px'}" [options]="transOptions[i]" formControlName="{{'transId'+i}}" placeholder="please select" (onChange)="typeChange($event, i, 'trans')"></p-dropdown>
-                        <p-dropdown *ngIf="modifyTrans && modifyTrans.length !=0" [style]="{'width':'166px'}" [options]="transOptions[i]" formControlName="{{'transId'+i}}" (onChange)="typeChange($event, i, 'trans')"></p-dropdown>
+                        <p-dropdown *ngIf="!modifyTrans ||modifyTrans.length == 0" [style]="{'width':'166px'}" [options]="transOptions[i]" formControlName="{{'transId'+i}}" placeholder="please select" (onChange)="typeChange($event, i)"></p-dropdown>
+                        <p-dropdown *ngIf="modifyTrans && modifyTrans.length !=0" [style]="{'width':'166px'}" [options]="transOptions[i]" formControlName="{{'transId'+i}}" (onChange)="typeChange($event, i)"></p-dropdown>
                         <div class="ui-message-container" *ngIf="createLifeCycleForm.controls['transId'+i] && !createLifeCycleForm.controls['transId'+i].valid &&(createLifeCycleForm.controls['transId'+i].dirty || createLifeCycleForm.controls['transId'+i].touched)">
                             <div class="ui-message ui-message-error ui-corner-all">
                                 <i class="fa fa-exclamation-circle"></i>
@@ -96,13 +96,21 @@
                         </div>
                     </div>
                     <div class="ui-grid-col-3" *ngIf="backendShow[i]">
-                        <p-dropdown *ngIf="modifyBakend.length <= i || modifyBakend[i] ==''" [style]="{'width':'134px'}" [options]="backends[i]" formControlName="{{'backendId'+i}}" placeholder="please select"></p-dropdown>
-                        <p-dropdown *ngIf="modifyBakend.length > i && modifyBakend[i] !=''" [style]="{'width':'134px'}" [options]="backends[i]" formControlName="{{'backendId'+i}}"></p-dropdown>
+                        <p-dropdown *ngIf="modifyBakend.length <= i || modifyBakend[i] ==''" [style]="{'width':'134px'}" [options]="backends[i]" formControlName="{{'backendId'+i}}" placeholder="please select" (onChange)="backendChange()"></p-dropdown>
+                        <p-dropdown *ngIf="modifyBakend.length > i && modifyBakend[i] !=''" [style]="{'width':'134px'}" [options]="backends[i]" formControlName="{{'backendId'+i}}"  (onChange)="backendChange()"></p-dropdown>
                     </div>
                     <div class="ui-grid-col-1">
                         <div class="create-profile-img " (click)="deleteTransRules(i)">
                             <img style="vertical-align:middle; margin-left: 40px;" src="assets/business/images/profile/u1065.png">
                         </div>
+                    </div>
+                </div>
+                <div *ngIf="sameTransition" class="ui-message-container">
+                    <div class="ui-message ui-message-error ui-corner-all">
+                        <i class="fa fa-exclamation-circle"></i>
+                        <span class="ui-message-error-text">
+                            Setting up the same transitions and backend at the same time is not recommended
+                        </span>
                     </div>
                 </div>
             </div>
@@ -132,7 +140,7 @@
                 <div class="ui-grid ui-grid-responsive ui-grid-pad ui-fluid volume-item">
                     <div class="ui-grid-row volume-item" *ngIf="expirCleanUp">
                         <span class="ui-grid-col-2">Elapsed time</span>
-                        <div class="ui-grid-col-4" style="display: inline-block;">
+                        <div class="ui-grid-col-4" style="display: inline-block;margin-top: -10px;">
                             <p-spinner formControlName="cleanDays" [min]="1"></p-spinner>
                             <div class="ui-message-container" *ngIf="createLifeCycleForm.controls['cleanDays'] && !createLifeCycleForm.controls['cleanDays'].valid &&(createLifeCycleForm.controls['cleanDays'].dirty || createLifeCycleForm.controls['cleanDays'].touched)">
                                     <div class="ui-message ui-message-error ui-corner-all">

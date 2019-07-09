@@ -1,7 +1,7 @@
 import { Router,ActivatedRoute } from '@angular/router';
 import { Component, OnInit, ViewContainerRef, ViewChild, Directive, ElementRef, HostBinding, HostListener, Input } from '@angular/core';
 import { I18NService, MsgBoxService, HttpService, Utils } from 'app/shared/api';
-import { ConfirmationService, ConfirmDialogModule} from '../../../components/common/api';
+import { ConfirmationService, ConfirmDialogModule, Message} from '../../../components/common/api';
 import { trigger, state, style, transition, animate} from '@angular/animations';
 import { I18nPluralPipe } from '@angular/common';
 import { FormGroup, Validators, FormBuilder, FormControl } from '@angular/forms';
@@ -58,6 +58,7 @@ export class FileShareDetailComponent implements OnInit{
     descriptBlock = false;
     exportBlock = false;
     checkSnapshotName = false;
+    msgs: Message[];
     errorMessage = {
         "level": { required: "Access Level is required." },
         "user": { required: "Ip/User is required." },
@@ -361,6 +362,11 @@ export class FileShareDetailComponent implements OnInit{
             this.snapshotCreateShow = false;
             this.getSnapshots(this.fromFileShareId);
             this.showCreateSnapshot = true;
+        },
+        err=>{
+          this.msgs = [];
+          this.snapshotCreateShow = false;
+          this.msgs.push({severity: 'error', summary: 'Error', detail: err.message ? err.message : err.json().message});
         })
     }
     modifySnapshot(){
@@ -405,6 +411,11 @@ export class FileShareDetailComponent implements OnInit{
         this.FileShareAclService.createFileShareAcl(param,this.fromFileShareId).subscribe((res)=>{
             this.getAcls();
             this.aclCreateShow = false;
+        },
+        err=>{
+          this.msgs = [];
+          this.aclCreateShow = false;
+          this.msgs.push({severity: 'error', summary: 'Error', detail: err.message ? err.message : err.json().message});
         })
     }
     aclsModifySubmit(param){
