@@ -9,6 +9,7 @@ import { FormControl, FormGroup, FormBuilder, Validators, ValidatorFn, AbstractC
 import { BaseRequestOptionsArgs } from 'app/shared/service/api';
 
 declare let X2JS:any;
+let lodash = require('lodash');
 
 @Component({
   selector: 'bucket-detail',
@@ -150,7 +151,8 @@ export class BucketDetailComponent implements OnInit {
               this.allDir = [alldir];
           }
           //The depth of the clone
-          let backupAllDir = JSON.parse( JSON.stringify( this.allDir ) );;
+          let backupAllDir = JSON.parse( JSON.stringify( this.allDir ) );
+          this.resolveObject();
           //Data in folder
           if(this.folderId !=""){
             if(!this.folderId.endsWith(this.colon)){
@@ -198,6 +200,7 @@ export class BucketDetailComponent implements OnInit {
           this.allDir.forEach(item=>{
             item.size = Utils.getDisplayCapacity(item.Size,2,'KB');
             item.lastModified = Utils.formatDate(item.LastModified *1000);
+            item.Tier = "Tier_" + item.Tier + " (" + item.StorageClass + ")";
             if(item.ObjectKey.indexOf(this.colon) !=-1){
               item.objectName = item.ObjectKey.slice(0,item.ObjectKey.lastIndexOf(this.colon));
               this.allFolderNameForCheck.push(item.objectName);
@@ -226,16 +229,29 @@ export class BucketDetailComponent implements OnInit {
               item.disabled = false;
             }
           })
-          this.allDir.forEach((item,index)=>{
-            this.allDir[index].Tier = "Tier_" + item.Tier + " (" + item.StorageClass + ")";
-            if(item.objectName.length > 15){
-              item['name'] = item.objectName.substr(0,15) + "...";
-            }else{
-              item['name'] = item.objectName;
-            }
-          });
         });
         })
+    })
+  }
+  //Resolve objects with file directories that are not manually uploaded
+  resolveObject(){
+    let set = new Set();
+    this.allDir.forEach((item,index)=>{
+      let includeIndex = item.ObjectKey.indexOf(this.colon);
+      if(includeIndex != -1 && includeIndex < item.ObjectKey.length-1){
+        while(includeIndex > -1){
+          set.add(item.ObjectKey.substr(0,includeIndex+1));
+          includeIndex = item.ObjectKey.indexOf(this.colon, includeIndex+1);
+        }
+      }
+    })
+    this.allDir.forEach(it=>{
+      set.delete(it.ObjectKey);
+    })
+    set.forEach(item=>{
+      let defaultObject = lodash.cloneDeep(this.allDir[0]);
+      defaultObject.ObjectKey = item;
+      this.allDir.push(defaultObject);
     })
   }
   //Request header with AK/SK authentication added
