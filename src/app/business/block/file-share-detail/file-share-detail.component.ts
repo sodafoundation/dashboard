@@ -179,7 +179,8 @@ export class FileShareDetailComponent implements OnInit{
                     }
                 })(),
                 type: "ip",
-                accessTo: value['userInput'+index]
+                accessTo: value['userInput'+index],
+                description: value.description
             })
         })
         return dataArr;
@@ -198,7 +199,6 @@ export class FileShareDetailComponent implements OnInit{
         }
         this.aclsItems.forEach(index => {
             if((this.aclsItems.length > 1 && index !== 0) || (this.aclsItems.length ==1)){
-            //   this.createAclsFormGroup.addControl('user'+index, this.fb.control("", Validators.required));
               this.createAclsFormGroup.addControl('userInput'+index, this.fb.control("", [Validators.required,Validators.pattern(this.validRule.name)]));
             }
         });
@@ -230,6 +230,7 @@ export class FileShareDetailComponent implements OnInit{
                         id: item.id,
                         name: item.accessTo,
                         type: item.type,
+                        description: item.description? item.description: "--",
                         level: item.accessCapability,
                         createdAt: Utils.formatDate(item.createdAt),
                         updatedAt: Utils.formatDate(item.updatedAt)
