@@ -63,7 +63,9 @@ export class FileShareDetailComponent implements OnInit{
     errorMessage = {
         "level": { required: "Access Level is required." },
         "user": { required: "Ip/User is required." },
-        "name":{ required: "Name is required." },
+        "name":{ required: "Name is required." ,
+                 pattern: this.i18n.keyID['sds_pattern']},
+        "description":{maxlength: this.i18n.keyID['sds_validate_max_length']},
         "userInput":{required: "Ip is required"},
         "accessCapability": { required: "Access Level is required." },
         "accessTo": {required: "Access is required."}
@@ -71,6 +73,9 @@ export class FileShareDetailComponent implements OnInit{
     Regexp = '(1\\d{2}|2[0-4]\\d|25[0-5]|[1-9]\\d|';
     validRule= {
         'name':'^' + this.Regexp + '[1-9])\\.' + this.Regexp + '\\d)\\.' + this.Regexp + '\\d)\\.' + this.Regexp +'\\d)(\\/([1-9]|[1-2]\\d|3[0-2]))?$' 
+    };
+    snapshotValidRule = {
+        'name':'^[a-zA-Z]{1}([a-zA-Z0-9]|[_]){0,127}$'
     };
     
     constructor(
@@ -111,7 +116,7 @@ export class FileShareDetailComponent implements OnInit{
         ];
 
         this.createSnapshotFormGroup = this.fb.group({
-            "name": ["", Validators.required],
+            "name": ["", {validators: [Validators.required,Validators.pattern(this.snapshotValidRule.name)]}],
             "description": ["", Validators.maxLength(200)]
         })
         this.modifySnapshotFormGroup = this.fb.group({
@@ -138,7 +143,7 @@ export class FileShareDetailComponent implements OnInit{
             "level":  ["", Validators.required],
             "user":  ["ip"],
             "userInput0": ["", {validators: [Validators.required,Validators.pattern(this.validRule.name)]}],
-            "description": [""]
+            "description": ["", Validators.maxLength(200)]
         })
     }
     getProfile(){

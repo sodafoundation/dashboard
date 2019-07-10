@@ -59,7 +59,7 @@ export class VolumeListComponent implements OnInit {
     replicationGroup;
     errorMessage = {
         "name": { required: "Name is required." },
-        "description": { maxlength: "Max. length is 200." },
+        "description": { maxlength: this.I18N.keyID['sds_validate_max_length'] },
         "repName":{ required: "Name is required." },
         "profileOption":{ required: "Profile is required." },
         "expandSize":{

@@ -24,13 +24,19 @@ export class FileShareComponent implements OnInit{
     errorMessage = {
         "level": { required: "Access Level is required." },
         "user": { required: "Ip/User is required." },
-        "name":  {required: "Name is required.", isExisted: "Name is existing." },
+        "name":  {required: "Name is required.", 
+                  isExisted: "Name is existing.",
+                  pattern: this.I18N.keyID['sds_pattern']},
         "userInput":{required: "Ip/User is required"},
-        "accessCapability": { required: "Access Level is required." }
-    }
+        "accessCapability": { required: "Access Level is required." },
+        "description": {maxlength:this.I18N.keyID['sds_validate_max_length']}
+    };
     Regexp = '(1\\d{2}|2[0-4]\\d|25[0-5]|[1-9]\\d|';
     validRule= {
         'name':'^' + this.Regexp + '[1-9])\\.' + this.Regexp + '\\d)\\.' + this.Regexp + '\\d)\\.' + this.Regexp + '\\d)(\\/([1-9]|[1-2]\\d|3[0-2]))?$' 
+    };
+    snapshotValidRule = {
+        'name':'^[a-zA-Z]{1}([a-zA-Z0-9]|[_]){0,127}$'
     };
     selectedFileShare;
     modifyFileShareForm;
@@ -61,14 +67,14 @@ export class FileShareComponent implements OnInit{
         private FileShareAclService: FileShareAclService
     ){
         this.createSnapshotForm = this.fb.group({
-            "name": ["",Validators.required],
+            "name": ["",{validators: [Validators.required,Validators.pattern(this.snapshotValidRule.name)]}],
             "description": ["", Validators.maxLength(200)]
         });
         this.createAclsFormGroup = this.fb.group({
             "level":  ["", {validators:[Validators.required], updateOn:'change'}],
             "user":  ["ip", Validators.required],
             "userInput0": ["", {validators: [Validators.required,Validators.pattern(this.validRule.name)]}],
-            "description": [""]
+            "description": ["", Validators.maxLength(200)]
         })
     }
     ngOnInit(){

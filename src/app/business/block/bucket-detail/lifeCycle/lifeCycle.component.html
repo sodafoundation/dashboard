@@ -43,6 +43,14 @@
             <div class="volume-item" [innerHtml]="label.header"></div>
             <form-item label="Name" [required]="true">
                 <input id="lifeCycle" type="text" pInputText formControlName="name"/>
+                <div class="ui-message-container" *ngIf="createLifeCycleForm.controls['name'] && !createLifeCycleForm.controls['name'].valid&&createLifeCycleForm.controls['name'].dirty">
+                    <div class="ui-message ui-message-error ui-corner-all">
+                        <i class="fa fa-exclamation-circle"></i>
+                        <span class="ui-message-error-text">
+                            {{getErrorMessage(createLifeCycleForm.controls['name'],"name")}}
+                        </span>
+                    </div>
+                </div>
             </form-item>
             <form-item label="Prefix">
                 <input type="text" pInputText formControlName="prefix"/> 
