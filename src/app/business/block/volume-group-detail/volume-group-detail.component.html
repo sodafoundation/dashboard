@@ -54,7 +54,7 @@
             <button pButton type="button" label="{{I18N.keyID['sds_profile_extra_add']}}" (click)="showAddVolumes=true"></button>
         </div>
       </div>
-      <p-dataTable [value]="volumes" [rows]="5" [paginator]="true" [pageLinks]="3" [rowsPerPageOptions]="[5,10,20,40]">
+      <p-dataTable [value]="volumes" resizableColumns="true" [rows]="5" [paginator]="true" [pageLinks]="3" [rowsPerPageOptions]="[5,10,20,40]">
         <p-column field="name" header="{{I18N.keyID['sds_block_volume_name']}}" [style]="{'width': '10%'}"></p-column>
         <p-column field="status" header="{{I18N.keyID['sds_block_volume_status']}}" [style]="{'width': '10%'}"></p-column>
         <p-column field="size" header="{{I18N.keyID['sds_home_capacity']}}" [style]="{'width': '10%'}"></p-column>

@@ -88,17 +88,10 @@ export class ResourceComponent implements OnInit{
                         if(pool && pool.length != 0){
                             let zone = pool[0].availabilityZone;
                             let [name,ip,status,description,region,az,type] = [ele.name, ele.endpoint.split(":")[0], "Enabled", ele.description, "default_region", zone, ele.storageType];
-                        
-                                let newDescript;
-                                if(description.length > 20){
-                                    newDescript = description.substr(0,20) + "...";
-                                }else{
-                                    newDescript = description;
-                                }
                             if(pool[0].storageType == "block"){
-                                this.blockStorages.push({name,ip,status,description,newDescript,region,az,type});
+                                this.blockStorages.push({name,ip,status,description,region,az,type});
                             }else if(pool[0].storageType == "file"){
-                                this.fileStorages.push({name,ip,status,description,newDescript,region,az,type});
+                                this.fileStorages.push({name,ip,status,description,region,az,type});
                             }
                         }
                         
