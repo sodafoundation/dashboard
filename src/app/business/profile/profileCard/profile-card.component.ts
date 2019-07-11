@@ -91,7 +91,8 @@ export class ProfileCardComponent implements OnInit {
         "name": { 
             required: this.I18N.keyID['sds_profile_create_name_require'],
             isExisted:this.I18N.keyID['sds_isExisted'],
-        }
+        },
+        "descript":{maxlength:this.I18N.keyID['sds_validate_max_length']}
     };
     constructor(
         public I18N: I18NService,

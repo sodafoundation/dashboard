@@ -39,7 +39,7 @@ export class SnapshotListComponent implements OnInit {
 
   errorMessage = {
       "name": { required: "Name is required." },
-      "description": { maxlength: "Max. length is 200." }
+      "description": { maxlength: this.I18N.keyID['sds_validate_max_length'] }
   };
   param = {
     key: 'VolumeId',

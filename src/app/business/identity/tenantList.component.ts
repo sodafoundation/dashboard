@@ -51,7 +51,7 @@ export class TenantListComponent implements OnInit {
 
     errorMessage = {
         "form_name": { required: "Username is required.", pattern:"Beginning with a letter with a length of 1-128, it can contain letters / numbers / underlines.", ifTenantExisting:"Tenant is existing."},
-        "form_description": { maxlength: "Max. length is 200."}
+        "form_description": { maxlength: this.I18N.keyID['sds_validate_max_length']}
     };
 
     ngOnInit() {

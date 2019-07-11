@@ -64,7 +64,7 @@ export class UserListComponent implements OnInit, AfterViewChecked {
 
     errorMessage = {
         "form_username": { required: "Username is required.", pattern:"Beginning with a letter with a length of 1-128, it can contain letters / numbers / underlines.", ifUserExisting:"User is existing."},
-        "form_description": { maxlength: "Max. length is 200."},
+        "form_description": { maxlength: this.I18N.keyID['sds_validate_max_length']},
         "form_tenant": { required: "Tenant is required."},
         "form_psw": { required: "Password is required.", minlength: "At least two kinds of letters / numbers / special characters, min. length is 8.", regPassword:"At least two kinds of letters / numbers / special characters, min. length is 8." },
         "form_pswConfirm": { required: "Password is required.", regConfirmPassword: "Two inputted password inconsistencies." }
