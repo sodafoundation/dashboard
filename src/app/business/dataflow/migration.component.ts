@@ -175,15 +175,16 @@ export class MigrationListComponent implements OnInit {
         this.MigrationService.getMigrations().subscribe((res) => {
             let AllMigrations = res.json().plans ? res.json().plans :[];
             this.changeNumber.emit(AllMigrations.length);
-
+            let newMigrations = []; 
             AllMigrations.forEach((item,index)=>{
                 item.srctype = Consts.TYPE_SVG[Consts.BUCKET_TYPE.get(item.sourceConn.bucketName)];
                 item.desttype = Consts.TYPE_SVG[Consts.BUCKET_TYPE.get(item.destConn.bucketName)];
                 item.srcBucket = item.sourceConn.bucketName;
                 item.destBucket = item.destConn.bucketName;
                 this.allMigrationForCheck.push(item.name);
+                newMigrations.unshift(item);
             });
-            this.allMigrations = AllMigrations;
+            this.allMigrations = newMigrations;
         });
     }
 
