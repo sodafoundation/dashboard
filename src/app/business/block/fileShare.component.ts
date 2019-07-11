@@ -66,7 +66,7 @@ export class FileShareComponent implements OnInit{
         });
         this.createAclsFormGroup = this.fb.group({
             "level":  ["", {validators:[Validators.required], updateOn:'change'}],
-            "user":  ["ip", Validators.required],
+            "user":  ["ip"],
             "userInput0": ["", {validators: [Validators.required,Validators.pattern(this.validRule.name)]}],
             "description": [""]
         })
@@ -309,8 +309,9 @@ export class FileShareComponent implements OnInit{
                         return ['Read','Write'];
                     }
                 })(),
-                type: value['user'],
-                accessTo: value['userInput'+index]
+                type: "ip",
+                accessTo: value['userInput'+index],
+                description: value.description
             })
         })
         return dataArr;
