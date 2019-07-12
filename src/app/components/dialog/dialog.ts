@@ -205,7 +205,7 @@ export class Dialog implements AfterViewInit,AfterViewChecked,OnDestroy {
                 setTimeout(() => {
                     let height = this.domHandler.getOuterHeight(this.containerViewChild.nativeElement);
 
-                    if(height !== this.currentHeight) {
+                    if((height !== this.currentHeight) && (Math.abs(this.currentHeight - height) != 1)) {
                         this.currentHeight = height;
                         this.positionOverlay();
                     }
