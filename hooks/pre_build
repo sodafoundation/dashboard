@@ -1,0 +1,7 @@
+#!/bin/bash
+BASE_DIR=`pwd`
+pwd
+apt-get update && apt-get install -y git make curl wget libltdl7 libseccomp2 libffi-dev gawk sudo
+curl -sL https://deb.nodesource.com/setup_8.x | bash -
+apt-get install -y nodejs
+make docker
