@@ -216,11 +216,15 @@ export class FileShareDetailComponent implements OnInit{
             str.forEach(item=>{
                 if(item.fileshareId == fileShareId){
                     item.createdAt = Utils.formatDate(item.createdAt);
+                    item.date = new Date(Utils.formatDate(item.createdAt)).getTime();
                     if(!item.description){
                         item.description = "--";
                     }
                     this.snapshots.push(item); 
                 }
+            })
+            this.snapshots.sort((a,b)=>{
+                return b.date - a.date;
             })
             this.selectedSnapshots = [];
         })
@@ -238,10 +242,14 @@ export class FileShareDetailComponent implements OnInit{
                         description: item.description? item.description: "--",
                         level: item.accessCapability,
                         createdAt: Utils.formatDate(item.createdAt),
-                        updatedAt: Utils.formatDate(item.updatedAt)
+                        updatedAt: Utils.formatDate(item.updatedAt),
+                        date: new Date(Utils.formatDate(item.updatedAt)).getTime()
                     }
                     this.acls.push(acl);
                 }
+            })
+            this.acls.sort((a,b)=>{
+                return b.date - a.date;
             })
             this.selectedAcls = [];
         })
