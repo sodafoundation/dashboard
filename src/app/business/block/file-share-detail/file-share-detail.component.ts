@@ -60,6 +60,8 @@ export class FileShareDetailComponent implements OnInit{
     nameBlock = false;
     checkSnapshotName = false;
     msgs: Message[];
+    checkAclsIp = [];
+    showIpErrorMessage = [];
     errorMessage = {
         "level": { required: "Access Level is required." },
         "user": { required: "Ip/User is required." },
@@ -190,24 +192,6 @@ export class FileShareDetailComponent implements OnInit{
         })
         return dataArr;
     }
-    deleteAclUsers(index){
-        this.aclsItems.splice(index, 1);
-        this.createAclsFormGroup.removeControl('userInput'+index);
-    }
-    addTransRules(){
-        if(this.aclsItems.length > 0){
-            this.aclsItems.push(
-                this.aclsItems[this.aclsItems.length-1] + 1
-            );
-        }else{
-            this.aclsItems = [0];
-        }
-        this.aclsItems.forEach(index => {
-            if((this.aclsItems.length > 1 && index !== 0) || (this.aclsItems.length ==1)){
-              this.createAclsFormGroup.addControl('userInput'+index, this.fb.control("", [Validators.required,Validators.pattern(this.validRule.name)]));
-            }
-        });
-    }
 
     getSnapshots(fileShareId){
         this.snapshots = [];
@@ -225,7 +209,8 @@ export class FileShareDetailComponent implements OnInit{
             this.selectedSnapshots = [];
         })
     }
-    getAcls(){
+    getAcls(dialog?){
+        this.checkAclsIp = [];
         this.FileShareAclService.getFileShareAcl().subscribe((res)=>{
             let str = res.json();
             this.acls =[];
@@ -241,10 +226,21 @@ export class FileShareDetailComponent implements OnInit{
                         updatedAt: Utils.formatDate(item.updatedAt)
                     }
                     this.acls.push(acl);
+                    if(dialog){
+                        this.checkAclsIp.push(item.accessTo);
+                    }
                 }
             })
             this.selectedAcls = [];
         })
+    }
+    userIpChnage(index){
+        let userInput = this.createAclsFormGroup.value['userInput'+index];
+        if((this.checkAclsIp.indexOf(userInput) !=-1)){
+            this.showIpErrorMessage[index] = true;
+        }else{
+            this.showIpErrorMessage[index] = false;
+        }
     }
     showSnapshotPropertyDialog(dialog, selectedSnapshot?){
         if(dialog == 'create'){
@@ -281,6 +277,8 @@ export class FileShareDetailComponent implements OnInit{
             this.aclCreateShow = true;
             this.getCreateAclValue();
             this.aclsItems = [0];
+            this.getAcls(dialog);
+            this.showIpErrorMessage = [false];
         }else if(dialog == 'modify'){
             this.aclModifyShow = true;
             this.modifyAcl.accessCapability = acl.level;
@@ -390,7 +388,7 @@ export class FileShareDetailComponent implements OnInit{
         })
     }
     createAclsSubmit(value){
-        if(!this.createAclsFormGroup.valid){
+        if(!this.createAclsFormGroup.valid || (this.showIpErrorMessage.indexOf(true) !=-1)){
             for(let i in this.createAclsFormGroup.controls){
                 this.createAclsFormGroup.controls[i].markAsTouched();
             }
