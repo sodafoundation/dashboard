@@ -1,11 +1,12 @@
 import { Router,ActivatedRoute, NavigationExtras } from '@angular/router';
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, ViewChild } from '@angular/core';
 import { Message, I18N} from '../../../components/common/api';
 import { I18NService, MsgBoxService, Utils, ParamStorService } from '../../../shared/api';
 import { Validators, FormControl, FormGroup, FormBuilder } from '@angular/forms';
 import { WorkflowService } from '../workflow.service';
 import { ProfileService } from '../../profile/profile.service';
 import { trigger, state, style, transition, animate } from '@angular/animations';
+import { CreateClusterComponent } from '../create-cluster/create-cluster.component'
 import * as _ from "underscore";
 
 @Component({
@@ -15,6 +16,7 @@ import * as _ from "underscore";
   styleUrls: ['./dynamic-form.component.css']
 })
 export class DynamicFormComponent implements OnInit {
+  @ViewChild('createCluster') createCluster: CreateClusterComponent;
   @Input() dataObject: any;
   @Input() serviceId: any;
   @Input() selectedService: any;
@@ -24,6 +26,7 @@ export class DynamicFormComponent implements OnInit {
   objectProps: any;
   displayFormObject: any[];
   form: FormGroup;
+  showAnalysis = false;
   requestBody : any = {
     "service_id": "",
     "user_id": "",
@@ -112,7 +115,7 @@ export class DynamicFormComponent implements OnInit {
           item['type'] = 'string';
         }
 
-        if(item['key'] == 'port'){
+        if(item['key'] == 'port' || item['key']=='analysis_args'){
           item['showThis'] = false;
           item['required'] = false;
           item['validation'] = {required: false};
@@ -160,6 +163,11 @@ export class DynamicFormComponent implements OnInit {
         
       })
       this.form = new FormGroup(formGroup);
+      if(this.selectedService.group == 'bigdata-analysis'){
+        this.showAnalysis = true;
+      }else{
+        this.showAnalysis = false;
+      }
     }
       
 
@@ -210,7 +218,66 @@ export class DynamicFormComponent implements OnInit {
         this.requestBody.name = formObject.instanceName;
         this.requestBody.description = formObject.instanceDescription;
         this.requestBody.parameters = _.omit(formObject, ['instanceName', 'instanceDescription']);
+        if(this.showAnalysis){
+          let analysisParam = this.checkAnalysisParameters();
+          this.requestBody.parameters['analysis_args'] = analysisParam;
+          this.requestBody.parameters['ip_addr'] = location.hostname;
+          this.requestBody.parameters['port'] = location.port;
+          this.requestBody.parameters['name'] = formObject.instanceName;
+        }
         this.createInstance(this.requestBody);
+      }
+
+      checkAnalysisParameters(){
+        if(!this.createCluster.clusterForm.valid){
+          for(let i in this.createCluster.clusterForm.controls){
+              this.createCluster.clusterForm.controls[i].markAsTouched();
+          }
+          return;
+        }
+        let formValue = this.createCluster.clusterForm.value;
+        let configureValue = this.createCluster.setConfigureForm.value;
+        let  actionOnFailure = configureValue['action'].toUpperCase();
+        let analysis_args = {
+          Name: formValue.clusterName,
+          AK: formValue.ak,
+          SK: formValue.sk,
+          Region: formValue.region,
+          ReleaseLabel: formValue.releaseLabel,
+          Instances:{
+            MasterInstanceType: formValue.masterInstanceType,
+            InstanceCount: formValue.instanceCount,
+            KeepJobFlowAliveWhenNoSteps: false,
+            TerminationProtected: false
+          },
+          JobFlowRole: formValue.jobFlowRole,
+          ServiceRole: formValue.serviceRole,
+          VisibleToAllUsers: true,
+          Applications:[
+            {Name: formValue.application}
+          ],
+          Steps:[
+            {
+              Name: 'default boot',
+              ActionOnFailure: "TERMINATE_CLUSTER",
+              HadoopJarStep:{
+                Args:["state-pusher-script"],
+                Jar:"command-runner.jar"
+              }
+            },{
+              Name: configureValue['name'],
+              ActionOnFailure: actionOnFailure,
+              HadoopJarStep:{
+                Args: configureValue.arguments.split(' '),
+                Jar: configureValue.location
+              }
+            }
+          ]
+        }
+        if(this.createCluster.showSlaveType){
+          analysis_args.Instances['SlaveInstanceType'] = formValue.slaveInstanceType;
+        }
+        return analysis_args;
       }
 
       createInstance(param){
