@@ -217,14 +217,12 @@ export class FileShareDetailComponent implements OnInit{
                 if(item.fileshareId == fileShareId){
                     item.createdAt = Utils.formatDate(item.createdAt);
                     item.date = new Date(Utils.formatDate(item.createdAt)).getTime();
-                    if(!item.description){
-                        item.description = "--";
-                    }
+                    item.description = (!item.description || item.description == '') ? '--' : item.description;
                     this.snapshots.push(item); 
                 }
             })
-            this.snapshots.sort((a,b)=>{
-                return b.date - a.date;
+            this.snapshots.sort((previous,later)=>{
+                return later.date - previous.date;
             })
             this.selectedSnapshots = [];
         })
@@ -248,8 +246,8 @@ export class FileShareDetailComponent implements OnInit{
                     this.acls.push(acl);
                 }
             })
-            this.acls.sort((a,b)=>{
-                return b.date - a.date;
+            this.acls.sort((previous,later)=>{
+                return later.date - previous.date;
             })
             this.selectedAcls = [];
         })
