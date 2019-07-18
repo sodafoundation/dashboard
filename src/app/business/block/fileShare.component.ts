@@ -199,7 +199,7 @@ export class FileShareComponent implements OnInit{
             })
         })
     }
-    userIpChnage(index){
+    userIpChange(index){
         let userInput = this.createAclsFormGroup.value['userInput'+index];
         if((this.checkAclsIp.indexOf(userInput) !=-1)){
             this.showIpErrorMessage[index] = true;
