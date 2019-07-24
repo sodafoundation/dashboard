@@ -37,6 +37,7 @@ export class UserListComponent implements OnInit, AfterViewChecked {
     popTitle: string;
 
     sortField: string;
+    checkIndex = 0;
 
     validRule= {
         'name':'^[a-zA-Z]{1}([a-zA-Z0-9]|[_]){0,127}$'
@@ -57,8 +58,8 @@ export class UserListComponent implements OnInit, AfterViewChecked {
             "form_description":["", Validators.maxLength(200) ],
             "form_tenant": ["", {validators:[Validators.required]}],
             "form_isModifyPsw": [true],
-            "form_psw": ["", {validators: [Validators.required, Validators.minLength(8), this.regPassword], updateOn:'blur'} ],
-            "form_pswConfirm": ["", [Validators.required, this.regConfirmPassword(this.newPassword)] ]
+            "form_psw": ["", {validators: [Validators.required, Validators.minLength(8), this.regPassword, this.regConfirmPassword('form_pswConfirm')]} ],
+            "form_pswConfirm": ["", [Validators.required, this.regConfirmPassword('form_psw')] ]
         })
     }
 
@@ -111,9 +112,25 @@ export class UserListComponent implements OnInit, AfterViewChecked {
         return null;
     }
 
-    regConfirmPassword (param: any): ValidatorFn{
+    regConfirmPassword (controlName: string): ValidatorFn{
         return (c: AbstractControl): {[key:string]: boolean} | null => {
-            if(c.value != this.newPassword){
+            let other = c.root.get(controlName);
+            if(other && other.value) {
+                c = controlName == "form_pswConfirm" ? other : c;
+                if(c.value != other.value){
+                    this.checkIndex = 0;
+                    return {'regConfirmPassword': true};
+                }else{
+                    if(this.checkIndex == 0){
+                        this.checkIndex++;
+                        other.updateValueAndValidity();
+                    }else{
+                        this.checkIndex = 0; 
+                        return null;
+                    }
+                    
+                }
+            }else if(controlName == "form_psw"){
                 return {'regConfirmPassword': true};
             }
             return null;
@@ -149,8 +166,8 @@ export class UserListComponent implements OnInit, AfterViewChecked {
 
             this.myFormGroup.controls['form_isModifyPsw'].value = true;
             this.myFormGroup.controls['form_username'].setValidators({validators:[Validators.required, Validators.pattern(this.validRule.name), this.ifUserExisting(this.tenantUsers)], updateOn:'change'});
-            this.myFormGroup.controls['form_psw'].setValidators([Validators.required, Validators.minLength(8), this.regPassword]);
-            this.myFormGroup.controls['form_pswConfirm'].setValidators([Validators.required, this.regConfirmPassword(this.newPassword)] );
+            this.myFormGroup.controls['form_psw'].setValidators([Validators.required, Validators.minLength(8),this.regPassword,this.regConfirmPassword('form_pswConfirm')]);
+            this.myFormGroup.controls['form_pswConfirm'].setValidators([Validators.required, this.regConfirmPassword('form_psw')] );
         }
 
         // Update form validate status
@@ -286,8 +303,8 @@ export class UserListComponent implements OnInit, AfterViewChecked {
 
     ModifyPswChecked(checked){
         if(checked){
-            this.myFormGroup.controls['form_psw'].setValidators([Validators.required, Validators.minLength(8), this.regPassword]);
-            this.myFormGroup.controls['form_pswConfirm'].setValidators([Validators.required, this.regConfirmPassword(this.newPassword)] );
+            this.myFormGroup.controls['form_psw'].setValidators([Validators.required, Validators.minLength(8), this.regPassword,this.regConfirmPassword('form_pswConfirm')]);
+            this.myFormGroup.controls['form_pswConfirm'].setValidators([Validators.required, this.regConfirmPassword('form_psw')] );
 
         }else{
             this.myFormGroup.controls['form_psw'].clearValidators();
