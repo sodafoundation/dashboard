@@ -84,6 +84,10 @@ export class CreateProfileComponent implements OnInit {
         {
             label: 'RBD',
             value: 'RBD'
+        },
+        {
+            label: 'nvmeof',
+            value: 'nvmeof'
         }
     ];
     storageTypeOptions = [
