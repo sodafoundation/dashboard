@@ -21,6 +21,8 @@ export class FileShareComponent implements OnInit{
     modifyFileShareShow = false;
     createSnapshotForm;
     createAclsFormGroup;
+    checkAclsIp = [];
+    showIpErrorMessage = [];
     errorMessage = {
         "level": { required: "Access Level is required." },
         "user": { required: "Ip/User is required." },
@@ -180,8 +182,30 @@ export class FileShareComponent implements OnInit{
             this.aclCreateShow = true;
             this.aclsItems = [0];
             this.createAclsFormGroup.reset();
+            this.getAcls(selectedFileShare);
+            this.showIpErrorMessage = [false];
         }
         this.selectedFileShare = selectedFileShare;
+    }
+
+    getAcls(selectedFileShare){
+        this.checkAclsIp = [];
+        this.FileShareAclService.getFileShareAcl().subscribe((res)=>{
+            let str = res.json();
+            str.forEach(item=>{
+                if(item.fileshareId == selectedFileShare.id){
+                    this.checkAclsIp.push(item.accessTo);
+                }
+            })
+        })
+    }
+    userIpChange(index){
+        let userInput = this.createAclsFormGroup.value['userInput'+index];
+        if((this.checkAclsIp.indexOf(userInput) !=-1)){
+            this.showIpErrorMessage[index] = true;
+        }else{
+            this.showIpErrorMessage[index] = false;
+        }
     }
     modifyFileShare(value){
         if (!this.modifyFileShareForm.valid) {
@@ -274,26 +298,8 @@ export class FileShareComponent implements OnInit{
         })
     }
 
-    addTransRules(){
-        if(this.aclsItems.length > 0){
-            this.aclsItems.push(
-                this.aclsItems[this.aclsItems.length-1] + 1
-            );
-        }else{
-            this.aclsItems = [0];
-        }
-        this.aclsItems.forEach(index => {
-            if((this.aclsItems.length > 1 && index !== 0) || (this.aclsItems.length ==1)){
-              this.createAclsFormGroup.addControl('userInput'+index, this.fb.control("", [Validators.required,Validators.pattern(this.validRule.name)]));
-            }
-        });
-    }
-    deleteAclUsers(index){
-        this.aclsItems.splice(index, 1);
-        this.createAclsFormGroup.removeControl('userInput'+index);
-    }
     createAclsSubmit(value){
-        if(!this.createAclsFormGroup.valid){
+        if(!this.createAclsFormGroup.valid || (this.showIpErrorMessage.indexOf(true) !=-1)){
             for(let i in this.createAclsFormGroup.controls){
                 this.createAclsFormGroup.controls[i].markAsTouched();
             }
