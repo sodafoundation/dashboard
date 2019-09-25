@@ -9,7 +9,7 @@
 
 <div class="ui-g-12 ui-md-6 relative-class" *ngFor="let profile of profiles">
     <p-card styleClass="new-card-class ui-card-shadow">
-        <profile-card [cardData]="profile" (checkParam)="checkRep($event)"></profile-card>
+        <profile-card [cardData]="profile" (checkParam)="checkRep($event)" [checkName]= "allProfileNameForCheck"></profile-card>
     </p-card>
 </div>
 

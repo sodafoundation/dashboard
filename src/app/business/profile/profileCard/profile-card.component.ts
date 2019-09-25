@@ -53,7 +53,6 @@ export class ProfileCardComponent implements OnInit {
     map = new Map();
     showModifyProfile = false;
     modifyProfileForm: FormGroup;
-    allProfileNameForCheck = [];
     dropMenuItems = [];
     isAdministrator = true;
     @Input() 
@@ -85,6 +84,7 @@ export class ProfileCardComponent implements OnInit {
         this.map["Qos"] = "50px";
         this.map["Replication"] = "114px";     
     };
+    @Input() checkName;
 
     chartDatas: any;
     errorMessage={
@@ -104,12 +104,7 @@ export class ProfileCardComponent implements OnInit {
         private confirmationService:ConfirmationService
     ) { }
     option = {};
-    pools = [];
-    totalFreeCapacity = 0;
-    totalCapacity = 0;
     ngOnInit() {
-        this.getProfiles();
-        this.getPools();
         this.option = {
             cutoutPercentage: 80,
             // rotation: (0.5 * Math.PI),
@@ -147,20 +142,22 @@ export class ProfileCardComponent implements OnInit {
         }else{
             this.isAdministrator = false;
         }
+        this.chartDatas = {
+            labels: ['Unused Capacity', 'Used Capacity'],
+            datasets: [
+                {
+                    data: [this.data.totalFreeCapacity,this.data.totalCapacity-this.data.totalFreeCapacity],
+                    backgroundColor: [
+                        "rgba(224, 224, 224, .5)",
+                        "#438bd3"
+                    ]
+                }]
+        };
     }
 
     index;
     isHover;
 
-    getProfiles() {
-        this.allProfileNameForCheck = [];
-        this.ProfileService.getProfiles().subscribe((res) => {
-            let profiles = res.json();
-            profiles.forEach(item=>{
-                this.allProfileNameForCheck.push(item.name);
-            })
-        });
-    }
     showSuspensionFrame(event){
         if(event.type === 'mouseenter'){
             this.isHover = true;
@@ -174,54 +171,11 @@ export class ProfileCardComponent implements OnInit {
             }
         }
     }
-    getPools() {
-        let url = 'v1beta/{project_id}/pools';
-        this.http.get(url).subscribe((res) => {
-            this.pools = res.json();
-            this.totalFreeCapacity = this.getSumCapacity(this.pools, 'free');
-            this.totalCapacity = this.getSumCapacity(this.pools, 'total');
-            this.chartDatas = {
-                labels: ['Unused Capacity', 'Used Capacity'],
-                datasets: [
-                    {
-                        data: [this.totalFreeCapacity,this.totalCapacity-this.totalFreeCapacity],
-                        backgroundColor: [
-                            "rgba(224, 224, 224, .5)",
-                            "#438bd3"
-                        ]
-                    }]
-            };
-        });
-    }
-
-    getSumCapacity(pools, FreeOrTotal) {
-        let SumCapacity: number = 0;
-        let newPools = lodash.cloneDeep(pools);
-        newPools = newPools.filter(item=>{
-            return item.storageType == this.data.storageType;
-        })
-        let arrLength = newPools.length;
-        for (let i = 0; i < arrLength; i++) {
-            let valid = this.data && this.data["provisioningProperties"].ioConnectivity.accessProtocol && this.data["provisioningProperties"].ioConnectivity.accessProtocol.toLowerCase() 
-            == newPools[i].extras.ioConnectivity.accessProtocol;
-            let blockValid = this.data["provisioningProperties"].dataStorage.provisioningPolicy == newPools[i].extras.dataStorage.provisioningPolicy;
-            if(valid && (this.data.storageType == "file" ||  (this.data.storageType == "block" && blockValid))){
-                if (FreeOrTotal === 'free') {
-                    SumCapacity += newPools[i].freeCapacity;
-                } else {
-                    SumCapacity += newPools[i].totalCapacity;
-                }
-            }else{
-                SumCapacity = 0;
-            }
-        }
-        return SumCapacity;
-    }
 
     modifyPorfile(policyId){
         let id = policyId.id;
         this.showModifyProfile = true;
-        let modifyNameForCheck = lodash.cloneDeep(this.allProfileNameForCheck);
+        let modifyNameForCheck = lodash.cloneDeep(this.checkName);
         modifyNameForCheck = modifyNameForCheck.filter(item=>{
             return item != policyId.name;
         })
