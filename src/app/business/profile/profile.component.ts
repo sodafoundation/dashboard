@@ -5,8 +5,9 @@ import { AppService } from 'app/app.service';
 import { trigger, state, style, transition, animate } from '@angular/animations';
 import { I18nPluralPipe } from '@angular/common';
 
-import { ProfileService } from './profile.service';
+import { ProfileService, PoolService } from './profile.service';
 import { ConfirmationService,ConfirmDialogModule} from '../../components/common/api';
+let lodash = require('lodash');
 
 @Component({
     templateUrl: './profile.component.html',
@@ -44,12 +45,15 @@ export class ProfileComponent implements OnInit {
     profiles;
     showWarningDialog = false;
     isAdministrator = true;
+    allProfileNameForCheck = [];
+    pools = [];
     constructor(
         public I18N: I18NService,
         // private router: Router
         private ProfileService: ProfileService,
         private confirmationService:ConfirmationService,
-        private paramStor: ParamStorService
+        private paramStor: ParamStorService,
+        private PoolService: PoolService
     ) { }
     showCard = true;
     ngOnInit() {
@@ -68,12 +72,51 @@ export class ProfileComponent implements OnInit {
     }
     getProfiles() {
         this.ProfileService.getProfiles().subscribe((res) => {
-            this.profiles = res.json();
-            this.profiles.forEach(item=>{
+            let str = res.json();
+            this.allProfileNameForCheck = [];
+            str.forEach(item=>{
                 if(item.storageType && item.storageType == "file"){
                     delete item.replicationProperties;
                 }
+                this.allProfileNameForCheck.push(item.name);
             })
+            this.getPools(str);
         });
+    }
+    getPools(str) {
+        this.PoolService.getPools().subscribe((res) => {
+            this.pools = res.json();
+            str.forEach(item => {
+                item.totalFreeCapacity = this.getSumCapacity(this.pools, 'free',item);
+                item.totalCapacity = this.getSumCapacity(this.pools, 'total',item);
+            });
+            this.profiles = str;
+        },
+        err=>{
+            this.profiles = str;
+        });
+    }
+    getSumCapacity(pools, FreeOrTotal,data) {
+        let SumCapacity: number = 0;
+        let newPools = lodash.cloneDeep(pools);
+        newPools = newPools.filter(item=>{
+            return item.storageType == data.storageType;
+        })
+        let arrLength = newPools.length;
+        for (let i = 0; i < arrLength; i++) {
+            let valid = data && data["provisioningProperties"].ioConnectivity.accessProtocol && data["provisioningProperties"].ioConnectivity.accessProtocol.toLowerCase() 
+            == newPools[i].extras.ioConnectivity.accessProtocol;
+            let blockValid = data["provisioningProperties"].dataStorage.provisioningPolicy == newPools[i].extras.dataStorage.provisioningPolicy;
+            if(valid && (data.storageType == "file" ||  (data.storageType == "block" && blockValid))){
+                if (FreeOrTotal === 'free') {
+                    SumCapacity += newPools[i].freeCapacity;
+                } else {
+                    SumCapacity += newPools[i].totalCapacity;
+                }
+            }else{
+                SumCapacity = 0;
+            }
+        }
+        return SumCapacity;
     }
 }
