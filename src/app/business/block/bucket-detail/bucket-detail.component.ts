@@ -200,7 +200,7 @@ export class BucketDetailComponent implements OnInit {
           this.allDir.forEach(item=>{
             item.size = Utils.getDisplayCapacity(item.Size,2,'KB');
             item.lastModified = Utils.formatDate(item.LastModified *1000);
-            item.Tier = "Tier_" + item.Tier + " (" + item.StorageClass + ")";
+            item.Tier = item.Key.indexOf(this.colon) == -1 ? "Tier_" + item.Tier + " (" + item.StorageClass + ")" : '--';
             if(item.ObjectKey.indexOf(this.colon) !=-1){
               item.objectName = item.ObjectKey.slice(0,item.ObjectKey.lastIndexOf(this.colon));
               this.allFolderNameForCheck.push(item.objectName);

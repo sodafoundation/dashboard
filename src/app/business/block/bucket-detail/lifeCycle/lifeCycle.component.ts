@@ -539,32 +539,36 @@ export class LifeCycleComponent implements OnInit {
     getLifeCycleDataArray(value, object?, dialog?) {
         let xmlStr = `<LifecycleConfiguration xmlns=\"http://s3.amazonaws.com/doc/2006-03-01/\">`;
         let x2js = new X2JS();
-        let arr = lodash.cloneDeep(object.LifecycleConfiguration);
-        //In the modified/enable/disable state, delete the original lifeCycle and create new lifeCycle
-        let modifyCycle, modifyCleanDays;
-        if (dialog != "create") {
-            if (_.isArray(arr.Rule)) {
-                arr.Rule = arr.Rule.filter(item => {
-                    return item.ID != value.name;
-                })
-            } else {
-                arr = "";
+        let defaultLifeCycle, modifyCycle, modifyCleanDays;
+        if (object) {
+            let arr = lodash.cloneDeep(object.LifecycleConfiguration);
+            //In the modified/enable/disable state, delete the original lifeCycle and create new lifeCycle
+            if (dialog != "create") {
+                if (_.isArray(arr.Rule)) {
+                    arr.Rule = arr.Rule.filter(item => {
+                        return item.ID != value.name;
+                    })
+                } else {
+                    arr = "";
+                }
+                if (dialog != "update") {
+                    modifyCycle = this.modifyArr.filter(item => {
+                        return item.ID == value.name;
+                    });
+                    modifyCleanDays = modifyCycle[0].AbortIncompleteMultipartUpload.DaysAfterInitiation;
+                }
             }
-            if (dialog != "update") {
-                modifyCycle = this.modifyArr.filter(item => {
-                    return item.ID == value.name;
-                });
-                modifyCleanDays = modifyCycle[0].AbortIncompleteMultipartUpload.DaysAfterInitiation;
+            if(arr == "" || arr.Rule[0] || arr.Rule.constructor === Object){
+                defaultLifeCycle = x2js.json2xml_str(arr);
             }
         }
-        let defaultLifeCycle = x2js.json2xml_str(arr);
-        if(value.Status){
-            value.Status = value.Status == "enable" ? "Enabled" : "Disabled";
+        if (value.Status) {
+            value.Status = value.Status.toLowerCase() == "enabled" ? "Enabled" : "Disabled";
         }
         let Rules = {
             Rule: {
                 ID: value.name,
-                Filter: { Prefix: value.Prefix ? value.Prefix : value.prefix },
+                Filter: { Prefix: value.Prefix ? value.Prefix : (value.newPrefix ? value.newPrefix : value.prefix)},
                 Status: (((this.transChecked && this.transOptions.length != 0) || this.expirChecked || this.expirCleanUp) && value.enabled) ? "Enabled" :
                     value.Status ? value.Status : "Disabled"
             }
@@ -653,7 +657,11 @@ export class LifeCycleComponent implements OnInit {
             jsonObj = jsonObj + Incomplete;
         }
         let newLifeCycle = jsonObj + ruleXml;
-        xmlStr = xmlStr + defaultLifeCycle + newLifeCycle + `</LifecycleConfiguration>`;
+        if (defaultLifeCycle) {
+            xmlStr = xmlStr + defaultLifeCycle + newLifeCycle + `</LifecycleConfiguration>`;
+        } else {
+            xmlStr = xmlStr + newLifeCycle + `</LifecycleConfiguration>`;
+        }
         return xmlStr;
     }
     checkStorageClass(control: FormControl): { [s: string]: boolean } {
@@ -680,8 +688,8 @@ export class LifeCycleComponent implements OnInit {
             acceptLabel: this.i18n.keyID['ok'],
             isWarning: true,
             accept: () => {
-                selectedArr.forEach(item=>{
-                    item.Status = "enable"
+                selectedArr.forEach(item => {
+                    item.Status = "enabled"
                     item.name = item.ObjectKey;
                     this.onSubmit(item,"enable");
                 })
@@ -706,8 +714,8 @@ export class LifeCycleComponent implements OnInit {
             acceptLabel: this.i18n.keyID['ok'],
             isWarning: true,
             accept: () => {
-                selectedArr.forEach(item=>{
-                    item.Status = "disable"
+                selectedArr.forEach(item => {
+                    item.Status = "disabled"
                     item.name = item.ObjectKey;
                     this.onSubmit(item,"disable");
                 })
@@ -906,7 +914,11 @@ export class LifeCycleComponent implements OnInit {
                 isWarning: true,
                 accept: () => {
                     arr.forEach((item, index) => {
-                        this.deleteLifeCycle(item)
+                        if(arr.length > 1){
+                            this.deleteLifeCycle(item,"multiple");
+                        }else{
+                            this.deleteLifeCycle(item);
+                        }
                     })
                 },
                 reject: () => { }
@@ -915,7 +927,8 @@ export class LifeCycleComponent implements OnInit {
 
     }
 
-    deleteLifeCycle(value) {
+    deleteLifeCycle(value, multiple?) {
+        //Multiple means batch deletion
         window['getAkSkList'](() => {
             let requestMethod = "DELETE";
             let url = this.BucketService.url + '/' + this.bucketId + "/?lifecycle" + "&ruleID=" + value.ObjectKey;
@@ -924,10 +937,22 @@ export class LifeCycleComponent implements OnInit {
                 this.getSignature(options);
                 let requestUrl = this.bucketId + "/?lifecycle" + "&ruleID=" + value.ObjectKey;
                 this.BucketService.deleteLifeCycle(requestUrl, options).subscribe((res) => {
-                    this.modifyArr = this.modifyArr.filter(item => {
-                        item.ObjectKey != value.ObjectKey;
+                    let lifeCycleArr = _.filter(this.lifeCycleAlls, item=>{
+                        item.name = item.ObjectKey;
+                        return item.ObjectKey != value.ObjectKey;
+                    });
+                    this.modifyArr = _.filter(this.modifyArr, item => {
+                       return item.ID != value.ObjectKey;
                     })
-                    this.getLifeCycleList();
+                    this.submitObj.LifecycleConfiguration.Rule = _.filter(this.submitObj.LifecycleConfiguration.Rule,it=>{
+                        return it.ID != value.ObjectKey;
+                    })
+                    if(lifeCycleArr.length >0 && !multiple){
+                        let data = this.getLifeCycleDataArray(lifeCycleArr[0], this.submitObj, lifeCycleArr[0].Status);
+                        this.createLifeCycleSubmit(data);
+                    }else{
+                        this.getLifeCycleList();
+                    }
                 })
             })
         })
