@@ -45,7 +45,7 @@ export class HomeComponent implements OnInit {
     selectedBackend:any;
     cloud_type = [];
     allBackendNameForCheck=[];
-    isLocalCloud=true;
+    isLocalCloud=false;
 
     @ViewChild("path") path: ElementRef;
     @ViewChild("cloud_aws") c_AWS: ElementRef;
@@ -84,26 +84,22 @@ export class HomeComponent implements OnInit {
         
         this.getCounts();
         this.getType();
-        if(this.isLocalCloud){this.backendForm = this.fb.group({
-            "name":['', {validators:[Validators.required,Utils.isExisted(this.allBackendNameForCheck)]}],
-            "type":['',{validators:[Validators.required]}],
-            "region":['',{updateOn:'change'}],
-            "endpoint":['',{validators:[Validators.required], updateOn:'change'}],
-            "bucket":['',{validators:[Validators.required], updateOn:'change'}],
-            "ak":['',{validators:[Validators.required], updateOn:'change'}],
-            "sk":['',{validators:[Validators.required], updateOn:'change'}],
-        });
-        }else {
-            this.backendForm = this.fb.group({
-                "name": ['', {validators: [Validators.required, Utils.isExisted(this.allBackendNameForCheck)]}],
-                "type": ['', {validators: [Validators.required]}],
-                "region":['',{validators:[Validators.required],updateOn:'change'}],
-                "endpoint": ['', {validators: [Validators.required], updateOn: 'change'}],
-                "bucket": ['', {validators: [Validators.required], updateOn: 'change'}],
-                "ak": ['', {validators: [Validators.required], updateOn: 'change'}],
-                "sk": ['', {validators: [Validators.required], updateOn: 'change'}],
-            });
+        let info = {
+            "name": ['', { validators: [Validators.required, Utils.isExisted(this.allBackendNameForCheck)] }],
+            "type": ['', { validators: [Validators.required] }],
+            "region": null,
+            "endpoint": ['', { validators: [Validators.required], updateOn: 'change' }],
+            "bucket": ['', { validators: [Validators.required], updateOn: 'change' }],
+            "ak": ['', { validators: [Validators.required], updateOn: 'change' }],
+            "sk": ['', { validators: [Validators.required], updateOn: 'change' }],
         }
+        if (this.isLocalCloud) {
+            info.region = ['', { updateOn: 'change' }];
+        }
+        else {
+            info.region = ['', { validators: [Validators.required], updateOn: 'change' }];
+        }
+        this.backendForm = this.fb.group(info);
         this.modifyBackendForm = this.fb.group({
             "ak":['',{validators:[Validators.required], updateOn:'change'}],
             "sk":['',{validators:[Validators.required], updateOn:'change'}],
