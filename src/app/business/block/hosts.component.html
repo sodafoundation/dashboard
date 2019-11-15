@@ -1,0 +1,153 @@
+<div class="table-toolbar">
+    <div class="left">
+        <button class="ui-button-secondary" pButton type="button" label="{{I18N.keyID['sds_block_volume_create']}}" [routerLink]="['/createHost']"></button>
+        <button pButton type="button" label="{{I18N.keyID['sds_block_volume_delete']}}" [disabled]="selectedHosts.length == 0" (click)="batchDeleteHosts(selectedHosts)"></button></div>
+    <div class="right">
+        <div class="ui-inputsearch">
+            <input type="text" #searchByName pInputText placeholder="{{I18N.keyID['sds_block_volume_search']}}">
+            <button pButton type="button" icon="fa-search"></button>
+        </div>
+        <button class="" pButton type="button" (click)="getProfiles()" icon="fa-refresh"></button>
+    </div>
+</div>
+
+<p-dataTable [value]="allHosts" [globalFilter]="searchByName" [(selection)]="selectedHosts" [expandableRows]="true" [showHeaderCheckbox]="true" [rows]="10" [paginator]="true" [pageLinks]="3" [rowsPerPageOptions]="[10,20,50,100]">
+    <p-column expander="true" styleClass="col-icon" [style]="{'width': '30px'}"></p-column>
+    <p-column selectionMode="multiple" [style]="{'width': '30px'}"></p-column>
+    <p-column field="hostName" header="Name">
+        <ng-template pTemplate="body" let-host="rowData">
+            <a [routerLink]="['/hostDetails/' + host.id]" title="{{host.hostName}}">{{host.hostName}}</a>
+        </ng-template>
+    </p-column>
+    <p-column field="ip" header="IP Address"></p-column>
+    <p-column field="port" header="Port"></p-column>
+    <p-column field="isActive" header="Status">
+        <ng-template let-host="rowData" pTemplate="body">
+            <span>{{host.isActive ? "Active" : "Inactive"}}</span>
+        </ng-template>
+    </p-column>
+    <p-column field="osType" header="OS"></p-column>
+    <p-column field="accessMode" header="Access Mode"></p-column>
+    <p-column field="availabilityZones" header="Availablilty Zones">
+       
+    </p-column>
+    <p-column header="{{I18N.keyID['sds_block_volume_operation']}}">
+        <ng-template pTemplate="body" let-host="rowData">
+            <p-dropmenu label="Actions" [model]="menuItems" (click)="returnSelectedHost(host)"></p-dropmenu>
+        </ng-template>
+    </p-column>
+    <ng-template let-host pTemplate="rowexpansion">
+            <div class="ui-grid ui-grid-responsive ui-grid-pad ui-fluid">
+                <div class="ui-grid-row volume-basic-item-class">
+                    <div class="ui-grid-col-1">
+                        {{label.hostName}}:
+                    </div>
+                    <div class="ui-grid-col-3 volume-basic-item-value-color">
+                        {{host.hostName}}
+                    </div>
+                    <div class="ui-grid-col-1">
+                        {{label.status}}:
+                    </div>
+                    <div class="ui-grid-col-3 volume-basic-item-value-color">
+                        {{host.status}}
+                    </div>
+                    <div class="ui-grid-col-1">
+                        {{label.createdAt}}:
+                    </div>
+                    <div class="ui-grid-col-3 volume-basic-item-value-color">
+                        {{host.createdAt}}
+                    </div>
+                    
+                </div>
+                <div class="ui-grid-row volume-basic-item-class">
+                    <div class="ui-grid-col-1">
+                        {{label.ip}}:
+                    </div>
+                    <div class="ui-grid-col-3 volume-basic-item-value-color">
+                        {{host.ip}}
+                    </div>
+                    <div class="ui-grid-col-1">
+                        {{label.accessMode}}:
+                    </div>
+                    <div class="ui-grid-col-3 volume-basic-item-value-color">
+                        {{host.accessMode}}
+                    </div>
+                    <div class="ui-grid-col-1">
+                        {{label.updatedAt}}:
+                    </div>
+                    <div class="ui-grid-col-3 volume-basic-item-value-color">
+                        {{host.updatedAt}}
+                    </div>
+                    
+                </div>
+                <div class="ui-grid-row volume-basic-item-class">
+                        <div class="ui-grid-col-1">
+                            {{label.port}}:
+                        </div>
+                        <div class="ui-grid-col-3 volume-basic-item-value-color">
+                            {{host.port}}
+                        </div>
+                        <div class="ui-grid-col-1">
+                            {{label.availabilityZones}}:
+                        </div>
+                        <div class="ui-grid-col-3 volume-basic-item-value-color">
+                            {{host.availabilityZones}}
+                        </div>
+                        
+                        <div class="ui-grid-col-1">
+                            {{label.osType}}:
+                        </div>
+                        <div class="ui-grid-col-3 volume-basic-item-value-color">
+                            {{host.osType}}
+                        </div>
+                </div>
+                <div class="ui-grid-row volume-basic-item-class">
+                    <div class="ui-grid-col-12">
+                        {{label.initiators}}:
+                    </div>
+                </div>
+                <div class="ui-grid-row volume-basic-item-class">
+                    <p-dataTable [value]="host.initiators">
+                        <p-column field="portName" header="Port Name"></p-column>
+                        <p-column field="protocol" header="Protocol"></p-column>
+                    </p-dataTable>
+                </div>
+            </div>
+    </ng-template>
+</p-dataTable>
+<!--create volumes group-->
+<!-- <p-dialog header="{{I18N.keyID['sds_block_volume_group_create_group']}}" [(visible)]="showHostsDialog" [modal]="true" [responsive]="true" [width]="800" [contentStyle]="{'min-height':'300px'}">
+    <form [grid]="{label: 'ui-g-2', content:'ui-g-10'}" [formGroup]="volumeGroupForm" [errorMessage]="errorMessage">
+        <form-item label="{{label.group_name_lable }}" [required]="true">
+            <input type="text" pInputText formControlName="group_name" />
+        </form-item>
+        <form-item label="{{label.description}}" [required]="false">
+            <textarea [rows]="5" [cols]="30" pInputTextarea formControlName="description" ></textarea>
+        </form-item>
+        <form-item [required]="false" label="{{label.zone}}">
+            <p-dropdown [options]="availabilityZones" formControlName="zone" [style]="{'min-width':'100px'}" placeholder="Please choose" ></p-dropdown>
+        </form-item>
+        <form-item label="{{label.profile_label}}" [required]="true" >
+            <p-multiSelect [options]="profileOptions" [filter]="false" formControlName="profile" [style]="{'width':'150px'}" placeholder="Please choose"></p-multiSelect>
+        </form-item>
+    </form>
+    <p-footer>
+        <button type="button" pButton (click)="submit(volumeGroupForm.value)"  label="{{I18N.keyID['ok']}}"></button>
+        <button type="button" pButton (click)="showVolumeGroupDialog=false"  label="{{I18N.keyID['cancel']}}"></button>
+    </p-footer>
+</p-dialog> -->
+<!-- <p-dialog header="{{I18N.keyID['sds_block_volume_group_modify_group']}}" [(visible)]="showModifyGroup" [modal]="true" [responsive]="true" [width]="800">
+    <form [grid]="{label: 'ui-g-2', content:'ui-g-10'}" [formGroup]="modifyGroupForm" [errorMessage]="errorMessage">
+        <form-item label="{{label.group_name_lable }}" [required]="true">
+            <input type="text" pInputText formControlName="group_name"  />
+        </form-item>
+        <form-item label="{{label.description}}" [required]="false">
+            <textarea [rows]="5" [cols]="30" pInputTextarea formControlName="description"></textarea>
+        </form-item>
+    </form>
+    <p-footer>
+        <button type="button" pButton (click)="modifyGroup(modifyGroupForm.value)"  label="{{I18N.keyID['ok']}}"></button>
+        <button type="button" pButton (click)="showModifyGroup=false"  label="{{I18N.keyID['cancel']}}"></button>
+    </p-footer>
+</p-dialog> -->
+<p-confirmDialog></p-confirmDialog>
