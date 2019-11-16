@@ -72,6 +72,10 @@ export class BucketsComponent implements OnInit{
     allBucketNameForCheck=[];
     showCreateBucket = false;
     akSkRouterLink = "/akSkManagement";
+    enableVersion: boolean;
+    enableEncryption = false;
+    sseTypes = [];
+    selectedSse = "SSE";
     constructor(
         public I18N: I18NService,
         private router: Router,
@@ -92,7 +96,10 @@ export class BucketsComponent implements OnInit{
         this.createBucketForm = this.fb.group({
             "backend":["",{validators:[Validators.required], updateOn:'change'}],
             "backend_type":["",{validators:[Validators.required], updateOn:'change'}],
-            "name":["",{validators:[Validators.required,Utils.isExisted(this.allBucketNameForCheck)], updateOn:'change'}]
+            "name":["",{validators:[Validators.required,Utils.isExisted(this.allBucketNameForCheck)], updateOn:'change'}],
+            "version": [false, { validators: [Validators.required], updateOn: 'change' }],
+            "encryption": [false, { validators: [Validators.required], updateOn: 'change' }],
+            "sse":["",{}],
         });
         this.migrationForm = this.fb.group({
             "name": ['',{validators:[Validators.required], updateOn:'change'}],
@@ -131,6 +138,20 @@ export class BucketsComponent implements OnInit{
         }];
         this.allBackends = [];
         this.getBuckets();
+        this.sseTypes = [
+            {
+                label: "SSE",
+                value: 'sse'
+            },
+            {
+                label: "SSE-C",
+                value: 'sse-c'
+            },
+            {
+                label: "SSE-KMS",
+                value: 'sse-kms'
+            },
+        ]
     }
     showcalendar(){
         this.selectTime = !this.selectTime;
@@ -190,6 +211,8 @@ export class BucketsComponent implements OnInit{
                                 label:item.name,
                                 value:item.name
                             });
+                            item.encryptionEnabled = item.IsSSEEnabled=="true" ? true : false;
+                            item.versionEnabled = item.IsVersioningEnabled=="true" ? true : false;
                         });
                         this.initBucket2backendAnd2Type();
                     });
@@ -327,7 +350,16 @@ export class BucketsComponent implements OnInit{
             });
         });
     }
-
+    versionControl(){
+        let enableVersionValue = this.createBucketForm.get('version').value;
+        
+        this.enableVersion = enableVersionValue ? true : false;
+    }
+    encryptionControl(){
+        let enableEncryptionValue = this.createBucketForm.get('encryption').value;
+        
+        this.enableEncryption = enableEncryptionValue ? true : false;
+    }
     creatBucket(){
         if(!this.createBucketForm.valid){
             for(let i in this.createBucketForm.controls){
@@ -338,7 +370,7 @@ export class BucketsComponent implements OnInit{
         let param = {
             name:this.createBucketForm.value.name,
             backend_type:this.createBucketForm.value.backend_type,
-            backend:this.createBucketForm.value.backend,
+            backend:this.createBucketForm.value.backend
         };
         let xmlStr = `<CreateBucketConfiguration xmlns=\"http://s3.amazonaws.com/doc/2006-03-01/\">
                         <LocationConstraint>${this.createBucketForm.value.backend}</LocationConstraint>
@@ -352,14 +384,83 @@ export class BucketsComponent implements OnInit{
                 options.headers.set('Content-Type','application/xml');
                 this.BucketService.createBucket(this.createBucketForm.value.name,xmlStr,options).subscribe(()=>{
                     this.createBucketDisplay = false;
-                    this.getBuckets();
+                    /* Add the PUT Encryption Call here before fetching the updated list of Buckets */
+                    if(this.enableEncryption){
+                        this.bucketEncryption();
+                    }
+                    if(this.enableVersion){
+                       this.bucketVersioning();
+                    }
+                    if(!this.enableEncryption && !this.enableVersion){
+                        this.getBuckets();
+                    }
+                    /* Call the getBuckets call in the success of the encryption call */
+                    
                 }); 
             })
         })           
     }
+
+    bucketEncryption(){
+        let encryptStr = `<DefaultSSEConfiguration>
+                        <SSE>
+                            <enabled>true</enabled>
+                        </SSE>
+                        <SSE-KMS>
+                            <enabled>false</enabled>
+                            <DefaultKMSMasterKey>string</DefaultKMSMasterKey>
+                        </SSE-KMS>
+                     </DefaultSSEConfiguration>`
+        window['getAkSkList'](()=>{
+            let requestMethod = "PUT";
+            let url = this.BucketService.url+"/"+this.createBucketForm.value.name;
+            window['canonicalString'](requestMethod, url,()=>{
+                let options: any = {};
+                this.getSignature(options);
+                options.headers.set('Content-Type','application/xml');
+                this.BucketService.setEncryption(this.createBucketForm.value.name,encryptStr,options).subscribe(()=>{
+                    
+                    if(this.enableVersion){
+                        this.bucketVersioning();
+                        this.enableVersion = false;
+                    }
+                    this.getBuckets();
+                });
+            });
+        })
+    }
+    bucketVersioning(){
+        window['getAkSkList'](()=>{
+            let requestMethod = "PUT";
+            let url = this.BucketService.url+"/"+this.createBucketForm.value.name;
+            window['canonicalString'](requestMethod, url,()=>{
+                let options: any = {};
+                this.getSignature(options);
+                options.headers.set('Content-Type','application/xml');
+                this.BucketService.setVersioning(this.createBucketForm.value.name,options).subscribe(()=>{
+                    
+                    if(this.enableEncryption){
+                        this.bucketEncryption();
+                        this.enableEncryption=false;
+                    }
+                    this.getBuckets();
+                });
+            });
+        });
+    }
     showCreateForm(){
         this.createBucketDisplay = true;
-        this.createBucketForm.reset();
+        this.enableEncryption = false;
+        this.enableVersion = false;
+        this.createBucketForm.reset(
+            {
+                "backend":"",
+                "backend_type":"",
+                "name":"",
+                "version": false,
+                "encryption": false
+            }
+        );
         this.createBucketForm.controls['name'].setValidators([Validators.required,Utils.isExisted(this.allBucketNameForCheck)]);
         this.getTypes();
     }

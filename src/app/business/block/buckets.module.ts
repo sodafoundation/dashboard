@@ -3,7 +3,7 @@ import { BucketsComponent } from './buckets.component';
 import { RouterModule } from '@angular/router';
 import { TabViewModule, ButtonModule } from '../../components/common/api';
 import {DataTableModule, DropMenuModule, DialogModule, FormModule, InputTextModule, InputTextareaModule, 
-  DropdownModule ,ConfirmationService,ConfirmDialogModule,CalendarModule,CheckboxModule} from '../../components/common/api';
+  DropdownModule ,ConfirmationService,ConfirmDialogModule,CalendarModule,CheckboxModule, InputSwitchModule} from '../../components/common/api';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { HttpService } from './../../shared/service/Http.service';
@@ -31,7 +31,8 @@ import { MigrationService } from './../dataflow/migration.service';
     ConfirmDialogModule,
     RouterModule,
     CalendarModule,
-    CheckboxModule
+    CheckboxModule,
+    InputSwitchModule
   ],
   exports: [ BucketsComponent ],
   providers: [
