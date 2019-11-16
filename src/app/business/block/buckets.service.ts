@@ -49,6 +49,12 @@ export class BucketService {
     let url = this.url + '/' + id;
     return this.http.get(url,options);
   }
+  
+  //Set Bucket Encryption
+  setEncryption(name,param?,options?) {
+    return this.http.put(this.url+"/"+name+"/?DefaultEncryption",param,options);
+  }
+
   //Set Bucket Versioning
   setVersioning(name,param?,options?) {
     return this.http.put(this.url+"/"+name+"/?Versioning",param,options);
