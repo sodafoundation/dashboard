@@ -8,11 +8,12 @@ import { VolumeService} from './volume.service';
 import { HostsService } from './hosts.service';
 import { AvailabilityZonesService } from './../resource/resource.service';
 import { ConfirmationService,ConfirmDialogModule} from '../../components/common/api';
+import { TooltipModule } from '../../components/tooltip/tooltip';
 import { RouterModule } from '@angular/router';
 
 @NgModule({
   declarations: [ HostsComponent ],
-  imports: [ CommonModule, ButtonModule, DataTableModule, InputTextModule, DropMenuModule, DialogModule,FormModule,MultiSelectModule,DropdownModule,ReactiveFormsModule,FormsModule,ConfirmDialogModule,InputTextareaModule,RouterModule],
+  imports: [ CommonModule, ButtonModule, DataTableModule, InputTextModule, DropMenuModule, DialogModule,FormModule,MultiSelectModule,DropdownModule,ReactiveFormsModule,FormsModule,ConfirmDialogModule,InputTextareaModule, TooltipModule,RouterModule],
   exports: [ HostsComponent ],
   providers: [
     HttpService,

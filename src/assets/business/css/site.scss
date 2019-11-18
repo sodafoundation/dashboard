@@ -2016,7 +2016,14 @@ a {
     height: 50px;
 }
 /* Host Management Starts */
-
+/* Host List */
+.host-az{
+    text-align: center;
+}
+.host-az-tip{
+    font-size: 14px;
+    padding: 10px;
+}
 /* Create Host page */
 .initiator-array{
     width: 600px;

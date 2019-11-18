@@ -28,8 +28,11 @@
     </p-column>
     <p-column field="osType" header="OS"></p-column>
     <p-column field="accessMode" header="Access Mode"></p-column>
-    <p-column field="availabilityZones" header="Availablilty Zones">
-       
+    <p-column field="availabilityZones" header="Availablilty Zones" [styleClass]="host-az">
+       <ng-template pTemplate="body" let-host="rowData">
+            <span class="host-az" >{{host.availabilityZones[0]}}</span>
+            <a *ngIf="host.availabilityZones.length > 1" pTooltip="{{host.availabilityZones}}" tooltipPosition="top" tooltipStyleClass="host-az-tip" positionStyle="absolute">...</a>
+       </ng-template>
     </p-column>
     <p-column header="{{I18N.keyID['sds_block_volume_operation']}}">
         <ng-template pTemplate="body" let-host="rowData">
