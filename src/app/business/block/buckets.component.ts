@@ -75,7 +75,10 @@ export class BucketsComponent implements OnInit{
     enableVersion: boolean;
     enableEncryption = false;
     sseTypes = [];
-    selectedSse = "SSE";
+    selectedSse;
+    isSSE: boolean = false;
+    isSSEKMS: boolean = false;
+    isSSEC: boolean = false;
     constructor(
         public I18N: I18NService,
         private router: Router,
@@ -142,15 +145,15 @@ export class BucketsComponent implements OnInit{
             {
                 label: "SSE",
                 value: 'sse'
-            },
-            {
-                label: "SSE-C",
-                value: 'sse-c'
-            },
+            }/*,
             {
                 label: "SSE-KMS",
                 value: 'sse-kms'
             },
+            {
+                label: "SSE-C",
+                value: 'sse-c'
+            }, */
         ]
     }
     showcalendar(){
@@ -402,12 +405,27 @@ export class BucketsComponent implements OnInit{
     }
 
     bucketEncryption(){
+        switch (this.selectedSse) {
+            case 'sse':
+                this.isSSE = true;
+                break;
+            case 'sse-kms':
+                this.isSSEKMS = true;
+                break;
+            case 'sse-c':
+                this.isSSEC = true;
+                break;
+        
+            default:
+                break;
+        }
+
         let encryptStr = `<DefaultSSEConfiguration>
                         <SSE>
-                            <enabled>true</enabled>
+                            <enabled>${this.isSSE}</enabled>
                         </SSE>
                         <SSE-KMS>
-                            <enabled>false</enabled>
+                            <enabled>${this.isSSEKMS}</enabled>
                             <DefaultKMSMasterKey>string</DefaultKMSMasterKey>
                         </SSE-KMS>
                      </DefaultSSEConfiguration>`
