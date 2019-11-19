@@ -28,7 +28,7 @@
     </p-column>
     <p-column field="osType" header="OS"></p-column>
     <p-column field="accessMode" header="Access Mode"></p-column>
-    <p-column field="availabilityZones" header="Availablilty Zones" [styleClass]="host-az">
+    <p-column field="availabilityZones" header="Availablilty Zones">
        <ng-template pTemplate="body" let-host="rowData">
             <span class="host-az" >{{host.availabilityZones[0]}}</span>
             <a *ngIf="host.availabilityZones.length > 1" pTooltip="{{host.availabilityZones}}" tooltipPosition="top" tooltipStyleClass="host-az-tip" positionStyle="absolute">...</a>
