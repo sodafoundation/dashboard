@@ -118,7 +118,7 @@
     </p-footer>
 </p-dialog>
 <!-- Detach Host from Volume -->
-<p-dialog *ngIf="detachDisplay" header="{{I18N.keyID['sds_block_volume_attach_host']}}" styleClass="detachHostModal" [(visible)]="detachDisplay" [width]="650" [height]="400" modal="modal">
+<p-dialog *ngIf="detachDisplay" header="{{I18N.keyID['sds_block_volume_detach_host']}}" styleClass="detachHostModal" [(visible)]="detachDisplay" [width]="650" [height]="400" modal="modal">
         <form [grid]="{label: 'ui-g-3', content:'ui-g-20'}" [formGroup]="detachHostFormGroup" [errorMessage]="errorMessage">
             <form-item [required]="true" label="{{I18N.keyID['sds_block_volume_title']}}" >
                 <span class="text-only">{{selectedVolume.name}}</span>
