@@ -31,10 +31,15 @@
     "sds_block_volume_createrep":"Create Replication",
     "sds_block_volume_more":"More",
     "sds_block_volume_modify":"Modify",
+    "sds_block_volume_attach_host":"Attach Host",
+    "sds_block_volume_detach_host":"Detach Host",
     "sds_block_volume_expand":"Expand",
     "sds_block_volume_delete":"Delete",
     "sds_block_volume_create":"Create",
     "sds_block_volume_search":"search",
+    "sds_block_volume_attach":"Attach",
+    "sds_block_volume_detach":"Detach",
+    "sds_block_volume_attachments":"Attachments",
     "sds_block_volume_createVol":"Create Volume",
     "sds_block_volume_createVol_desc":"Apply for block storage resources.",
     "sds_block_volume_quantity":"Quantity",
@@ -143,4 +148,5 @@
     "sds_fileShare_export": "Export Location",
     "sds_fileShare_update": "Updated At",
     "sds_ippattern": "IP address must be (1~255). (0~255). (0~255). (0~255)/(1-32)"
+    "sds_block_attach_mode" : "Attach Mode"
 }

@@ -2015,3 +2015,9 @@ a {
 .list-header{
     height: 50px;
 }
+/* Attach Host to Volume */
+.attachHostModal, .detachHostModal{
+    .ui-dialog-content{
+        height: 250px;
+    }
+}
