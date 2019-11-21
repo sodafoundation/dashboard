@@ -68,13 +68,7 @@ export class HostsComponent implements OnInit {
        
     }
 
-    attach(){
-        console.log("Host Attached;")
-    }
-
-    detach(){
-        console.log("Host Detached;")
-    }
+    
 
     returnSelectedHost(host){
         this.selectedHost = host;
@@ -83,27 +77,7 @@ export class HostsComponent implements OnInit {
     ngOnInit() {
         this.getAllHosts();
         this.menuItems = [
-            {
-                "label": this.I18N.keyID['sds_block_volume_modify'],
-                command: () => {
-                    /* this.modifyDisplay = true; */
-                },
-                disabled:false
-            },
-            {
-                "label": "Attach",
-                command: () => {
-                    this.attach();
-                },
-                disabled:false
-            },
-            {
-                "label": "Detach",
-                command: () => {
-                    this.detach();
-                },
-                disabled:false
-            },
+           
             {
                 "label": this.I18N.keyID['sds_block_volume_delete'], 
                 command: () => {
@@ -115,32 +89,16 @@ export class HostsComponent implements OnInit {
             }
         ];
         this.menuDeleDisableItems = [
-           /*  {
-                "label": this.I18N.keyID['sds_block_volume_modify'],
-                command: () => {
-                    this.modifyDisplay = true;
-                },
-                disabled:false
-            },
-            {
-                "label": this.I18N.keyID['sds_block_volume_expand'],
-                command: () => {
-                    this.expandDisplay = true;
-                    this.expandFormGroup.reset();
-                    this.expandFormGroup.controls["expandSize"].setValue(1);
-                    this.unit = 1;
-                },
-                disabled:false
-            },
+           
             {
                 "label": this.I18N.keyID['sds_block_volume_delete'], 
                 command: () => {
-                    if (this.selectedVolume && this.selectedVolume.id) {
-                        this.deleteVolumes(this.selectedVolume);
+                    if (this.selectedHost) {
+                        this.batchDeleteHosts(this.selectedHost);
                     }
                 },
                 disabled:true
-            } */
+            }
         ];
 
     }
@@ -303,33 +261,33 @@ export class HostsComponent implements OnInit {
     });
    }
 
-   batchDeleteHosts(hosts){
-    let arr=[], msg;
-    if(_.isArray(hosts)){
-        hosts.forEach((item,index)=> {
-            arr.push(item.id);
-        })
-        msg = "<div>Are you sure you want to delete the selected hosts?</div><h3>[ "+ hosts.length +" Hosts ]</h3>";
-    }else{
-        arr.push(hosts.id);
-        msg = "<div>Are you sure you want to delete the host?</div><h3>[ "+ hosts.hostName +" ]</h3>";
-    }
-
-    this.confirmationService.confirm({
-        message: msg,
-        header: this.I18N.keyID['sds_block_host_delete'],
-        acceptLabel: this.I18N.keyID['sds_block_volume_delete'],
-        isWarning: true,
-        accept: ()=>{
-            arr.forEach((item,index)=> {
-                this.deleteHost(item)
+    batchDeleteHosts(hosts){
+        let arr=[], msg;
+        if(_.isArray(hosts)){
+            hosts.forEach((item,index)=> {
+                arr.push(item.id);
             })
+            msg = "<div>Are you sure you want to delete the selected hosts?</div><h3>[ "+ hosts.length +" Hosts ]</h3>";
+        }else{
+            arr.push(hosts.id);
+            msg = "<div>Are you sure you want to delete the host?</div><h3>[ "+ hosts.hostName +" ]</h3>";
+        }
 
-        },
-        reject:()=>{}
-    })
+        this.confirmationService.confirm({
+            message: msg,
+            header: this.I18N.keyID['sds_block_host_delete'],
+            acceptLabel: this.I18N.keyID['sds_block_volume_delete'],
+            isWarning: true,
+            accept: ()=>{
+                arr.forEach((item,index)=> {
+                    this.deleteHost(item)
+                })
 
-}
+            },
+            reject:()=>{}
+        })
+
+    }
 
 
   /*   modifyVolume() {
