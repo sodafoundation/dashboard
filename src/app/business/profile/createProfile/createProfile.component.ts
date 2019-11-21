@@ -229,10 +229,7 @@ export class CreateProfileComponent implements OnInit {
             isExisted:this.I18N.keyID['sds_isExisted'],
         },
         "maxIOPS": { required: this.I18N.keyID['sds_required'].replace("{0}","MaxIOPS")},
-        "minIOPS": { required: this.I18N.keyID['sds_required'].replace("{0}","MinIOPS")},
         "maxBWS" :{ required: this.I18N.keyID['sds_required'].replace("{0}","MaxBWS")},
-        "minBWS" :{ required: this.I18N.keyID['sds_required'].replace("{0}","MinBWS")},
-        "latency" :{ required: this.I18N.keyID['sds_required'].replace("{0}","Latency")},
         "repPeriod" :{ required: this.I18N.keyID['sds_required'].replace("{0}","Period")},
         "repBandwidth" :{ required: this.I18N.keyID['sds_required'].replace("{0}","Bandwidth")},
         "repRPO" :{ required: this.I18N.keyID['sds_required'].replace("{0}","RPO")},
@@ -364,10 +361,10 @@ export class CreateProfileComponent implements OnInit {
         });
         this.qosPolicy = this.fb.group({
             "maxIOPS": new FormControl(6000, Validators.required),
-            "minIOPS": new FormControl(500, Validators.required),
+            "minIOPS": new FormControl(500),
             "maxBWS" : new FormControl(100, Validators.required),
-            "minBWS" : new FormControl(1, Validators.required),
-            "latency" : new FormControl(5, Validators.required),
+            "minBWS" : new FormControl(1),
+            "latency" : new FormControl(5),
         });
         this.repPolicy = this.fb.group({
             "repType": new FormControl("mirror", Validators.required),
