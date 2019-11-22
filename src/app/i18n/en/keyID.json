@@ -6,6 +6,7 @@
     "sds_block_volumes_descrip":"View and manage Volumes that have been manually created or applied for through service templates.",
     "sds_block_volumesGroup_descrip":"View and manage Volume Groups that have been manually created or applied for through service templates.",
     "sds_block_fileShare_descrip":"View and manage File Shares that have been manually created or applied for through service templates.",
+    "sds_block_hosts_descrip":"View and manage Hosts.",
     "sds_home_tenants":"Tenants",
     "sds_home_users":"Users",
     "sds_home_volumes":"Volumes",
@@ -142,5 +143,15 @@
     "sds_lifeCycle_disable": "Disable the lifecycle rule",
     "sds_fileShare_export": "Export Location",
     "sds_fileShare_update": "Updated At",
-    "sds_ippattern": "IP address must be (1~255). (0~255). (0~255). (0~255)/(1-32)"
+    "sds_ippattern": "IP address must be (1~255). (0~255). (0~255). (0~255)/(1-32)",
+    "sds_Hosts_title": "Hosts",
+    "sds_Host_detail": "Host details",
+    "sds_create_host": "Create Host",
+    "sds_host_os_type": "OS Type",
+    "sds_host_ip": "IP Address",
+    "sds_host_access_mode": "Access Mode",
+    "sds_host_initiators": "Initiators",
+    "sds_host_availability_zones": "Availability Zones",
+    "sds_block_createHost_desc" : "Add a new host",
+    "sds_block_host_delete":"Delete Host"
 }

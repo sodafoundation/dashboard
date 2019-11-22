@@ -2015,3 +2015,26 @@ a {
 .list-header{
     height: 50px;
 }
+/* Host Management Starts */
+/* Host List */
+.host-az{
+    text-align: center;
+}
+.host-az-tip{
+    font-size: 14px;
+    padding: 10px;
+}
+/* Create Host page */
+.initiator-array{
+    width: 600px;
+    padding: 0 0 5px 0;
+}
+a.add-initiator{
+    color: #00b12e;
+}
+
+a.remove-initiator {
+    color: #ff0000;
+    padding: 8px 0 0 0;
+}
+/* Host Management Ends */
