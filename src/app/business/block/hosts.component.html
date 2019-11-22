@@ -118,39 +118,5 @@
             </div>
     </ng-template>
 </p-dataTable>
-<!--create volumes group-->
-<!-- <p-dialog header="{{I18N.keyID['sds_block_volume_group_create_group']}}" [(visible)]="showHostsDialog" [modal]="true" [responsive]="true" [width]="800" [contentStyle]="{'min-height':'300px'}">
-    <form [grid]="{label: 'ui-g-2', content:'ui-g-10'}" [formGroup]="volumeGroupForm" [errorMessage]="errorMessage">
-        <form-item label="{{label.group_name_lable }}" [required]="true">
-            <input type="text" pInputText formControlName="group_name" />
-        </form-item>
-        <form-item label="{{label.description}}" [required]="false">
-            <textarea [rows]="5" [cols]="30" pInputTextarea formControlName="description" ></textarea>
-        </form-item>
-        <form-item [required]="false" label="{{label.zone}}">
-            <p-dropdown [options]="availabilityZones" formControlName="zone" [style]="{'min-width':'100px'}" placeholder="Please choose" ></p-dropdown>
-        </form-item>
-        <form-item label="{{label.profile_label}}" [required]="true" >
-            <p-multiSelect [options]="profileOptions" [filter]="false" formControlName="profile" [style]="{'width':'150px'}" placeholder="Please choose"></p-multiSelect>
-        </form-item>
-    </form>
-    <p-footer>
-        <button type="button" pButton (click)="submit(volumeGroupForm.value)"  label="{{I18N.keyID['ok']}}"></button>
-        <button type="button" pButton (click)="showVolumeGroupDialog=false"  label="{{I18N.keyID['cancel']}}"></button>
-    </p-footer>
-</p-dialog> -->
-<!-- <p-dialog header="{{I18N.keyID['sds_block_volume_group_modify_group']}}" [(visible)]="showModifyGroup" [modal]="true" [responsive]="true" [width]="800">
-    <form [grid]="{label: 'ui-g-2', content:'ui-g-10'}" [formGroup]="modifyGroupForm" [errorMessage]="errorMessage">
-        <form-item label="{{label.group_name_lable }}" [required]="true">
-            <input type="text" pInputText formControlName="group_name"  />
-        </form-item>
-        <form-item label="{{label.description}}" [required]="false">
-            <textarea [rows]="5" [cols]="30" pInputTextarea formControlName="description"></textarea>
-        </form-item>
-    </form>
-    <p-footer>
-        <button type="button" pButton (click)="modifyGroup(modifyGroupForm.value)"  label="{{I18N.keyID['ok']}}"></button>
-        <button type="button" pButton (click)="showModifyGroup=false"  label="{{I18N.keyID['cancel']}}"></button>
-    </p-footer>
-</p-dialog> -->
+
 <p-confirmDialog></p-confirmDialog>
