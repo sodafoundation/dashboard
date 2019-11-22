@@ -280,8 +280,7 @@ export class VolumeListComponent implements OnInit {
                 self.hostOptions.push(option);
             })
          }, (error) =>{
-             this.msgs = [];
-             this.msgs.push({severity: 'error', summary: 'Error', detail: error.message});
+            console.log("No hosts.", error.json().message);
          })
      }
      showDetach(selectedVolume){
@@ -328,8 +327,7 @@ export class VolumeListComponent implements OnInit {
                 this.msgs.push({severity: 'error', summary: 'Error', detail: 'This volume does not have any attachments.'});
             }
          }, (error) =>{
-             this.msgs = [];
-             this.msgs.push({severity: 'error', summary: 'Error', detail: error.json().message});
+             console.log("Attachments not found", error);
          })
          
      }
