@@ -214,8 +214,7 @@ export class BucketsComponent implements OnInit{
                                 label:item.name,
                                 value:item.name
                             });
-                            item.encryptionEnabled = item.IsSSEEnabled=="true" ? true : false;
-                            item.versionEnabled = item.IsVersioningEnabled=="true" ? true : false;
+                            item.encryptionEnabled = item.SSEConfiguration.SSE.enabled =="true" ? true : false;
                         });
                         this.initBucket2backendAnd2Type();
                     });
@@ -353,15 +352,9 @@ export class BucketsComponent implements OnInit{
             });
         });
     }
-    versionControl(){
-        let enableVersionValue = this.createBucketForm.get('version').value;
-        
-        this.enableVersion = enableVersionValue ? true : false;
-    }
+  
     encryptionControl(){
-        let enableEncryptionValue = this.createBucketForm.get('encryption').value;
-        
-        this.enableEncryption = enableEncryptionValue ? true : false;
+        this.enableEncryption = this.createBucketForm.get('encryption').value;
     }
     creatBucket(){
         if(!this.createBucketForm.valid){
@@ -390,11 +383,6 @@ export class BucketsComponent implements OnInit{
                     /* Add the PUT Encryption Call here before fetching the updated list of Buckets */
                     if(this.enableEncryption){
                         this.bucketEncryption();
-                    }
-                    if(this.enableVersion){
-                       this.bucketVersioning();
-                    }
-                    if(!this.enableEncryption && !this.enableVersion){
                         this.getBuckets();
                     }
                     /* Call the getBuckets call in the success of the encryption call */
@@ -419,16 +407,16 @@ export class BucketsComponent implements OnInit{
             default:
                 break;
         }
-
-        let encryptStr = `<DefaultSSEConfiguration>
-                        <SSE>
-                            <enabled>${this.isSSE}</enabled>
-                        </SSE>
-                        <SSE-KMS>
-                            <enabled>${this.isSSEKMS}</enabled>
-                            <DefaultKMSMasterKey>string</DefaultKMSMasterKey>
-                        </SSE-KMS>
-                     </DefaultSSEConfiguration>`
+        
+        let encryptStr = `<SSEConfiguration>
+        <SSE>
+            <enabled>${this.isSSE}</enabled>
+        </SSE>
+        <SSE-KMS>
+            <enabled>${this.isSSEKMS}</enabled>
+            <DefaultKMSMasterKey>string</DefaultKMSMasterKey>
+        </SSE-KMS>
+    </SSEConfiguration>`;
         window['getAkSkList'](()=>{
             let requestMethod = "PUT";
             let url = this.BucketService.url+"/"+this.createBucketForm.value.name;
@@ -436,36 +424,15 @@ export class BucketsComponent implements OnInit{
                 let options: any = {};
                 this.getSignature(options);
                 options.headers.set('Content-Type','application/xml');
-                this.BucketService.setEncryption(this.createBucketForm.value.name,encryptStr,options).subscribe(()=>{
-                    
-                    if(this.enableVersion){
-                        this.bucketVersioning();
-                        this.enableVersion = false;
-                    }
+                this.BucketService.setEncryption(this.createBucketForm.value.name,encryptStr,options).subscribe((res)=>{
                     this.getBuckets();
+                }, (error) => {
+                    console.log("Set encryption failed", error);
                 });
             });
         })
     }
-    bucketVersioning(){
-        window['getAkSkList'](()=>{
-            let requestMethod = "PUT";
-            let url = this.BucketService.url+"/"+this.createBucketForm.value.name;
-            window['canonicalString'](requestMethod, url,()=>{
-                let options: any = {};
-                this.getSignature(options);
-                options.headers.set('Content-Type','application/xml');
-                this.BucketService.setVersioning(this.createBucketForm.value.name,options).subscribe(()=>{
-                    
-                    if(this.enableEncryption){
-                        this.bucketEncryption();
-                        this.enableEncryption=false;
-                    }
-                    this.getBuckets();
-                });
-            });
-        });
-    }
+    
     showCreateForm(){
         this.createBucketDisplay = true;
         this.enableEncryption = false;
