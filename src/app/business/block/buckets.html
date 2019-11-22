@@ -64,9 +64,6 @@
             <form-item label="Backend" [required]="true">
                 <p-dropdown [style]="{'min-width':'150px','width':'220px'}" placeholder="Please select" [options]="backendsOption" formControlName="backend"></p-dropdown>
             </form-item>
-            <form-item label="Enable Versioning?" >
-                <p-inputSwitch formControlName="version" onLabel="Yes" offLabel="No" (onChange)="versionControl()"></p-inputSwitch>
-            </form-item>
             <form-item label="Enable Encryption?" >
                 <p-inputSwitch formControlName="encryption" onLabel="Yes" offLabel="No" (onChange)="encryptionControl()"></p-inputSwitch>
             </form-item>
