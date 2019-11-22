@@ -59,6 +59,11 @@
             <p-tabPanel header="{{i18n.keyID['sds_block_volume_replication']}}">
                 <app-replication-list [volumeId]="volumeId"></app-replication-list>
             </p-tabPanel>
+            <p-tabPanel header="{{i18n.keyID['sds_Hosts_title']}}">
+                <ng-template pTemplate="content">
+                        <app-attachment-list [volumeId]="volumeId"></app-attachment-list>
+                </ng-template>
+            </p-tabPanel>
         </p-tabView>
     </div>
 </div>

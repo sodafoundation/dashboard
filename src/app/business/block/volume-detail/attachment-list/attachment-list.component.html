@@ -1,0 +1,62 @@
+<p-growl [value]="msgs" [sticky]="false" [life]="6000"></p-growl>
+<div>
+<div class="table-toolbar">
+        <div class="left">
+            
+        </div>
+        <div class="right">
+            <div class="ui-inputsearch">
+                <input type="text" #searchByName pInputText placeholder="{{I18N.keyID['sds_block_volume_search']}}">
+                <button pButton type="button" icon="fa-search"></button>
+            </div>
+            <button class="" pButton type="button" (click)="getAllAttachedHosts()" icon="fa-refresh"></button>
+        </div>
+    </div>
+    <p-dataTable [value]="attachedHostsTableData" [globalFilter]="searchByName" [expandableRows]="true" [showHeaderCheckbox]="true" [rows]="10" [paginator]="true" [pageLinks]="3" [rowsPerPageOptions]="[10,20,50,100]">
+            <div *ngFor="let item of attachedHostsTableData">
+                    <pre>{{item | json}}</pre>
+                </div>
+        <p-column field="hostName" header="Name">
+            <ng-template pTemplate="body" let-host="rowData">
+                <span>{{host.hostName}}</span>
+            </ng-template>
+        </p-column>
+        <p-column field="ip" header="IP Address"></p-column>
+        <p-column field="port" header="Port">
+            <ng-template pTemplate="body" let-host="rowData">
+                <span>{{host.port? host.port : '-'}}</span>
+            </ng-template>
+        </p-column>
+        <p-column field="osType" header="OS"></p-column>
+        <p-column field="accessMode" header="Access Mode"></p-column>
+        <p-column field="availabilityZones" header="Availablilty Zones">
+            <ng-template pTemplate="body" let-host="rowData">
+                <span class="host-az" >{{host.availabilityZones[0]}}</span>
+                <a *ngIf="host.availabilityZones.length > 1" pTooltip="{{host.availabilityZones}}" tooltipPosition="top" tooltipStyleClass="host-az-tip" positionStyle="absolute">...</a>
+            </ng-template>
+        </p-column>
+        <p-column header="{{I18N.keyID['sds_block_volume_operation']}}">
+            <ng-template pTemplate="body" let-host="rowData">
+                <a (click)="showDetach(host)">{{this.I18N.keyID['sds_block_volume_detach_host']}}</a>
+            </ng-template>
+        </p-column>
+      
+    </p-dataTable>
+</div>
+
+<!-- Detach Host from Volume -->
+<p-dialog *ngIf="detachDisplay" header="{{I18N.keyID['sds_block_volume_detach_host']}}" styleClass="detachHostModal" [(visible)]="detachDisplay" [width]="650" [height]="400" modal="modal">
+    <form [grid]="{label: 'ui-g-3', content:'ui-g-20'}" [formGroup]="detachHostFormGroup" [errorMessage]="errorMessage">
+        <form-item label="{{I18N.keyID['sds_block_volume_title']}}" >
+            <span class="text-only">{{selectedVolume.name}}</span>
+        </form-item>
+        <form-item label="{{I18N.keyID['sds_block_volume_attachments']}}" >
+            <span class="text-only">{{selectedHost.hostName}}</span>
+        </form-item>
+    </form>
+    <p-footer>
+        <button type="button" pButton (click)="detachHost()" label="{{I18N.keyID['ok']}}" ></button>
+        <button type="button" pButton (click)="detachDisplay=false" label="{{I18N.keyID['cancel']}}"></button>
+    </p-footer>
+</p-dialog>
+<p-confirmDialog></p-confirmDialog>    

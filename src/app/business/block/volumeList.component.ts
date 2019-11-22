@@ -5,10 +5,12 @@ import { FormControl, FormGroup, FormBuilder, Validators, ValidatorFn, AbstractC
 import { AppService } from 'app/app.service';
 import { I18nPluralPipe } from '@angular/common';
 import { trigger, state, style, transition, animate } from '@angular/animations';
-import { MenuItem ,ConfirmationService} from '../../components/common/api';
+import { MenuItem ,ConfirmationService, Message} from '../../components/common/api';
 
 import { VolumeService, SnapshotService,ReplicationService} from './volume.service';
 import { ProfileService } from './../profile/profile.service';
+import { HostsService } from './hosts.service';
+import { AttachService } from './attach.service';
 import { identifierModuleUrl } from '@angular/compiler';
 
 let _ = require("underscore");
@@ -24,6 +26,10 @@ export class VolumeListComponent implements OnInit {
     createReplicationDisplay = false;
     expandDisplay = false;
     modifyDisplay = false;
+    attachDisplay: boolean = false;
+    detachDisplay: boolean = false;
+    noHosts: boolean = false;
+    noAttachments: boolean = false;
     selectVolumeSize;
     newVolumeSize;
     newVolumeSizeFormat;
@@ -40,6 +46,16 @@ export class VolumeListComponent implements OnInit {
         }
 
     ];
+    attachModeOptions = [
+        {
+            label: "RO",
+            value: "ro"
+        },
+        {
+            label: "RW",
+            value: "rw"
+        }
+    ]
     profileOptions = [];
     snapProfileOptions = [];
     azOption=[{label:"Secondary",value:"secondary"}];
@@ -56,6 +72,8 @@ export class VolumeListComponent implements OnInit {
     snapshotFormGroup;
     modifyFormGroup;
     expandFormGroup;
+    attachHostFormGroup;
+    detachHostFormGroup;
     replicationGroup;
     errorMessage = {
         "name": { required: "Name is required." },
@@ -65,10 +83,17 @@ export class VolumeListComponent implements OnInit {
         "expandSize":{
             required: "Expand Capacity is required.",
             pattern: "Expand Capacity can only be number"
-        }
+        },
+        "hostId" : {required : "Host is required"},
+        "attachmentId" : {required: "Attachment is required"}
     };
     profiles;
     selectedVolume;
+    allHosts;
+    attachedHosts;
+    attachedHostOptions = [];
+    hostOptions = [];
+    msgs: Message[];
 
     constructor(
         public I18N: I18NService,
@@ -76,6 +101,8 @@ export class VolumeListComponent implements OnInit {
         private VolumeService: VolumeService,
         private SnapshotService: SnapshotService,
         private ProfileService: ProfileService,
+        private HostsService: HostsService,
+        private attach: AttachService,
         private ReplicationService: ReplicationService,
         private confirmationService: ConfirmationService,
         private fb: FormBuilder
@@ -92,6 +119,13 @@ export class VolumeListComponent implements OnInit {
             "expandSize":[1,{validators:[Validators.required,Validators.pattern(/^\d+$/)], updateOn:'change'} ],
             "capacityOption":[this.capacityOptions[0] ]
         });
+        this.attachHostFormGroup = this.fb.group({
+            "hostId" : ['', Validators.required],
+            "attachMode" : ['']
+        })
+        this.detachHostFormGroup = this.fb.group({
+            "attachmentId" : ['', Validators.required]
+        })
         this.expandFormGroup.get("expandSize").valueChanges.subscribe(
             (value:string)=>{
                 this.newVolumeSize =  parseInt(this.selectedVolume.size) + parseInt(value)*this.unit;
@@ -119,6 +153,22 @@ export class VolumeListComponent implements OnInit {
                 "label": this.I18N.keyID['sds_block_volume_modify'],
                 command: () => {
                     this.modifyDisplay = true;
+                },
+                disabled:false
+            },
+            {
+                "label": this.I18N.keyID['sds_block_volume_attach_host'],
+                command: () => {
+                    this.showAttach();
+                },
+                disabled:false
+            },
+            {
+                "label": this.I18N.keyID['sds_block_volume_detach_host'],
+                command: () => {
+                    if (this.selectedVolume && this.selectedVolume.id) {
+                        this.showDetach(this.selectedVolume);
+                    }
                 },
                 disabled:false
             },
@@ -151,6 +201,22 @@ export class VolumeListComponent implements OnInit {
                 disabled:false
             },
             {
+                "label": this.I18N.keyID['sds_block_volume_attach_host'],
+                command: () => {
+                    this.showAttach();
+                },
+                disabled:false
+            },
+            {
+                "label": this.I18N.keyID['sds_block_volume_detach_host'],
+                command: () => {
+                    if (this.selectedVolume && this.selectedVolume.id) {
+                        this.showDetach(this.selectedVolume);
+                    }
+                },
+                disabled:false
+            },
+            {
                 "label": this.I18N.keyID['sds_block_volume_expand'],
                 command: () => {
                     this.expandDisplay = true;
@@ -174,6 +240,97 @@ export class VolumeListComponent implements OnInit {
         this.getProfiles()
     }
 
+    showAttach(){
+        let self = this;
+        this.attachDisplay = true;
+        this.hostOptions = [];
+        this.attachHostFormGroup.reset();
+        this.getAllHosts();
+    }
+
+    attachHost(){
+        let params = {
+            "volumeId" : this.selectedVolume.id,
+            "hostId" : this.attachHostFormGroup.value.hostId,
+            "attachMode" : this.attachHostFormGroup.value.attachMode
+        }
+        this.attach.createAttachment(params).subscribe((res) =>{
+            this.msgs = [];
+            this.msgs.push({severity: 'success', summary: 'Success', detail: 'Host Attached Successfully.'});
+            this.attachDisplay = false;
+            this.getProfiles();
+        }, (error) =>{
+            this.msgs = [];
+            this.msgs.push({severity: 'error', summary: 'Error', detail: error.json().message});
+            this.attachDisplay = false;
+        })
+    }
+    getAllHosts(){
+        let self =this;
+         this.HostsService.getHosts().subscribe((res) => {
+             this.allHosts = res.json();
+             if(this.allHosts.length == 0){
+                this.noHosts = true;
+            }
+            _.each(this.allHosts, function(item){
+                let option = {
+                    label: item['hostName'] + ' ' + '(' + item['ip'] + ')',
+                    value: item['id']
+                }
+                self.hostOptions.push(option);
+            })
+         }, (error) =>{
+            console.log("No hosts.", error.json().message);
+         })
+     }
+     showDetach(selectedVolume){
+        this.getAllAttachedHosts();
+        
+    }
+
+    detachHost(){
+        this.attach.deleteAttachment(this.detachHostFormGroup.value.attachmentId).subscribe((res) =>{
+            this.msgs = [];
+            this.msgs.push({severity: 'success', summary: 'Success', detail: 'Host Detached Successfully.'});
+            this.detachDisplay = false;
+            this.getProfiles();
+        }, (error) => {
+            this.msgs = [];
+            this.msgs.push({severity: 'error', summary: 'Error', detail: error.json().message});
+        })
+    }
+     getAllAttachedHosts(){
+         let self =this;
+         this.attachedHostOptions = [];
+         this.getAllHosts();
+          this.attach.getAttachments().subscribe((res) => {
+             this.attachedHosts = res.json();
+             if(this.attachedHosts.length > 0 && _.where(this.attachedHosts, {volumeId: self.selectedVolume.id}).length > 0){
+                let self = this;
+                this.detachDisplay = true;
+                this.noAttachments = false;
+                this.detachHostFormGroup.reset();
+                _.each(self.attachedHosts, function(atItem){
+                        _.each(self.allHosts, function(hostItem){
+                            if(self.selectedVolume.id == atItem['volumeId'] && atItem['hostId'] == hostItem['id']){
+                                let option = {
+                                    label: hostItem['hostName'] + ' ' + '(' + hostItem['ip'] + ')',
+                                    value: atItem['id']
+                                }
+                                self.attachedHostOptions.push(option);
+                            } 
+                        })
+                })
+            } else{
+                this.noAttachments = true;
+                this.msgs = [];
+                this.msgs.push({severity: 'error', summary: 'Error', detail: 'This volume does not have any attachments.'});
+            }
+         }, (error) =>{
+             console.log("Attachments not found", error);
+         })
+         
+     }
     getVolumes() {
         this.selectedVolumes = [];
         this.VolumeService.getVolumes().subscribe((res) => {
@@ -237,19 +394,14 @@ export class VolumeListComponent implements OnInit {
         });
     }
 
-    batchDeleteVolume() {
-        this.selectedVolumes.forEach(volume => {
-            this.deleteVolume(volume.id);
-        });
-    }
-
-    deleteVolumeById(id) {
-        this.deleteVolume(id);
-    }
+  
 
     deleteVolume(id) {
         this.VolumeService.deleteVolume(id).subscribe((res) => {
             this.getVolumes();
+        }, (error) =>{
+            this.msgs = [];
+            this.msgs.push({severity: 'error', summary: 'Error', detail: error.json().message});
         });
     }
 

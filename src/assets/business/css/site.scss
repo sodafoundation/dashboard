@@ -2015,6 +2015,14 @@ a {
 .list-header{
     height: 50px;
 }
+
+/* Attach Host to Volume */
+.attachHostModal, .detachHostModal{
+    .ui-dialog-content{
+        height: 250px;
+    }
+}
+
 /* Host Management Starts */
 /* Host List */
 .host-az{
@@ -2038,3 +2046,4 @@ a.remove-initiator {
     padding: 8px 0 0 0;
 }
 /* Host Management Ends */
+
