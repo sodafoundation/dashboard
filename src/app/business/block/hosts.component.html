@@ -1,3 +1,4 @@
+<p-growl [value]="msgs" [sticky]="false" [life]="6000"></p-growl>
 <div class="table-toolbar">
     <div class="left">
         <button class="ui-button-secondary" pButton type="button" label="{{I18N.keyID['sds_block_volume_create']}}" [routerLink]="['/createHost']"></button>
@@ -20,10 +21,9 @@
         </ng-template>
     </p-column>
     <p-column field="ip" header="IP Address"></p-column>
-    <p-column field="port" header="Port"></p-column>
-    <p-column field="isActive" header="Status">
-        <ng-template let-host="rowData" pTemplate="body">
-            <span>{{host.isActive ? "Active" : "Inactive"}}</span>
+    <p-column field="port" header="Port">
+        <ng-template pTemplate="body" let-host="rowData">
+            <span>{{host.port? host.port : '-'}}</span>
         </ng-template>
     </p-column>
     <p-column field="osType" header="OS"></p-column>

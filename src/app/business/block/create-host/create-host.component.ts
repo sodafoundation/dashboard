@@ -64,7 +64,7 @@ export class CreateHostComponent implements OnInit {
     "osType": { required: "OS Type is required."},
     "ip": { 
         required: "IP Address is required",
-        pattern: "Enter valid IP address"
+        pattern: "Enter valid IPv4 address"
     },
     "hostName": {
         required: "Host Name is required.",
@@ -73,7 +73,7 @@ export class CreateHostComponent implements OnInit {
     }
   };
   validRule = {
-    'validIp': '([0-9]{1,3})[.]([0-9]{1,3})[.]([0-9]{1,3})[.]([0-9]{1,3})'
+    'validIp': '([0-9]{1,3})[.]([0-9]{1,3})[.]([0-9]{1,3})[.]([0-9]{1,3})' /* Validates IPv4 address */
   };
   
   constructor(
