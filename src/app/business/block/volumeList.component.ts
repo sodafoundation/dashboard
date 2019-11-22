@@ -166,7 +166,9 @@ export class VolumeListComponent implements OnInit {
             {
                 "label": this.I18N.keyID['sds_block_volume_detach_host'],
                 command: () => {
-                    this.showDetach();
+                    if (this.selectedVolume && this.selectedVolume.id) {
+                        this.showDetach(this.selectedVolume);
+                    }
                 },
                 disabled:false
             },
@@ -208,7 +210,9 @@ export class VolumeListComponent implements OnInit {
             {
                 "label": this.I18N.keyID['sds_block_volume_detach_host'],
                 command: () => {
-                    this.showDetach();
+                    if (this.selectedVolume && this.selectedVolume.id) {
+                        this.showDetach(this.selectedVolume);
+                    }
                 },
                 disabled:false
             },
@@ -242,7 +246,6 @@ export class VolumeListComponent implements OnInit {
         this.hostOptions = [];
         this.attachHostFormGroup.reset();
         this.getAllHosts();
-        
     }
 
     attachHost(){
@@ -281,7 +284,7 @@ export class VolumeListComponent implements OnInit {
              this.msgs.push({severity: 'error', summary: 'Error', detail: error.message});
          })
      }
-     showDetach(){
+     showDetach(selectedVolume){
         this.getAllAttachedHosts();
         
     }
@@ -299,27 +302,26 @@ export class VolumeListComponent implements OnInit {
     }
      getAllAttachedHosts(){
          let self =this;
+         this.attachedHostOptions = [];
          this.getAllHosts();
           this.attach.getAttachments().subscribe((res) => {
-              console.log("Attachments", res.json());
              this.attachedHosts = res.json();
-             if(this.attachedHosts.length > 0){
+             if(this.attachedHosts.length > 0 && _.where(this.attachedHosts, {volumeId: self.selectedVolume.id}).length > 0){
                 let self = this;
                 this.detachDisplay = true;
-                this.attachedHostOptions = [];
+                this.noAttachments = false;
                 this.detachHostFormGroup.reset();
                 _.each(self.attachedHosts, function(atItem){
-                    _.each(self.allHosts, function(hostItem){
-                        if(atItem['hostId'] == hostItem['id']){
-                            let option = {
-                                label: hostItem['hostName'] + ' ' + '(' + hostItem['ip'] + ')',
-                                value: atItem['id']
-                            }
-                            self.attachedHostOptions.push(option);
-                        }
-                    })
+                        _.each(self.allHosts, function(hostItem){
+                            if(self.selectedVolume.id == atItem['volumeId'] && atItem['hostId'] == hostItem['id']){
+                                let option = {
+                                    label: hostItem['hostName'] + ' ' + '(' + hostItem['ip'] + ')',
+                                    value: atItem['id']
+                                }
+                                self.attachedHostOptions.push(option);
+                            } 
+                        })
                 })
-                console.log("Attachment Options", this.attachedHostOptions);
             } else{
                 this.noAttachments = true;
                 this.msgs = [];
@@ -329,7 +331,7 @@ export class VolumeListComponent implements OnInit {
              this.msgs = [];
              this.msgs.push({severity: 'error', summary: 'Error', detail: error.json().message});
          })
-       
+         
      }
     getVolumes() {
         this.selectedVolumes = [];
@@ -394,15 +396,7 @@ export class VolumeListComponent implements OnInit {
         });
     }
 
-   /*  batchDeleteVolume() {
-        this.selectedVolumes.forEach(volume => {
-            this.deleteVolume(volume.id);
-        });
-    }
-
-    deleteVolumeById(id) {
-        this.deleteVolume(id);
-    } */
+  
 
     deleteVolume(id) {
         this.VolumeService.deleteVolume(id).subscribe((res) => {
