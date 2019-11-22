@@ -107,16 +107,12 @@ export class CreateHostComponent implements OnInit {
         value: "iscsi"
       },
       {
-        label: "SCSI",
-        value: "scsi"
-      },
-      {
         label: "FC",
-        value: "fc"
+        value: "fibre_channel"
       },
       {
-        label: "NVMe",
-        value: "nvme"
+        label: "NVMeOF",
+        value: "nvmeof"
       }
     ]
     this.getAZ();
@@ -169,7 +165,7 @@ export class CreateHostComponent implements OnInit {
         this.router.navigate(['/block',"fromHosts"]);
     }, (error) =>{
         this.msgs = [];
-        this.msgs.push({severity: 'error', summary: 'Error', detail: error.message});
+        this.msgs.push({severity: 'error', summary: 'Error', detail: error.json().message});
     });
   }
 
