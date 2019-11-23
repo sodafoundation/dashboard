@@ -422,10 +422,7 @@ export class BucketsComponent implements OnInit{
                 this.getSignature(options);
                 options.headers.set('Content-Type','application/xml');
                 this.BucketService.setEncryption(this.createBucketForm.value.name,encryptStr,options).subscribe((res)=>{
-                    if(this.enableVersion){
-                        this.enableBucketVersioning(this.createBucketForm.value.name);
-                        this.enableVersion = false;
-                    }
+                    
                     this.getBuckets();
                 }, (error) => {
                     console.log("Set encryption failed", error);
