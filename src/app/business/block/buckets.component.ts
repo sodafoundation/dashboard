@@ -435,7 +435,7 @@ export class BucketsComponent implements OnInit{
     showCreateForm(){
         this.createBucketDisplay = true;
         this.enableEncryption = false;
-        this.enableVersion = false;
+
         this.createBucketForm.reset(
             {
                 "backend":"",
