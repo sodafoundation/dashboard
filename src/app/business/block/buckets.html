@@ -1,4 +1,4 @@
-
+<p-growl [value]="msgs" [sticky]="false" [life]="6000"></p-growl>
 <div class="content-header">
     <div class="table-toolbar">
         <div class="left">
@@ -27,15 +27,23 @@
         </p-column>
         <p-column field="LocationConstraint" header="Default Backend" ></p-column>
         <p-column field="createdAt" header="Created At"></p-column>
+        
+        <p-column field="encryptionEnabled" header="Encryption Enabled">
+            <ng-template pTemplate="body" let-bucket="rowData">
+                <p *ngIf="bucket.encryptionEnabled==true"><i class="fa fa-lock"></i> <span class="encryption-text">Yes</span><span class="encryption-type">AES256</span></p>
+                <p *ngIf="bucket.encryptionEnabled==false"><i class="fa fa-unlock"></i><span class="encryption-text">No</span></p>
+            </ng-template>
+        </p-column>
         <p-column header="{{I18N.keyID['sds_block_volume_operation']}}" [style]="{'width': '335px'}">
             <ng-template pTemplate="body" let-bucket="rowData" let-i="rowIndex">
+                
                 <a (click)="configMigration(bucket)">Migrate</a>
                 <a (click)="deleteBucket(bucket)">Delete</a>
             </ng-template>
         </p-column>
     </p-dataTable>
     
-    <p-dialog styleClass="create-bucket-dialog"  header="Create Bucket" [(visible)]="createBucketDisplay" [width]="600" modal="modal" [height]="410">
+    <p-dialog styleClass="create-bucket-dialog"  header="Create Bucket" [(visible)]="createBucketDisplay" [width]="900" modal="modal" [height]="700">
         <form [grid]="{label: 'ui-g-3', content:'ui-g-20'}" [formGroup]="createBucketForm" [errorMessage]="errorMessage">
             <form-item label="Name" [required]="true">
                 <input type="text" pInputText formControlName="name" />
@@ -48,6 +56,13 @@
             <form-item label="Backend" [required]="true">
                 <p-dropdown [style]="{'min-width':'150px','width':'220px'}" placeholder="Please select" [options]="backendsOption" formControlName="backend"></p-dropdown>
             </form-item>
+            <form-item label="Enable Encryption?" >
+                <p-inputSwitch formControlName="encryption" onLabel="Yes" offLabel="No" (onChange)="encryptionControl()"></p-inputSwitch>
+            </form-item>
+            <form-item label="Encryption Type">
+                <p-dropdown [style]="{'min-width':'150px','width':'220px'}" placeholder="Please select" [options]="sseTypes" [(disabled)]="!enableEncryption" [(ngModel)]='selectedSse' formControlName="sse"></p-dropdown>
+            </form-item>
+            
         </form>
         <p-footer>
             <button type="submit" class="ui-button-secondary" pButton (click)="creatBucket()"  label="{{I18N.keyID['ok']}}"></button>

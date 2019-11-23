@@ -5,7 +5,7 @@ import { AppService } from 'app/app.service';
 import { trigger, state, style, transition, animate} from '@angular/animations';
 import { I18nPluralPipe } from '@angular/common';
 import { FormControl, FormGroup, FormBuilder, Validators, ValidatorFn, AbstractControl } from '@angular/forms';
-import { MenuItem ,ConfirmationService} from '../../components/common/api';
+import { MenuItem ,ConfirmationService, Message} from '../../components/common/api';
 import { BucketService} from './buckets.service';
 import { debug } from 'util';
 import { MigrationService } from './../dataflow/migration.service';
@@ -72,6 +72,15 @@ export class BucketsComponent implements OnInit{
     allBucketNameForCheck=[];
     showCreateBucket = false;
     akSkRouterLink = "/akSkManagement";
+    
+    enableEncryption = false;
+    sseTypes = [];
+    selectedSse;
+    isSSE: boolean = false;
+    isSSEKMS: boolean = false;
+    isSSEC: boolean = false;
+    msgs: Message[];
+
     constructor(
         public I18N: I18NService,
         private router: Router,
@@ -92,7 +101,9 @@ export class BucketsComponent implements OnInit{
         this.createBucketForm = this.fb.group({
             "backend":["",{validators:[Validators.required], updateOn:'change'}],
             "backend_type":["",{validators:[Validators.required], updateOn:'change'}],
-            "name":["",{validators:[Validators.required,Utils.isExisted(this.allBucketNameForCheck)], updateOn:'change'}]
+            "name":["",{validators:[Validators.required,Utils.isExisted(this.allBucketNameForCheck)], updateOn:'change'}],
+            "encryption": [false, { validators: [Validators.required], updateOn: 'change' }],
+            "sse":["",{}],
         });
         this.migrationForm = this.fb.group({
             "name": ['',{validators:[Validators.required], updateOn:'change'}],
@@ -131,6 +142,12 @@ export class BucketsComponent implements OnInit{
         }];
         this.allBackends = [];
         this.getBuckets();
+        this.sseTypes = [
+            {
+                label: "SSE",
+                value: 'sse'
+            }
+        ]
     }
     showcalendar(){
         this.selectTime = !this.selectTime;
@@ -190,6 +207,8 @@ export class BucketsComponent implements OnInit{
                                 label:item.name,
                                 value:item.name
                             });
+                            item.encryptionEnabled = item.SSEConfiguration.SSE.enabled.toLower() == "true" ? true : false;
+                            
                         });
                         this.initBucket2backendAnd2Type();
                     });
@@ -327,7 +346,10 @@ export class BucketsComponent implements OnInit{
             });
         });
     }
-
+    
+    encryptionControl(){
+        this.enableEncryption = this.createBucketForm.get('encryption').value;
+    }
     creatBucket(){
         if(!this.createBucketForm.valid){
             for(let i in this.createBucketForm.controls){
@@ -338,7 +360,7 @@ export class BucketsComponent implements OnInit{
         let param = {
             name:this.createBucketForm.value.name,
             backend_type:this.createBucketForm.value.backend_type,
-            backend:this.createBucketForm.value.backend,
+            backend:this.createBucketForm.value.backend
         };
         let xmlStr = `<CreateBucketConfiguration xmlns=\"http://s3.amazonaws.com/doc/2006-03-01/\">
                         <LocationConstraint>${this.createBucketForm.value.backend}</LocationConstraint>
@@ -352,14 +374,76 @@ export class BucketsComponent implements OnInit{
                 options.headers.set('Content-Type','application/xml');
                 this.BucketService.createBucket(this.createBucketForm.value.name,xmlStr,options).subscribe(()=>{
                     this.createBucketDisplay = false;
-                    this.getBuckets();
+                    /* Add the PUT Encryption Call here before fetching the updated list of Buckets */
+                    if(this.enableEncryption){
+                        this.bucketEncryption();
+                    } else {
+		    	this.getBuckets();
+		    }
+                    
+
+                    /* Call the getBuckets call in the success of the encryption call */
+                    
                 }); 
             })
         })           
     }
+
+    bucketEncryption(){
+        switch (this.selectedSse) {
+            case 'sse':
+                this.isSSE = true;
+                break;
+            case 'sse-kms':
+                this.isSSEKMS = true;
+                break;
+            case 'sse-c':
+                this.isSSEC = true;
+                break;
+        
+            default:
+                break;
+        }
+        
+        let encryptStr = `<SSEConfiguration>
+        <SSE>
+            <enabled>${this.isSSE}</enabled>
+        </SSE>
+        <SSE-KMS>
+            <enabled>${this.isSSEKMS}</enabled>
+            <DefaultKMSMasterKey>string</DefaultKMSMasterKey>
+        </SSE-KMS>
+    </SSEConfiguration>`;
+        window['getAkSkList'](()=>{
+            let requestMethod = "PUT";
+            let url = this.BucketService.url+"/"+this.createBucketForm.value.name;
+            window['canonicalString'](requestMethod, url,()=>{
+                let options: any = {};
+                this.getSignature(options);
+                options.headers.set('Content-Type','application/xml');
+                this.BucketService.setEncryption(this.createBucketForm.value.name,encryptStr,options).subscribe((res)=>{
+                    
+                    this.getBuckets();
+                }, (error) => {
+                    console.log("Set encryption failed", error);
+                });
+            });
+        })
+    }
+    
+    
     showCreateForm(){
         this.createBucketDisplay = true;
-        this.createBucketForm.reset();
+        this.enableEncryption = false;
+
+        this.createBucketForm.reset(
+            {
+                "backend":"",
+                "backend_type":"",
+                "name":"",
+                "encryption": false
+            }
+        );
         this.createBucketForm.controls['name'].setValidators([Validators.required,Utils.isExisted(this.allBucketNameForCheck)]);
         this.getTypes();
     }
@@ -418,26 +502,33 @@ export class BucketsComponent implements OnInit{
             isWarning: warming,
             accept: ()=>{
                 try {
-                    let name = bucket.name;
-                    if(plans){
-                        plans.forEach(element => {
-                            this.http.delete(`v1/{project_id}/plans/${element.id}`).subscribe();
-                        });
+                    switch (func) {
+                        case "delete":  console.log("Delete Confirm");
+                                        let name = bucket.name;
+                                        if(plans){
+                                            plans.forEach(element => {
+                                                this.http.delete(`v1/{project_id}/plans/${element.id}`).subscribe();
+                                            });
+                                        }
+                                        window['getAkSkList'](()=>{
+                                            let requestMethod = "DELETE";
+                                            let url = this.BucketService.url + '/' + name;
+                                            window['canonicalString'](requestMethod, url,()=>{
+                                                let options: any = {};
+                                                this.getSignature(options);
+                                                this.BucketService.deleteBucket(name,options).subscribe((res) => {
+                                                    this.getBuckets();
+                                                },
+                                                error=>{
+                                                    this.getBuckets();
+                                                });
+                                            })
+                                        })
+                                        break;
+                        default:
+                                        break;
                     }
-                    window['getAkSkList'](()=>{
-                        let requestMethod = "DELETE";
-                        let url = this.BucketService.url + '/' + name;
-                        window['canonicalString'](requestMethod, url,()=>{
-                            let options: any = {};
-                            this.getSignature(options);
-                            this.BucketService.deleteBucket(name,options).subscribe((res) => {
-                                this.getBuckets();
-                            },
-                            error=>{
-                                this.getBuckets();
-                            });
-                        })
-                    })
+                    
                     
                 }
                 catch (e) {
