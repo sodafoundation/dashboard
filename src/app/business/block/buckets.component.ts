@@ -145,15 +145,7 @@ export class BucketsComponent implements OnInit{
             {
                 label: "SSE",
                 value: 'sse'
-            }/*,
-            {
-                label: "SSE-KMS",
-                value: 'sse-kms'
-            },
-            {
-                label: "SSE-C",
-                value: 'sse-c'
-            }, */
+            }
         ]
     }
     showcalendar(){
