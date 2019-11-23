@@ -376,13 +376,11 @@ export class BucketsComponent implements OnInit{
                     /* Add the PUT Encryption Call here before fetching the updated list of Buckets */
                     if(this.enableEncryption){
                         this.bucketEncryption();
-                    }
-                    if(this.enableVersion){
-                       this.enableBucketVersioning(this.createBucketForm.value.name);
-                    }
-                    if(!this.enableEncryption && !this.enableVersion){
-                        this.getBuckets();
-                    }
+                    } else {
+		    	this.getBuckets();
+		    }
+                    
+
                     /* Call the getBuckets call in the success of the encryption call */
                     
                 }); 
