@@ -1,4 +1,4 @@
-
+<p-growl [value]="msgs" [sticky]="false" [life]="6000"></p-growl>
 <div class="content-header">
     <div class="table-toolbar">
         <div class="left">
@@ -45,6 +45,7 @@
         </p-column>
         <p-column header="{{I18N.keyID['sds_block_volume_operation']}}" [style]="{'width': '335px'}">
             <ng-template pTemplate="body" let-bucket="rowData" let-i="rowIndex">
+                
                 <a (click)="configMigration(bucket)">Migrate</a>
                 <a (click)="deleteBucket(bucket)">Delete</a>
             </ng-template>
