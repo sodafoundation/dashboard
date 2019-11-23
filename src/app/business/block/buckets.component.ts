@@ -77,7 +77,8 @@ export class BucketsComponent implements OnInit{
     sseTypes = [];
     selectedSse;
     isSSE: boolean = false;
-    
+    isSSEKMS: boolean = false;
+    isSSEC: boolean = false;
     msgs: Message[];
 
     constructor(
