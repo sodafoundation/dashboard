@@ -57,7 +57,10 @@ export class BucketService {
 
   //Set Bucket Versioning
   setVersioning(name,param?,options?) {
-    return this.http.put(this.url+"/"+name+"/?Versioning",param,options);
+    return this.http.put(this.url+"/"+name+"/?versioning",param,options);
+  }
+  suspendVersioning(name,param?,options?) {
+    return this.http.put(this.url+"/"+name+"/?versioning",param,options);
   }
 
   getBckends(): Observable<any> {
