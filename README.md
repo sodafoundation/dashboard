@@ -94,7 +94,7 @@ To enable debug mode and to check log messages replace the content with the foll
 
 #### Start the live development server
 ```shell
-sudo npm install
+npm install
 npm start
 ```
 This will start a NG Live development server and can be accessed at http://localhost:4200/  
