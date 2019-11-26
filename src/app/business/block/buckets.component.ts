@@ -72,7 +72,7 @@ export class BucketsComponent implements OnInit{
     allBucketNameForCheck=[];
     showCreateBucket = false;
     akSkRouterLink = "/akSkManagement";
-    
+    enableVersion: boolean;
     enableEncryption = false;
     sseTypes = [];
     selectedSse;
@@ -102,6 +102,7 @@ export class BucketsComponent implements OnInit{
             "backend":["",{validators:[Validators.required], updateOn:'change'}],
             "backend_type":["",{validators:[Validators.required], updateOn:'change'}],
             "name":["",{validators:[Validators.required,Utils.isExisted(this.allBucketNameForCheck)], updateOn:'change'}],
+            "version": [false, { validators: [Validators.required], updateOn: 'change' }],
             "encryption": [false, { validators: [Validators.required], updateOn: 'change' }],
             "sse":["",{}],
         });
@@ -208,7 +209,7 @@ export class BucketsComponent implements OnInit{
                                 value:item.name
                             });
                             item.encryptionEnabled = item.SSEConfiguration.SSE.enabled.toLower() == "true" ? true : false;
-                            
+                            item.versionEnabled = item.VersioningConfiguration.Status.toLower() == "enabled" ? true : false;
                         });
                         this.initBucket2backendAnd2Type();
                     });
@@ -346,7 +347,9 @@ export class BucketsComponent implements OnInit{
             });
         });
     }
-    
+    versionControl(){
+        this.enableVersion = this.createBucketForm.get('version').value;
+    }
     encryptionControl(){
         this.enableEncryption = this.createBucketForm.get('encryption').value;
     }
@@ -377,11 +380,14 @@ export class BucketsComponent implements OnInit{
                     /* Add the PUT Encryption Call here before fetching the updated list of Buckets */
                     if(this.enableEncryption){
                         this.bucketEncryption();
-                    } else {
-		    	this.getBuckets();
-		    }
-                    
-
+                    }
+                    if(this.enableVersion){
+                       this.enableBucketVersioning(this.createBucketForm.value.name);
+                    }
+                    if(!this.enableEncryption && !this.enableVersion){
+                        this.getBuckets();
+                    }
+                   
                     /* Call the getBuckets call in the success of the encryption call */
                     
                 }); 
@@ -422,7 +428,10 @@ export class BucketsComponent implements OnInit{
                 this.getSignature(options);
                 options.headers.set('Content-Type','application/xml');
                 this.BucketService.setEncryption(this.createBucketForm.value.name,encryptStr,options).subscribe((res)=>{
-                    
+                    if(this.enableVersion){
+                        this.enableBucketVersioning(this.createBucketForm.value.name);
+                        this.enableVersion = false;
+                    }
                     this.getBuckets();
                 }, (error) => {
                     console.log("Set encryption failed", error);
@@ -430,17 +439,83 @@ export class BucketsComponent implements OnInit{
             });
         })
     }
-    
-    
+    showEnableVersioning(bucketName){
+        let msg = "<div>Are you sure you want to Enable Versioning on the Bucket ?</div><h3>[ "+ bucketName +" ]</h3>";
+        let header ="Enable Versioning";
+        let acceptLabel = "Enable";
+        let warming = false;
+        this.confirmDialog([msg,header,acceptLabel,warming,"enable"], bucketName);
+    }
+    enableBucketVersioning(bucketName){
+        let versionStr = `<VersioningConfiguration>
+        <Status>Enabled</Status>
+      </VersioningConfiguration>`
+        window['getAkSkList'](()=>{
+            let requestMethod = "PUT";
+            let url = this.BucketService.url+"/"+bucketName;
+            window['canonicalString'](requestMethod, url,()=>{
+                let options: any = {};
+                this.getSignature(options);
+                options.headers.set('Content-Type','application/xml');
+                this.BucketService.setVersioning(bucketName, versionStr, options).subscribe(()=>{
+                    
+                    if(this.enableEncryption){
+                        this.bucketEncryption();
+                        this.enableEncryption=false;
+                    }
+                    this.msgs = [];
+                    this.msgs.push({severity: 'success', summary: 'Success', detail: 'Versioning enabled successfully.'});
+                    this.getBuckets();
+                }, (error) =>{
+                    console.log("Set versioning failed", error);
+                    this.msgs = [];
+                    this.msgs.push({severity: 'error', summary: 'Error', detail: "Enable versioning failed <br/>" + error});
+                });
+            });
+        });
+    }
+    showSuspendVersioning(bucketName){
+        let msg = "<div>Are you sure you want to Suspend Versioning on the Bucket ?</div><h3>[ "+ bucketName +" ]</h3>";
+        let header ="Suspend Versioning";
+        let acceptLabel = "Suspend";
+        let warming = true;
+        this.confirmDialog([msg,header,acceptLabel,warming,"suspend"], bucketName);
+    }
+    suspendVersioning(bucketName){
+        console.log("Suspend Versioning", bucketName);
+        let versionStr = `<VersioningConfiguration>
+                                        <Status>Suspended</Status>
+                                    </VersioningConfiguration>`
+        window['getAkSkList'](()=>{
+            let requestMethod = "PUT";
+            let url = this.BucketService.url+"/"+bucketName;
+            window['canonicalString'](requestMethod, url,()=>{
+                let options: any = {};
+                this.getSignature(options);
+                options.headers.set('Content-Type','application/xml');
+                this.BucketService.suspendVersioning(bucketName, versionStr, options).subscribe(()=>{
+                    this.msgs = [];
+                    this.msgs.push({severity: 'success', summary: 'Success', detail: 'Versioning suspended successfully.'});
+                    this.getBuckets();
+                }, (error) =>{
+                    console.log("Suspend versioning failed", error);
+                    this.msgs = [];
+                    this.msgs.push({severity: 'error', summary: 'Error', detail: "Suspend versioning failed <br/>" + error});
+                });
+            });
+        });
+        
+    }
     showCreateForm(){
         this.createBucketDisplay = true;
         this.enableEncryption = false;
-
+        this.enableVersion = false;
         this.createBucketForm.reset(
             {
                 "backend":"",
                 "backend_type":"",
                 "name":"",
+                "version": false,
                 "encryption": false
             }
         );
@@ -525,6 +600,14 @@ export class BucketsComponent implements OnInit{
                                             })
                                         })
                                         break;
+                        
+                        case "suspend": console.log("Suspend Confirm")
+                                        this.suspendVersioning(bucket);
+                                        break;
+                        case "enable": console.log("Enable Confirm");
+                                        this.suspendVersioning(bucket);
+                                        break;
+                    
                         default:
                                         break;
                     }
