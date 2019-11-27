@@ -182,8 +182,7 @@ export class DynamicFormComponent implements OnInit {
     getAllHosts(){
       let self = this;
         this.HostsService.getHosts().subscribe((res) => {
-          console.log("All Hosts Dummy", res.json().allHosts);
-            this.allHosts = res.json().allHosts;
+          this.allHosts = res.json();
             if(this.allHosts.length == 0){
               this.noHosts = true;
             }
