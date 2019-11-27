@@ -42,19 +42,43 @@
             </div>
             <div class="ui-grid-col-10">
                 <div class="ui-grid ui-grid-responsive ui-grid-pad ui-fluid secondary-form">
-                    <form [formGroup]="qosPolicy" [grid]="{label: 'ui-g-2', content:'ui-g-3'}" [errorMessage]="errorMessage">
-                        <form-item label="{{label.maxIOPS}}" [required]="true">
-                            <div class="input-text-vertical-align">
-                                <input pInputText type="text" formControlName="maxIOPS" />
-                                <span>{{I18N.keyID['sds_profile_IOPS_unit']}}</span>
-                            </div>
-                        </form-item>
-                        <form-item label="{{label.MBPS}}" [required]="true">
-                            <div class="input-text-vertical-align">
-                                <input pInputText type="text" formControlName="maxBWS" />
-                                <span>{{I18N.keyID['sds_profile_BWS_unit']}}</span>
-                            </div>
-                        </form-item>
+                    <form [formGroup]="qosPolicy" [grid]="{label: 'ui-g-3', content:'ui-g-3'}" [errorMessage]="errorMessage">
+                        <div class="ui-grid-col-6">
+                            <form-item label="{{label.maxIOPS}}" [required]="true">
+                                <div class="input-text-vertical-align">
+                                    <input pInputText type="text" formControlName="maxIOPS" />
+                                    <span>{{I18N.keyID['sds_profile_IOPS_unit']}}</span>
+                                </div>
+                            </form-item>
+                            <form-item label="{{label.MBPS}}" [required]="true">
+                                <div class="input-text-vertical-align">
+                                    <input pInputText type="text" formControlName="maxBWS" />
+                                    <span>{{I18N.keyID['sds_profile_BWS_unit']}}</span>
+                                </div>
+                            </form-item>
+                            <form-item label="{{label.latency}}">
+                                <div class="input-text-vertical-align">
+                                    <input pInputText type="text" formControlName="latency" />
+                                    <span>{{I18N.keyID['sds_profile_latency_unit']}}</span>
+                                </div>
+                            </form-item>
+                        </div>
+                        <div class="ui-grid-col-6">
+                            <form-item label="{{label.minIOPS}}">
+                                <div class="input-text-vertical-align">
+                                    <input pInputText type="text" formControlName="minIOPS" />
+                                    <span>{{I18N.keyID['sds_profile_IOPS_unit']}}</span>
+                                </div>
+                            </form-item>
+                            <form-item label="{{label.minBWS}}">
+                                <div class="input-text-vertical-align">
+                                    <input pInputText type="text" formControlName="minBWS" />
+                                    <span>{{I18N.keyID['sds_profile_BWS_unit']}}</span>
+                                </div>
+                            </form-item>
+                        </div>
+                       
+                        
                     </form>
                 </div>
             </div>
