@@ -53,7 +53,17 @@
 
             <div class="form-item-container" *ngSwitchCase="'select'">
                 <form-item label="{{prop.label}}" [required]="true">
-                    <p-dropdown [options]="prop.options" [required]="true" [formControlName]="prop.key" [placeholder]="prop.description ? prop.description : ''"></p-dropdown>
+                    <p-dropdown [disabled]="noHosts && (prop.key == 'host_id')" [options]="prop.options" [required]="true" [formControlName]="prop.key" [placeholder]="prop.description ? prop.description : ''"></p-dropdown>
+                    <div *ngIf="(prop.key == 'host_id')">
+                        <i class="fa fa-exclamation-circle fa-2x"></i>
+                        <span >Would you like to add a host? </span>
+                        <a  [routerLink]="['/createHost']">Add Host</a>
+                    </div>
+                    <div *ngIf="noHosts && (prop.key == 'host_id')">
+                        <i class="fa fa-exclamation-circle fa-2x"></i>
+                        <span >There are no hosts. Would you like to add one? </span>
+                        <a  [routerLink]="['/createHost']">Add Host</a>
+                    </div>
                 </form-item>      
             </div>
           </div>
