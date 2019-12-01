@@ -103,6 +103,11 @@ export class BucketService {
     let url = this.url + "/" +name;
     return this.http.delete(url,param);
   }
+  //copy object
+  copyObject(object,param, options){
+    let url = this.url + "/" + object;
+    return this.http.put(url, param, options);
+  }
 
   // Rquest header with AK/SK authentication added
   getSignatureOptions(SignatureObjectwindow, options?){
