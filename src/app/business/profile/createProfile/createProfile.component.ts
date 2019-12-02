@@ -88,10 +88,6 @@ export class CreateProfileComponent implements OnInit {
         {
             label: 'nvmeof',
             value: 'nvmeof'
-        },
-        {
-            label: 'DSWARE',
-            value: 'DSWARE'
         }
     ];
     storageTypeOptions = [
