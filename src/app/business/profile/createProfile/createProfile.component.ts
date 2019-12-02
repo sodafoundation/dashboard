@@ -75,15 +75,15 @@ export class CreateProfileComponent implements OnInit {
     protocolOptions = [
         {
             label: 'iSCSI',
-            value: 'iSCSI'
+            value: 'iscsi'
         },
         {
             label: 'FC',
-            value: 'FC'
+            value: 'fibre_channel'
         },
         {
             label: 'RBD',
-            value: 'RBD'
+            value: 'rbd'
         },
         {
             label: 'nvmeof',
@@ -352,7 +352,7 @@ export class CreateProfileComponent implements OnInit {
         this.profileform = this.fb.group({
             'name': new FormControl('', {validators:[Validators.required,Utils.isExisted(this.allProfileNameForCheck)]}),
             'description':new FormControl('',Validators.maxLength(200)),
-            'protocol': new FormControl('iSCSI'),
+            'protocol': new FormControl('iscsi'),
             'storageType': new FormControl('Thin'),
             'policys': new FormControl(''),
             'snapshotRetention': new FormControl('Time'),
@@ -432,18 +432,18 @@ export class CreateProfileComponent implements OnInit {
                     this.protocolOptions = [
                         {
                             label: 'iSCSI',
-                            value: 'iSCSI'
+                            value: 'iscsi'
                         },
                         {
                             label: 'FC',
-                            value: 'FC'
+                            value: 'fibre_channel'
                         },
                         {
                             label: 'RBD',
-                            value: 'RBD'
+                            value: 'rbd'
                         }
                     ]
-                    this.profileform.patchValue({protocol: 'iSCSI'})
+                    this.profileform.patchValue({protocol: 'iscsi'})
                     this.isReplicationFlag = true;
                 }
             }
