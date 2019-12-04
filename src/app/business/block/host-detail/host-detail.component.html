@@ -20,13 +20,13 @@
                     {{label.status}}:
                 </div>
                 <div class="ui-grid-col-3 volume-basic-item-value-color" *ngIf="host">
-                    {{host.status}}
+                    {{host.status? host.status : '--'}}
                 </div>
                 <div class="ui-grid-col-1">
                     {{label.createdAt}}:
                 </div>
                 <div class="ui-grid-col-3 volume-basic-item-value-color" *ngIf="host">
-                    {{host.createdAt}}
+                    {{host.createdAt ? (host.createdAt | date:'long') : '--'}}
                 </div>
                
             </div>
@@ -47,7 +47,7 @@
                     {{label.updatedAt}}:
                 </div>
                 <div class="ui-grid-col-3 volume-basic-item-value-color" *ngIf="host">
-                    {{host.updatedAt}}
+                    {{host.updatedAt ? (host.updatedAt | date:'long') : '--'}}
                 </div>
                 
             </div>
@@ -56,7 +56,7 @@
                         {{label.port}}:
                     </div>
                     <div class="ui-grid-col-3 volume-basic-item-value-color" *ngIf="host">
-                        {{host.port}}
+                        {{host.port ? host.port : '--'}}
                     </div>
                     <div class="ui-grid-col-1">
                         {{label.availabilityZones}}:
