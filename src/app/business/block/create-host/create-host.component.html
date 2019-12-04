@@ -12,7 +12,7 @@
     </div>
     <hr />
 </div>
-<form [formGroup]="createHostform" [grid]="{label: 'ui-g-2', content:'ui-g-20'}" (ngSubmit)="onSubmit()" [errorMessage]="errorMessage">
+<form [formGroup]="createHostform" [grid]="{label: 'ui-g-3', content:'ui-g-20'}" (ngSubmit)="onSubmit()" [errorMessage]="errorMessage">
     
     <form-item [required]="true" label="{{label.name}}">
         <input formControlName="hostName" type="text" size="30" pInputText [maxlength]="30" [minlength]="2"> 
@@ -27,7 +27,7 @@
         <p-dropdown [options]="accessModeOptions" formControlName="accessMode" placeholder="Please choose"></p-dropdown>
     </form-item>
     <form-item [required]="true" label="{{label.availabilityZones}}">
-        <p-multiSelect [options]="availabilityZonesOptions" formControlName="availabilityZones" defaultLabel="Please choose multiple"></p-multiSelect>
+        <p-multiSelect [options]="availabilityZonesOptions" formControlName="availabilityZones" defaultLabel="You can choose multiple"></p-multiSelect>
     </form-item>
     <form-item [required]="true" label="{{label.initiators}}">
         <a class="add-initiator" (click)="addNext()"><i class="fa fa-plus-circle" ></i></a>
