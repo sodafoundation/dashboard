@@ -18,7 +18,6 @@ let _ = require("underscore");
 export class HostDetailComponent implements OnInit {
   items;
   label;
-  allHosts;
   host;
   hostDetails;
   hostId;
@@ -31,12 +30,20 @@ export class HostDetailComponent implements OnInit {
     private ActivatedRoute: ActivatedRoute,
     private ProfileService: ProfileService,
     public i18n:I18NService
-  ) { }
+  ) {
+    
+   }
 
   ngOnInit() {
     
     this.ActivatedRoute.params.subscribe((params) => this.hostId = params.hostId);
     console.log("Host: ", this.hostId);
+    this.HostsService.getHostById(this.hostId).subscribe((res) => {
+
+      this.host = res.json();
+      }, (err) => {
+        console.log("Something went wrong. Details could not be fetched.")
+      });
     this.items = [
       { label: this.i18n.keyID["sds_Hosts_title"], url: '/block' },
       { label: this.i18n.keyID["sds_Host_detail"], url: '/hostDetails' }
@@ -56,17 +63,7 @@ export class HostDetailComponent implements OnInit {
       initiators: "Initiators"
   };
 
-   this.getHost(this.hostId);
-   console.log("Host Details", this.host);
-  }
 
-  getHost(id){
-    this.HostsService.getHostById(id).subscribe((res) => {
-      this.host = res.json();
-      }, (err) => {
-        console.log("Something went wrong. Details could not be fetched.")
-      });
-    
   }
 
 }
