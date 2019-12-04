@@ -115,9 +115,6 @@ export class DynamicFormComponent implements OnInit {
         /* Adding host info object for volume provisioning.  */
         if(item['key'] == 'host_id'){
           item['label'] = "Host";
-          item['showThis'] = true;
-          item['validation'] = {required: true};
-          item['required'] = true;
           item['inputType'] = "select"; 
           item['options'] = self.hostOptions;
           
@@ -154,18 +151,29 @@ export class DynamicFormComponent implements OnInit {
           formGroup[item['key']] = new FormControl(item['value'] || '', self.mapValidators(item['validation']));
         }
 
+        switch (item['type']) {
+          case "string": item['inputType'] = "text"; 
+                        if((item['key'] == 'profile_id') || (item['key'] == 'host_id')){
+                            item['inputType'] = "select";
+                        }
+            
+            break;
+          case "boolean": item['inputType'] = "radio";
+                          item['options'] = [
+                            { label: "True", value: 'true'},
+                            { label: "False", value: 'false'}
+                          ];
+            
+            break;
+          case "integer": item['inputType'] = "number";
+            
+            break;
         
-        if(item['type'] == "string" && item['key'] != 'profile_id'){
-          item['inputType'] = "text";
-        } else if(item['type'] == "boolean"){
-          item['inputType'] = "radio";
-          item['options'] = [
-            { label: "True", value: 'true'},
-            { label: "False", value: 'false'}
-          ];
-        } else if(item['type'] == "integer"){
-          item['inputType'] = "number";
+          default:
+            break;
         }
+
+       
         if(item['required']==true){
           formGroup[item['key']] = new FormControl(item['value'] || '', self.mapValidators(item['validation']));
         }
@@ -197,7 +205,9 @@ export class DynamicFormComponent implements OnInit {
             }
             console.log("Host Options", self.hostOptions);
         }, (error) =>{
-            console.log(error);
+            console.log("Something went wrong. Could not fetch hosts.", error);
+            this.msgs = [];
+            this.msgs.push({severity: 'error', summary: 'Error', detail: error._body});
         })
       
     }
