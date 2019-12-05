@@ -153,6 +153,7 @@
     "sds_fileShare_export": "Export Location",
     "sds_fileShare_update": "Updated At",
     "sds_ippattern": "IP address must be (1~255). (0~255). (0~255). (0~255)/(1-32)",
+    "sds_block_host_title":"Host",
     "sds_block_attach_mode" : "Attach Mode",
     "sds_Hosts_title": "Hosts",
     "sds_Host_detail": "Host details",
