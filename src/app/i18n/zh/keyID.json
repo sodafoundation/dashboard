@@ -152,7 +152,7 @@
     "sds_lifeCycle_disable": "Disable the lifecycle rule",
     "sds_fileShare_export": "Export Location",
     "sds_fileShare_update": "Updated At",
-    "sds_ippattern": "IP address must be (1~255). (0~255). (0~255). (0~255)/(1-32)",
+    "sds_ippattern": "IP address must be (1~255). (0~255). (0~255). (0~255)/(1-32)"
     "sds_block_attach_mode" : "Attach Mode",
     "sds_Hosts_title": "Hosts",
     "sds_Host_detail": "Host details",
