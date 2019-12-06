@@ -94,6 +94,10 @@ export class CreateHostComponent implements OnInit {
             label: "Windows",
             value: 'windows'
         },
+        {
+          label: "ESXi",
+          value: 'esxi'
+        }
     ];
     this.accessModeOptions = [
         {
