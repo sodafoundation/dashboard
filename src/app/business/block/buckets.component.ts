@@ -208,8 +208,8 @@ export class BucketsComponent implements OnInit{
                                 label:item.name,
                                 value:item.name
                             });
-                            item.encryptionEnabled = item.SSEConfiguration.SSE.enabled.toLower() == "true" ? true : false;
-                            item.versionEnabled = item.VersioningConfiguration.Status.toLower() == "enabled" ? true : false;
+                            // item.encryptionEnabled = item.SSEConfiguration.SSE.enabled.toLower() == "true" ? true : false;
+                            // item.versionEnabled = item.VersioningConfiguration.Status.toLower() == "enabled" ? true : false;
                         });
                         this.initBucket2backendAnd2Type();
                     });
