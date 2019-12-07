@@ -167,6 +167,10 @@ export class AppComponent implements OnInit, AfterViewInit {
     d;
 
     ngOnInit() {
+        window.onbeforeunload = ()=>{
+            window.sessionStorage['folderId'] = ""
+            window.sessionStorage['headerTag'] = ""
+        }
         // Global upload function
         window['uploadPartArr'] = [];
         window['isUpload'] = false;
