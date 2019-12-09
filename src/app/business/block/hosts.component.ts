@@ -79,7 +79,16 @@ export class HostsComponent implements OnInit {
     ngOnInit() {
         this.getAllHosts();
         this.menuItems = [
-           
+            {
+                "label": this.I18N.keyID['sds_block_volume_modify'],
+                command: () => {
+                    if(this.selectedHost){
+                        this.modifyHost(this.selectedHost)
+                    }
+                    
+                },
+                disabled:false
+            },
             {
                 "label": this.I18N.keyID['sds_block_volume_delete'], 
                 command: () => {
@@ -91,7 +100,15 @@ export class HostsComponent implements OnInit {
             }
         ];
         this.menuDeleDisableItems = [
-           
+            {
+                "label": this.I18N.keyID['sds_block_volume_modify'],
+                command: () => {
+                    if(this.selectedHost){
+                        this.modifyHost(this.selectedHost)
+                    }
+                },
+                disabled:false
+            },
             {
                 "label": this.I18N.keyID['sds_block_volume_delete'], 
                 command: () => {
@@ -109,8 +126,7 @@ export class HostsComponent implements OnInit {
         this.HostsService.getHosts().subscribe((res) => {
             this.allHosts = res.json();
         }, (error) =>{
-            this.msgs = [];
-            this.msgs.push({severity: 'error', summary: 'Error', detail: error.message});
+            console.log(error);
         })
        
     }
@@ -166,10 +182,10 @@ export class HostsComponent implements OnInit {
     }
 
     modifyHost(host){
-        console.log("Host is being modified");
+        // TODO: Check for Volume attachement and make appropriate modifications.
         this.isVolumeAttached = false;
         if(this.isVolumeAttached == false){
-            this.router.navigate(['/modifyHost', host.id]);
+            this.router.navigate(['/modifyHost',host.id]);
         }
     }
     

@@ -1,0 +1,64 @@
+<p-growl [value]="msgs" [sticky]="false" [life]="6000"></p-growl>
+<div class="page-header">
+    <div class="custom-breadcrumb">
+        <span *ngFor="let item of items; index as i">
+            <a [ngClass]="{'font-color-class': i===0}" [routerLink]="[item.url,'fromHosts']">{{item.label}}</a>
+            <span *ngIf="(i+1) !== items.length">></span>
+        </span>
+    </div>
+    <div class="content-header">
+        <h1>{{i18n.keyID['sds_modify_host']}}</h1>
+        <p>{{i18n.keyID['sds_modify_host_desc']}}</p>
+    </div>
+    <hr />
+</div>
+<div>
+<form [formGroup]="modifyHostform" [grid]="{label: 'ui-g-2', content:'ui-g-20'}" (ngSubmit)="onSubmit()" [errorMessage]="errorMessage">
+    
+    <form-item [required]="true" label="{{label.name}}">
+        <input formControlName="hostName" type="text" size="30" pInputText [maxlength]="30" [minlength]="2"> 
+    </form-item>
+    <form-item [required]="true" label="{{label.osType}}">
+        <p-dropdown [(ngModel)]="selectedOs" name="selectedOs" [options]="osTypeOptions" formControlName="osType" placeholder="Please choose"></p-dropdown>
+    </form-item>
+    <form-item [required]="true" label="{{label.ip}}">
+        <input formControlName="ip" type="text" size="30" pInputText> 
+    </form-item>
+    <form-item [required]="true" label="{{label.accessMode}}">
+        <p-dropdown [(ngModel)]="selectedAccessMode" name="selectedAccessMode" [options]="accessModeOptions" formControlName="accessMode" placeholder="Please choose"></p-dropdown>
+    </form-item>
+    <form-item [required]="true" label="{{label.availabilityZones}}">
+        <p-multiSelect [(ngModel)]="selectedAZs" name="selectedAZs" [options]="availabilityZonesOptions" formControlName="availabilityZones" defaultLabel="You can choose multiple"></p-multiSelect>
+    </form-item>
+    <form-item [required]="true" label="{{label.initiators}}">
+        <a class="add-initiator" (click)="addNext()"><i class="fa fa-plus-circle" ></i></a>
+        <div class="initiator-array" formArrayName="initiators" 
+            *ngFor="let item of modifyHostform.controls['initiators'].controls; let i = index">
+            <div class="ui-g ui-fluid" [formGroupName]="i">
+                <div class="ui-g-12 ui-md-4">
+                    <div class="ui-inputgroup">
+                        <input type="text" pInputText formControlName='portName' placeholder="Port">         
+                    </div>
+                </div>
+                <div class="ui-g-12 ui-md-4 ui-md-offset-1">
+                    <div class="ui-inputgroup">
+                        <p-dropdown [(ngModel)]="item.value.selectedProtocol" [style]="{'min-width':125}" [options]="protocolOptions" formControlName="protocol" placeholder="Please choose protocol"></p-dropdown>       
+                    </div>
+                </div>
+                <div class="ui-g-12 ui-md-2 ui-md-offset-1">
+                    <div class="ui-inputgroup">
+                        <a disabled="modifyHostform.controls['initiators'].length > 1" class="remove-initiator" (click)="removeLink(i)"><i class="fa fa-minus-circle"></i></a>     
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+    </form-item>
+        
+   
+    <div class="bottom-button-margin">
+        <button pButton type="submit" class="ui-button-secondary" label="{{i18n.keyID['ok']}}" [disabled]="modifyHostform.invalid" ></button>
+        <button pButton type="button" label="{{i18n.keyID['cancel']}}" [routerLink]="['/block','fromHosts']"></button>
+    </div>
+</form>
+</div>
