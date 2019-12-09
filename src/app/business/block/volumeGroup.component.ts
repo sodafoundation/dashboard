@@ -86,11 +86,19 @@ export class VolumeGroupComponent implements OnInit{
       }
     //show create volumes group
     createVolumeGroup(){
-        this.volumeGroupForm.reset();
+        this.volumeGroupForm.reset({
+            group_name : "",
+            description : "",
+            profile : "",
+            zone : ""
+        });
         this.showVolumeGroupDialog = true;
     }
     ModifyVolumeGroupDisplay(volumeGroup){
-        this.modifyGroupForm.reset();
+        this.modifyGroupForm.reset({
+            group_name : "",
+            description : ""
+        });
         this.currentGroup = volumeGroup;
         this.modifyGroupForm.controls['group_name'].setValue(this.currentGroup.name);
         this.modifyGroupForm.controls['description'].setValue("");
