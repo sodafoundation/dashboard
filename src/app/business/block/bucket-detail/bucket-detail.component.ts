@@ -512,7 +512,7 @@ export class BucketDetailComponent implements OnInit {
                     break;
                   case "deleteMilti":
                    file.forEach(element => {
-                      let objectKey = element.objectKey;
+                      let objectKey = element.ObjectKey;
                       //If you want to delete files from a folder, you must include the name of the folder
                       if(this.folderId !=""){
                         objectKey = this.folderId + objectKey;
