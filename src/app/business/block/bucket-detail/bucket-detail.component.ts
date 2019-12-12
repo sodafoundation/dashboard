@@ -104,7 +104,7 @@ export class BucketDetailComponent implements OnInit {
   }
   //Click on folder
   folderLink(file){
-    let folderKey = file.ObjectKey;
+    let folderKey = file.Contents.Key;
     if(this.folderId == ""){
       this.folderId = folderKey;
     }else{
@@ -247,11 +247,11 @@ export class BucketDetailComponent implements OnInit {
       }
     })
     this.allDir.forEach(it=>{
-      set.delete(it.ObjectKey);
+      set.delete(it.Contents.Key);
     })
     set.forEach(item=>{
       let defaultObject = lodash.cloneDeep(this.allDir[0]);
-      defaultObject.ObjectKey = item;
+      defaultObject.Contents.Key = item;
       this.allDir.push(defaultObject);
     })
   }
@@ -363,9 +363,9 @@ export class BucketDetailComponent implements OnInit {
   downloadFile(file) {
     let fileObjectKey;
     if(this.folderId !=""){
-      fileObjectKey = this.folderId + file.ObjectKey;
+      fileObjectKey = this.folderId + file.Contents.Key;
     }else{
-      fileObjectKey = file.ObjectKey;
+      fileObjectKey = file.Contents.Key;
     }
     let downloadUrl = `${this.BucketService.url}/${this.bucketId}/${fileObjectKey}`;
     window['getAkSkList'](()=>{
@@ -384,14 +384,14 @@ export class BucketDetailComponent implements OnInit {
         this.httpClient.get(downloadUrl, options).subscribe((res)=>{
           let blob = new Blob([res]);
           if (typeof window.navigator.msSaveBlob !== 'undefined') {  
-              window.navigator.msSaveBlob(blob, file.ObjectKey);
+              window.navigator.msSaveBlob(blob, file.Contents.Key);
           } else {
             let URL = window.URL
             let objectUrl = URL.createObjectURL(blob)
-            if (file.ObjectKey) {
+            if (file.Contents.Key) {
               let a = document.createElement('a')
               a.href = objectUrl
-              a.download = file.ObjectKey
+              a.download = file.Contents.Key
               document.body.appendChild(a)
               a.click()
               a.remove()
@@ -450,10 +450,10 @@ export class BucketDetailComponent implements OnInit {
   }
   deleteFile(file){
     let fileObjectKey;
-    if(file.ObjectKey.indexOf(this.colon) !=-1){
-      fileObjectKey = file.ObjectKey.slice(0,file.ObjectKey.length-1);
+    if(file.Contents.Key.indexOf(this.colon) !=-1){
+      fileObjectKey = file.Contents.Key.slice(0,file.Contents.Key.length-1);
     }else{
-      fileObjectKey = file.ObjectKey;
+      fileObjectKey = file.Contents.Key;
     }
     let msg = "<div>Are you sure you want to delete the File ?</div><h3>[ "+ fileObjectKey +" ]</h3>";
     let header ="Delete";
@@ -472,7 +472,7 @@ export class BucketDetailComponent implements OnInit {
               try {
                 switch(func){
                   case "delete":
-                    let objectKey = file.ObjectKey;
+                    let objectKey = file.Contents.Key;
                     //If you want to delete files from a folder, you must include the name of the folder
                     if(this.folderId !=""){
                       objectKey = this.folderId + objectKey;
@@ -492,7 +492,7 @@ export class BucketDetailComponent implements OnInit {
                     break;
                   case "deleteMilti":
                    file.forEach(element => {
-                      let objectKey = element.ObjectKey;
+                      let objectKey = element.Contents.Key;
                       //If you want to delete files from a folder, you must include the name of the folder
                       if(this.folderId !=""){
                         objectKey = this.folderId + objectKey;
