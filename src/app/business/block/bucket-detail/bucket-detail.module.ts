@@ -5,7 +5,7 @@ import { RouterModule } from '@angular/router';
 import { BucketDetailComponent } from './bucket-detail.component';
 import { LifeCycleModule } from './lifeCycle/lifeCycle.module';
 import { TabViewModule,ButtonModule, DataTableModule, DropMenuModule, DialogModule, FormModule, InputTextModule, InputTextareaModule, 
-  ConfirmDialogModule ,ConfirmationService,CheckboxModule,DropdownModule} from './../../../components/common/api';
+  ConfirmDialogModule ,ConfirmationService,CheckboxModule,DropdownModule, SplitButtonModule} from './../../../components/common/api';
 import { HttpService } from './../../../shared/service/Http.service';
 import { BucketService } from '../buckets.service';
 import { HttpClientModule } from '@angular/common/http';
@@ -32,7 +32,8 @@ let routers = [{
     CheckboxModule,
     DropdownModule,
     LifeCycleModule,
-    HttpClientModule 
+    HttpClientModule,
+    SplitButtonModule
   ],
   declarations: [
     BucketDetailComponent
