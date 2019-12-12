@@ -2,11 +2,12 @@ import { NgModule, APP_INITIALIZER } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { VolumeListComponent } from './volumeList.component';
-import { ButtonModule, DataTableModule, DropMenuModule, DialogModule, FormModule, InputTextModule, InputTextareaModule, DropdownModule ,ConfirmationService,ConfirmDialogModule} from '../../components/common/api';
+import { ButtonModule, DataTableModule, DropMenuModule, DialogModule, FormModule, InputTextModule, InputTextareaModule, GrowlModule, DropdownModule ,ConfirmationService,ConfirmDialogModule} from '../../components/common/api';
 
 import { HttpService } from './../../shared/service/Http.service';
 import {VolumeService, SnapshotService, ReplicationService} from './volume.service';
 import { ProfileService } from './../profile/profile.service';
+import { AttachService } from './attach.service';
 import { RouterModule } from '@angular/router';
 
 @NgModule({
@@ -18,6 +19,7 @@ import { RouterModule } from '@angular/router';
     ButtonModule,
     InputTextModule,
     InputTextareaModule,
+    GrowlModule,
     DataTableModule,
     DropdownModule,
     DropMenuModule,
@@ -32,6 +34,7 @@ import { RouterModule } from '@angular/router';
     VolumeService,
     SnapshotService,
     ProfileService,
+    AttachService,
     ReplicationService,
     ConfirmationService
   ]

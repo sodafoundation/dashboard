@@ -1,5 +1,5 @@
 <p-growl [value]="msgs" [sticky]="false" [life]="6000"></p-growl>
-<form [grid]="{label: 'ui-g-2', content:'ui-g-2'}" (ngSubmit)="onSubmit(form.value)" [formGroup]="form">
+<form [grid]="{label: 'ui-g-2', content:'ui-g-3'}" (ngSubmit)="onSubmit(form.value)" [formGroup]="form">
     <div class="ui-grid ui-grid-responsive ui-grid-pad ui-fluid">
         <div class="table-toolbar">
           <h2>Instance Details</h2>
@@ -53,7 +53,12 @@
 
             <div class="form-item-container" *ngSwitchCase="'select'">
                 <form-item label="{{prop.label}}" [required]="true">
-                    <p-dropdown [options]="prop.options" [required]="true" [formControlName]="prop.key" [placeholder]="prop.description ? prop.description : ''"></p-dropdown>
+                    <p-dropdown [disabled]="noHosts && (prop.key == 'host_id')" [options]="prop.options" [required]="true" [formControlName]="prop.key" [placeholder]="prop.description ? prop.description : ''"></p-dropdown>
+                    <div class="input-context-help" *ngIf="(prop.key == 'host_id')">
+                        <i class="fa fa-exclamation-circle fa-2x"></i>
+                        <span *ngIf="noHosts">There are no hosts.</span><span >Would you like to add a host? </span>
+                        <a  [routerLink]="['/createHost']">Add Host</a>
+                    </div>
                 </form-item>      
             </div>
           </div>

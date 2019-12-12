@@ -49,6 +49,19 @@ export class BucketService {
     let url = this.url + '/' + id;
     return this.http.get(url,options);
   }
+  
+  //Set Bucket Encryption
+  setEncryption(name,param?,options?) {
+    return this.http.put(this.url+"/"+name+"/?DefaultEncryption",param,options);
+  }
+
+  //Set Bucket Versioning
+  setVersioning(name,param?,options?) {
+    return this.http.put(this.url+"/"+name+"/?versioning",param,options);
+  }
+  suspendVersioning(name,param?,options?) {
+    return this.http.put(this.url+"/"+name+"/?versioning",param,options);
+  }
 
   getBckends(): Observable<any> {
     return this.http.get('v1beta/{project_id}/backend');

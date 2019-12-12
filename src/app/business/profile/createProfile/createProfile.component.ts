@@ -75,15 +75,15 @@ export class CreateProfileComponent implements OnInit {
     protocolOptions = [
         {
             label: 'iSCSI',
-            value: 'iSCSI'
+            value: 'iscsi'
         },
         {
             label: 'FC',
-            value: 'FC'
+            value: 'fibre_channel'
         },
         {
             label: 'RBD',
-            value: 'RBD'
+            value: 'rbd'
         },
         {
             label: 'nvmeof',
@@ -326,7 +326,10 @@ export class CreateProfileComponent implements OnInit {
             key: this.I18N.keyID['sds_profile_extra_key'],
             value: this.I18N.keyID['sds_profile_extra_value'],
             maxIOPS: this.I18N.keyID['sds_profile_create_maxIOPS'],
+            minIOPS: this.I18N.keyID['sds_profile_create_minIOPS'],
             MBPS: this.I18N.keyID['sds_profile_create_maxBWS'],
+            minBWS: this.I18N.keyID['sds_profile_create_minBWS'],
+            latency: this.I18N.keyID['sds_profile_create_latency'],
             replicationLabel: {
                 type:this.I18N.keyID['sds_profile_rep_type'] ,
                 RGO: this.I18N.keyID['sds_profile_rep_rgo'],
@@ -349,7 +352,7 @@ export class CreateProfileComponent implements OnInit {
         this.profileform = this.fb.group({
             'name': new FormControl('', {validators:[Validators.required,Utils.isExisted(this.allProfileNameForCheck)]}),
             'description':new FormControl('',Validators.maxLength(200)),
-            'protocol': new FormControl('iSCSI'),
+            'protocol': new FormControl('iscsi'),
             'storageType': new FormControl('Thin'),
             'policys': new FormControl(''),
             'snapshotRetention': new FormControl('Time'),
@@ -358,7 +361,10 @@ export class CreateProfileComponent implements OnInit {
         });
         this.qosPolicy = this.fb.group({
             "maxIOPS": new FormControl(6000, Validators.required),
+            "minIOPS": new FormControl(500),
             "maxBWS" : new FormControl(100, Validators.required),
+            "minBWS" : new FormControl(1),
+            "latency" : new FormControl(5),
         });
         this.repPolicy = this.fb.group({
             "repType": new FormControl("mirror", Validators.required),
@@ -426,18 +432,18 @@ export class CreateProfileComponent implements OnInit {
                     this.protocolOptions = [
                         {
                             label: 'iSCSI',
-                            value: 'iSCSI'
+                            value: 'iscsi'
                         },
                         {
                             label: 'FC',
-                            value: 'FC'
+                            value: 'fibre_channel'
                         },
                         {
                             label: 'RBD',
-                            value: 'RBD'
+                            value: 'rbd'
                         }
                     ]
-                    this.profileform.patchValue({protocol: 'iSCSI'})
+                    this.profileform.patchValue({protocol: 'iscsi'})
                     this.isReplicationFlag = true;
                 }
             }
@@ -476,7 +482,10 @@ export class CreateProfileComponent implements OnInit {
             this.param["provisioningProperties"]= {
                 "ioConnectivity": {
                     "maxIOPS": Number(this.qosPolicy.value.maxIOPS),
+                    "minIOPS": Number(this.qosPolicy.value.minIOPS),
                     "maxBWS": Number(this.qosPolicy.value.maxBWS),
+                    "minBWS": Number(this.qosPolicy.value.minBWS),
+                    "latency": Number(this.qosPolicy.value.latency),
                     "accessProtocol": value.protocol == "FC" ? "fibre_channel" : value.protocol
                 }, 
                 "dataStorage": {

@@ -1,0 +1,88 @@
+<div>
+    <div class="custom-breadcrumb">
+        <span *ngFor="let item of items; index as i">
+          <a [ngClass]="{'font-color-class': i===0}" [routerLink]="[item.url,'fromHosts']">{{item.label}}</a>
+          <span *ngIf="(i+1) !== items.length">></span>
+        </span>
+    </div>
+    <div class="volume-basic-info">
+        <h3>{{i18n.keyID['sds_block_volume_base_info']}}</h3>
+        <p *ngIf="showHostSource">{{ hostSource }}</p>
+        <div class="ui-grid ui-grid-responsive ui-grid-pad ui-fluid">
+            <div class="ui-grid-row volume-basic-item-class">
+                <div class="ui-grid-col-2">
+                    {{label.hostName}}:
+                </div>
+                <div class="ui-grid-col-2 volume-basic-item-value-color" *ngIf="host">
+                    {{host.hostName}}
+                </div>
+                <div class="ui-grid-col-2">
+                    {{label.status}}:
+                </div>
+                <div class="ui-grid-col-2 volume-basic-item-value-color" *ngIf="host">
+                    {{host.status? host.status : '--'}}
+                </div>
+                <div class="ui-grid-col-2">
+                    {{label.createdAt}}:
+                </div>
+                <div class="ui-grid-col-3 volume-basic-item-value-color" *ngIf="host">
+                    {{host.createdAt ? (host.createdAt | date:'long') : '--'}}
+                </div>
+               
+            </div>
+            <div class="ui-grid-row volume-basic-item-class">
+                <div class="ui-grid-col-2">
+                    {{label.ip}}:
+                </div>
+                <div class="ui-grid-col-2 volume-basic-item-value-color" *ngIf="host">
+                    {{host.ip}}
+                </div>
+                <div class="ui-grid-col-2">
+                    {{label.accessMode}}:
+                </div>
+                <div class="ui-grid-col-2 volume-basic-item-value-color" *ngIf="host">
+                    {{host.accessMode}}
+                </div>
+                <div class="ui-grid-col-2">
+                    {{label.updatedAt}}:
+                </div>
+                <div class="ui-grid-col-3 volume-basic-item-value-color" *ngIf="host">
+                    {{host.updatedAt ? (host.updatedAt | date:'long') : '--'}}
+                </div>
+                
+            </div>
+            <div class="ui-grid-row volume-basic-item-class">
+                    <div class="ui-grid-col-2">
+                        {{label.port}}:
+                    </div>
+                    <div class="ui-grid-col-2 volume-basic-item-value-color" *ngIf="host">
+                        {{host.port ? host.port : '--'}}
+                    </div>
+                    <div class="ui-grid-col-2">
+                        {{label.availabilityZones}}:
+                    </div>
+                    <div class="ui-grid-col-2 volume-basic-item-value-color" *ngIf="host">
+                        {{host.availabilityZones}}
+                    </div>
+                    
+                    <div class="ui-grid-col-2">
+                        {{label.osType}}:
+                    </div>
+                    <div class="ui-grid-col-3 volume-basic-item-value-color" *ngIf="host">
+                        {{host.osType}}
+                    </div>
+            </div>
+                <div class="ui-grid-row volume-basic-item-class">
+                    <div class="ui-grid-col-12">
+                        {{label.initiators}}:
+                    </div>
+                </div>
+                <div class="ui-grid-row volume-basic-item-class" *ngIf="host">
+                    <p-dataTable [value]="host.initiators">
+                        <p-column field="portName" header="Port Name"></p-column>
+                        <p-column field="protocol" header="Protocol"></p-column>
+                    </p-dataTable>
+                </div>
+        </div>
+    </div>
+</div>
