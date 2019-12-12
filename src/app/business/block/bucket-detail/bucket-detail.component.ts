@@ -218,8 +218,7 @@ export class BucketDetailComponent implements OnInit {
           let str = res._body;
           let x2js = new X2JS();
           let jsonObj = x2js.xml_str2json(str);
-          // let alldir = jsonObj.ListBucketResult ? jsonObj.ListBucketResult :[] ;
-          let alldir = jsonObj.ListObjectResponse.ListObjects ? jsonObj.ListObjectResponse.ListObjects :[] ;
+          let alldir = jsonObj.ListBucketResult ? jsonObj.ListBucketResult :[] ;
           if(Object.prototype.toString.call(alldir) === "[object Array]"){
               this.allDir = alldir;
           }else if(Object.prototype.toString.call(alldir) === "[object Object]"){
