@@ -157,7 +157,7 @@ export class BucketDetailComponent implements OnInit {
           let str = res._body;
           let x2js = new X2JS();
           let jsonObj = x2js.xml_str2json(str);
-          let alldir = jsonObj.ListBucketResult && jsonObj.ListBucketResult.Contents ? jsonObj.ListBucketResult.Contents :[] ;
+          let alldir = jsonObj.ListBucketResult ? jsonObj.ListBucketResult :[] ;
 
           if(Object.prototype.toString.call(alldir) === "[object Array]"){
               this.allDir = alldir;
@@ -183,7 +183,7 @@ export class BucketDetailComponent implements OnInit {
                   folderContain = true;
                 }else if(ObjectKeyNum == folderNum + 1){
                   //Identify folders within folders
-
+                  alldir 
                   let lastNum = arr.Contents.Key.lastIndexOf(this.colon);
                   if(lastNum == arr.Contents.Key.length -1){
 
