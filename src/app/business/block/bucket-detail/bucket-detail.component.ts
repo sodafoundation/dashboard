@@ -261,11 +261,11 @@ export class BucketDetailComponent implements OnInit {
       }
     })
     this.allDir.forEach(it=>{
-      set.delete(it.ObjectKey);
+      set.delete(it.Contents[0].Key);
     })
     set.forEach(item=>{
       let defaultObject = lodash.cloneDeep(this.allDir[0]);
-      defaultObject.ObjectKey = item;
+      defaultObject.Contents[0].Key = item;
       this.allDir.push(defaultObject);
     })
   }
@@ -506,7 +506,7 @@ export class BucketDetailComponent implements OnInit {
                     break;
                   case "deleteMilti":
                    file.forEach(element => {
-                      let objectKey = element.ObjectKey;
+                      let objectKey = element.Contents[0].Key;
                       //If you want to delete files from a folder, you must include the name of the folder
                       if(this.folderId !=""){
                         objectKey = this.folderId + objectKey;
