@@ -144,7 +144,7 @@ export class BucketDetailComponent implements OnInit {
           let str = res._body;
           let x2js = new X2JS();
           let jsonObj = x2js.xml_str2json(str);
-          let alldir = jsonObj.ListBucketResult ? jsonObj.ListBucketResult :[] ;
+          let alldir = jsonObj.ListBucketResult.Contents ? jsonObj.ListBucketResult : [] ;
           if(Object.prototype.toString.call(alldir) === "[object Array]"){
               this.allDir = alldir;
           }else if(Object.prototype.toString.call(alldir) === "[object Object]"){
@@ -199,7 +199,7 @@ export class BucketDetailComponent implements OnInit {
           this.allFolderNameForCheck = [];
           this.allDir.forEach(item=>{
             item.size = Utils.getDisplayCapacity(item.Contents.Size,2,'KB');
-            item.lastModified = Utils.formatDate(item.Contents.LastModified *1000);
+            item.lastModified = item.Contents.LastModified;
             item.Location = item.Contents.Location;
             item.Tier = "Tier_" + item.Contents.Tier + " (" + item.Contents.StorageClass + ")";
             if(item.Contents.Key.indexOf(this.colon) !=-1){
@@ -237,15 +237,17 @@ export class BucketDetailComponent implements OnInit {
   //Resolve objects with file directories that are not manually uploaded
   resolveObject(){
     let set = new Set();
-    this.allDir.forEach((item,index)=>{
-      let includeIndex = item.Contents.Key.indexOf(this.colon);
-      if(includeIndex != -1 && includeIndex < item.Contents.Key.length-1){
-        while(includeIndex > -1){
-          set.add(item.Contents.Key.substr(0,includeIndex+1));
-          includeIndex = item.Contents.Key.indexOf(this.colon, includeIndex+1);
+    if(this.allDir['Content']){  
+      this.allDir.forEach((item,index)=>{
+        let includeIndex = item.Contents.Key.indexOf(this.colon);
+        if(includeIndex != -1 && includeIndex < item.Contents.Key.length-1){
+          while(includeIndex > -1){
+            set.add(item.Contents.Key.substr(0,includeIndex+1));
+            includeIndex = item.Contents.Key.indexOf(this.colon, includeIndex+1);
+          }
         }
-      }
-    })
+      })
+    }
     this.allDir.forEach(it=>{
       set.delete(it.Contents.Key);
     })
