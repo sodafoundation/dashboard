@@ -428,7 +428,11 @@ export class VolumeListComponent implements OnInit {
 
     returnSelectedVolume(selectedVolume, dialog) {
         if (dialog === 'snapshot') {
-            this.snapshotFormGroup.reset();
+            this.snapshotFormGroup.reset({
+                name: "",
+                profile : "",
+                description: ""
+            });
             this.createSnapshotDisplay = true;
         } else if (dialog === 'replication') {
             this.createReplicationDisplay = true;

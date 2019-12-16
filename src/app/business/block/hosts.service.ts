@@ -11,26 +11,26 @@ export class HostsService {
 
     project_id = this.paramStor.CURRENT_TENANT().split("|")[1];
     hostsUrl = 'v1beta/{project_id}/host/hosts';
-    //create volume group
+    //create host 
     createHost(param){
         let url = this.hostsUrl;
         return this.http.post(url,param);
     }
-    //get volume group
+    //get host 
     getHosts(): Observable<any> {
         return this.http.get(this.hostsUrl);
     }
-    //delete volume group
+    //delete host 
     deleteHost(hostId): Observable<any> {
       let url = this.hostsUrl + "/" + hostId
       return this.http.delete(url);
     }
-    //modify volume group
+    //modify host 
     modifyHost(hostId,param): Observable<any> {
       let url = this.hostsUrl + "/" + hostId
       return this.http.put(url,param);
     }
-    //get volume group by id
+    //get host  by id
     getHostById(hostId): Observable<any> {
       let url = this.hostsUrl + "/" + hostId;
       return this.http.get(url);
