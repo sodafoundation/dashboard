@@ -404,7 +404,7 @@ export class BucketDetailComponent implements OnInit {
         this.httpClient.get(downloadUrl, options).subscribe((res)=>{
           let blob = new Blob([res]);
           if (typeof window.navigator.msSaveBlob !== 'undefined') {  
-            window.navigator.msSaveBlob(blob, file.ObjectKey);
+              window.navigator.msSaveBlob(blob, file.ObjectKey);
           } else {
             let URL = window.URL
             let objectUrl = URL.createObjectURL(blob)
@@ -495,7 +495,7 @@ export class BucketDetailComponent implements OnInit {
                   let objectKey = file.ObjectKey;
                     //If you want to delete files from a folder, you must include the name of the folder
                     if(this.folderId !=""){
-                      objectKey = this.folderId + objectKey;
+                        objectKey = this.folderId + objectKey;
                     }
                     window['getAkSkList'](()=>{
                       let requestMethod = "DELETE";
