@@ -492,10 +492,10 @@ export class BucketDetailComponent implements OnInit {
               try {
                 switch(func){
                   case "delete":
-                  let objectKey = file.ObjectKey;
+                    let objectKey = file.ObjectKey;
                     //If you want to delete files from a folder, you must include the name of the folder
                     if(this.folderId !=""){
-                        objectKey = this.folderId + objectKey;
+                      objectKey = this.folderId + objectKey;
                     }
                     window['getAkSkList'](()=>{
                       let requestMethod = "DELETE";
