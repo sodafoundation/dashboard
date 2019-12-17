@@ -99,7 +99,7 @@ export class BucketDetailComponent implements OnInit {
         url: ["/" + this.bucketId],
       });
       this.fromObjects = params.fromRoute === "fromObjects";
-      this.fromLifeCycle = params.fromRoute === "fromLifeCycle";    
+      this.fromLifeCycle = params.fromRoute === "fromLifeCycle";
       this.backetUrl = this.bucketId;
       this.getAlldir();
       this.allTypes = [];
@@ -144,7 +144,6 @@ export class BucketDetailComponent implements OnInit {
     }
     if(window.sessionStorage['folderId']!==''){
       this.folderId = JSON.parse(window.sessionStorage.getItem("folderId"))
-      
     }
     this.selectedDir = [];
     window['getAkSkList'](()=>{
@@ -158,7 +157,6 @@ export class BucketDetailComponent implements OnInit {
           let x2js = new X2JS();
           let jsonObj = x2js.xml_str2json(str);
           let alldir = jsonObj.ListBucketResult ? jsonObj.ListBucketResult :[] ;
-
           if(Object.prototype.toString.call(alldir) === "[object Array]"){
               this.allDir = alldir;
           }else if(Object.prototype.toString.call(alldir) === "[object Object]"){
@@ -183,11 +181,8 @@ export class BucketDetailComponent implements OnInit {
                   folderContain = true;
                 }else if(ObjectKeyNum == folderNum + 1){
                   //Identify folders within folders
-                  alldir 
                   let lastNum = arr.Contents.Key.lastIndexOf(this.colon);
                   if(lastNum == arr.Contents.Key.length -1){
-
-
                     folderContain = true;
                   }
                 }
@@ -201,7 +196,6 @@ export class BucketDetailComponent implements OnInit {
             //Distinguish between folders and files at the first level
             this.allDir = this.allDir.filter(item=>{
               let folderIndex = false;
-
               if(item.Contents.Key.indexOf(this.colon) !=-1){
                 let index;
                 index = item.Contents.Key.indexOf(this.colon,index);
@@ -548,5 +542,4 @@ export class BucketDetailComponent implements OnInit {
   passHeaderTag() {
     window.sessionStorage['headerTag'] =JSON.stringify(this.items);
   }
-
 }
