@@ -103,11 +103,6 @@ export class BucketService {
     let url = this.url + "/" +name;
     return this.http.delete(url,param);
   }
-  //copy object
-  copyObject(object,param, options){
-    let url = this.url + "/" + object;
-    return this.http.put(url, param, options);
-  }
   //get acl
   getAcl(name, options){
     let url = this.url + "/" + name;
