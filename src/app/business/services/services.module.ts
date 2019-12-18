@@ -19,6 +19,7 @@ import { CreateInstanceComponent } from './create-instance/create-instance.compo
 import { CreateClusterComponent } from './create-cluster/create-cluster.component';
 import { WorkflowService } from './workflow.service';
 import { ProfileService } from '../profile/profile.service';
+import { HostsService } from '../block/hosts.service';
 import { HttpClientModule } from '@angular/common/http';
 import { DynamicFormComponent } from './dynamic-form/dynamic-form.component';
 
@@ -57,6 +58,6 @@ import { DynamicFormComponent } from './dynamic-form/dynamic-form.component';
     HttpClientModule,
     SpinnerModule],
   exports: [ServicesRoutingModule],
-  providers: [WorkflowService, ProfileService, ConfirmationService]
+  providers: [WorkflowService, ProfileService, HostsService, ConfirmationService]
 })
 export class ServicesModule { }

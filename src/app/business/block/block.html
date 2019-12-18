@@ -23,5 +23,11 @@
         </div>
         <app-file-share></app-file-share>
     </p-tabPanel>
+    <p-tabPanel header="Hosts" [selected]="fromHosts">
+        <div class="content-header">
+            <p>{{I18N.keyID['sds_block_hosts_descrip']}}</p>
+        </div>
+        <app-hosts></app-hosts>
+    </p-tabPanel>
     
 </p-tabView>

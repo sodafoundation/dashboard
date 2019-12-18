@@ -49,6 +49,19 @@ export class BucketService {
     let url = this.url + '/' + id;
     return this.http.get(url,options);
   }
+  
+  //Set Bucket Encryption
+  setEncryption(name,param?,options?) {
+    return this.http.put(this.url+"/"+name+"/?DefaultEncryption",param,options);
+  }
+
+  //Set Bucket Versioning
+  setVersioning(name,param?,options?) {
+    return this.http.put(this.url+"/"+name+"/?versioning",param,options);
+  }
+  suspendVersioning(name,param?,options?) {
+    return this.http.put(this.url+"/"+name+"/?versioning",param,options);
+  }
 
   getBckends(): Observable<any> {
     return this.http.get('v1beta/{project_id}/backend');
@@ -89,6 +102,11 @@ export class BucketService {
   deleteLifeCycle(name,param){
     let url = this.url + "/" +name;
     return this.http.delete(url,param);
+  }
+  //copy object
+  copyObject(object,param, options){
+    let url = this.url + "/" + object;
+    return this.http.put(url, param, options);
   }
 
   // Rquest header with AK/SK authentication added

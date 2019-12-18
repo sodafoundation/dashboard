@@ -5,6 +5,7 @@ import { I18NService, MsgBoxService, Utils, ParamStorService } from '../../../sh
 import { Validators, FormControl, FormGroup, FormBuilder } from '@angular/forms';
 import { WorkflowService } from '../workflow.service';
 import { ProfileService } from '../../profile/profile.service';
+import { HostsService } from '../../block/hosts.service';
 import { trigger, state, style, transition, animate } from '@angular/animations';
 import { CreateClusterComponent } from '../create-cluster/create-cluster.component'
 import * as _ from "underscore";
@@ -23,6 +24,9 @@ export class DynamicFormComponent implements OnInit {
 
   msgs: Message[];
   profileOptions: any[] = [];
+  allHosts;
+  noHosts: boolean = false;
+  hostOptions: any[] = [];
   objectProps: any;
   displayFormObject: any[];
   form: FormGroup;
@@ -56,6 +60,7 @@ export class DynamicFormComponent implements OnInit {
     public i18n: I18NService,
     private wfservice: WorkflowService,
     private profileService: ProfileService,
+    private HostsService: HostsService,
     private paramStor: ParamStorService,
     private fb: FormBuilder) {
       this.default_parameters['auth_token'] = localStorage['auth-token'];
@@ -66,6 +71,7 @@ export class DynamicFormComponent implements OnInit {
   ngOnInit() {
     let self = this;
     self.getProfiles();
+    self.getAllHosts();
     this.dataObject['instanceName'] = {
       "description": "Name of the Instance",
       "required": true,
@@ -107,12 +113,12 @@ export class DynamicFormComponent implements OnInit {
           item['showThis'] = false;
         }
         /* Adding host info object for volume provisioning.  */
-        if(item['key'] == 'host_info'){
-          item['label'] = "Host IP";
-          item['showThis'] = true;
-          item['validation'] = {required: true};
-          item['required'] = true;
-          item['type'] = 'string';
+        if(item['key'] == 'host_id'){
+          item['label'] = "Host";
+          item['inputType'] = "select"; 
+          item['options'] = self.hostOptions;
+          
+          formGroup[item['key']] = new FormControl(item['value'] || '', self.mapValidators(item['validation']));
         }
 
         if(item['key'] == 'port' || item['key']=='analysis_args'){
@@ -145,18 +151,29 @@ export class DynamicFormComponent implements OnInit {
           formGroup[item['key']] = new FormControl(item['value'] || '', self.mapValidators(item['validation']));
         }
 
+        switch (item['type']) {
+          case "string": item['inputType'] = "text"; 
+                        if((item['key'] == 'profile_id') || (item['key'] == 'host_id')){
+                            item['inputType'] = "select";
+                        }
+            
+            break;
+          case "boolean": item['inputType'] = "radio";
+                          item['options'] = [
+                            { label: "True", value: 'true'},
+                            { label: "False", value: 'false'}
+                          ];
+            
+            break;
+          case "integer": item['inputType'] = "number";
+            
+            break;
         
-        if(item['type'] == "string" && item['key'] != 'profile_id'){
-          item['inputType'] = "text";
-        } else if(item['type'] == "boolean"){
-          item['inputType'] = "radio";
-          item['options'] = [
-            { label: "True", value: 'true'},
-            { label: "False", value: 'false'}
-          ];
-        } else if(item['type'] == "integer"){
-          item['inputType'] = "number";
+          default:
+            break;
         }
+
+       
         if(item['required']==true){
           formGroup[item['key']] = new FormControl(item['value'] || '', self.mapValidators(item['validation']));
         }
@@ -170,7 +187,30 @@ export class DynamicFormComponent implements OnInit {
       }
     }
       
-
+    getAllHosts(){
+      let self = this;
+        this.HostsService.getHosts().subscribe((res) => {
+          this.allHosts = res.json();
+            if(this.allHosts.length == 0){
+              this.noHosts = true;
+            }
+            if(this.allHosts && this.allHosts.length){
+              _.each(self.allHosts, function(item){
+                let option = {
+                    label: item['hostName'] + ' ' + '(' + item['ip'] + ')',
+                    value: item['id']
+                }
+                self.hostOptions.push(option);
+            })
+            }
+            console.log("Host Options", self.hostOptions);
+        }, (error) =>{
+            console.log("Something went wrong. Could not fetch hosts.", error);
+            this.msgs = [];
+            this.msgs.push({severity: 'error', summary: 'Error', detail: error._body});
+        })
+      
+    }
       mapValidators(validators) {
         const formValidators = [];
 
@@ -206,12 +246,6 @@ export class DynamicFormComponent implements OnInit {
 
       onSubmit(value) {
         let formObject = value;
-        if(_.has(formObject, 'host_info')){
-          let val = {
-            "ip" : formObject['host_info']
-          }
-          formObject['host_info'] =  val;
-        }
         this.requestBody.service_id = this.serviceId;
         this.requestBody.action = this.selectedService.action;
         this.requestBody.user_id = this.default_parameters['user_id'];

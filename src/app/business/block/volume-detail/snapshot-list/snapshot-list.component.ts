@@ -203,7 +203,11 @@ export class SnapshotListComponent implements OnInit {
 
   showSnapshotPropertyDialog(method,selectedSnapshot?){
     this.snapshotPropertyDisplay = true;
-    this.snapshotFormGroup.reset();
+    this.snapshotFormGroup.reset({
+        name: "",
+        profile : "",
+        description: ""
+    });
     if(method === 'create'){
       this.isCreate = true;
       this.isModify = false;

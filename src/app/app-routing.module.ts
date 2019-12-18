@@ -1,5 +1,7 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
+import { HostsResolver } from './business/block/modify-host/host-resolver.service';
+import { AzResolver } from './business/block/modify-host/az-resolver.service';
 
 const routes: Routes = [
     {path: '', redirectTo: '/home', pathMatch: 'full'},
@@ -7,6 +9,14 @@ const routes: Routes = [
     {path: 'block', loadChildren: './business/block/block.module#BlockModule'},
     {path: 'createVolume', loadChildren: './business/block/create-volume/create-volume.module#CreateVolumeModule'},
     {path: 'volumeDetails/:volumeId', loadChildren: './business/block/volume-detail/volume-detail.module#VolumeDetailModule'},
+    {path: 'createHost', loadChildren: './business/block/create-host/create-host.module#CreateHostModule'},
+    {path: 'modifyHost/:hostId', loadChildren: './business/block/modify-host/modify-host.module#ModifyHostModule',
+        resolve: {
+            host: HostsResolver,
+            az: AzResolver
+        }
+    },
+    {path: 'hostDetails/:hostId', loadChildren: './business/block/host-detail/host-detail.module#HostDetailModule'},
     {path: 'cloud', loadChildren: './business/cloud/cloud.module#CloudModule'},
     {path: 'profile', loadChildren: './business/profile/profile.module#ProfileModule'},
     {path: 'createProfile', loadChildren: './business/profile/createProfile/createProfile.module#CreateProfileModule'},
@@ -26,6 +36,10 @@ const routes: Routes = [
 
 @NgModule({
     imports: [RouterModule.forRoot(routes)],
-    exports: [RouterModule]
+    exports: [RouterModule],
+    providers: [
+        HostsResolver,
+        AzResolver
+    ]
 })
 export class AppRoutingModule {}

@@ -163,7 +163,10 @@ export class FileShareComponent implements OnInit{
     returnSelectedFileShare(selectedFileShare, dialog){
         if(dialog == 'snapshot'){
             this.createSnapshotShow = true;
-            this.createSnapshotForm.reset();
+            this.createSnapshotForm.reset({
+                name: "",
+                description: ""
+            });
             this.checkSnapshotName = false;
             this.createSnapshotForm.get("name").valueChanges.subscribe((value: string)=>{
                 let defaultLength = "snapshot".length;
@@ -181,7 +184,12 @@ export class FileShareComponent implements OnInit{
         }else if(dialog == 'acl'){
             this.aclCreateShow = true;
             this.aclsItems = [0];
-            this.createAclsFormGroup.reset();
+            this.createAclsFormGroup.reset({
+                level : "",
+                user : "",
+                userInput0 : "",
+                description : ""
+            });
             this.getAcls(selectedFileShare);
             this.showIpErrorMessage = [false];
         }
