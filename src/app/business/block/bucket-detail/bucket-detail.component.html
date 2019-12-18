@@ -32,13 +32,13 @@
                                 <img style="vertical-align: middle;" src="assets/business/images/volume/icon_folder.png">
                                 <span>{{file.objectName}}</span>
                             </a>
-                            <span title="{{file.objectName}}"  *ngIf="!file.newFolder">{{file.objectName}}</span>
+                            <a (click)="passHeaderTag()" [routerLink]="['/objectAcl/'+bucketId+'/'+file.objectName]" title="{{file.objectName}}"  *ngIf="!file.newFolder">{{file.objectName}}</a>
                         </ng-template>
                     </p-column>
                     <p-column field="size" header="Size" [style]="{'width': '120px'}"></p-column>
                     <p-column field="Location" header="Location" [style]="{'width': '120px'}" ></p-column>
                     <p-column field="Tier" header="Tier" ></p-column>
-                    <p-column field="lastModified" header="Last Modified"></p-column>
+                    <p-column field="LastModified" header="Last Modified"></p-column>
                     <p-column header="{{I18N.keyID['sds_block_volume_operation']}}" [style]="{'width': '180px'}">
                         <ng-template pTemplate="body" let-file="rowData" let-i="rowIndex">
                             <a (click)="downloadFile(file)" *ngIf="!file.newFolder">Download</a>
@@ -93,6 +93,9 @@
         </p-tabPanel>
         <p-tabPanel header="lifeCycle" [selected]="fromLifeCycle">
             <lifeCycle [bucketId]="bucketId"></lifeCycle>
+        </p-tabPanel> 
+        <p-tabPanel header="acl" [selected]="fromAcl">
+            <acl [bucketId]="bucketId"></acl>
         </p-tabPanel> 
     </p-tabView>
 </div>

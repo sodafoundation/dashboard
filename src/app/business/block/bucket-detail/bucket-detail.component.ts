@@ -22,6 +22,7 @@ let lodash = require('lodash');
 export class BucketDetailComponent implements OnInit {
   fromObjects:boolean = false;
   fromLifeCycle:boolean = false;
+  fromAcl:boolean = false;
   kDate = "";
   Signature = "";
   colon = "/";
@@ -207,6 +208,13 @@ export class BucketDetailComponent implements OnInit {
     this.getAlldir();
   }
   getAlldir(){
+    if(window.sessionStorage['headerTag']!==''){
+      this.items = []
+      this.items = JSON.parse(window.sessionStorage.getItem("headerTag"))
+    }
+    if(window.sessionStorage['folderId']!==''){
+      this.folderId = JSON.parse(window.sessionStorage.getItem("folderId"))
+    }
     this.selectedDir = [];
     window['getAkSkList'](()=>{
       let requestMethod = "GET";
@@ -307,6 +315,8 @@ export class BucketDetailComponent implements OnInit {
         });
         })
     })
+    window.sessionStorage['folderId'] = ""
+    window.sessionStorage['headerTag'] = ""
   }
   //Resolve objects with file directories that are not manually uploaded
   resolveObject(){
@@ -599,5 +609,7 @@ export class BucketDetailComponent implements OnInit {
   tablePaginate() {
       this.selectedDir = [];
   }
-
+  passHeaderTag() {
+    window.sessionStorage['headerTag'] =JSON.stringify(this.items);
+  }
 }
