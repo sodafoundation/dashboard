@@ -35,7 +35,6 @@ let routers = [{
     LifeCycleModule,
     HttpClientModule,
     AclModule,
-    SplitButtonModule
   ],
   declarations: [
     BucketDetailComponent
