@@ -38,7 +38,11 @@
                     <p-column field="size" header="Size" [style]="{'width': '120px'}"></p-column>
                     <p-column field="Location" header="Location" [style]="{'width': '120px'}" ></p-column>
                     <p-column field="Tier" header="Tier" ></p-column>
-                    <p-column field="lastModified" header="Last Modified"></p-column>
+                    <p-column field="lastModified" header="Last Modified">
+                        <ng-template pTemplate="body" let-obj="rowData" let-i="rowIndex">
+                            {{obj.lastModified ? (obj.lastModified | date:'long') : '--'}}
+                        </ng-template>
+                    </p-column>
                     <p-column header="{{I18N.keyID['sds_block_volume_operation']}}" [style]="{'width': '180px'}">
                         <ng-template pTemplate="body" let-file="rowData" let-i="rowIndex">
                             <a (click)="downloadFile(file)" *ngIf="!file.newFolder">Download</a>
