@@ -50,7 +50,11 @@ export class BucketDetailComponent implements OnInit {
   showCreateFolder = false;
   createFolderForm:FormGroup;
   showErrorMsg = false;
-  UPLOAD_UPPER_LIMIT = 1024*1024*1024*2;
+  isReadyCopy = true;
+  isReadyPast = true;
+  UPLOAD_UPPER_LIMIT = 1024 * 1024 * 1024 * 2;
+  moreItems = [];
+  copySelectedDir = [];
   errorMessage = {
     "backend_type": { required: "Type is required." },
     "backend": { required: "Backend is required." },
@@ -101,6 +105,76 @@ export class BucketDetailComponent implements OnInit {
       this.getTypes();
     }
     );
+    this.copySelectedDir = window.sessionStorage['searchIndex'] != "" ? JSON.parse(window.sessionStorage.getItem("searchIndex")) : [];
+  }
+  clickOperate(){
+    if(this.selectedDir.length >0){
+      this.isReadyCopy = false;
+      this.copySelectedDir = lodash.cloneDeep(this.selectedDir);
+    }else{
+      this.isReadyCopy = true;
+      this.copySelectedDir = window.sessionStorage['searchIndex'] != "" ? JSON.parse(window.sessionStorage.getItem("searchIndex")) : [];
+      this.isReadyPast = this.copySelectedDir.length != 0 ? false :true;
+    }
+    this.moreItems = [
+      {
+        disabled: this.isReadyCopy,
+        label: 'copy', command: () => {
+          this.copyObject();
+        }
+      },
+      {
+        disabled: this.isReadyPast,
+        label: 'paste', command: (y) => {
+          this.pasteObject();
+        }
+      },
+    ];
+  }
+  //copy object
+  copyObject() {
+    this.isReadyPast = true;
+    this.copySelectedDir.forEach((item, index) =>{
+      this.copySelectedDir[index]['source'] = this.bucketId;
+      this.copySelectedDir[index]['folderId'] = this.folderId;
+    })
+    window.sessionStorage['searchIndex'] = JSON.stringify(this.copySelectedDir);
+  }
+  //paste object
+  pasteObject() {
+    this.copySelectedDir.forEach(item=>{
+      let key = this.folderId != "" ? this.folderId + item.Contents.Key : item.Contents.Key;
+      let copySource = item.folderId != "" ? item.source + '/' + item.folderId + item.Contents.Key : 
+      item.source + '/' + item.Contents.Key;
+      let sourceBucket = item.source;
+      window['getAkSkList'](() => {
+        let requestMethod = "PUT";
+        let url = this.BucketService.url + "/" + this.bucketId + '/' + key;
+        window['canonicalString'](requestMethod, url, () => {
+          let options: any = {};
+          this.getSignature(options);
+          options.headers.set('Content-Type', 'application/xml');
+          //The source data
+          options.headers.set('x-amz-copy-source', copySource);
+          if(sourceBucket != this.bucketId){
+            //Copy between different buckets
+            options.headers.set('X-Amz-Metadata-Directive', 'COPY');
+          }else{
+            //Copy in the same bucket
+            options.headers.set('X-Amz-Metadata-Directive', 'REPLACE');
+          }
+          let param = {};
+          this.BucketService.copyObject(this.bucketId + '/' + key, param, options).subscribe((res) => {
+            this.isReadyPast = true;
+            window.sessionStorage['searchIndex'] = "";
+            this.getAlldir();
+            res
+          }, (error)=>{
+            window.sessionStorage['searchIndex'] = "";
+          });
+        })
+      })
+    })
   }
   //Click on folder
   folderLink(file){
