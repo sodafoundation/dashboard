@@ -33,7 +33,7 @@ export const Consts = {
     BUCKET_TYPE:new Map<string,string>(),
     BYTES_PER_CHUNK : 1024 * 1024 * 16,
     TIMEOUT: 30 * 60 * 1000,
-    CLOUD_TYPE:['aws-s3','azure-blob','hw-obs','fusionstorage-object','ceph-s3','ibm-cos','gcp'],
+    CLOUD_TYPE:['aws-s3','azure-blob','hw-obs','fusionstorage-object','ceph-s3','ibm-cos','gcp', 'yig'],
     TYPE_SVG:{
         "aws-s3":'aws.svg',
         "hw-obs":"huawei.svg",
@@ -50,6 +50,7 @@ export const Consts = {
         'fusionstorage-object': "FusionStorage Object",
         'ceph-s3': "Ceph S3",
         'gcp-s3': "GCP Storage",
-        'ibm-cos': "IBM COS"
+        'ibm-cos': "IBM COS",
+        'yig': "YIG"
     }
 }

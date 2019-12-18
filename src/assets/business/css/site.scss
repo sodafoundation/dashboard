@@ -1863,7 +1863,8 @@ a {
 }
 .create-bucket-dialog{
     .ui-dialog-content{
-        height: 295px;
+        height: 550px;
+        padding-bottom: 0.6rem !important;
     }
 }
 
@@ -2014,4 +2015,50 @@ a {
 /* Services Page Css ends */
 .list-header{
     height: 50px;
+}
+
+/* Bucket Listing Page */
+span.encryption-text, span.version-text{
+    margin-left: 5px;
+    font-weight: 600;
+}
+span.encryption-type {
+    border: 1px solid #00b12e;
+    border-radius: 2px;
+    padding: 0 3px;
+    margin-left: 5px;
+    color: #00b12e;
+}
+/* Bucket Listing Page ends */
+/* Host Management Starts */
+/* Host List */
+.host-az{
+    text-align: center;
+}
+.host-az-tip{
+    font-size: 14px;
+    padding: 10px;
+}
+/* Create Host page */
+.initiator-array{
+    width: 600px;
+    padding: 0 0 5px 0;
+}
+a.add-initiator{
+    color: #00b12e;
+}
+
+a.remove-initiator {
+    color: #ff0000;
+    padding: 8px 0 0 0;
+}
+/* Host Management Ends */
+/* Attach Host to Volume */
+.attachHostModal, .detachHostModal{
+    .ui-dialog-content{
+        height: 250px;
+    }
+}
+.input-context-help {
+    padding-top: 0.1rem;
 }

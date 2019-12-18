@@ -224,10 +224,21 @@ export class HomeComponent implements OnInit {
             return  initArray;
         },[]);
         this.Allbackends = result;
+        this.allBackends_count.localBKD = 0;
         this.allBackends_count.aws = this.Allbackends[this.cloud_type[0]] ? this.Allbackends[Consts.CLOUD_TYPE[0]].length :0;
         this.allBackends_count.huaweipri = this.Allbackends[this.cloud_type[1]] ? this.Allbackends[Consts.CLOUD_TYPE[1]].length :0;
         this.allBackends_count.huaweipub = this.Allbackends[this.cloud_type[2]] ? this.Allbackends[Consts.CLOUD_TYPE[2]].length :0;
-        this.allBackends_count.localBKD = this.Allbackends[this.cloud_type[3]] ? this.Allbackends[Consts.CLOUD_TYPE[3]].length :0 + this.Allbackends[this.cloud_type[4]] ? this.Allbackends[Consts.CLOUD_TYPE[4]].length :0;
+        if( this.Allbackends[this.cloud_type[3]]){
+            this.allBackends_count.localBKD += this.Allbackends[this.cloud_type[3]].length;
+        }
+        if( this.Allbackends[this.cloud_type[4]]){
+            this.allBackends_count.localBKD += this.Allbackends[this.cloud_type[4]].length;
+        }
+        if( this.Allbackends[this.cloud_type[7]]){
+            this.allBackends_count.localBKD += this.Allbackends[this.cloud_type[7]].length;
+        }
+
+
         this.allBackends_count.ibmcos = this.Allbackends[this.cloud_type[5]] ? this.Allbackends[Consts.CLOUD_TYPE[5]].length :0;
         this.allBackends_count.gcp = this.Allbackends[this.cloud_type[6]] ? this.Allbackends[Consts.CLOUD_TYPE[6]].length :0;
     }
@@ -280,7 +291,8 @@ export class HomeComponent implements OnInit {
             this.selectedType = null;
             let fs_arr = this.Allbackends['fusionstorage-object'] ? this.Allbackends['fusionstorage-object'] : [];
             let ceph_arr = this.Allbackends['ceph-s3'] ? this.Allbackends['ceph-s3'] : [];
-            this.typeDetail = fs_arr.concat(ceph_arr);
+            let yig_arr = this.Allbackends['yig'] ? this.Allbackends['yig'] : [];
+            this.typeDetail = fs_arr.concat(ceph_arr,yig_arr);
         }
     }
 
