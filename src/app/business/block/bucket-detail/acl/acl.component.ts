@@ -38,7 +38,7 @@ export class AclComponent implements OnInit {
     getAclList() {
         window['getAkSkList'](()=> {
             let requestMethod = "GET";
-            let url = this.BucketService.url + '/' + this.bucketId;
+            let url = this.BucketService.url + '/' + this.bucketId+'/?acl';
             window['canonicalString'](requestMethod, url, () => {
                 let options: any = {};
                 let key = "/?acl"
