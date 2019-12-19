@@ -260,7 +260,7 @@ export class BucketDetailComponent implements OnInit {
               return folderContain;
             })
             this.allDir.forEach(val=>{
-              val.ObjectKey = val.ObjectKey.slice(this.folderId.length);
+              val.Key = val.Key.slice(this.folderId.length);
             })
           }else{
             //Distinguish between folders and files at the first level
