@@ -32,7 +32,7 @@
                                 <img style="vertical-align: middle;" src="assets/business/images/volume/icon_folder.png">
                                 <span>{{file.objectName}}</span>
                             </a>
-                            <span title="{{file.objectName}}"  *ngIf="!file.newFolder">{{file.objectName}}</span>
+                            <a (click)="passHeaderTag()" [routerLink]="['/objectAcl/'+bucketId+'/'+file.objectName]" title="{{file.objectName}}"  *ngIf="!file.newFolder">{{file.objectName}}</a>
                         </ng-template>
                     </p-column>
                     <p-column field="size" header="Size" [style]="{'width': '120px'}"></p-column>
@@ -97,6 +97,9 @@
         </p-tabPanel>
         <p-tabPanel header="lifeCycle" [selected]="fromLifeCycle">
             <lifeCycle [bucketId]="bucketId"></lifeCycle>
+        </p-tabPanel> 
+        <p-tabPanel header="acl" [selected]="fromAcl">
+            <acl [bucketId]="bucketId"></acl>
         </p-tabPanel> 
     </p-tabView>
 </div>
