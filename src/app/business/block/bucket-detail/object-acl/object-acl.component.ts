@@ -46,10 +46,11 @@ export class ObjectAclComponent implements OnInit {
         this.items = window.sessionStorage['headerTag'] && window.sessionStorage['headerTag'] != "" ? JSON.parse(window.sessionStorage.getItem("headerTag")) : [];
         window['getAkSkList'](()=> {
             let requestMethod = "GET";
-            let url = this.BucketService.url + '/' + this.bucketId;
+            let url = this.BucketService.url + '/' + this.bucketId+ `/${this.key}?acl`;
             window['canonicalString'](requestMethod, url, () => {
                 let options: any = {};
                 let name = this.bucketId + `/${this.key}?acl`
+                this.getSignature(options);
                 this.BucketService.getObjectAcl(name,options).subscribe((res) => {
                     let str = res['_body'];
                     let x2js = new X2JS();
@@ -89,7 +90,7 @@ export class ObjectAclComponent implements OnInit {
     creatObjectAclSubmit(param,user) {
         window['getAkSkList'](()=> {
             let requestMethod = "PUT";
-            let url = this.BucketService.url + '/' + this.bucketId + "/?acl";
+            let url = this.BucketService.url + '/' + this.bucketId + `/${this.key}?acl`;
             window['canonicalString'](requestMethod,url,() => {
                 let options: any = {}; 
                 this.getSignature(options);
