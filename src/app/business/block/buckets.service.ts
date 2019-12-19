@@ -103,7 +103,33 @@ export class BucketService {
     let url = this.url + "/" +name;
     return this.http.delete(url,param);
   }
+  //copy object
+  copyObject(object,param, options){
+    let url = this.url + "/" + object;
+    return this.http.put(url, param, options);
+  }
 
+  //get acl
+  getAcl(name, options){
+    let url = this.url + "/" + name;
+    return this.http.get(url, options)
+  }
+  //put acl
+  creatAcl(name,param,options){
+    let url = this.url + "/" + name;
+    return this.http.put(url,param,options);
+  }
+  //get Objectacl
+  getObjectAcl(name, options){
+    let url = this.url + "/" + name;
+    return this.http.get(url, options)
+  }
+  //put Objectacl
+  creatObjectAcl(name,param,options){
+    let url = this.url + "/" + name;
+    return this.http.put(url,param,options);
+  }
+  
   // Rquest header with AK/SK authentication added
   getSignatureOptions(SignatureObjectwindow, options?){
     let kAccessKey = SignatureObjectwindow.SignatureKey.AccessKey;

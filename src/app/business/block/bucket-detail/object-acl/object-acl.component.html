@@ -1,0 +1,46 @@
+<div>
+    <div class="custom-breadcrumb">
+        <span *ngFor="let item of items; index as i">
+            <a *ngIf="i==0" [ngClass]="{'font-color-class': true}" [routerLink]="item.url">{{item.label}}</a>
+            <a *ngIf="i!=0" [ngClass]="{'font-color-class': true}" [routerLink]='["/bucketDetail/"+bucketId]' (click)="navigateClick(item.url)">{{item.label}}</a>
+            <span *ngIf="(i+1) !== items.length">></span>
+        </span>
+        <span>>{{key}}</span>
+    </div>
+    <div class="table-toolbar">
+        <div>Public access</div>
+        <div class="right">
+            <button  class="" pButton type="button" (click)="getObjectAclList()" icon="fa-refresh"></button>
+        </div>
+    </div>
+    <p-tabView styleClass="ui-tabview-large">
+        <div class="content-owner">
+            <p-dataTable [value]="cols">
+                <p-column [style]="{'width': '60px'}"></p-column>
+                <p-column header="Group">
+                    <ng-template pTemplate="body" let-aksk="rowData" let-i="rowIndex">
+                        <span>
+                            Everyone
+                        </span>
+                    </ng-template>
+                </p-column>
+                <p-column header="List objects">
+                    <ng-template pTemplate="body" let-aksk="rowData" let-i="rowIndex">
+                        <p-checkbox label="Yes" value="read" name="choose" [(ngModel)]="checkBoxArr"></p-checkbox>
+                    </ng-template>
+                </p-column>
+                <p-column header="Write objects">
+                    <ng-template pTemplate="body" let-aksk="rowData" let-i="rowIndex">
+                        <p-checkbox  label="Yes" value="write" name="choose" [(ngModel)]="checkBoxArr"></p-checkbox>
+                    </ng-template>
+                </p-column>
+                <p-column header="Operation">
+                        <ng-template pTemplate="body" let-aksk="rowData" let-i="rowIndex">
+                                <button  class="ui-button-secondary" (click)="onSubmit()" pButton type="button"  label="Save"></button>
+                                <button class="ui-button-secondary" (click)="getAclList()" pButton type="button" label="Cancel"></button>
+                        </ng-template>
+                    </p-column>
+            </p-dataTable>
+        </div>
+    </p-tabView>
+</div>

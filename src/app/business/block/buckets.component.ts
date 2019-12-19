@@ -208,8 +208,8 @@ export class BucketsComponent implements OnInit{
                                 label:item.name,
                                 value:item.name
                             });
-                            item.encryptionEnabled = item.SSEConfiguration.SSE.enabled.toLower() == "true" ? true : false;
-                            item.versionEnabled = item.VersioningConfiguration.Status.toLower() == "enabled" ? true : false;
+                            item.encryptionEnabled = item.SSEConfiguration.SSE.enabled.toLowerCase() == "true" ? true : false;
+                            item.versionEnabled = item.VersioningConfiguration.Status.toLowerCase() == "enabled" ? true : false;
                         });
                         this.initBucket2backendAnd2Type();
                     });
@@ -533,7 +533,7 @@ export class BucketsComponent implements OnInit{
                     let str = res._body;
                     let x2js = new X2JS();
                     let jsonObj = x2js.xml_str2json(str);
-                    let alldir = jsonObj.ListBucketResult ? jsonObj.ListBucketResult :[] ;
+                    let alldir = jsonObj.ListBucketResult.Contents ? jsonObj.ListBucketResult.Contents :[] ;
                     if(alldir.length === 0){
                         this.http.get(`v1/{project_id}/plans?bucketname=${bucket.name}`).subscribe((res)=>{
                             let plans = res.json().plans ? res.json().plans : [];
