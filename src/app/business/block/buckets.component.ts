@@ -422,7 +422,7 @@ export class BucketsComponent implements OnInit{
     </SSEConfiguration>`;
         window['getAkSkList'](()=>{
             let requestMethod = "PUT";
-            let url = this.BucketService.url+"/"+this.createBucketForm.value.name;
+            let url = this.BucketService.url+"/"+this.createBucketForm.value.name + "/?DefaultEncryption";
             window['canonicalString'](requestMethod, url,()=>{
                 let options: any = {};
                 this.getSignature(options);
@@ -452,7 +452,7 @@ export class BucketsComponent implements OnInit{
       </VersioningConfiguration>`
         window['getAkSkList'](()=>{
             let requestMethod = "PUT";
-            let url = this.BucketService.url+"/"+bucketName;
+            let url = this.BucketService.url+"/"+bucketName + "/?versioning";
             window['canonicalString'](requestMethod, url,()=>{
                 let options: any = {};
                 this.getSignature(options);
@@ -488,7 +488,7 @@ export class BucketsComponent implements OnInit{
                                     </VersioningConfiguration>`
         window['getAkSkList'](()=>{
             let requestMethod = "PUT";
-            let url = this.BucketService.url+"/"+bucketName;
+            let url = this.BucketService.url+"/"+bucketName + "/?versioning";
             window['canonicalString'](requestMethod, url,()=>{
                 let options: any = {};
                 this.getSignature(options);
@@ -558,7 +558,7 @@ export class BucketsComponent implements OnInit{
                             }
                         });
                     }else{
-                        this.msg.info("The backend cannot be deleted. please delete objects first");
+                        this.msg.info("The bucket cannot be deleted. please delete objects first.");
                     }
                 }); 
             })
