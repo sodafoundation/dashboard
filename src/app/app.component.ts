@@ -290,18 +290,27 @@ export class AppComponent implements OnInit, AfterViewInit {
                     options.headers.set('Authorization', this.Signature);
                     options.headers.set('X-Auth-Date', this.kDate);
                     this.http.put("/"+ uploadUrl + '?partNumber=' + (i + 1) + '&uploadId=' + uploadId, chunk, options).subscribe((data) => {
-                        let x2js = new X2JS();
-                        let jsonObj = x2js.xml_str2json(data['_body']);
-                        window['uploadPartArr'].push(jsonObj);
-                        uploadNum = 0;
+                        let header = data.headers['_headers']
+                        let headerArr = header.entries()
+                        let headerArr1= Array.from(headerArr)
+                        let ETag 
+                        headerArr1.forEach((item)=>{
+                            if(item[0] == 'etag'){
+                                return ETag = item[1][0].replace(/\"/g,"")
+                            }
+                        })
+                        let obj = {}
+                        obj['PartNumber'] = i+1
+                        obj['ETag'] = ETag && ETag? ETag : ""
+                        window['uploadPartArr'].push(obj);
                         if (i < (chunks.length - 1)) {
                             window['segmentUpload'](i + 1, chunks, blob, uploadId, options, bucketId, cb);
                         } else {
                             let marltipart = '<CompleteMultipartUpload>';
                             window['uploadPartArr'].forEach(item => {
                                 marltipart += `<Part>
-                                <PartNumber>${item.UploadPartResult.PartNumber}</PartNumber>
-                                <ETag>${item.UploadPartResult.ETag}</ETag>
+                                <PartNumber>${item.PartNumber}</PartNumber>
+                                <ETag>${item.ETag}</ETag>
                                 </Part>`
                             });
                             marltipart += '</CompleteMultipartUpload>';

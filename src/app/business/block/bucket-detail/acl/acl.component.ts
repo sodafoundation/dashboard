@@ -42,6 +42,7 @@ export class AclComponent implements OnInit {
             window['canonicalString'](requestMethod, url, () => {
                 let options: any = {};
                 let key = "/?acl"
+                this.getSignature(options);
                 let name = this.bucketId + key
                 this.BucketService.getAcl(name,options).subscribe((res) => {
                     let str = res['_body'];
