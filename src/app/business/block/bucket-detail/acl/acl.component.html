@@ -17,12 +17,12 @@
                         </span>
                     </ng-template>
                 </p-column>
-                <p-column header="List objects">
+                <p-column header="Read">
                     <ng-template pTemplate="body" let-aksk="rowData" let-i="rowIndex">
                         <p-checkbox label="yes" value="read" name="choose" [(ngModel)]="checkBoxArr"></p-checkbox>
                     </ng-template>
                 </p-column>
-                <p-column header="Write objects">
+                <p-column header="Write">
                     <ng-template pTemplate="body" let-aksk="rowData" let-i="rowIndex">
                         <p-checkbox  label="yes" value="write" name="choose" [(ngModel)]="checkBoxArr"></p-checkbox>
                     </ng-template>

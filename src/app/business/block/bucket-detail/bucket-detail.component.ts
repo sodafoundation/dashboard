@@ -144,9 +144,9 @@ export class BucketDetailComponent implements OnInit {
   //paste object
   pasteObject() {
     this.copySelectedDir.forEach(item=>{
-      let key = this.folderId != "" ? this.folderId + item.Contents.Key : item.Contents.Key;
-      let copySource = item.folderId != "" ? item.source + '/' + item.folderId + item.Contents.Key : 
-      item.source + '/' + item.Contents.Key;
+      let key = this.folderId != "" ? this.folderId + item.Key : item.Key;
+      let copySource = item.folderId != "" ? item.source + '/' + item.folderId + item.Key : 
+      item.source + '/' + item.Key;
       let sourceBucket = item.source;
       window['getAkSkList'](() => {
         let requestMethod = "PUT";
