@@ -24,16 +24,16 @@
                         </span>
                     </ng-template>
                 </p-column>
-                <p-column header="List objects">
+                <p-column header="Read">
                     <ng-template pTemplate="body" let-aksk="rowData" let-i="rowIndex">
                         <p-checkbox label="Yes" value="read" name="choose" [(ngModel)]="checkBoxArr"></p-checkbox>
                     </ng-template>
                 </p-column>
-                <p-column header="Write objects">
+                <!-- <p-column header="Write objects">
                     <ng-template pTemplate="body" let-aksk="rowData" let-i="rowIndex">
                         <p-checkbox  label="Yes" value="write" name="choose" [(ngModel)]="checkBoxArr"></p-checkbox>
                     </ng-template>
-                </p-column>
+                </p-column> -->
                 <p-column header="Operation">
                         <ng-template pTemplate="body" let-aksk="rowData" let-i="rowIndex">
                                 <button  class="ui-button-secondary" (click)="onSubmit()" pButton type="button"  label="Save"></button>
