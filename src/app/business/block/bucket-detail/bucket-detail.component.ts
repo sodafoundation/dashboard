@@ -456,6 +456,8 @@ export class BucketDetailComponent implements OnInit {
       let requestMethod = "GET";
       let url = downloadUrl;
       window['canonicalString'](requestMethod, url,()=>{
+        let options: any = {};
+        this.getSignature(options);
         window['load'](file.Key,file.ETag)
         var xhr = new XMLHttpRequest();
         xhr.open('GET', url, true);    
