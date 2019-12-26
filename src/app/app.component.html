@@ -61,3 +61,9 @@
 <div *ngIf="showPrompt" style="padding:15px 20px; z-index: 99999; line-height:18px;position: fixed;bottom: 10px;left:10px;background:rgba(255,255,255,0.75); border-radius: 5px; box-shadow:0 0 10px rgba(0,0,0,0.3);">
     <span>Uploading file [ {{fileName}} ]</span>
 </div> 
+<ul style=" z-index: 99999; line-height:18px;position: fixed;bottom: 10px;left:10px;">
+    <li *ngFor="let downfile of downLoadArr;index as i" style="display: inline-block;  padding:15px; background:rgba(255,255,255,0.75); border-radius: 5px; box-shadow:0 0 10px rgba(0,0,0,0.3);">
+        <span *ngIf="i==0">downloading file</span>
+        <span>[ {{downfile.name}} ]</span>
+    </li>
+</ul>
