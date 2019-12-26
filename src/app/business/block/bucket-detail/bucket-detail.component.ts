@@ -493,13 +493,13 @@ export class BucketDetailComponent implements OnInit {
             msgs.success(`${file.Key} downloaded successfully`)
           }else{
             window['disload'](file.Key,file.ETag)
-            msgs.error(`${file.Key} downloaded failed. The network may be unstable. Please try again later.`);
+            msgs.error(`${file.Key} download failed. The network may be unstable. Please try again later.`);
           }
         };
         xhr.send()
         xhr.onerror = ()=>{
           window['disload'](file.Key,file.ETag)
-          msgs.error(`${file.Key} downloaded failed. The network may be unstable. Please try again later.`);
+          msgs.error(`${file.Key} download failed. The network may be unstable. Please try again later.`);
         }
         xhr.onloadend=()=>{
           window['disload'](file.Key)
