@@ -386,7 +386,7 @@ export class BucketsComponent implements OnInit{
                 let options: any = {};
                 this.getSignature(options);
                 options.headers.set('Content-Type','application/xml');
-                this.BucketService.createBucket(this.createBucketForm.value.name,xmlStr,options).subscribe(()=>{
+                this.BucketService.createBucket(this.createBucketForm.value.name,xmlStr,options).subscribe((res)=>{
                     this.createBucketDisplay = false;
                     /* Add the PUT Encryption Call here before fetching the updated list of Buckets */
                     if(this.enableEncryption){
@@ -398,9 +398,13 @@ export class BucketsComponent implements OnInit{
                     if(!this.enableEncryption && !this.enableVersion){
                         this.getBuckets();
                     }
-                   
+                    this.msgs = [];
+                    this.msgs.push({severity: 'success', summary: 'Success', detail: 'Bucket has been created successfully.'});
                     /* Call the getBuckets call in the success of the encryption call */
                     
+                },(error)=>{
+                    this.msgs = [];
+                    this.msgs.push({severity: 'error', summary: "Error", detail: error._body});
                 }); 
             })
         })           
