@@ -392,9 +392,8 @@ export class BucketsComponent implements OnInit{
                     /* Call the getBuckets call in the success of the encryption call */
                     
                 },(error)=>{
-                    console.log("Error:", error);
                     this.msgs = [];
-                    this.msgs.push({severity: 'error', summary: 'Error', detail: 'Bucket creation failed.'});
+                    this.msgs.push({severity: 'error', summary: "Error", detail: error._body});
                 }); 
             })
         })           
