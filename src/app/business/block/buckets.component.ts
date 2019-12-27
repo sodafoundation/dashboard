@@ -102,7 +102,7 @@ export class BucketsComponent implements OnInit{
             "backend":["",{validators:[Validators.required], updateOn:'change'}],
             "backend_type":["",{validators:[Validators.required], updateOn:'change'}],
             "name":["",{validators:[Validators.required,Utils.isExisted(this.allBucketNameForCheck)], updateOn:'change'}],
-            "version": [false, { validators: [Validators.required], updateOn: 'change' }],
+            "version": [false],
             "encryption": [false, { validators: [Validators.required], updateOn: 'change' }],
             "sse":["",{}],
         });
