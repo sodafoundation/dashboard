@@ -47,6 +47,7 @@ export class BucketsComponent implements OnInit{
     allBuckets = [];
     createBucketForm:FormGroup;
     errorMessage :Object;
+    validRule: any;
     createBucketDisplay=false;
     showLife = false;
     backendsOption = [];
@@ -93,16 +94,26 @@ export class BucketsComponent implements OnInit{
         private msg: MsgBoxService
     ){
         this.errorMessage = {
-            "name": { required: "Name is required.",isExisted:"Name is existing" },
+            "name": { 
+                required: "Name is required.", 
+                isExisted:"Name is existing",
+                minlength: "The bucket name should have minimum 3 characters.",
+                maxlength: "The bucket name can have maximum 63 characters.",
+                pattern: "Please enter valid bucket name."
+            },
             "backend_type": { required: "Type is required." },
             "backend":{ required: "Backend is required." },
             "destBucket":{ required: "Destination Bucket is required." },
         };
+        this.validRule = {
+            'validName' : '^[a-z0-9][a-z0-9\.\-]{1,61}[a-z0-9]$'
+        };
         this.createBucketForm = this.fb.group({
+            "name":["",{validators:[Validators.required, Validators.minLength(3), Validators.maxLength(63), Validators.pattern(this.validRule.validName), 
+                Utils.isExisted(this.allBucketNameForCheck)], updateOn:'change'}],
             "backend":["",{validators:[Validators.required], updateOn:'change'}],
             "backend_type":["",{validators:[Validators.required], updateOn:'change'}],
-            "name":["",{validators:[Validators.required,Utils.isExisted(this.allBucketNameForCheck)], updateOn:'change'}],
-            "version": [false, { validators: [Validators.required], updateOn: 'change' }],
+            "version": [false],
             "encryption": [false, { validators: [Validators.required], updateOn: 'change' }],
             "sse":["",{}],
         });
@@ -519,7 +530,7 @@ export class BucketsComponent implements OnInit{
                 "encryption": false
             }
         );
-        this.createBucketForm.controls['name'].setValidators([Validators.required,Utils.isExisted(this.allBucketNameForCheck)]);
+        this.createBucketForm.controls['name'].setValidators([Validators.required, Validators.minLength(3), Validators.maxLength(63), Validators.pattern(this.validRule.validName), Utils.isExisted(this.allBucketNameForCheck)]);
         this.getTypes();
     }
     deleteBucket(bucket){
