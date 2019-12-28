@@ -35,7 +35,7 @@ export class HomeComponent implements OnInit {
         bucketsCount:0,
         migrationCount:0
     }
-    backendForm :FormGroup;
+    backendForm;
     typeDetail = [];
     selectedType:any;
     selectedRegions = [];
@@ -45,6 +45,55 @@ export class HomeComponent implements OnInit {
     selectedBackend:any;
     cloud_type = [];
     allBackendNameForCheck=[];
+    formItemCopy = [];
+    formItems = [
+        {
+            label: 'Region',
+            required: 'true',
+            id: 'region',
+            type: 'text',
+            name: 'region',
+            formControlName: 'region',
+            arr:['aws-s3','azure-blob','hw-obs','fusionstorage-object','ceph-s3','gcp-s3','ibm-cos']
+        },
+        {
+            label: 'Endpoint',
+            required: 'true',
+            id: 'endpoint',
+            type: 'text',
+            name: 'endpoint',
+            formControlName: 'endpoint',
+            arr:['aws-s3','azure-blob','hw-obs','fusionstorage-object','ceph-s3','gcp-s3','ibm-cos','yig']
+        },
+        {
+            label: 'Bucket',
+            required: 'true',
+            id: 'bucket',
+            type: 'text',
+            name: 'bucket',
+            formControlName: 'bucket',
+            arr:['aws-s3','azure-blob','hw-obs','fusionstorage-object','ceph-s3','gcp-s3','ibm-cos']
+        },
+        {
+            label: 'Access Key',
+            required: 'true',
+            id: 'accessKey',
+            type: 'text',
+            name: 'accessKey',
+            formControlName: 'ak',
+            arr:['aws-s3','azure-blob','hw-obs','fusionstorage-object','ceph-s3','gcp-s3','ibm-cos']
+        },
+        {
+            label: 'Secret Key',
+            required: 'true',
+            id: 'secretKey',
+            type: 'password',
+            name: 'secretKey',
+            formControlName: 'sk',
+            arr:['aws-s3','azure-blob','hw-obs','fusionstorage-object','ceph-s3','gcp-s3','ibm-cos']
+        },
+    ]
+
 
     @ViewChild("path") path: ElementRef;
     @ViewChild("cloud_aws") c_AWS: ElementRef;
@@ -87,11 +136,11 @@ export class HomeComponent implements OnInit {
         this.backendForm = this.fb.group({
             "name":['', {validators:[Validators.required,Utils.isExisted(this.allBackendNameForCheck)]}],
             "type":['',{validators:[Validators.required]}],
-            "region":['',{validators:[Validators.required], updateOn:'change'}],
-            "endpoint":['',{validators:[Validators.required], updateOn:'change'}],
-            "bucket":['',{validators:[Validators.required], updateOn:'change'}],
-            "ak":['',{validators:[Validators.required], updateOn:'change'}],
-            "sk":['',{validators:[Validators.required], updateOn:'change'}],
+            "region":new FormControl([]),
+            "endpoint":new FormControl([]),
+            "bucket":new FormControl([]),
+            "ak":new FormControl([]),
+            "sk":new FormControl([]),
         });
         this.modifyBackendForm = this.fb.group({
             "ak":['',{validators:[Validators.required], updateOn:'change'}],
@@ -149,6 +198,20 @@ export class HomeComponent implements OnInit {
             }) 
         });
         this.initBucket2backendAnd2Type();
+    }
+    selectOption(){
+        this.formItemCopy = []
+        let selectOptionItem =this.backendForm && this.backendForm.value.type
+        this.formItems.forEach((item)=>{
+            item.arr.forEach((item1)=>{
+                if(item1 == selectOptionItem){
+                    this.formItemCopy.push(item)
+                    this.backendForm.controls[`${item.formControlName}`].setValidators(Validators.required);
+                }else{
+                    this.backendForm.controls[`${item.formControlName}`].setValidators('');
+                }
+            })
+        })
     }
 
     initBucket2backendAnd2Type(){
@@ -375,10 +438,12 @@ export class HomeComponent implements OnInit {
             this.http.get('v1/{project_id}/backends').subscribe((res)=>{
                 let backends = res.json().backends ? res.json().backends :[];
                 this.initBackendsAndNum(backends);
+                this.formItemCopy = []
             });
         });
     }
     showRegister(){
+        this.formItemCopy = []
         this.showRegisterFlag = true;
         this.backendForm.reset();
         this.backendForm.controls['name'].setValidators([Validators.required,Utils.isExisted(this.allBackendNameForCheck)]);
