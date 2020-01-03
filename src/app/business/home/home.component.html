@@ -127,22 +127,10 @@
                 <input id="name" type="text" name="name" formControlName="name"  pInputText />
             </form-item>
             <form-item label="Type" [required]="true">
-                <p-dropdown [style]="{'min-width':'220px'}" placeholder="Please select" formControlName="type" [options]="allTypes"  ></p-dropdown>
+                <p-dropdown [style]="{'min-width':'220px'}" (onChange)="selectOption()" placeholder="Please select" formControlName="type" [options]="allTypes"  ></p-dropdown>
             </form-item>
-            <form-item label="Region" [required]="true">
-                <input id="region" type="text" name="region"  formControlName="region"  pInputText />
-            </form-item>
-            <form-item label="Endpoint" [required]="true">
-                <input id="endpoint" type="text" name="endpoint"  formControlName="endpoint"  pInputText />
-            </form-item>
-            <form-item label="Bucket" [required]="true">
-                <input id="bucket" type="text" name="bucket" formControlName="bucket"  placeholder="Bucket name" pInputText />
-            </form-item>
-            <form-item label="Access Key" [required]="true">
-                <input id="accessKey" type="text" name="accessKey" formControlName="ak"  pInputText />
-            </form-item>
-            <form-item label="Secret Key" [required]="true">
-                <input id="secretKey" type="password" name="secretKey" formControlName="sk"  pInputText />
+            <form-item *ngFor="let item of formItemCopy" [label]="item.label" [required]="item.required">
+                <input [id]="item.id" [type]="item.type" [name]="item.name"  [formControlName]="item.formControlName"  pInputText />
             </form-item>
         </form>
         <div style="margin-top:100px;">

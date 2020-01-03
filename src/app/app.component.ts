@@ -51,7 +51,7 @@ export class AppComponent implements OnInit, AfterViewInit {
     errorMsg: string = "";
     showPrompt = false;
     fileName: string = "";
-
+    downLoadArr = [];
     tenantItems = [];
     projectItemId;
     userId;
@@ -175,6 +175,17 @@ export class AppComponent implements OnInit, AfterViewInit {
         window['uploadPartArr'] = [];
         window['isUpload'] = false;
         let uploadNum = 0;
+        window['load'] = (file,id) => {
+            this.downLoadArr.push({
+                'name':file,
+                'id': id
+            })
+        }
+        window['disload'] = (file,id) =>{
+            this.downLoadArr = this.downLoadArr.filter((item)=>{
+                return item.id != id
+            })
+        }
         window['startUpload'] = (selectFile, bucketId, options,folderId, cb) => {
             window['isUpload'] = true;
             this.showPrompt =  true;

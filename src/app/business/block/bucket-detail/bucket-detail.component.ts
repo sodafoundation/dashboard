@@ -458,38 +458,54 @@ export class BucketDetailComponent implements OnInit {
       window['canonicalString'](requestMethod, url,()=>{
         let options: any = {};
         this.getSignature(options);
-        options = {
-          headers: {
-            'Authorization': this.Signature,
-            'X-Auth-Date': this.kDate
-          },
-          responseType: 'arraybuffer' as 'arraybuffer'
-        }
-        this.httpClient.get(downloadUrl, options).subscribe((res)=>{
-          let blob = new Blob([res]);
-          if (typeof window.navigator.msSaveBlob !== 'undefined') {  
+        window['load'](file.Key,file.ETag)
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', url, true);    
+        xhr.responseType = "arraybuffer";
+        xhr.setRequestHeader('Authorization', this.Signature)
+        xhr.setRequestHeader('X-Auth-Date', this.kDate)
+        let msgs = this.msg
+        xhr.onload = function () {
+          if ((this as any).status === 200) {
+            let res = (this as any).response;
+            let blob = new Blob([res]);
+            var reader = new FileReader();
+            reader.readAsDataURL(blob);
+            reader.onload = ()=>{
+              if (typeof window.navigator.msSaveBlob !== 'undefined') {  
               window.navigator.msSaveBlob(blob, file.Key);
-          } else {
-            let URL = window.URL
-            let objectUrl = URL.createObjectURL(blob)
-            if (file.Key) {
-              let a = document.createElement('a')
-              a.href = objectUrl
-              a.download = file.Key
-              document.body.appendChild(a)
-              a.click()
-              a.remove()
+            } else {
+              let URL = window.URL
+              let objectUrl = URL.createObjectURL(blob)
+              if (file.Key) {
+                let a = document.createElement('a')
+                a.href = objectUrl
+                a.download = file.Key
+                document.body.appendChild(a)
+                a.click()
+                a.remove()
+                }else {
+                  navigator.msSaveBlob(blob);
+                }
+              }
             }
+            window['disload'](file.Key,file.ETag)
+            msgs.success(`${file.Key} downloaded successfully`)
+          }else{
+            window['disload'](file.Key,file.ETag)
+            msgs.error(`${file.Key} download failed. The network may be unstable. Please try again later.`);
           }
-        },
-        (error)=>{
-          console.log('error');
-          this.msg.error("The download failed. The network may be unstable. Please try again later.");
-        });
+        };
+        xhr.send()
+        xhr.onerror = ()=>{
+          window['disload'](file.Key,file.ETag)
+          msgs.error(`${file.Key} download failed. The network may be unstable. Please try again later.`);
+        }
+        xhr.onloadend=()=>{
+          window['disload'](file.Key)
+        }
       })
     });
-    
-    
   }
   //Gets the name of the folder
   folderNameOnChanged(folder){

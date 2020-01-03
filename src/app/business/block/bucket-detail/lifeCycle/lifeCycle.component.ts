@@ -203,6 +203,7 @@ export class LifeCycleComponent implements OnInit {
                                 let lifeCycleAll = {
                                     ObjectKey: item.ID,
                                     Status: item.Status,
+                                    prefix:item.Filter.Prefix,
                                     newPrefix: this.getLifeCyclePrefix(item, dialog, cycle),
                                     Rules: this.getLifeCycleRule(item)
                                 }
@@ -218,6 +219,7 @@ export class LifeCycleComponent implements OnInit {
                             let lifeCycleAll = {
                                 ObjectKey: lifeCycleArr.ID,
                                 Status: lifeCycleArr.Status,
+                                prefix:lifeCycleArr.Filter.Prefix,
                                 newPrefix: this.getLifeCyclePrefix(lifeCycleArr, dialog, cycle),
                                 Rules: this.getLifeCycleRule(lifeCycleArr)
                             }
@@ -568,7 +570,7 @@ export class LifeCycleComponent implements OnInit {
         let Rules = {
             Rule: {
                 ID: value.name,
-                Filter: { Prefix: value.Prefix ? value.Prefix : (value.newPrefix ? value.newPrefix : value.prefix)},
+                Filter: { Prefix: value.prefix ? value.prefix : (value.newPrefix && value.newPrefix!='--' ? value.newPrefix : value.prefix)},
                 Status: (((this.transChecked && this.transOptions.length != 0) || this.expirChecked || this.expirCleanUp) && value.enabled) ? "Enabled" :
                     value.Status ? value.Status : "Disabled"
             }
