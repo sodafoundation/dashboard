@@ -41,7 +41,8 @@ export const Consts = {
         "fusionstorage-object":"huawei.svg",
         "ceph-s3": "ceph.svg",
         "ibm-cos": "ibm.svg",
-        "gcp": "GCP.jpg"
+        "gcp": "GCP.jpg",
+        "yig": "yig.png"
     },
     CLOUD_TYPE_NAME: {
         'aws-s3': 'AWS S3',
