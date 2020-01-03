@@ -203,8 +203,8 @@ export class HomeComponent implements OnInit {
         this.formItemCopy = []
         let selectOptionItem =this.backendForm && this.backendForm.value.type
         this.formItems.forEach((item)=>{
-            item.arr.forEach((item1)=>{
-                if(item1 == selectOptionItem){
+            item.arr.forEach((it)=>{
+                if(it == selectOptionItem){
                     this.formItemCopy.push(item)
                     this.backendForm.controls[`${item.formControlName}`].setValidators(Validators.required);
                 }else{
