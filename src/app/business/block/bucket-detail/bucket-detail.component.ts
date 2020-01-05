@@ -2,12 +2,13 @@ import { Component, OnInit } from '@angular/core';
 import { Router,ActivatedRoute} from '@angular/router';
 import { I18NService, Utils, MsgBoxService, HttpService, Consts} from 'app/shared/api';
 import { BucketService} from '../buckets.service';
-import { MenuItem ,ConfirmationService} from '../../../components/common/api';
+import { MenuItem ,ConfirmationService, Message} from '../../../components/common/api';
 import { HttpClient } from '@angular/common/http';
 import {XHRBackend, RequestOptions, Request, RequestOptionsArgs, Response, Headers, BaseRequestOptions } from '@angular/http';
 import { FormControl, FormGroup, FormBuilder, Validators, ValidatorFn, AbstractControl } from '@angular/forms';
 import { BaseRequestOptionsArgs } from 'app/shared/service/api';
 
+let _ = require("underscore");
 declare let X2JS:any;
 let lodash = require('lodash');
 
@@ -71,6 +72,7 @@ export class BucketDetailComponent implements OnInit {
   uploadForm :FormGroup;
   files;
   allFolderNameForCheck = [];
+  msgs: Message[];
   constructor(
     private ActivatedRoute: ActivatedRoute,
     public I18N:I18NService,
@@ -144,9 +146,9 @@ export class BucketDetailComponent implements OnInit {
   //paste object
   pasteObject() {
     this.copySelectedDir.forEach(item=>{
-      let key = this.folderId != "" ? this.folderId + item.Key : item.Key;
-      let copySource = item.folderId != "" ? item.source + '/' + item.folderId + item.Key : 
-      item.source + '/' + item.Key;
+      let key = this.folderId != "" ? this.folderId + item.Contents[0].Key : item.Contents[0].Key;
+      let copySource = item.folderId != "" ? item.source + '/' + item.folderId + item.Contents[0].Key : 
+      item.source + '/' + item.Contents[0].Key;
       let sourceBucket = item.source;
       window['getAkSkList'](() => {
         let requestMethod = "PUT";
@@ -179,7 +181,7 @@ export class BucketDetailComponent implements OnInit {
   }
   //Click on folder
   folderLink(file){
-    let folderKey = file.Key;
+    let folderKey = file.Contents[0].Key;
     if(this.folderId == ""){
       this.folderId = folderKey;
     }else{
@@ -226,12 +228,29 @@ export class BucketDetailComponent implements OnInit {
           let str = res._body;
           let x2js = new X2JS();
           let jsonObj = x2js.xml_str2json(str);
-          let alldir = jsonObj.ListBucketResult.Contents ? jsonObj.ListBucketResult.Contents :[] ;
+          let alldir = jsonObj.Result.ListBucketResult ? jsonObj.Result.ListBucketResult :[] ;
           if(Object.prototype.toString.call(alldir) === "[object Array]"){
               this.allDir = alldir;
           }else if(Object.prototype.toString.call(alldir) === "[object Object]"){
               this.allDir = [alldir];
           }
+	  // Populate Versions
+          _.each(this.allDir, function(obj, i){
+            let ver: any[] = [];
+                if(_.isArray(obj['Contents'])) {
+                  _.each(obj['Contents'], function(item, verCount){ 
+                    item.size = Utils.getDisplayCapacity(item.Size,2,'KB');
+                    if((verCount+1) < obj['Contents'].length){
+                      ver.push(obj['Contents'][verCount+1]);
+                    }
+                    
+                  })
+                 obj['Versions'] = ver;
+                } else {
+                  obj['Contents'] = [obj['Contents']];
+                }
+                
+          });
           //The depth of the clone
           let backupAllDir = JSON.parse( JSON.stringify( this.allDir ) );
           this.resolveObject();
@@ -242,17 +261,17 @@ export class BucketDetailComponent implements OnInit {
             }
             this.allDir = this.allDir.filter(arr=>{
               let folderContain = false;
-              if(arr.Key.substring(0,this.folderId.length) == this.folderId && arr.Key.length > this.folderId.length){
+              if(arr.Contents[0].Key.substring(0,this.folderId.length) == this.folderId && arr.Contents[0].Key.length > this.folderId.length){
                 // The number of occurrences of ":" in the folder
                 let folderNum = (this.folderId.split(this.colon)).length-1;
-                let ObjectKeyNum = (arr.Key.split(this.colon)).length-1;
+                let ObjectKeyNum = (arr.Contents[0].Key.split(this.colon)).length-1;
                 if(folderNum == ObjectKeyNum){
                   //Identify the file in the folder
                   folderContain = true;
                 }else if(ObjectKeyNum == folderNum + 1){
                   //Identify folders within folders
-                  let lastNum = arr.Key.lastIndexOf(this.colon);
-                  if(lastNum == arr.Key.length -1){
+                  let lastNum = arr.Contents[0].Key.lastIndexOf(this.colon);
+                  if(lastNum == arr.Contents[0].Key.length -1){
                     folderContain = true;
                   }
                 }
@@ -266,48 +285,48 @@ export class BucketDetailComponent implements OnInit {
             //Distinguish between folders and files at the first level
             this.allDir = this.allDir.filter(item=>{
               let folderIndex = false;
-              if(item.Key.indexOf(this.colon) !=-1){
+              if(item.Contents[0].Key.indexOf(this.colon) !=-1){
                 let index;
-                index = item.Key.indexOf(this.colon,index);
+                index = item.Contents[0].Key.indexOf(this.colon,index);
                 //Distinguish between folders and files in folders
-                if(index == item.Key.length-1){
+                if(index == item.Contents[0].Key.length-1){
                   folderIndex = true;
                 }
               }
-              return item.Key.indexOf(this.colon) ==-1 || folderIndex;
+              return item.Contents[0].Key.indexOf(this.colon) ==-1 || folderIndex;
             })
           }
           let folderArray = [];
           this.allFolderNameForCheck = [];
           this.allDir.forEach(item=>{
-            item.size = Utils.getDisplayCapacity(item.Size,2,'KB');
-            item.lastModified = new Date(item.LastModified).toUTCString();
-            item.Location = item.Location;
-            item.Tier = "Tier_" + item.Tier + " (" + item.StorageClass + ")";
-            if(item.Key.indexOf(this.colon) !=-1){
-              item.objectName = item.Key.slice(0,item.Key.lastIndexOf(this.colon));
+            item.size = Utils.getDisplayCapacity(item.Contents[0].Size,2,'KB');
+            item.lastModified = new Date(item.Contents[0].LastModified).toUTCString();
+            item.Location = item.Contents[0].Location;
+            item.Tier = "Tier_" + item.Contents[0].Tier + " (" + item.Contents[0].StorageClass + ")";
+            if(item.Contents[0].Key.indexOf(this.colon) !=-1){
+              item.objectName = item.Contents[0].Key.slice(0,item.Contents[0].Key.lastIndexOf(this.colon));
               this.allFolderNameForCheck.push(item.objectName);
               item.newFolder = true;
               item.disabled = false;
               item.size = "--";
               backupAllDir.forEach(arr=>{
                 if(this.folderId !=""){
-                  let hasFolder = arr.Key.indexOf(this.folderId) !=-1 && arr.Key != this.folderId;
+                  let hasFolder = arr.Contents[0].Key.indexOf(this.folderId) !=-1 && arr.Contents[0].Key != this.folderId;
                   if( hasFolder){
-                    let newArrKey = arr.Key.slice(this.folderId.length);
-                    if(newArrKey.slice(0,item.Key.length) == item.Key && newArrKey != item.Key){
+                    let newArrKey = arr.Contents[0].Key.slice(this.folderId.length);
+                    if(newArrKey.slice(0,item.Contents[0].Key.length) == item.Contents[0].Key && newArrKey != item.Contents[0].Key){
                       item.disabled = true
                     }
                   }
                 }else{
-                  let hasFile = arr.Key.indexOf(item.Key) !=-1 && arr.Key != item.Key;
-                  if(hasFile && arr.Key.slice(0,item.Key.length) == item.Key){
+                  let hasFile = arr.Contents[0].Key.indexOf(item.Contents[0].Key) !=-1 && arr.Contents[0].Key != item.Contents[0].Key;
+                  if(hasFile && arr.Contents[0].Key.slice(0,item.Contents[0].Key.length) == item.Contents[0].Key){
                     item.disabled = true
                   }
                 }
               })
             }else{
-              item.objectName = item.Key;
+              item.objectName = item.Contents[0].Key;
               item.newFolder = false;
               item.disabled = false;
             }
@@ -322,20 +341,20 @@ export class BucketDetailComponent implements OnInit {
   resolveObject(){
     let set = new Set();
     this.allDir.forEach((item,index)=>{
-      let includeIndex = item.Key.indexOf(this.colon);
-      if(includeIndex != -1 && includeIndex < item.Key.length-1){
+      let includeIndex = item.Contents[0].Key.indexOf(this.colon);
+      if(includeIndex != -1 && includeIndex < item.Contents[0].Key.length-1){
         while(includeIndex > -1){
-          set.add(item.Key.substr(0,includeIndex+1));
-          includeIndex = item.Key.indexOf(this.colon, includeIndex+1);
+          set.add(item.Contents[0].Key.substr(0,includeIndex+1));
+          includeIndex = item.Contents[0].Key.indexOf(this.colon, includeIndex+1);
         }
       }
     })
     this.allDir.forEach(it=>{
-      set.delete(it.Key);
+      set.delete(it.Contents[0].Key);
     })
     set.forEach(item=>{
       let defaultObject = lodash.cloneDeep(this.allDir[0]);
-      defaultObject.Key = item;
+      defaultObject.Contents[0].Key = item;
       this.allDir.push(defaultObject);
     })
   }
@@ -447,9 +466,9 @@ export class BucketDetailComponent implements OnInit {
   downloadFile(file) {
     let fileObjectKey;
     if(this.folderId !=""){
-      fileObjectKey = this.folderId + file.Key;
+      fileObjectKey = this.folderId + file.Contents[0].Key;
     }else{
-      fileObjectKey = file.Key;
+      fileObjectKey = file.Contents[0].Key;
     }
     let downloadUrl = `${this.BucketService.url}/${this.bucketId}/${fileObjectKey}`;
     window['getAkSkList'](()=>{
@@ -458,7 +477,7 @@ export class BucketDetailComponent implements OnInit {
       window['canonicalString'](requestMethod, url,()=>{
         let options: any = {};
         this.getSignature(options);
-        window['load'](file.Key,file.ETag)
+        window['load'](file.Contents[0].Key,file.Contents[0].ETag)
         var xhr = new XMLHttpRequest();
         xhr.open('GET', url, true);    
         xhr.responseType = "arraybuffer";
@@ -473,14 +492,14 @@ export class BucketDetailComponent implements OnInit {
             reader.readAsDataURL(blob);
             reader.onload = ()=>{
               if (typeof window.navigator.msSaveBlob !== 'undefined') {  
-              window.navigator.msSaveBlob(blob, file.Key);
+              window.navigator.msSaveBlob(blob, file.Contents[0].Key);
             } else {
               let URL = window.URL
               let objectUrl = URL.createObjectURL(blob)
-              if (file.Key) {
+            if (file.Contents[0].Key) {
                 let a = document.createElement('a')
                 a.href = objectUrl
-                a.download = file.Key
+              a.download = file.Contents[0].Key
                 document.body.appendChild(a)
                 a.click()
                 a.remove()
@@ -489,20 +508,20 @@ export class BucketDetailComponent implements OnInit {
                 }
               }
             }
-            window['disload'](file.Key,file.ETag)
-            msgs.success(`${file.Key} downloaded successfully`)
+            window['disload'](file.Contents[0].Key,file.Contents[0].ETag)
+            msgs.success(`${file.Contents[0].Key} downloaded successfully`)
           }else{
-            window['disload'](file.Key,file.ETag)
-            msgs.error(`${file.Key} download failed. The network may be unstable. Please try again later.`);
+            window['disload'](file.Contents[0].Key,file.Contents[0].ETag)
+            msgs.error(`${file.Contents[0].Key} download failed. The network may be unstable. Please try again later.`);
           }
         };
         xhr.send()
         xhr.onerror = ()=>{
-          window['disload'](file.Key,file.ETag)
-          msgs.error(`${file.Key} download failed. The network may be unstable. Please try again later.`);
+          window['disload'](file.Contents[0].Key,file.Contents[0].ETag)
+          msgs.error(`${file.Contents[0].Key} download failed. The network may be unstable. Please try again later.`);
         }
         xhr.onloadend=()=>{
-          window['disload'](file.Key)
+          window['disload'](file.Contents[0].Key)
         }
       })
     });
@@ -550,10 +569,10 @@ export class BucketDetailComponent implements OnInit {
   }
   deleteFile(file){
     let fileObjectKey;
-    if(file.Key.indexOf(this.colon) !=-1){
-      fileObjectKey = file.Key.slice(0,file.Key.length-1);
+    if(file.Contents[0].Key.indexOf(this.colon) !=-1){
+      fileObjectKey = file.Contents[0].Key.slice(0,file.Contents[0].Key.length-1);
     }else{
-      fileObjectKey = file.Key;
+      fileObjectKey = file.Contents[0].Key;
     }
     let msg = "<div>Are you sure you want to delete the File ?</div><h3>[ "+ fileObjectKey +" ]</h3>";
     let header ="Delete";
@@ -572,7 +591,7 @@ export class BucketDetailComponent implements OnInit {
               try {
                 switch(func){
                   case "delete":
-                    let objectKey = file.Key;
+                    let objectKey = file.Contents[0].Key;
                     //If you want to delete files from a folder, you must include the name of the folder
                     if(this.folderId !=""){
                       objectKey = this.folderId + objectKey;
@@ -584,15 +603,19 @@ export class BucketDetailComponent implements OnInit {
                         let options: any = {};
                         this.getSignature(options);
                         this.BucketService.deleteFile(`/${this.bucketId}/${objectKey}`,options).subscribe((res) => {
-                          this.getAlldir();
-                        });
+                          this.getAlldir();this.msgs = [];
+                          this.msgs.push({severity: 'success', summary: 'Success', detail: 'Object deleted successfully.'});
+                        },(error)=>{
+                          this.msgs = [];
+                          this.msgs.push({severity: 'error', summary: "Error", detail: error._body});
+                      });
                       })
                     })
                     
                     break;
                   case "deleteMilti":
                    file.forEach(element => {
-                      let objectKey = element.Key;
+                      let objectKey = element.Contents[0].Key;
                       //If you want to delete files from a folder, you must include the name of the folder
                       if(this.folderId !=""){
                         objectKey = this.folderId + objectKey;
@@ -605,7 +628,11 @@ export class BucketDetailComponent implements OnInit {
                           this.getSignature(options);
                           this.BucketService.deleteFile(`/${this.bucketId}/${objectKey}`,options).subscribe((res) => {
                             this.getAlldir();
-                          });
+                            this.msgs.push({severity: 'success', summary: 'Success', detail: 'Objects deleted successfully.'});
+                          },(error)=>{
+                            this.msgs = [];
+                            this.msgs.push({severity: 'error', summary: "Error", detail: error._body});
+                        });
                         }) 
                       })
                    });
