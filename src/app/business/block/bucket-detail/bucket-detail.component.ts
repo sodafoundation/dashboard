@@ -466,9 +466,9 @@ export class BucketDetailComponent implements OnInit {
   downloadFile(file) {
     let fileObjectKey;
     if(this.folderId !=""){
-      fileObjectKey = this.folderId + file.Contents[0].Key;
+      fileObjectKey = this.folderId + file.Contents[0].Key + '?versionId=' + file.Contents[0].Version;
     }else{
-      fileObjectKey = file.Contents[0].Key;
+      fileObjectKey = file.Contents[0].Key + '?versionId=' + file.Contents[0].Version;
     }
     let downloadUrl = `${this.BucketService.url}/${this.bucketId}/${fileObjectKey}`;
     window['getAkSkList'](()=>{
@@ -591,7 +591,7 @@ export class BucketDetailComponent implements OnInit {
               try {
                 switch(func){
                   case "delete":
-                    let objectKey = file.Contents[0].Key;
+                    let objectKey = file.Contents[0].Key + '?versionId=' + file.Contents[0].Version;
                     //If you want to delete files from a folder, you must include the name of the folder
                     if(this.folderId !=""){
                       objectKey = this.folderId + objectKey;
@@ -615,7 +615,7 @@ export class BucketDetailComponent implements OnInit {
                     break;
                   case "deleteMilti":
                    file.forEach(element => {
-                      let objectKey = element.Contents[0].Key;
+                      let objectKey = element.Contents[0].Key + '?versionId=' + file.Contents[0].Version;
                       //If you want to delete files from a folder, you must include the name of the folder
                       if(this.folderId !=""){
                         objectKey = this.folderId + objectKey;
