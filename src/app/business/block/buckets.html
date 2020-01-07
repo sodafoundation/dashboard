@@ -27,16 +27,6 @@
         </p-column>
         <p-column field="LocationConstraint" header="Default Backend" ></p-column>
         <p-column field="CreateTime" header="Created At"></p-column>
-        <p-column field="versionEnabled" header="Versioning Enabled">
-            <ng-template pTemplate="body" let-bucket="rowData">
-                <p *ngIf="bucket.versionEnabled">
-                    <span class="version-text">Yes</span>
-                </p>
-                <p *ngIf="!bucket.versionEnabled">
-                    <span class="version-text">No</span>
-                </p>
-            </ng-template>
-        </p-column>
         <p-column field="encryptionEnabled" header="Encryption Enabled">
             <ng-template pTemplate="body" let-bucket="rowData">
                 <p *ngIf="bucket.encryptionEnabled==true"><i class="fa fa-lock"></i> <span class="encryption-text">Yes</span><span class="encryption-type">AES256</span></p>
@@ -45,8 +35,6 @@
         </p-column>
         <p-column header="{{I18N.keyID['sds_block_volume_operation']}}" [style]="{'width': '335px'}">
             <ng-template pTemplate="body" let-bucket="rowData" let-i="rowIndex">
-                <a *ngIf="bucket.versionEnabled" (click)="showSuspendVersioning(bucket.name)">Suspend Versioning</a>
-                <a *ngIf="!bucket.versionEnabled" (click)="showEnableVersioning(bucket.name)">Enable Versioning</a>
                 <a (click)="configMigration(bucket)">Migrate</a>
                 <a (click)="deleteBucket(bucket)">Delete</a>
             </ng-template>
@@ -66,9 +54,7 @@
             <form-item label="Backend" [required]="true">
                 <p-dropdown [style]="{'min-width':'150px','width':'220px'}" placeholder="Please select" [options]="backendsOption" formControlName="backend"></p-dropdown>
             </form-item>
-            <form-item label="Enable Versioning?" >
-                    <p-inputSwitch formControlName="version" onLabel="Yes" offLabel="No" (onChange)="versionControl()"></p-inputSwitch>
-                </form-item>
+           
             <form-item label="Enable Encryption?" >
                 <p-inputSwitch formControlName="encryption" onLabel="Yes" offLabel="No" (onChange)="encryptionControl()"></p-inputSwitch>
             </form-item>
