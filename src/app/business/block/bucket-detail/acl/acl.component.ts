@@ -39,7 +39,7 @@ export class AclComponent implements OnInit {
         window['getAkSkList'](()=> {
             let requestMethod = "GET";
             let url = this.BucketService.url + '/' + this.bucketId+'/?acl';
-            window['canonicalString'](requestMethod, url, () => {
+            //window['canonicalString'](requestMethod, url, () => {
                 let options: any = {};
                 let key = "/?acl"
                 this.getSignature(options);
@@ -60,7 +60,7 @@ export class AclComponent implements OnInit {
                     });
                     
                 })
-            })
+            //})
         })
     }
     
@@ -84,7 +84,7 @@ export class AclComponent implements OnInit {
         window['getAkSkList'](()=> {
             let requestMethod = "PUT";
             let url = this.BucketService.url + '/' + this.bucketId + "/?acl";
-            window['canonicalString'](requestMethod,url,() => {
+            //window['canonicalString'](requestMethod,url,() => {
                 let options: any = {}; 
                 this.getSignature(options);
                 options['Content-Length'] = param.length;
@@ -94,17 +94,17 @@ export class AclComponent implements OnInit {
                 this.BucketService.creatAcl(name, param, options).subscribe((res)=> {
                     this.getAclList()
                 })
-            })
+            //})
         })
     }
 
     // Rquest header with AK/SK authentication added
     getSignature(options) {
-        let SignatureObjectwindow = window['getSignatureKey']();
+       /*  let SignatureObjectwindow = window['getSignatureKey']();
         let requestObject = this.BucketService.getSignatureOptions(SignatureObjectwindow, options);
         options = requestObject['options'];
         this.Signature = requestObject['Signature'];
-        this.kDate = requestObject['kDate'];
+        this.kDate = requestObject['kDate']; */
         return options;
     }
 }

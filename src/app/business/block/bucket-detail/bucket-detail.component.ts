@@ -217,11 +217,15 @@ export class BucketDetailComponent implements OnInit {
     }
     this.selectedDir = [];
     window['getAkSkList'](()=>{
-      let requestMethod = "GET";
-      let url = this.BucketService.url + '/' + this.bucketId;
-      window['canonicalString'](requestMethod, url,()=>{
+      
+      //window['canonicalString'](requestMethod, url,()=>{
+        let requestMethod = "GET";
+        let url = '/' + this.bucketId;
+        let requestOptions: any;
         let options: any = {};
-        this.getSignature(options);
+        requestOptions = window['getSignatureKey'](requestMethod, url);
+        options['headers'] = new Headers();
+        options = this.BucketService.getSignatureOptions(requestOptions, options);
         this.BucketService.getBucketById(this.bucketId,options).subscribe((res) => {
           let str = res._body;
           let x2js = new X2JS();
@@ -313,7 +317,7 @@ export class BucketDetailComponent implements OnInit {
             }
           })
         });
-        })
+        //})
     })
     window.sessionStorage['folderId'] = ""
     window.sessionStorage['headerTag'] = ""
@@ -341,11 +345,11 @@ export class BucketDetailComponent implements OnInit {
   }
   //Request header with AK/SK authentication added
   getSignature(options) {
-    let SignatureObjectwindow = window['getSignatureKey']();
+    /* let SignatureObjectwindow = window['getSignatureKey']();
     let requestObject = this.BucketService.getSignatureOptions(SignatureObjectwindow,options);
     options = requestObject['options'];
     this.Signature = requestObject['Signature'];
-    this.kDate = requestObject['kDate'];
+    this.kDate = requestObject['kDate']; */
     return options;
   }
   getTypes() {
@@ -455,7 +459,7 @@ export class BucketDetailComponent implements OnInit {
     window['getAkSkList'](()=>{
       let requestMethod = "GET";
       let url = downloadUrl;
-      window['canonicalString'](requestMethod, url,()=>{
+      //window['canonicalString'](requestMethod, url,()=>{
         let options: any = {};
         this.getSignature(options);
         window['load'](file.Key,file.ETag)
@@ -504,7 +508,7 @@ export class BucketDetailComponent implements OnInit {
         xhr.onloadend=()=>{
           window['disload'](file.Key)
         }
-      })
+      //})
     });
   }
   //Gets the name of the folder
@@ -530,7 +534,7 @@ export class BucketDetailComponent implements OnInit {
     window['getAkSkList'](()=>{
       let requestMethod = "PUT";
       let url = this.BucketService.url + "/" + this.bucketId+ '/' +folderName;
-      window['canonicalString'](requestMethod, url,()=>{
+      //window['canonicalString'](requestMethod, url,()=>{
         let options: any = {};
         this.getSignature(options);
         options.headers.set('Content-Type','application/xml');
@@ -538,7 +542,7 @@ export class BucketDetailComponent implements OnInit {
           this.showCreateFolder = false;
           this.getAlldir();
         });
-      })
+      //})
     })
   }
   deleteMultiDir(){
@@ -580,13 +584,13 @@ export class BucketDetailComponent implements OnInit {
                     window['getAkSkList'](()=>{
                       let requestMethod = "DELETE";
                       let url = this.BucketService.url + `/${this.bucketId}/${objectKey}`;
-                      window['canonicalString'](requestMethod, url,()=>{
+                      //window['canonicalString'](requestMethod, url,()=>{
                         let options: any = {};
                         this.getSignature(options);
                         this.BucketService.deleteFile(`/${this.bucketId}/${objectKey}`,options).subscribe((res) => {
                           this.getAlldir();
                         });
-                      })
+                      //})
                     })
                     
                     break;
@@ -600,13 +604,13 @@ export class BucketDetailComponent implements OnInit {
                       window['getAkSkList'](()=>{
                         let requestMethod = "DELETE";
                         let url = this.BucketService.url + `/${this.bucketId}/${objectKey}`;
-                        window['canonicalString'](requestMethod, url,()=>{
+                       // window['canonicalString'](requestMethod, url,()=>{
                           let options: any = {};
                           this.getSignature(options);
                           this.BucketService.deleteFile(`/${this.bucketId}/${objectKey}`,options).subscribe((res) => {
                             this.getAlldir();
                           });
-                        }) 
+                        //}) 
                       })
                    });
                     break;

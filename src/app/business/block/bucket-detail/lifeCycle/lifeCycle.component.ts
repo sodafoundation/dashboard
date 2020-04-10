@@ -182,7 +182,7 @@ export class LifeCycleComponent implements OnInit {
         window['getAkSkList'](() => {
             let requestMethod = "GET";
             let url = this.BucketService.url + '/' + this.bucketId + "/?lifecycle";
-            window['canonicalString'](requestMethod, url, () => {
+            //window['canonicalString'](requestMethod, url, () => {
                 let options: any = {};
                 this.getSignature(options);
                 let name = this.bucketId + "/?lifecycle";
@@ -233,7 +233,7 @@ export class LifeCycleComponent implements OnInit {
                         this.editFile(cycle);
                     }
                 })
-            })
+            //})
         })
     }
     // Transition Rules checkbox click
@@ -328,7 +328,7 @@ export class LifeCycleComponent implements OnInit {
         window['getAkSkList'](() => {
             let requestMethod = "GET";
             let url = this.BucketService.url;
-            window['canonicalString'](requestMethod, url, () => {
+            //window['canonicalString'](requestMethod, url, () => {
                 let options: any = {};
                 this.getSignature(options);
                 if (Object.keys(options).length > 0) {
@@ -336,7 +336,7 @@ export class LifeCycleComponent implements OnInit {
                         let str = res._body;
                         let x2js = new X2JS();
                         let jsonObj = x2js.xml_str2json(str);
-                        let buckets = (jsonObj ? jsonObj.ListAllMyBucketsResult.Buckets : []);
+                        let buckets = (jsonObj ? jsonObj.ListAllMyBucketsResult.Buckets.Bucket : []);
                         if (Object.prototype.toString.call(buckets) === "[object Array]") {
                             buckets = buckets;
                         } else if (Object.prototype.toString.call(buckets) === "[object Object]") {
@@ -353,7 +353,7 @@ export class LifeCycleComponent implements OnInit {
                         this.getBackends(selectedTrans, tierId, newBackend, transIndex);
                     });
                 }
-            })
+            //})
         })
     }
     getTransOptions(transIndex?, cycle?) {
@@ -361,7 +361,7 @@ export class LifeCycleComponent implements OnInit {
         window['getAkSkList'](() => {
             let requestMethod = "GET";
             let url = this.BucketService.url + '/' + storageClasses;
-            window['canonicalString'](requestMethod, url, () => {
+            //window['canonicalString'](requestMethod, url, () => {
                 let options: any = {};
                 this.getSignature(options);
                 this.BucketService.getTransOptions(storageClasses, options).subscribe((res) => {
@@ -441,7 +441,7 @@ export class LifeCycleComponent implements OnInit {
                     }
                     this.transOptions.push(transItem);
                 })
-            })
+            //})
         })
 
     }
@@ -498,11 +498,11 @@ export class LifeCycleComponent implements OnInit {
     }
     // Rquest header with AK/SK authentication added
     getSignature(options) {
-        let SignatureObjectwindow = window['getSignatureKey']();
+       /*  let SignatureObjectwindow = window['getSignatureKey']();
         let requestObject = this.BucketService.getSignatureOptions(SignatureObjectwindow, options);
         options = requestObject['options'];
         this.Signature = requestObject['Signature'];
-        this.kDate = requestObject['kDate'];
+        this.kDate = requestObject['kDate']; */
         return options;
     }
     //create/update pop-up box

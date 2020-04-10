@@ -6,6 +6,8 @@ import { I18nPluralPipe } from '@angular/common';
 import { MenuItem, SelectItem} from './components/common/api';
 import { akSkService } from './business/ak-sk/ak-sk.service';
 import { BucketService } from './business/block/buckets.service';
+import { environment } from '../environments/environment';
+import * as aws4 from "ngx-aws4";
 
 let d3 = window["d3"];
 declare let X2JS: any;
@@ -471,66 +473,37 @@ export class AppComponent implements OnInit, AfterViewInit {
             this.SignatureKey['AccessKey'] = secretAccessKey.access;
         }
         //Calculation of the signature
-        window['getSignatureKey'] = ()=>{
-            let SignatureObject = {};
-            SignatureObject['kSigning'] = window['getkSigning'](this.SignatureKey['secretAccessKey'],this.SignatureKey['dayDate'],this.SignatureKey['regionName'],this.SignatureKey['serviceName'],this.SignatureKey['dateStamp']);
-            SignatureObject['SignatureKey'] = this.SignatureKey;
-            return SignatureObject;
-        }
-        window['getkSigning'] = (key, dayDate, regionName, serviceName, dateStamp)=>{
-            let kDate = CryptoJS.HmacSHA256(dayDate, "OPENSDS" + key);
-            let kRegion = CryptoJS.HmacSHA256(regionName, kDate);
-            let kService = CryptoJS.HmacSHA256(serviceName, kRegion);
-            let signRequest = CryptoJS.HmacSHA256("sign_request", kService);
-            let kSigning = CryptoJS.HmacSHA256(this.stringToSign, signRequest);
-            return kSigning;
-        }
-        window['buildStringToSign'] = ()=>{
-            let authHeaderPrefix = "OPENSDS-HMAC-SHA256";
-            let requestDateTime = this.SignatureKey['dateStamp'];
-            let credentialString = this.SignatureKey['AccessKey'] + "/" + 
-            this.SignatureKey['dayDate'] + "/" + this.SignatureKey['regionName'] + "/" + this.SignatureKey['serviceName'] + "/" + "sign_request";
-            let canonical = CryptoJS.SHA256(this.canonicalString);
-            this.stringToSign = authHeaderPrefix + "\n" + requestDateTime + "\n" + credentialString + "\n" + canonical;
-        }
-        window['canonicalString'] = (requestMethod, url,cb)=>{
-            let body ="";
-            let canonicalHeaders = "x-auth-date:" + this.SignatureKey['dateStamp'] + "\n";
-            let signedHeaders = "x-auth-date";
-            let hash = CryptoJS.SHA256(body);
-            let rawQuery = "";
-            if(url.indexOf("?") !=-1){
-                let index = url.indexOf("?");
-                let query = url.substring(index+1,url.length);
-                url = url.substring(0,index);
-                rawQuery = window['parameter'](query,rawQuery)
+        window['getSignatureKey'] = (method, canonicalUri, host?, region?, service?, params?, contentType?, queryString?, headers?)=>{
+            //AWSV4
+            /* Using NGX-AWS4 */
+            // canonicalUri = (canonicalUri == 's3/') ? '' : canonicalUri;
+            if(canonicalUri == 's3/'){
+                canonicalUri = '';
             }
-            url = encodeURI(url);
-            this.canonicalString = requestMethod + "\n" + "/" + url + "" + "\n" + rawQuery + "\n" + canonicalHeaders + "\n" + signedHeaders + "\n" + hash;
-            window['buildStringToSign']();
-            if (cb) {
-                cb();
+            let requestOptions: any = {
+                host: host ? host : environment.hostIP + ':' + environment.hostPort,
+                method: method,
+                path: canonicalUri,
+                service: service ? service : 's3',
+                region: region ? region : 'ap-south-1',
+                body: params ? params : '',
+                headers: {
+                    'X-Auth-Token': localStorage['auth-token']
+                }
+
             }
-        }
-        //Canonical url parameter
-        window['parameter'] = (param,rawQuery)=>{
-           if(param.indexOf("&") != -1){
-                let paramArray = param.split("&").sort();
-                paramArray.map((item,index)=>{
-                    if(item.indexOf("=") ==-1){
-                        item += "=";
-                    }
-                    if(index < paramArray.length-1){
-                        item += "&";
-                    }
-                    rawQuery += item;
-                })
-            }else if(param.indexOf("=") != -1){
-                rawQuery = param;
-            }else{
-                rawQuery = param.replace(/\s/g,'%20') + "=";
+            if(contentType){
+                requestOptions.headers['Content-Type'] = contentType;
             }
-            return rawQuery;
+            console.log("Request options before signign: ", requestOptions);
+            aws4.sign(requestOptions, {
+                secretAccessKey: this.SignatureKey['secretAccessKey'],
+                accessKeyId: this.SignatureKey['AccessKey']
+            })
+            console.log("ngx-aws4  requestOptions after signing:",requestOptions);
+            return requestOptions;
+           
+        /* NGXAWS4 */
         }
     }
 

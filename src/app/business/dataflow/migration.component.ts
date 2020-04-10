@@ -108,7 +108,7 @@ export class MigrationListComponent implements OnInit {
                         let str = res._body;
                         let x2js = new X2JS();
                         let jsonObj = x2js.xml_str2json(str);
-                        let buckets = (jsonObj ? jsonObj.ListAllMyBucketsResult.Buckets:[]);
+                        let buckets = (jsonObj ? jsonObj.ListAllMyBucketsResult.Buckets.Bucket:[]);
                         let allBuckets = [];
                         if(Object.prototype.toString.call(buckets) === "[object Array]"){
                             allBuckets = buckets;

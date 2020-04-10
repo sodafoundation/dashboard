@@ -54,6 +54,7 @@
         "karma-jasmine": "1.1.0",
         "karma-jasmine-html-reporter": "0.2.2",
         "moment": "2.18.1",
+        "ngx-aws4": "^1.0.0",
         "node-sass": "4.7.2",
         "prismjs": "1.6.0",
         "protractor": "5.1.2",
