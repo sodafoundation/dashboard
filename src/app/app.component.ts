@@ -493,15 +493,11 @@ export class AppComponent implements OnInit, AfterViewInit {
                 }
 
             }
-            /* if(contentType){
-                requestOptions.headers['Content-Type'] = contentType;
-            } */
-            console.log("Request options before signign: ", requestOptions);
+           
             aws4.sign(requestOptions, {
                 secretAccessKey: this.SignatureKey['secretAccessKey'],
                 accessKeyId: this.SignatureKey['AccessKey']
             })
-            console.log("ngx-aws4  requestOptions after signing:",requestOptions);
             return requestOptions;
            
         /* NGXAWS4 */

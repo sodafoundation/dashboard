@@ -207,9 +207,7 @@ export class BucketsComponent implements OnInit{
                     let str = res._body;
                     let x2js = new X2JS();
                     let jsonObj = x2js.xml_str2json(str);
-                    console.log("JsonObj Buckets", jsonObj);
                     let buckets = (jsonObj ? jsonObj.ListAllMyBucketsResult.Buckets.Bucket:[]);
-                    console.log("Buckets:", buckets);
                     if(Object.prototype.toString.call(buckets) === "[object Array]"){
                         this.allBuckets = buckets;
                     }else if(Object.prototype.toString.call(buckets) === "[object Object]"){
@@ -234,16 +232,7 @@ export class BucketsComponent implements OnInit{
             // })
         })
     }
-    //Request header with AK/SK authentication added
-    getSignature(options) {
-        /* let SignatureObjectwindow = window['getSignatureKey']();
-        if(Object.keys(SignatureObjectwindow.SignatureKey).length > 0){
-            let requestObject = this.BucketService.getSignatureOptions(SignatureObjectwindow, options);
-            options = requestObject['options'];
-            return options;
-        } */
-        return options;
-    }
+   
     initBucket2backendAnd2Type(){
         window['getAkSkList'](()=>{
             let requestMethod = "GET";
@@ -390,9 +379,7 @@ export class BucketsComponent implements OnInit{
             let url = '/'+this.createBucketForm.value.name;
             let requestOptions: any;
             let options: any = {};
-            console.log("URL for create", url);
             requestOptions = window['getSignatureKey'](requestMethod, url, '', '', '', xmlStr) ;
-            console.log("RequestOptions after signing", requestOptions);
             options['headers'] = new Headers();
             options = this.BucketService.getSignatureOptions(requestOptions, options);
                 this.BucketService.createBucket(this.createBucketForm.value.name,requestOptions.body,options).subscribe((res)=>{
@@ -505,7 +492,6 @@ export class BucketsComponent implements OnInit{
         this.confirmDialog([msg,header,acceptLabel,warming,"suspend"], bucketName);
     }
     suspendVersioning(bucketName){
-        console.log("Suspend Versioning", bucketName);
         let versionStr = `<VersioningConfiguration>
                                         <Status>Suspended</Status>
                                     </VersioningConfiguration>`
