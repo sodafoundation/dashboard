@@ -180,11 +180,14 @@ export class LifeCycleComponent implements OnInit {
         this.lifeCycleAlls = [];
         this.modifyArr = [];
         window['getAkSkList'](() => {
-            let requestMethod = "GET";
-            let url = this.BucketService.url + '/' + this.bucketId + "/?lifecycle";
-            //window['canonicalString'](requestMethod, url, () => {
+            
+                let requestMethod = "GET";
+                let url = this.BucketService.url + '/' + this.bucketId + "/?lifecycle";
+                let requestOptions: any;
                 let options: any = {};
-                this.getSignature(options);
+                requestOptions = window['getSignatureKey'](requestMethod, url);
+                options['headers'] = new Headers();
+                options = this.BucketService.getSignatureOptions(requestOptions, options);
                 let name = this.bucketId + "/?lifecycle";
                 let arr = [];
                 this.BucketService.getLifeCycle(name, options).subscribe((res) => {
@@ -233,7 +236,6 @@ export class LifeCycleComponent implements OnInit {
                         this.editFile(cycle);
                     }
                 })
-            //})
         })
     }
     // Transition Rules checkbox click
@@ -326,11 +328,13 @@ export class LifeCycleComponent implements OnInit {
     }
     getBackets(event, transIndex) {
         window['getAkSkList'](() => {
-            let requestMethod = "GET";
-            let url = this.BucketService.url;
-            //window['canonicalString'](requestMethod, url, () => {
+                let requestMethod = "GET";
+                let url = this.BucketService.url;
+                let requestOptions: any;
                 let options: any = {};
-                this.getSignature(options);
+                requestOptions = window['getSignatureKey'](requestMethod, url);
+                options['headers'] = new Headers();
+                options = this.BucketService.getSignatureOptions(requestOptions, options);
                 if (Object.keys(options).length > 0) {
                     this.BucketService.getBuckets(options).subscribe((res) => {
                         let str = res._body;
@@ -353,17 +357,19 @@ export class LifeCycleComponent implements OnInit {
                         this.getBackends(selectedTrans, tierId, newBackend, transIndex);
                     });
                 }
-            //})
         })
     }
     getTransOptions(transIndex?, cycle?) {
         let storageClasses = "storageClasses";
         window['getAkSkList'](() => {
-            let requestMethod = "GET";
-            let url = this.BucketService.url + '/' + storageClasses;
-            //window['canonicalString'](requestMethod, url, () => {
+            
+                let requestMethod = "GET";
+                let url = '/' + storageClasses;
+                let requestOptions: any;
                 let options: any = {};
-                this.getSignature(options);
+                requestOptions = window['getSignatureKey'](requestMethod, url);
+                options['headers'] = new Headers();
+                options = this.BucketService.getSignatureOptions(requestOptions, options);
                 this.BucketService.getTransOptions(storageClasses, options).subscribe((res) => {
                     let str = res['_body'];
                     let x2js = new X2JS();
@@ -441,7 +447,6 @@ export class LifeCycleComponent implements OnInit {
                     }
                     this.transOptions.push(transItem);
                 })
-            //})
         })
 
     }
@@ -496,15 +501,7 @@ export class LifeCycleComponent implements OnInit {
             }
         })
     }
-    // Rquest header with AK/SK authentication added
-    getSignature(options) {
-       /*  let SignatureObjectwindow = window['getSignatureKey']();
-        let requestObject = this.BucketService.getSignatureOptions(SignatureObjectwindow, options);
-        options = requestObject['options'];
-        this.Signature = requestObject['Signature'];
-        this.kDate = requestObject['kDate']; */
-        return options;
-    }
+    
     //create/update pop-up box
     createLifeCycle(dialog, cycle?) {
         this.modifyBakend = [];
@@ -824,14 +821,17 @@ export class LifeCycleComponent implements OnInit {
     }
     createLifeCycleSubmit(param) {
         window['getAkSkList'](() => {
-            let requestMethod = "PUT";
-            let url = this.BucketService.url + '/' + this.bucketId + "/?lifecycle";
-            window['canonicalString'](requestMethod, url, () => {
+                
+            
+                let requestMethod = "PUT";
+                let url = '/' + this.bucketId + "/?lifecycle";
+                let requestOptions: any;
                 let options: any = {};
-                this.getSignature(options);
+                requestOptions = window['getSignatureKey'](requestMethod, url) ;
+                options['headers'] = new Headers();
+                options = this.BucketService.getSignatureOptions(requestOptions, options);
                 options['Content-Length'] = param.length;
-                options.headers.set('Content-Type', 'application/xml');
-                // options['Content-MD5'] = CryptoJS.SHA256(param, 'base64');
+                options.headers.set('Content-Length', param.length)
                 let name = this.bucketId + "/?lifecycle";
                 this.BucketService.createLifeCycle(name, param, options).subscribe((res) => {
                     this.showCreateLifeCycle = false;
@@ -839,7 +839,7 @@ export class LifeCycleComponent implements OnInit {
                     this.showModifyLifeCycle = false;
                     this.getLifeCycleList();
                 })
-            })
+            
         })
     }
     //Determining whether the values for transition and backend are the same is not recommended for user creation
@@ -932,11 +932,14 @@ export class LifeCycleComponent implements OnInit {
     deleteLifeCycle(value, multiple?) {
         //Multiple means batch deletion
         window['getAkSkList'](() => {
-            let requestMethod = "DELETE";
-            let url = this.BucketService.url + '/' + this.bucketId + "/?lifecycle" + "&ruleID=" + value.ObjectKey;
-            window['canonicalString'](requestMethod, url, () => {
+            
+                let requestMethod = "DELETE";
+                let url = '/' + this.bucketId + "/?lifecycle" + "&ruleID=" + value.ObjectKey;
+                let requestOptions: any;
                 let options: any = {};
-                this.getSignature(options);
+                requestOptions = window['getSignatureKey'](requestMethod, url);
+                options['headers'] = new Headers();
+                options = this.BucketService.getSignatureOptions(requestOptions, options);
                 let requestUrl = this.bucketId + "/?lifecycle" + "&ruleID=" + value.ObjectKey;
                 this.BucketService.deleteLifeCycle(requestUrl, options).subscribe((res) => {
                     let lifeCycleArr = _.filter(this.lifeCycleAlls, item=>{
@@ -956,7 +959,6 @@ export class LifeCycleComponent implements OnInit {
                         this.getLifeCycleList();
                     }
                 })
-            })
         })
     }
     //lifeCycle page initialization in modified statue

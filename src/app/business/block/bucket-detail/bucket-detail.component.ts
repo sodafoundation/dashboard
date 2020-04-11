@@ -582,15 +582,17 @@ export class BucketDetailComponent implements OnInit {
                       objectKey = this.folderId + objectKey;
                     }
                     window['getAkSkList'](()=>{
-                      let requestMethod = "DELETE";
-                      let url = this.BucketService.url + `/${this.bucketId}/${objectKey}`;
-                      //window['canonicalString'](requestMethod, url,()=>{
+                      
+                        let requestMethod = "DELETE";
+                        let url = '/' + `${this.bucketId}/${objectKey}`;
+                        let requestOptions: any;
                         let options: any = {};
-                        this.getSignature(options);
-                        this.BucketService.deleteFile(`/${this.bucketId}/${objectKey}`,options).subscribe((res) => {
+                        requestOptions = window['getSignatureKey'](requestMethod, url);
+                        options['headers'] = new Headers();
+                        options = this.BucketService.getSignatureOptions(requestOptions, options);
+                        this.BucketService.deleteFile(`${this.bucketId}/${objectKey}`,options).subscribe((res) => {
                           this.getAlldir();
                         });
-                      //})
                     })
                     
                     break;
@@ -602,15 +604,17 @@ export class BucketDetailComponent implements OnInit {
                         objectKey = this.folderId + objectKey;
                       }
                       window['getAkSkList'](()=>{
+                        
                         let requestMethod = "DELETE";
-                        let url = this.BucketService.url + `/${this.bucketId}/${objectKey}`;
-                       // window['canonicalString'](requestMethod, url,()=>{
-                          let options: any = {};
-                          this.getSignature(options);
-                          this.BucketService.deleteFile(`/${this.bucketId}/${objectKey}`,options).subscribe((res) => {
+                        let url = '/' + `${this.bucketId}/${objectKey}`;
+                        let requestOptions: any;
+                        let options: any = {};
+                        requestOptions = window['getSignatureKey'](requestMethod, url);
+                        options['headers'] = new Headers();
+                        options = this.BucketService.getSignatureOptions(requestOptions, options);
+                          this.BucketService.deleteFile(`${this.bucketId}/${objectKey}`,options).subscribe((res) => {
                             this.getAlldir();
                           });
-                        //}) 
                       })
                    });
                     break;

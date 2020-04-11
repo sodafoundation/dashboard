@@ -37,13 +37,16 @@ export class AclComponent implements OnInit {
     //query acl list
     getAclList() {
         window['getAkSkList'](()=> {
-            let requestMethod = "GET";
-            let url = this.BucketService.url + '/' + this.bucketId+'/?acl';
-            //window['canonicalString'](requestMethod, url, () => {
+            
+                let requestMethod = "GET";
+                let url = '/' + this.bucketId+'/?acl';
+                let requestOptions: any;
                 let options: any = {};
-                let key = "/?acl"
-                this.getSignature(options);
-                let name = this.bucketId + key
+                requestOptions = window['getSignatureKey'](requestMethod, url) ;
+                options['headers'] = new Headers();
+                options = this.BucketService.getSignatureOptions(requestOptions, options);
+                let key = "/?acl";
+                let name = this.bucketId + key;
                 this.BucketService.getAcl(name,options).subscribe((res) => {
                     let str = res['_body'];
                     let x2js = new X2JS();
@@ -60,7 +63,6 @@ export class AclComponent implements OnInit {
                     });
                     
                 })
-            //})
         })
     }
     
@@ -82,11 +84,14 @@ export class AclComponent implements OnInit {
     }
     creatAclSubmit(param,user) {
         window['getAkSkList'](()=> {
-            let requestMethod = "PUT";
-            let url = this.BucketService.url + '/' + this.bucketId + "/?acl";
-            //window['canonicalString'](requestMethod,url,() => {
-                let options: any = {}; 
-                this.getSignature(options);
+            
+                let requestMethod = "PUT";
+                let url = '/' + this.bucketId + "/?acl";
+                let requestOptions: any;
+                let options: any = {};
+                requestOptions = window['getSignatureKey'](requestMethod, url) ;
+                options['headers'] = new Headers();
+                options = this.BucketService.getSignatureOptions(requestOptions, options);
                 options['Content-Length'] = param.length;
                 options.headers.set('Content-Type', 'application/xml');
                 options.headers.set('x-amz-acl', user);
@@ -94,17 +99,8 @@ export class AclComponent implements OnInit {
                 this.BucketService.creatAcl(name, param, options).subscribe((res)=> {
                     this.getAclList()
                 })
-            //})
         })
     }
 
-    // Rquest header with AK/SK authentication added
-    getSignature(options) {
-       /*  let SignatureObjectwindow = window['getSignatureKey']();
-        let requestObject = this.BucketService.getSignatureOptions(SignatureObjectwindow, options);
-        options = requestObject['options'];
-        this.Signature = requestObject['Signature'];
-        this.kDate = requestObject['kDate']; */
-        return options;
-    }
+    
 }
