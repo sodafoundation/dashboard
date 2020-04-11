@@ -488,13 +488,14 @@ export class AppComponent implements OnInit, AfterViewInit {
                 region: region ? region : 'ap-south-1',
                 body: params ? params : '',
                 headers: {
-                    'X-Auth-Token': localStorage['auth-token']
+                    'X-Auth-Token': localStorage['auth-token'],
+                    'Content-Type': 'application/xml'
                 }
 
             }
-            if(contentType){
+            /* if(contentType){
                 requestOptions.headers['Content-Type'] = contentType;
-            }
+            } */
             console.log("Request options before signign: ", requestOptions);
             aws4.sign(requestOptions, {
                 secretAccessKey: this.SignatureKey['secretAccessKey'],

@@ -26,7 +26,11 @@
             </ng-template>
         </p-column>
         <p-column field="LocationConstraint" header="Default Backend" ></p-column>
-        <p-column field="CreationDate" header="Created At"></p-column>
+        <p-column field="CreationDate" header="Created At">
+            <ng-template pTemplate="body" let-obj="rowData" let-i="rowIndex">
+                {{obj.CreationDate ? (obj.CreationDate | date:'long') : '--'}}
+            </ng-template>
+        </p-column>
         <p-column field="encryptionEnabled" header="Encryption Enabled">
             <ng-template pTemplate="body" let-bucket="rowData">
                 <p *ngIf="bucket.encryptionEnabled==true"><i class="fa fa-lock"></i> <span class="encryption-text">Yes</span><span class="encryption-type">AES256</span></p>

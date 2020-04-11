@@ -136,6 +136,7 @@ export class BucketService {
     options.headers.set('X-Amz-Date', requestOptions.headers['X-Amz-Date']);
     options.headers.set('Authorization', requestOptions.headers['Authorization']);
     options.headers.set('X-Auth-Token', requestOptions.headers['X-Auth-Token']);
+    options.headers.set('Content-Type', requestOptions.headers['Content-Type']);
     return options;
   }
 }

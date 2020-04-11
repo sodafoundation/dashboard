@@ -218,10 +218,8 @@ export class HomeComponent implements OnInit {
         window['getAkSkList'](()=>{
             let requestMethod = "GET";
             let url = this.BucketService.url;
-            // window['canonicalString'](requestMethod, url,()=>{
             let requestOptions: any;
             let options: any = {};
-            //this.getSignature(options);
             requestOptions = window['getSignatureKey'](requestMethod, url);
             console.log("Options in Getbucket", options);
             options['headers'] = new Headers();

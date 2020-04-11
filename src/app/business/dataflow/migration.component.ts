@@ -95,15 +95,13 @@ export class MigrationListComponent implements OnInit {
     getBuckets() {
         this.bucketOption = [];
         window['getAkSkList'](()=>{
-            let requestMethod = "GET";
-            let url = this.BucketService.url;
-            window['canonicalString'](requestMethod, url,()=>{
-                //Request header with AK/SK authentication added
-                let SignatureObjectwindow = window['getSignatureKey']();
-                if(Object.keys(SignatureObjectwindow.SignatureKey).length > 0){
+                    let requestMethod = "GET";
+                    let url = this.BucketService.url;
+                    let requestOptions: any;
                     let options: any = {};
-                    let requestObject = this.BucketService.getSignatureOptions(SignatureObjectwindow,options);
-                    options = requestObject['options'];
+                    requestOptions = window['getSignatureKey'](requestMethod, url);
+                    options['headers'] = new Headers();
+                    options = this.BucketService.getSignatureOptions(requestOptions, options);
                     this.BucketService.getBuckets(options).subscribe((res) => {
                         let str = res._body;
                         let x2js = new X2JS();
@@ -142,8 +140,6 @@ export class MigrationListComponent implements OnInit {
                             });
                         }
                     }); 
-                }
-            })
             
         })
         

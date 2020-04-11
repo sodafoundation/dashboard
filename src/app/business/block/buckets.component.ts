@@ -195,7 +195,7 @@ export class BucketsComponent implements OnInit{
         this.allBucketNameForCheck = [];
         window['getAkSkList'](()=>{
             let requestMethod = "GET";
-            let url = '';
+            let url = this.BucketService.url;
             let requestOptions: any;
             let options: any = {};
             requestOptions = window['getSignatureKey'](requestMethod, url);
@@ -387,16 +387,14 @@ export class BucketsComponent implements OnInit{
                     </CreateBucketConfiguration>`
         window['getAkSkList'](()=>{
             let requestMethod = "PUT";
-            let url = this.BucketService.url+this.createBucketForm.value.name;
-            let contentType = 'application/xml';
+            let url = '/'+this.createBucketForm.value.name;
             let requestOptions: any;
             let options: any = {};
             console.log("URL for create", url);
-            requestOptions = window['getSignatureKey'](requestMethod, url, '', '', '', xmlStr, contentType) ;
+            requestOptions = window['getSignatureKey'](requestMethod, url, '', '', '', xmlStr) ;
             console.log("RequestOptions after signing", requestOptions);
             options['headers'] = new Headers();
             options = this.BucketService.getSignatureOptions(requestOptions, options);
-            //options.headers.set('Content-Type','application/xml');
                 this.BucketService.createBucket(this.createBucketForm.value.name,requestOptions.body,options).subscribe((res)=>{
                     this.createBucketDisplay = false;
                     /* Add the PUT Encryption Call here before fetching the updated list of Buckets */
@@ -447,11 +445,12 @@ export class BucketsComponent implements OnInit{
     </SSEConfiguration>`;
         window['getAkSkList'](()=>{
             let requestMethod = "PUT";
-            let url = this.BucketService.url+"/"+this.createBucketForm.value.name + "/?DefaultEncryption";
-            // window['canonicalString'](requestMethod, url,()=>{
-                let options: any = {};
-                this.getSignature(options);
-                options.headers.set('Content-Type','application/xml');
+            let url = '/'+this.createBucketForm.value.name + "/?DefaultEncryption";
+            let requestOptions: any;
+            let options: any = {};
+            requestOptions = window['getSignatureKey'](requestMethod, url, '', '', '', encryptStr) ;
+            options['headers'] = new Headers();
+            options = this.BucketService.getSignatureOptions(requestOptions, options);
                 this.BucketService.setEncryption(this.createBucketForm.value.name,encryptStr,options).subscribe((res)=>{
                     if(this.enableVersion){
                         this.enableBucketVersioning(this.createBucketForm.value.name);
@@ -461,7 +460,6 @@ export class BucketsComponent implements OnInit{
                 }, (error) => {
                     console.log("Set encryption failed", error);
                 });
-            // });
         })
     }
     showEnableVersioning(bucketName){
@@ -476,12 +474,13 @@ export class BucketsComponent implements OnInit{
         <Status>Enabled</Status>
       </VersioningConfiguration>`
         window['getAkSkList'](()=>{
-            let requestMethod = "PUT";
-            let url = this.BucketService.url+"/"+bucketName + "/?versioning";
-            // window['canonicalString'](requestMethod, url,()=>{
+                let requestMethod = "PUT";
+                let url = '/'+bucketName + "/?versioning";
+                let requestOptions: any;
                 let options: any = {};
-                this.getSignature(options);
-                options.headers.set('Content-Type','application/xml');
+                requestOptions = window['getSignatureKey'](requestMethod, url, '', '', '', versionStr) ;
+                options['headers'] = new Headers();
+                options = this.BucketService.getSignatureOptions(requestOptions, options);
                 this.BucketService.setVersioning(bucketName, versionStr, options).subscribe(()=>{
                     
                     if(this.enableEncryption){
@@ -496,7 +495,6 @@ export class BucketsComponent implements OnInit{
                     this.msgs = [];
                     this.msgs.push({severity: 'error', summary: 'Error', detail: "Enable versioning failed <br/>" + error});
                 });
-            // });
         });
     }
     showSuspendVersioning(bucketName){
@@ -512,12 +510,13 @@ export class BucketsComponent implements OnInit{
                                         <Status>Suspended</Status>
                                     </VersioningConfiguration>`
         window['getAkSkList'](()=>{
-            let requestMethod = "PUT";
-            let url = this.BucketService.url+"/"+bucketName + "/?versioning";
-            // window['canonicalString'](requestMethod, url,()=>{
+                let requestMethod = "PUT";
+                let url = '/'+bucketName + "/?versioning";
+                let requestOptions: any;
                 let options: any = {};
-                this.getSignature(options);
-                options.headers.set('Content-Type','application/xml');
+                requestOptions = window['getSignatureKey'](requestMethod, url, '', '', '', versionStr) ;
+                options['headers'] = new Headers();
+                options = this.BucketService.getSignatureOptions(requestOptions, options);
                 this.BucketService.suspendVersioning(bucketName, versionStr, options).subscribe(()=>{
                     this.msgs = [];
                     this.msgs.push({severity: 'success', summary: 'Success', detail: 'Versioning suspended successfully.'});
@@ -527,7 +526,6 @@ export class BucketsComponent implements OnInit{
                     this.msgs = [];
                     this.msgs.push({severity: 'error', summary: 'Error', detail: "Suspend versioning failed <br/>" + error});
                 });
-            // });
         });
         
     }
