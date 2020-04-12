@@ -375,14 +375,14 @@ export class BucketsComponent implements OnInit{
                         <LocationConstraint>${this.createBucketForm.value.backend}</LocationConstraint>
                     </CreateBucketConfiguration>`
         window['getAkSkList'](()=>{
-            let requestMethod = "PUT";
-            let url = '/'+this.createBucketForm.value.name;
-            let requestOptions: any;
-            let options: any = {};
-            requestOptions = window['getSignatureKey'](requestMethod, url, '', '', '', xmlStr) ;
-            options['headers'] = new Headers();
-            options = this.BucketService.getSignatureOptions(requestOptions, options);
-                this.BucketService.createBucket(this.createBucketForm.value.name,requestOptions.body,options).subscribe((res)=>{
+                    let requestMethod = "PUT";
+                    let url = '/'+this.createBucketForm.value.name;
+                    let requestOptions: any;
+                    let options: any = {};
+                    requestOptions = window['getSignatureKey'](requestMethod, url, '', '', '', xmlStr) ;
+                    options['headers'] = new Headers();
+                    options = this.BucketService.getSignatureOptions(requestOptions, options);
+                    this.BucketService.createBucket(this.createBucketForm.value.name,requestOptions.body,options).subscribe((res)=>{
                     this.createBucketDisplay = false;
                     /* Add the PUT Encryption Call here before fetching the updated list of Buckets */
                     if(this.enableEncryption){

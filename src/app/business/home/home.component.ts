@@ -221,7 +221,7 @@ export class HomeComponent implements OnInit {
             let requestOptions: any;
             let options: any = {};
             requestOptions = window['getSignatureKey'](requestMethod, url);
-            console.log("Options in Getbucket", options);
+
             options['headers'] = new Headers();
             options = this.BucketService.getSignatureOptions(requestOptions, options);
                 if(Object.keys(options).length > 0 ){

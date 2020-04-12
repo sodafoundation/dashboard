@@ -52,15 +52,15 @@ export class BucketService {
   
   //Set Bucket Encryption
   setEncryption(name,param?,options?) {
-    return this.http.put(this.url+"/"+name+"/?DefaultEncryption",param,options);
+    return this.http.put(this.url+name+"/?DefaultEncryption",param,options);
   }
 
   //Set Bucket Versioning
   setVersioning(name,param?,options?) {
-    return this.http.put(this.url+"/"+name+"/?versioning",param,options);
+    return this.http.put(this.url+name+"/?versioning",param,options);
   }
   suspendVersioning(name,param?,options?) {
-    return this.http.put(this.url+"/"+name+"/?versioning",param,options);
+    return this.http.put(this.url+name+"/?versioning",param,options);
   }
 
   getBckends(): Observable<any> {
@@ -90,12 +90,12 @@ export class BucketService {
   }
   //get lifeCycle
   getLifeCycle(name, options){
-    let url = this.url + name;
+    let url = this.url + name + '/?lifecycle';
     return this.http.get(url, options)
   }
   //put lifeCycle
   createLifeCycle(name,param,options){
-    let url = this.url + name;
+    let url = this.url + name + '/?lifecycle';
     return this.http.put(url,param,options);
   }
   //delete lifeCycle
@@ -111,22 +111,22 @@ export class BucketService {
 
   //get acl
   getAcl(name, options){
-    let url = this.url + name;
+    let url = this.url + name + '/?acl';
     return this.http.get(url, options)
   }
   //put acl
   creatAcl(name,param,options){
-    let url = this.url + name;
+    let url = this.url + name + '/?acl';
     return this.http.put(url,param,options);
   }
   //get Objectacl
   getObjectAcl(name, options){
-    let url = this.url + name;
+    let url = this.url + name + '/?acl';
     return this.http.get(url, options)
   }
   //put Objectacl
   creatObjectAcl(name,param,options){
-    let url = this.url + name;
+    let url = this.url + name + '/?acl';
     return this.http.put(url,param,options);
   }
   

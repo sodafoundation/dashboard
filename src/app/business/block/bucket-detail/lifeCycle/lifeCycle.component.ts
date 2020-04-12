@@ -7,6 +7,7 @@ import { trigger, state, style, transition, animate } from '@angular/animations'
 import { I18nPluralPipe } from '@angular/common';
 import { FormGroup, Validators, FormBuilder, FormControl } from '@angular/forms';
 import { DomSanitizer } from '@angular/platform-browser';
+import { Http, Headers } from '@angular/http';
 
 declare let X2JS: any;
 let _ = require("underscore");
@@ -182,15 +183,15 @@ export class LifeCycleComponent implements OnInit {
         window['getAkSkList'](() => {
             
                 let requestMethod = "GET";
-                let url = this.BucketService.url + '/' + this.bucketId + "/?lifecycle";
+                let url = '/' + this.bucketId + "/?lifecycle";
                 let requestOptions: any;
                 let options: any = {};
                 requestOptions = window['getSignatureKey'](requestMethod, url);
                 options['headers'] = new Headers();
                 options = this.BucketService.getSignatureOptions(requestOptions, options);
-                let name = this.bucketId + "/?lifecycle";
+
                 let arr = [];
-                this.BucketService.getLifeCycle(name, options).subscribe((res) => {
+                this.BucketService.getLifeCycle(this.bucketId, options).subscribe((res) => {
                     let str = res['_body'];
                     let x2js = new X2JS();
                     let jsonObj = x2js.xml_str2json(str);
@@ -827,13 +828,10 @@ export class LifeCycleComponent implements OnInit {
                 let url = '/' + this.bucketId + "/?lifecycle";
                 let requestOptions: any;
                 let options: any = {};
-                requestOptions = window['getSignatureKey'](requestMethod, url) ;
+                requestOptions = window['getSignatureKey'](requestMethod, url, '', '', '', param) ;
                 options['headers'] = new Headers();
                 options = this.BucketService.getSignatureOptions(requestOptions, options);
-                options['Content-Length'] = param.length;
-                options.headers.set('Content-Length', param.length)
-                let name = this.bucketId + "/?lifecycle";
-                this.BucketService.createLifeCycle(name, param, options).subscribe((res) => {
+                this.BucketService.createLifeCycle(this.bucketId , param, options).subscribe((res) => {
                     this.showCreateLifeCycle = false;
                     this.liceCycleDialog = false;
                     this.showModifyLifeCycle = false;

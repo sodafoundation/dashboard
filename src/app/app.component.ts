@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewContainerRef, ViewChild, Directive, ElementRef, HostBinding, HostListener, AfterViewInit } from '@angular/core';
-import { Http } from '@angular/http';
+import { Http, Headers } from '@angular/http';
 import { Router } from '@angular/router';
 import { I18NService, Consts, ParamStorService, MsgBoxService, Utils } from 'app/shared/api';
 import { I18nPluralPipe } from '@angular/common';
@@ -197,17 +197,18 @@ export class AppComponent implements OnInit, AfterViewInit {
                 this.selectFileName = selectFile.name 
             }
             this.fileName = selectFile.name;
-            let uploadUrl = this.BucketService.url + '/'+ bucketId + '/' + this.selectFileName;
+            let uploadUrl = this.BucketService.url + bucketId + '/' + this.selectFileName;
             if (selectFile['size'] > Consts.BYTES_PER_CHUNK) {
                 //first step get uploadId
                 window['getAkSkList'](()=>{
                     let requestMethod = "PUT";
-                    let url = uploadUrl + "?uploads";
-                    window['canonicalString'](requestMethod, url,()=>{
-                        this.getSignature();
-                        options.headers.set('Authorization', this.Signature);
-                        options.headers.set('X-Auth-Date', this.kDate);
-                        this.http.put( '/' + uploadUrl + "?uploads", '', options).subscribe((res) => {
+                    let url = '/'+ bucketId + '/' + this.selectFileName + "?uploads";
+                    let requestOptions: any;
+                    let options: any = {};
+                    requestOptions = window['getSignatureKey'](requestMethod, url) ;
+                    options['headers'] = new Headers();
+                    options = this.BucketService.getSignatureOptions(requestOptions, options);
+                        this.http.put(uploadUrl + "?uploads", '', options).subscribe((res) => {
                             let str = res['_body'];
                             let x2js = new X2JS();
                             let jsonObj = x2js.xml_str2json(str);
@@ -229,7 +230,6 @@ export class AppComponent implements OnInit, AfterViewInit {
                                 }
                             }
                         });  
-                    })
                 })
             } else {
                 window['singleUpload'](selectFile, bucketId, options, uploadUrl, cb);
@@ -238,12 +238,17 @@ export class AppComponent implements OnInit, AfterViewInit {
         window['singleUpload'] = (selectFile, bucketId, options, uploadUrl, cb) => {
             window['getAkSkList'](()=>{
                 let requestMethod = "PUT";
-                let url = uploadUrl;
-                window['canonicalString'](requestMethod, url,()=>{
-                    this.getSignature();
-                    options.headers.set('Authorization', this.Signature);
-                    options.headers.set('X-Auth-Date', this.kDate);
-                    this.http.put("/" + uploadUrl, selectFile, options).subscribe((res) => {
+                    let url = '/'+ bucketId + '/' + this.selectFileName;
+                    let requestOptions: any;
+                    let options: any = {};
+                    let param = {
+                        Key: this.selectFileName,
+                        Body: selectFile
+                    }
+                    requestOptions = window['getSignatureKey'](requestMethod, url, '', '', '', param) ;
+                    options['headers'] = new Headers();
+                    options = this.BucketService.getSignatureOptions(requestOptions, options);
+                    this.http.put(uploadUrl, selectFile, options).subscribe((res) => {
                         this.showPrompt = false;
                         window['isUpload'] = false;
                         this.msg.success("Upload file ["+ selectFile.name +"] successfully.");
@@ -268,7 +273,7 @@ export class AppComponent implements OnInit, AfterViewInit {
                         }
                         
                     });
-                })
+                
             })
         }
         window['uploadPart'] = (selectFile, uploadId, bucketId, options, cb) => {
@@ -294,15 +299,17 @@ export class AppComponent implements OnInit, AfterViewInit {
         }
         window['segmentUpload'] = (i, chunks, blob, uploadId, options, bucketId, cb) => {
             let chunk = blob.slice(chunks[i].start, chunks[i].end);
-            let uploadUrl = this.BucketService.url + '/'+ bucketId + '/' + this.selectFileName;
+            let uploadUrl = this.BucketService.url + bucketId + '/' + this.selectFileName;
             window['getAkSkList'](()=>{
+                
                 let requestMethod = "PUT";
-                let url = uploadUrl + '?partNumber=' + (i + 1) + '&uploadId=' + uploadId;
-                window['canonicalString'](requestMethod, url,()=>{
-                    this.getSignature();
-                    options.headers.set('Authorization', this.Signature);
-                    options.headers.set('X-Auth-Date', this.kDate);
-                    this.http.put("/"+ uploadUrl + '?partNumber=' + (i + 1) + '&uploadId=' + uploadId, chunk, options).subscribe((data) => {
+                let url = '/'+ bucketId + '/' + this.selectFileName + '?partNumber=' + (i + 1) + '&uploadId=' + uploadId;
+                let requestOptions: any;
+                let options: any = {};
+                requestOptions = window['getSignatureKey'](requestMethod, url) ;
+                options['headers'] = new Headers();
+                options = this.BucketService.getSignatureOptions(requestOptions, options);
+                    this.http.put(uploadUrl + '?partNumber=' + (i + 1) + '&uploadId=' + uploadId, chunk, options).subscribe((data) => {
                         let header = data.headers['_headers']
                         let headerArr = header.entries()
                         let headerArr1= Array.from(headerArr)
@@ -340,34 +347,35 @@ export class AppComponent implements OnInit, AfterViewInit {
                             uploadNum = 0;
                             window['isUpload'] = false;
                             window['getAkSkList'](()=>{
-                                let requestMethod = "DELETE";
-                                let url = uploadUrl + '?uploadId=' + uploadId;
-                                window['canonicalString'](requestMethod, url,()=>{
-                                    this.getSignature();
-                                    options.headers.set('Authorization', this.Signature);
-                                    options.headers.set('X-Auth-Date', this.kDate);
-                                    this.http.delete("/" + uploadUrl + "?uploadId=" + uploadId, options).subscribe((data)=>{});
+                                
+                                    let requestMethod = "DELETE";
+                                    let url = '/'+ bucketId + '/' + this.selectFileName + '?uploadId=' + uploadId;
+                                    let requestOptions: any;
+                                    let options: any = {};
+                                    requestOptions = window['getSignatureKey'](requestMethod, url) ;
+                                    options['headers'] = new Headers();
+                                    options = this.BucketService.getSignatureOptions(requestOptions, options);
+                                    this.http.delete(uploadUrl + "?uploadId=" + uploadId, options).subscribe((data)=>{});
                                     this.msg.error("Upload failed. The network may be unstable. Please try again later.");
                                     if (cb) {
                                         cb();
                                     }
-                                })
                             })
                         } 
                     });
-                })
             })
         }
         window['CompleteMultipartUpload'] = (bucketId, blob, uploadId, marltipart, options, cb) => {
-            let uploadUrl = this.BucketService.url + '/'+ bucketId + '/' + this.selectFileName;
+            let uploadUrl = this.BucketService.url + bucketId + '/' + this.selectFileName;
             window['getAkSkList'](()=>{
-                let requestMethod = "PUT";
-                let url = uploadUrl + '?uploadId=' + uploadId;
-                window['canonicalString'](requestMethod, url,()=>{
-                    this.getSignature();
-                    options.headers.set('Authorization', this.Signature);
-                    options.headers.set('X-Auth-Date', this.kDate);
-                    this.http.put("/" + uploadUrl + '?uploadId=' + uploadId, marltipart, options).subscribe((res) => {
+                    let requestMethod = "PUT";
+                    let url = '/'+ bucketId + '/' + this.selectFileName + '?uploadId=' + uploadId;
+                    let requestOptions: any;
+                    let options: any = {};
+                    requestOptions = window['getSignatureKey'](requestMethod, url) ;
+                    options['headers'] = new Headers();
+                    options = this.BucketService.getSignatureOptions(requestOptions, options);
+                    this.http.put(uploadUrl + '?uploadId=' + uploadId, marltipart, options).subscribe((res) => {
                         this.showPrompt = false;
                         window['isUpload'] = false;
                         this.msg.success("Upload file ["+ blob.name +"] successfully.");
@@ -383,18 +391,17 @@ export class AppComponent implements OnInit, AfterViewInit {
                             this.showPrompt = false;
                             uploadNum = 0;
                             window['getAkSkList'](()=>{
-                                let requestMethod = "DELETE";
-                                let url = uploadUrl + '?uploadId=' + uploadId;
-                                window['canonicalString'](requestMethod, url,()=>{
-                                    this.getSignature();
-                                    options.headers.set('Authorization', this.Signature);
-                                    options.headers.set('X-Auth-Date', this.kDate);
-                                    this.http.delete("/" + uploadUrl + "?uploadId=" + uploadId, options).subscribe((data)=>{});
-                                })
+                                    let requestMethod = "DELETE";
+                                    let url = '/'+ bucketId + '/' + this.selectFileName + '?uploadId=' + uploadId;
+                                    let requestOptions: any;
+                                    let options: any = {};
+                                    requestOptions = window['getSignatureKey'](requestMethod, url) ;
+                                    options['headers'] = new Headers();
+                                    options = this.BucketService.getSignatureOptions(requestOptions, options);
+                                    this.http.delete(uploadUrl + "?uploadId=" + uploadId, options).subscribe((data)=>{});
                             })
                         }
                     });
-                })
             })
             
         }
@@ -476,7 +483,6 @@ export class AppComponent implements OnInit, AfterViewInit {
         window['getSignatureKey'] = (method, canonicalUri, host?, region?, service?, params?, contentType?, queryString?, headers?)=>{
             //AWSV4
             /* Using NGX-AWS4 */
-            // canonicalUri = (canonicalUri == 's3/') ? '' : canonicalUri;
             if(canonicalUri == 's3/'){
                 canonicalUri = '';
             }

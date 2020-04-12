@@ -150,10 +150,13 @@ export class BucketDetailComponent implements OnInit {
       let sourceBucket = item.source;
       window['getAkSkList'](() => {
         let requestMethod = "PUT";
-        let url = this.BucketService.url + "/" + this.bucketId + '/' + key;
-        window['canonicalString'](requestMethod, url, () => {
+        let param = {};
+          let url = "/" + this.bucketId + '/' + key;
+          let requestOptions: any;
           let options: any = {};
-          this.getSignature(options);
+          requestOptions = window['getSignatureKey'](requestMethod, url, '', '', '', param) ;
+          options['headers'] = new Headers();
+          options = this.BucketService.getSignatureOptions(requestOptions, options);
           options.headers.set('Content-Type', 'application/xml');
           //The source data
           options.headers.set('x-amz-copy-source', copySource);
@@ -164,7 +167,7 @@ export class BucketDetailComponent implements OnInit {
             //Copy in the same bucket
             options.headers.set('X-Amz-Metadata-Directive', 'REPLACE');
           }
-          let param = {};
+          
           this.BucketService.copyObject(this.bucketId + '/' + key, param, options).subscribe((res) => {
             this.isReadyPast = true;
             window.sessionStorage['searchIndex'] = "";
@@ -173,7 +176,6 @@ export class BucketDetailComponent implements OnInit {
           }, (error)=>{
             window.sessionStorage['searchIndex'] = "";
           });
-        })
       })
     })
   }
@@ -343,15 +345,7 @@ export class BucketDetailComponent implements OnInit {
       this.allDir.push(defaultObject);
     })
   }
-  //Request header with AK/SK authentication added
-  getSignature(options) {
-    /* let SignatureObjectwindow = window['getSignatureKey']();
-    let requestObject = this.BucketService.getSignatureOptions(SignatureObjectwindow,options);
-    options = requestObject['options'];
-    this.Signature = requestObject['Signature'];
-    this.kDate = requestObject['kDate']; */
-    return options;
-  }
+  
   getTypes() {
     this.allTypes = [];
     this.BucketService.getTypes().subscribe((res) => {
@@ -455,19 +449,24 @@ export class BucketDetailComponent implements OnInit {
     }else{
       fileObjectKey = file.Key;
     }
-    let downloadUrl = `${this.BucketService.url}/${this.bucketId}/${fileObjectKey}`;
+    let downloadUrl = this.BucketService.url + `${this.bucketId}/${fileObjectKey}`;
     window['getAkSkList'](()=>{
-      let requestMethod = "GET";
-      let url = downloadUrl;
-      //window['canonicalString'](requestMethod, url,()=>{
+      
+        let requestMethod = "GET";
+        let url = '/' + this.bucketId + '/' + fileObjectKey;
+        let requestOptions: any;
         let options: any = {};
-        this.getSignature(options);
+        requestOptions = window['getSignatureKey'](requestMethod, url);
+        options['headers'] = new Headers();
+        options = this.BucketService.getSignatureOptions(requestOptions, options);
         window['load'](file.Key,file.ETag)
         var xhr = new XMLHttpRequest();
-        xhr.open('GET', url, true);    
+        xhr.open('GET', downloadUrl, true);    
         xhr.responseType = "arraybuffer";
-        xhr.setRequestHeader('Authorization', this.Signature)
-        xhr.setRequestHeader('X-Auth-Date', this.kDate)
+        xhr.setRequestHeader('X-Amz-Content-Sha256', options.headers['x-amz-content-sha256']);
+        xhr.setRequestHeader('X-Amz-Date', options.headers['x-amz-date']);
+        xhr.setRequestHeader('Authorization', options.headers['authorization']);
+        xhr.setRequestHeader('X-Auth-Token', options.headers['x-auth-token']);
         let msgs = this.msg
         xhr.onload = function () {
           if ((this as any).status === 200) {
@@ -508,7 +507,6 @@ export class BucketDetailComponent implements OnInit {
         xhr.onloadend=()=>{
           window['disload'](file.Key)
         }
-      //})
     });
   }
   //Gets the name of the folder
@@ -532,17 +530,18 @@ export class BucketDetailComponent implements OnInit {
       folderName = this.createFolderForm.value.name + this.colon;
     }
     window['getAkSkList'](()=>{
-      let requestMethod = "PUT";
-      let url = this.BucketService.url + "/" + this.bucketId+ '/' +folderName;
-      //window['canonicalString'](requestMethod, url,()=>{
+        let requestMethod = "PUT";
+        let url = "/" + this.bucketId+ '/' +folderName;
+        let requestOptions: any;
         let options: any = {};
-        this.getSignature(options);
+        requestOptions = window['getSignatureKey'](requestMethod, url);
+        options['headers'] = new Headers();
+        options = this.BucketService.getSignatureOptions(requestOptions, options);
         options.headers.set('Content-Type','application/xml');
         this.BucketService.uploadFile(this.bucketId+ '/' +folderName,"",options).subscribe((res) => {
           this.showCreateFolder = false;
           this.getAlldir();
         });
-      //})
     })
   }
   deleteMultiDir(){
