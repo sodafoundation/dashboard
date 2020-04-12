@@ -3,9 +3,8 @@ sudo: required
 node_js:
    - "11"
 env:
-   - OPENSDS_S3_HOST=192.168.56.12
-   - OPENSDS_S3_PORT=8090
-   - PRODUCTION=true
+   - OPENSDS_S3_HOST=192.168.56.12 OPENSDS_S3_PORT=8090 PRODUCTION=true
+
 before_script:
    - "sudo apt-get update && sudo apt-get install -y nginx make"
 
