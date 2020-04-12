@@ -1,155 +1,62 @@
-# Summary
-OpenSDS dashboard uses the front-end development framework Angular5 (https://angular.io/)
-and relies on PrimeNG UI Components (https://www.primefaces.org/primeng/). 
+# Dashboard
 
-# Prerequisite 
+[![Releases](https://img.shields.io/github/release/sodafoundation/api/all.svg?style=flat-square)](https://github.com/sodafoundation/api/releases)
+[![LICENSE](https://img.shields.io/github/license/sodafoundation/api.svg?style=flat-square)](https://github.com/sodafoundation/api/blob/master/LICENSE)
 
-## 1. Ubuntu
-* Version information
-```shell
-root@proxy:~# cat /etc/issue
-Ubuntu 16.04.2 LTS \n \l
-```
-## 2. NodeJS installation, NPM will be installed with nodejs.
-```shell
-curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash -
-sudo apt-get install -y nodejs
-```
+<img src="https://sodafoundation.io/wp-content/uploads/2020/01/SODA_logo_outline_color_800x800.png" width="200" height="200">
 
-## 3. Angular CLI installation
-Specify the version[1.7.4] of angular5 suitable for installation.
-```shell
-sudo npm install -g @angular/cli@1.7.4
-```
-## 4. Nginx installation (Optional)
-To be used for testing the build using `ng build`. For development a local npm server is enough (explained below)
-```shell
-sudo apt-get install -y nginx
-```
+## Introduction
 
+SODA Dashboard provides a GUI interface through which the users can experience various features and capabilities added to each SODA Release. It provides an easy user setup and experience of all the key features integrated.
 
-# Build & Start
-## 1. Git clone dashboard code.
-```shell
-git clone https://github.com/opensds/opensds-dashboard.git
-```
-Switch to appropriate branch or release tag. (`master`, `development` or the release tag)
+It can also provide the reference implementation for a client and gives an idea of how a client can be integrated with soda api and data platform.
 
-## 2. Build opensds dashboard.
-### 2.1 **For local development** a local npm server can be started. This will allow to run a local server and make changes to the code and use the live reload feature to see code changes on the fly.    
+The dashboard is mainly for providing the first hand experience for SODA Solutions. However, it could be referred for your production integrations
 
-#### Configure local proxy
-Open the `proxy.conf.json ` file located in the document root and update the IP addresses with the appropriate endpoints where the OpenSDS components are installed (usually machine IP or VM IP)
-```shell
-cd opensds-dashboard
-nano proxy.conf.json
-```
-The contents of the proxy.conf.json files are :
-```
-{
-    "/v1beta": {
-        "target": "http://139.159.150.240:50040",
-        "secure": false
-    },
-    "/v1": {
-        "target": "http://139.159.150.240:8089",
-        "secure": false
-    },
-    "/v3": {
-        "target": "http://139.159.150.240/identity",
-        "secure": false
-    }
-}
-```  
+SODA Dashboard project is maintained by SODA Foundation directly.
 
-To enable debug mode and to check log messages replace the content with the following. The `/orch` block is needed to test Orchestration services if orchestration is enabled in the setup.  
-```
-{
-    "/v1beta": {
-        "target": "http://192.168.56.123:50040",
-        "secure": false,
-         "logLevel" : "debug"
-    },
-    "/orch" : {
-        "target": "http://192.168.56.123:5000",
-        "secure": false,
-         "logLevel" : "debug",
-         "changeOrigin" : true,
-         "pathRewrite" : {
-            "^/orch/" : "/v1beta/"
-         }
-    },
-    "/v1": {
-        "target": "http://192.168.56.123:8089",
-        "secure": false,
-         "logLevel" : "debug"
-    },
-    "/v3": {
-        "target": "http://192.168.56.123/identity",
-        "secure": false,
-         "logLevel" : "debug"
-    }
-}
-```  
+## Documentation
 
-#### Start the live development server
-```shell
-npm install
-npm start
-```
-This will start a NG Live development server and can be accessed at http://localhost:4200/  
+[https://docs.sodafoundation.io](https://docs.sodafoundation.io/)
 
-Make any changes in the code and the server will live reload. If this fails then run the below commands.  
-```shell
-sudo sysctl fs.inotify.max_user_watches=524288
-systemd-sysusers # (1)
-```  
+## Quick Start - To Use/Experience
 
-### 2.2 **Alternatively the dashboard code can be built and deployed.**  
+[https://docs.sodafoundation.io](https://docs.sodafoundation.io/)
 
-Use the commands below to build the dashboard code.  
-```shell
-cd opensds-dashboard
-sudo npm install
-sudo ng build --prod
-```
-After the build is successful, the files in the `dist` folder should be copied to the folder ` /var/www/html/`.
+## Quick Start - To Develop
 
-```shell
-cp -R opensds-dashboard/dist/* /var/www/html/
-```
+[https://docs.sodafoundation.io](https://docs.sodafoundation.io/)
 
-## 3. Set nginx default config. (optional)
-```shell
-vi /etc/nginx/sites-available/default 
-```
-Configure proxy, points to the resource server, multi-cloud server and the authentication server respectively. (replace 1.1.1.0 with the appropriate endpoints)
-Parameter 'client_max_body_size' configuration supports uploaded file size.
-Such as: 
-* Keystone server `http://1.1.1.0/identity`
-* Resource server `http://1.1.1.0:50040`
-* Multi-cloud server `http://1.1.1.0:8089`
-```shell
-location /v3/ {
-    proxy_pass http://1.1.1.0/identity/v3/;
-}
+## Latest Releases
 
-location /v1beta/ {
-    proxy_pass http://1.1.1.0:50040/v1beta/;
-}
+[https://github.com/sodafoundation/dashboard/releases](https://github.com/sodafoundation/dashboard/releases)
 
-location /v1/ {
-    proxy_pass http://1.1.1.0:8089/v1/;
-    client_max_body_size 10240m;
-}
-```
+## Support and Issues
 
-## 4. Restart nginx (optional)
-```shell
-service nginx restart 
-```
+[https://github.com/sodafoundation/dashboard/issues](https://github.com/sodafoundation/dashboard/issues)
 
-## 5. Access dashboard in browser. (optional)
-```shell
-http://localhost/
-```
+## Project Community
+
+[https://sodafoundation.io/slack/](https://sodafoundation.io/slack/)
+
+## How to contribute to this project?
+
+Join [https://sodafoundation.io/slack/](https://sodafoundation.io/slack/) and share your interest in the ‘general’ channel
+
+Checkout [https://github.com/sodafoundation/dashboard/issues](https://github.com/sodafoundation/dashboard/issues) labelled with ‘good first issue’ or ‘help needed’ or ‘help wanted’ or ‘StartMyContribution’ or ‘SMC’
+
+## Project Roadmap
+
+We envision to provide a professional dashboard to experience all SODA Capabilities. Also it can be a base for your production solution and act as a reference implementation for a soda client.  
+
+[https://docs.sodafoundation.io](https://docs.sodafoundation.io/)
+
+## Join SODA Foundation
+
+Website : [https://sodafoundation.io](https://sodafoundation.io/)
+
+Slack  : [https://sodafoundation.io/slack/](https://sodafoundation.io/slack/)
+
+Twitter  : @sodafoundation
+
+Mailinglist  : [https://lists.opensds.io](https://lists.opensds.io/groups)
