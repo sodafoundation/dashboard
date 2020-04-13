@@ -10,11 +10,11 @@ export class BucketService {
     private paramStor: ParamStorService
   ) { }
 
-  url = 's3/';
+  url = 'v1/s3';
 
   //Create bucket
   createBucket(name,param?,options?) {
-    return this.http.put(this.url + name,param,options);
+    return this.http.put(this.url+"/"+name,param,options);
   }
 
   //Upload file
@@ -29,13 +29,13 @@ export class BucketService {
 
   //Update Bucket
   modifyBucket(id,param) {
-    let modifyUrl = this.url + id
+    let modifyUrl = this.url + '/' + id
     return this.http.put(modifyUrl, param);
   }
 
   //Delete Bucket
   deleteBucket(name,options): Observable<any> {
-    let deleteUrl = this.url + name
+    let deleteUrl = this.url + '/' + name
     return this.http.delete(deleteUrl,options);
   }
 
@@ -46,21 +46,21 @@ export class BucketService {
 
   //Search Bucket
   getBucketById(id,options): Observable<any> {
-    let url = this.url + id;
+    let url = this.url + '/' + id;
     return this.http.get(url,options);
   }
   
   //Set Bucket Encryption
   setEncryption(name,param?,options?) {
-    return this.http.put(this.url+name+"/?DefaultEncryption",param,options);
+    return this.http.put(this.url+"/"+name+"/?DefaultEncryption",param,options);
   }
 
   //Set Bucket Versioning
   setVersioning(name,param?,options?) {
-    return this.http.put(this.url+name+"/?versioning",param,options);
+    return this.http.put(this.url+"/"+name+"/?versioning",param,options);
   }
   suspendVersioning(name,param?,options?) {
-    return this.http.put(this.url+name+"/?versioning",param,options);
+    return this.http.put(this.url+"/"+name+"/?versioning",param,options);
   }
 
   getBckends(): Observable<any> {
@@ -85,59 +85,70 @@ export class BucketService {
 
   //get transOptions
   getTransOptions(param,options){
-    let url = this.url + param;
+    let url = this.url + "/" + param;
     return this.http.get(url, options);
   }
   //get lifeCycle
   getLifeCycle(name, options){
-    let url = this.url + name + '/?lifecycle';
+    let url = this.url + "/" + name;
     return this.http.get(url, options)
   }
   //put lifeCycle
   createLifeCycle(name,param,options){
-    let url = this.url + name + '/?lifecycle';
+    let url = this.url + "/" + name;
     return this.http.put(url,param,options);
   }
   //delete lifeCycle
   deleteLifeCycle(name,param){
-    let url = this.url +name;
+    let url = this.url + "/" +name;
     return this.http.delete(url,param);
   }
   //copy object
   copyObject(object,param, options){
-    let url = this.url + object;
+    let url = this.url + "/" + object;
     return this.http.put(url, param, options);
   }
 
   //get acl
   getAcl(name, options){
-    let url = this.url + name + '/?acl';
+    let url = this.url + "/" + name;
     return this.http.get(url, options)
   }
   //put acl
   creatAcl(name,param,options){
-    let url = this.url + name + '/?acl';
+    let url = this.url + "/" + name;
     return this.http.put(url,param,options);
   }
   //get Objectacl
   getObjectAcl(name, options){
-    let url = this.url + name + '/?acl';
+    let url = this.url + "/" + name;
     return this.http.get(url, options)
   }
   //put Objectacl
   creatObjectAcl(name,param,options){
-    let url = this.url + name + '/?acl';
+    let url = this.url + "/" + name;
     return this.http.put(url,param,options);
   }
   
   // Rquest header with AK/SK authentication added
-  getSignatureOptions(requestOptions, options?){
-    options.headers.set('X-Amz-Content-Sha256', requestOptions.headers['X-Amz-Content-Sha256']);
-    options.headers.set('X-Amz-Date', requestOptions.headers['X-Amz-Date']);
-    options.headers.set('Authorization', requestOptions.headers['Authorization']);
-    options.headers.set('X-Auth-Token', requestOptions.headers['X-Auth-Token']);
-    options.headers.set('Content-Type', requestOptions.headers['Content-Type']);
-    return options;
+  getSignatureOptions(SignatureObjectwindow, options?){
+    let kAccessKey = SignatureObjectwindow.SignatureKey.AccessKey;
+    let kDate = SignatureObjectwindow.SignatureKey.dateStamp;
+    let kRegion = SignatureObjectwindow.SignatureKey.regionName;
+    let kService = SignatureObjectwindow.SignatureKey.serviceName;
+    let kSigning = SignatureObjectwindow.kSigning;
+    let Credential = kAccessKey + '/' + kDate.substr(0,8) + '/' + kRegion + '/' + kService + '/' + 'sign_request';
+    let Signature = 'OPENSDS-HMAC-SHA256' + ' Credential=' + Credential + ',SignedHeaders=host;x-auth-date' + ",Signature=" + kSigning;
+    let requestObject = {};
+    if(options){
+      options['headers'] = new Headers();
+      options.headers.set('Authorization',Signature);
+      options.headers.set('X-Auth-Date', kDate);
+      requestObject['options'] = options;
+    }
+    requestObject['Signature'] = Signature;
+    requestObject['kDate'] = kDate;
+    return requestObject;
   }
 }
 
