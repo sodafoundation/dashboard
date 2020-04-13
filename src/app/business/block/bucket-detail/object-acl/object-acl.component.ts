@@ -46,15 +46,14 @@ export class ObjectAclComponent implements OnInit {
     getObjectAclList() {
         this.items = window.sessionStorage['headerTag'] && window.sessionStorage['headerTag'] != "" ? JSON.parse(window.sessionStorage.getItem("headerTag")) : [];
         window['getAkSkList'](()=> {
-                let name = this.bucketId + '/' + this.key;
                 let requestMethod = "GET";
-                let url = '/' + this.bucketId+ `/${this.key}?acl`;
+                let url = '/' + this.bucketId+ '/' + this.key + '/' + '?acl';
                 let requestOptions: any;
                 let options: any = {};
                 requestOptions = window['getSignatureKey'](requestMethod, url) ;
                 options['headers'] = new Headers();
                 options = this.BucketService.getSignatureOptions(requestOptions, options);
-                this.BucketService.getObjectAcl(name,options).subscribe((res) => {
+                this.BucketService.getObjectAcl(this.bucketId + '/' + this.key,options).subscribe((res) => {
                     let str = res['_body'];
                     let x2js = new X2JS();
                     let jsonObj = x2js.xml_str2json(str);
@@ -90,18 +89,16 @@ export class ObjectAclComponent implements OnInit {
     }
     creatObjectAclSubmit(param,user) {
         window['getAkSkList'](()=> {
-                let name = this.bucketId + '/' + this.key;
                 let requestMethod = "PUT";
-                let url = '/' + this.bucketId + `/${this.key}?acl`;
+                let url = '/' + this.bucketId+ '/' + this.key + '/' + '?acl';
                 let requestOptions: any;
                 let options: any = {};
                 requestOptions = window['getSignatureKey'](requestMethod, url) ;
                 options['headers'] = new Headers();
                 options = this.BucketService.getSignatureOptions(requestOptions, options);
                 options.headers.set('Content-Length', param.length);
-                options.headers.set('Content-Type', 'application/xml');
                 options.headers.set('x-amz-acl', user);
-                this.BucketService.creatObjectAcl(name, param, options).subscribe((res)=> {
+                this.BucketService.creatObjectAcl(this.bucketId + '/' + this.key, param, options).subscribe((res)=> {
                     this.getObjectAclList()
                 }, (error) => {
                     console.log("Could not create Object ACL. Something went wrong.", error);
