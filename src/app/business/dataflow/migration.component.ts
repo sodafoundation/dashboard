@@ -95,18 +95,20 @@ export class MigrationListComponent implements OnInit {
     getBuckets() {
         this.bucketOption = [];
         window['getAkSkList'](()=>{
-                    let requestMethod = "GET";
-                    let url = this.BucketService.url;
-                    let requestOptions: any;
+            let requestMethod = "GET";
+            let url = this.BucketService.url;
+            window['canonicalString'](requestMethod, url,()=>{
+                //Request header with AK/SK authentication added
+                let SignatureObjectwindow = window['getSignatureKey']();
+                if(Object.keys(SignatureObjectwindow.SignatureKey).length > 0){
                     let options: any = {};
-                    requestOptions = window['getSignatureKey'](requestMethod, url);
-                    options['headers'] = new Headers();
-                    options = this.BucketService.getSignatureOptions(requestOptions, options);
+                    let requestObject = this.BucketService.getSignatureOptions(SignatureObjectwindow,options);
+                    options = requestObject['options'];
                     this.BucketService.getBuckets(options).subscribe((res) => {
                         let str = res._body;
                         let x2js = new X2JS();
                         let jsonObj = x2js.xml_str2json(str);
-                        let buckets = (jsonObj ? jsonObj.ListAllMyBucketsResult.Buckets.Bucket:[]);
+                        let buckets = (jsonObj ? jsonObj.ListAllMyBucketsResult.Buckets:[]);
                         let allBuckets = [];
                         if(Object.prototype.toString.call(buckets) === "[object Array]"){
                             allBuckets = buckets;
@@ -140,6 +142,8 @@ export class MigrationListComponent implements OnInit {
                             });
                         }
                     }); 
+                }
+            })
             
         })
         

@@ -20,7 +20,6 @@ fi
 
 npm install --unsafe-perm -g @angular/cli@1.7.4
 npm install --unsafe-perm
-npm run config
 ng build --prod
 
 sudo mkdir /var/www/html/ -p
