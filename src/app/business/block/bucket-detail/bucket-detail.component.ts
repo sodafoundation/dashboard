@@ -461,12 +461,14 @@ export class BucketDetailComponent implements OnInit {
         options = this.BucketService.getSignatureOptions(requestOptions, options);
         window['load'](file.Key,file.ETag)
         var xhr = new XMLHttpRequest();
+        xhr.withCredentials = true;
         xhr.open('GET', downloadUrl, true);    
         xhr.responseType = "arraybuffer";
-        xhr.setRequestHeader('X-Amz-Content-Sha256', options.headers['x-amz-content-sha256']);
-        xhr.setRequestHeader('X-Amz-Date', options.headers['x-amz-date']);
-        xhr.setRequestHeader('Authorization', options.headers['authorization']);
-        xhr.setRequestHeader('X-Auth-Token', options.headers['x-auth-token']);
+        xhr.setRequestHeader('Content-Type', requestOptions.headers['Content-Type']);
+        xhr.setRequestHeader('X-Auth-Token', requestOptions.headers['X-Auth-Token']);
+        xhr.setRequestHeader('X-Amz-Content-Sha256', requestOptions.headers['X-Amz-Content-Sha256']);
+        xhr.setRequestHeader('X-Amz-Date', requestOptions.headers['X-Amz-Date']);
+        xhr.setRequestHeader('Authorization', requestOptions.headers['Authorization']);
         let msgs = this.msg
         xhr.onload = function () {
           if ((this as any).status === 200) {
