@@ -7,6 +7,7 @@ import { trigger, state, style, transition, animate } from '@angular/animations'
 import { I18nPluralPipe } from '@angular/common';
 import { FormGroup, Validators, FormBuilder, FormControl } from '@angular/forms';
 import { DomSanitizer } from '@angular/platform-browser';
+import { Http, Headers } from '@angular/http';
 
 declare let X2JS: any;
 let _ = require("underscore");
@@ -45,29 +46,28 @@ export class ObjectAclComponent implements OnInit {
     getObjectAclList() {
         this.items = window.sessionStorage['headerTag'] && window.sessionStorage['headerTag'] != "" ? JSON.parse(window.sessionStorage.getItem("headerTag")) : [];
         window['getAkSkList'](()=> {
-            let requestMethod = "GET";
-            let url = this.BucketService.url + '/' + this.bucketId+ `/${this.key}?acl`;
-            window['canonicalString'](requestMethod, url, () => {
+                let requestMethod = "GET";
+                let url = '/' + this.bucketId+ '/' + this.key + '/' + '?acl';
+                let requestOptions: any;
                 let options: any = {};
-                let name = this.bucketId + `/${this.key}?acl`
-                this.getSignature(options);
-                this.BucketService.getObjectAcl(name,options).subscribe((res) => {
+                requestOptions = window['getSignatureKey'](requestMethod, url) ;
+                options['headers'] = new Headers();
+                options = this.BucketService.getSignatureOptions(requestOptions, options);
+                this.BucketService.getObjectAcl(this.bucketId + '/' + this.key,options).subscribe((res) => {
                     let str = res['_body'];
                     let x2js = new X2JS();
                     let jsonObj = x2js.xml_str2json(str);
                     let chooseObj = jsonObj.AccessControlPolicy.AccessControlList.Grant
                     this.checkBoxArr = []
-                    Array.isArray(chooseObj) && chooseObj.forEach((item) => {
-                        if(item.Permission =="WRITE"){
-                            this.checkBoxArr.push('write','read')
-                            return
-                        }else if(item.Permission == "READ"){
-                            this.checkBoxArr.push('read')
+                    if(chooseObj){
+                        if(chooseObj.Permission =="FULL_CONTROL"){
+                            this.checkBoxArr.push('write','read');
+                        }else if(chooseObj.Permission == "READ"){
+                            this.checkBoxArr.push('read');
                         }
-                    });
+                    }
                     
                 })
-            })
         })
     }
     
@@ -89,31 +89,24 @@ export class ObjectAclComponent implements OnInit {
     }
     creatObjectAclSubmit(param,user) {
         window['getAkSkList'](()=> {
-            let requestMethod = "PUT";
-            let url = this.BucketService.url + '/' + this.bucketId + `/${this.key}?acl`;
-            window['canonicalString'](requestMethod,url,() => {
-                let options: any = {}; 
-                this.getSignature(options);
-                options['Content-Length'] = param.length;
-                options.headers.set('Content-Type', 'application/xml');
+                let requestMethod = "PUT";
+                let url = '/' + this.bucketId+ '/' + this.key + '/' + '?acl';
+                let requestOptions: any;
+                let options: any = {};
+                requestOptions = window['getSignatureKey'](requestMethod, url) ;
+                options['headers'] = new Headers();
+                options = this.BucketService.getSignatureOptions(requestOptions, options);
+                options.headers.set('Content-Length', param.length);
                 options.headers.set('x-amz-acl', user);
-                let name = this.bucketId + `/${this.key}?acl`
-                this.BucketService.creatObjectAcl(name, param, options).subscribe((res)=> {
+                this.BucketService.creatObjectAcl(this.bucketId + '/' + this.key, param, options).subscribe((res)=> {
                     this.getObjectAclList()
+                }, (error) => {
+                    console.log("Could not create Object ACL. Something went wrong.", error);
                 })
-            })
         })
     }
 
-    // Rquest header with AK/SK authentication added
-    getSignature(options) {
-        let SignatureObjectwindow = window['getSignatureKey']();
-        let requestObject = this.BucketService.getSignatureOptions(SignatureObjectwindow, options);
-        options = requestObject['options'];
-        this.Signature = requestObject['Signature'];
-        this.kDate = requestObject['kDate'];
-        return options;
-    }
+   
     //Click on folder navigation
   navigateClick(itemUrl){
     this.items.forEach((item,index)=>{

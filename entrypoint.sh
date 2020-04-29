@@ -17,11 +17,13 @@
 OPENSDS_HOTPOT_URL=${OPENSDS_HOTPOT_URL:-http://127.0.0.1:50040}
 OPENSDS_ORCHESTRATION_URL=${OPENSDS_ORCHESTRATION_URL:-http://127.0.0.1:5000}
 OPENSDS_GELATO_URL=${OPENSDS_GELATO_URL:-http://127.0.0.1:8089}
+OPENSDS_S3_URL=${OPENSDS_S3_URL:-http://127.0.0.1:8090}
 OPENSDS_AUTH_URL=${OPENSDS_AUTH_URL:-http://127.0.0.1/identity}
 
 OPENSDS_HOTPOT_API_VERSION=${OPENSDS_HOTPOT_API_VERSION:-v1beta}
 OPENSDS_ORCHESTRATION_API_VERSION=${OPENSDS_ORCHESTRATION_API_VERSION:-orch}
 OPENSDS_GELATO_API_VERSION=${OPENSDS_GELATO_API_VERSION:-v1}
+OPENSDS_S3_API_VERSION=${OPENSDS_S3_API_VERSION:-s3}
 OPENSDS_AUTH_API_VERSION=${OPENSDS_AUTH_API_VERSION:-v3}
 
 LISTEN_PORT=${LISTEN_PORT:-8088}
@@ -45,7 +47,12 @@ cat > /etc/nginx/conf.d/default.conf <<EOF
         }
 
         location /${OPENSDS_GELATO_API_VERSION}/ {
-            proxy_pass ${OPENSDS_GELATO_URL}/${OPENSDS_GELATO_API_VERSION}/;
+            proxy_pass ${OPENSDS_GELATO_URL}/;
+            client_max_body_size 10240m;
+        }
+
+        location /${OPENSDS_S3_API_VERSION}/ {
+            proxy_pass ${OPENSDS_S3_URL}/;
             client_max_body_size 10240m;
         }
     }
@@ -55,6 +62,11 @@ EOF
 echo "Service Start Time $(date)"
 echo "Configuration /etc/nginx/conf.d/default.conf"
 cat /etc/nginx/conf.d/default.conf
+
+echo "Starting application..."
+echo "OPENSDS_S3_HOST = ${OPENSDS_S3_HOST}"
+echo "OPENSDS_S3_PORT = ${OPENSDS_S3_PORT}"
+envsubst '\${OPENSDS_S3_HOST} \${OPENSDS_S3_PORT}' < "/var/www/html/assets/data/runtime.json" > "/var/www/html/assets/data/runtime.json"
 
 # start nginx service
 /usr/sbin/nginx -g "daemon off;"
