@@ -246,7 +246,7 @@ export class AppComponent implements OnInit, AfterViewInit {
                     const reader = new FileReader();
                     reader.readAsBinaryString(selectFile);
                     reader.onloadend = (e) => {
-                        fileString = reader.result.toString().split(',')[1];
+                        fileString = reader.result;
                         requestOptions = window['getSignatureKey'](requestMethod, url, '', '', '', fileString) ;
                         options['headers'] = new Headers();
                         options = this.BucketService.getSignatureOptions(requestOptions, options);
