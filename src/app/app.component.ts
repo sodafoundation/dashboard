@@ -212,11 +212,6 @@ export class AppComponent implements OnInit, AfterViewInit {
                    
                     reader.readAsArrayBuffer(selectFile);
                     reader.onloadend = (e) => {
-                        if (!e) {
-                            fileContent = reader.content;
-                        } else {
-                            fileContent = reader.result; 
-                        } 
                         let self = this;
                         let binary: any = "";
                         fileContent = reader.result;
