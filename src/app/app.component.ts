@@ -197,84 +197,85 @@ export class AppComponent implements OnInit, AfterViewInit {
             }
             this.fileName = selectFile.name;
             let uploadUrl = this.BucketService.url + bucketId + '/' + this.selectFileName;
-            if (selectFile['size'] > Consts.BYTES_PER_CHUNK) {
-                let fileString: any;
-                //first step get uploadId
-                window['getAkSkList'](()=>{
-                    let requestMethod = "PUT";
-                    let url = '/'+ bucketId + '/' + this.selectFileName + "?uploads";
-                    let requestOptions: any;
-                    let options: any = {};
-                        requestOptions = window['getSignatureKey'](requestMethod, url) ;
-                        options['headers'] = new Headers();
-                        options = this.BucketService.getSignatureOptions(requestOptions, options);
-                        this.http.put(uploadUrl + "?uploads", '', options).subscribe((res) => {
-                            let str = res['_body'];
-                            let x2js = new X2JS();
-                            let jsonObj = x2js.xml_str2json(str);
-                            let uploadId = jsonObj.InitiateMultipartUploadResult.UploadId;
-                            // second step part upload
-                            window['uploadPart'](selectFile, uploadId, bucketId, options, cb);
-                        },
-                        (error)=>{
-                            if(uploadNum < 5){
-                                window['startUpload'] (selectFile, bucketId, options,folderId, cb);
-                                uploadNum++;
-                            }else{
-                                uploadNum = 0;
-                                this.showPrompt = false;
-                                window['isUpload'] = false;
-                                this.msg.error("Upload failed. The network may be unstable. Please try again later.");
-                                if (cb) {
-                                    cb();
-                                }
-                            }
-                        });  
-                })
-            } else {
-                window['singleUpload'](selectFile, bucketId, options, uploadUrl, cb);
-            }
+            window['singleUpload'](selectFile, bucketId, options, uploadUrl, cb);
         }
+
         window['singleUpload'] = (selectFile, bucketId, options, uploadUrl, cb) => {
             let fileString: any;
+            let fileContent: any;
             window['getAkSkList'](()=>{
                 let requestMethod = "PUT";
                     let url = '/'+ bucketId + '/' + this.selectFileName;
                     let requestOptions: any;
                     let options: any = {};
-
                     const reader = new FileReader();
-                    reader.readAsBinaryString(selectFile);
+                   
+                    reader.readAsArrayBuffer(selectFile);
                     reader.onloadend = (e) => {
-                        fileString = reader.result;
+                        if (!e) {
+                            fileContent = reader.content;
+                        } else {
+                            fileContent = reader.result; 
+                        } 
+                        let self = this;
+                        let binary: any = "";
+                        fileContent = reader.result;
+                        let bytes = new Uint8Array(fileContent);
+                        let length = bytes.byteLength;
+                        for (var i = 0; i < length; i++) {
+                            binary += String.fromCharCode(bytes[i]);
+                        }
+                        fileString = binary;
                         requestOptions = window['getSignatureKey'](requestMethod, url, '', '', '', fileString) ;
                         options['headers'] = new Headers();
                         options = this.BucketService.getSignatureOptions(requestOptions, options);
-                        this.http.put(uploadUrl, requestOptions.body, options).subscribe((res) => {
-                            this.showPrompt = false;
-                            window['isUpload'] = false;
-                            this.msg.success("Upload file ["+ selectFile.name +"] successfully.");
-                            if (cb) {
-                                cb();
-                            }
-                            uploadNum = 0;
-                        },
-                        (error)=>{
+                        /* XHR Send */
+                        var xhr = new XMLHttpRequest();
+                        xhr.withCredentials = true;
+                        xhr.open('PUT', uploadUrl, true);    
+                        //xhr.responseType = "arraybuffer";
+                        xhr.setRequestHeader('Content-Type', requestOptions.headers['Content-Type']);
+                        xhr.setRequestHeader('X-Auth-Token', requestOptions.headers['X-Auth-Token']);
+                        xhr.setRequestHeader('X-Amz-Content-Sha256', requestOptions.headers['X-Amz-Content-Sha256']);
+                        xhr.setRequestHeader('X-Amz-Date', requestOptions.headers['X-Amz-Date']);
+                        xhr.setRequestHeader('Authorization', requestOptions.headers['Authorization']);
+                        xhr.onload = function () {
+                            if(xhr.status == 200) {
+                                self.showPrompt = false;
+                                window['isUpload'] = false;
+                                self.msg.success("Upload file ["+ selectFile.name +"] successfully.");
+                                if (cb) {
+                                    cb();
+                                }
+                                uploadNum = 0;
+                              } else {
+                                    self.showPrompt = false;
+                                    uploadNum = 0;
+                                    window['isUpload'] = false;
+                                    self.msg.error("Upload failed. The network may be unstable. Please try again later.");
+                                
+                              }
+                        };
+                        xhr.send(requestOptions.body);
+                        xhr.onerror = (err)=>{
+                            console.log(err);
                             if(uploadNum < 5){
                                 window['singleUpload'](selectFile, bucketId, options, uploadUrl, cb);
                                 uploadNum++;
                             }else{
                                 this.showPrompt = false;
                                 uploadNum = 0;
-                                console.log('error');
+                                console.log(err);
                                 window['isUpload'] = false;
                                 this.msg.error("Upload failed. The network may be unstable. Please try again later.");
                                 if (cb) {
                                     cb();
                                 }
                             }
-                            
-                        });
+                        }
+                        xhr.onloadend=()=>{
+                        }
+                        /* XHR Send ends */
                      };
                     
                 
@@ -315,10 +316,10 @@ export class AppComponent implements OnInit, AfterViewInit {
                 reader.readAsBinaryString(chunk);
                 reader.onloadend = (e) => {
                     fileString = reader.result;
-                    requestOptions = window['getSignatureKey'](requestMethod, url, '', '', '', fileString) ;
+                    requestOptions = window['getSignatureKey'](requestMethod, url, '', '', '', chunk) ;
                     options['headers'] = new Headers();
                     options = this.BucketService.getSignatureOptions(requestOptions, options);
-                    this.http.put(uploadUrl + '?partNumber=' + (i + 1) + '&uploadId=' + uploadId, requestOptions.body, options).subscribe((data) => {
+                    this.http.put(uploadUrl + '?partNumber=' + (i + 1) + '&uploadId=' + uploadId, chunk, options).subscribe((data) => {
                         let header = data.headers['_headers']
                         let headerArr = header.entries()
                         let headerArr1= Array.from(headerArr)

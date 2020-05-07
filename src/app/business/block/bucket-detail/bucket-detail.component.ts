@@ -444,6 +444,8 @@ export class BucketDetailComponent implements OnInit {
 
   downloadFile(file) {
     let fileObjectKey;
+    let fileString: any;
+    let fileContent: any;
     if(this.folderId !=""){
       fileObjectKey = this.folderId + file.Key;
     }else{
@@ -475,8 +477,16 @@ export class BucketDetailComponent implements OnInit {
             let res = (this as any).response;
             let blob = new Blob([res]);
             var reader = new FileReader();
-            reader.readAsDataURL(blob);
+            reader.readAsArrayBuffer(blob);
             reader.onload = ()=>{
+              let binary: any = "";
+              fileContent = reader.result;
+              let bytes = new Uint8Array(fileContent);
+              let length = bytes.byteLength;
+              for (var i = 0; i < length; i++) {
+                  binary += String.fromCharCode(bytes[i]);
+              }
+              fileString = binary;
               if (typeof window.navigator.msSaveBlob !== 'undefined') {  
               window.navigator.msSaveBlob(blob, file.Key);
             } else {
