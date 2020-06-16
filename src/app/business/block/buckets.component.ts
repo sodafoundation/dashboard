@@ -43,6 +43,8 @@ declare let X2JS:any;
     ]
 })
 export class BucketsComponent implements OnInit{
+    listedBackends: any;
+    selectedRegion: any;
     selectedBuckets=[];
     allBuckets = [];
     createBucketForm:FormGroup;
@@ -333,6 +335,7 @@ export class BucketsComponent implements OnInit{
         this.backendsOption = [];
         this.BucketService.getBackendsByTypeId(this.selectType).subscribe((res) => {
             let backends = res.json().backends ? res.json().backends :[];
+            this.listedBackends = backends;
             backends.forEach(element => {
                 this.backendsOption.push({
                     label: element.name,
@@ -352,6 +355,14 @@ export class BucketsComponent implements OnInit{
                 })
             });
         });
+    }
+    setRegion(){
+        let selectedBackend = this.createBucketForm.value.backend;
+        this.listedBackends.forEach( element =>{
+            if(element.name == selectedBackend){
+                this.selectedRegion = element.region;
+            }
+        })
     }
     versionControl(){
         this.enableVersion = this.createBucketForm.get('version').value;
@@ -379,7 +390,7 @@ export class BucketsComponent implements OnInit{
                     let url = '/'+this.createBucketForm.value.name;
                     let requestOptions: any;
                     let options: any = {};
-                    requestOptions = window['getSignatureKey'](requestMethod, url, '', '', '', xmlStr) ;
+                    requestOptions = window['getSignatureKey'](requestMethod, url, '', encodeURIComponent(this.selectedRegion), '', xmlStr) ;
                     options['headers'] = new Headers();
                     options = this.BucketService.getSignatureOptions(requestOptions, options);
                     this.BucketService.createBucket(this.createBucketForm.value.name,requestOptions.body,options).subscribe((res)=>{

@@ -93,12 +93,16 @@ export class ObjectAclComponent implements OnInit {
                 let url = '/' + this.bucketId+ '/' + this.key + '/' + '?acl';
                 let requestOptions: any;
                 let options: any = {};
-                requestOptions = window['getSignatureKey'](requestMethod, url) ;
+                let contentHeaders = {
+                    'x-amz-acl' : user
+                };
+                let body = '';
+                requestOptions = window['getSignatureKey'](requestMethod, url, '', '', '', body, '', '', contentHeaders) ;
                 options['headers'] = new Headers();
                 options = this.BucketService.getSignatureOptions(requestOptions, options);
                 options.headers.set('Content-Length', param.length);
                 options.headers.set('x-amz-acl', user);
-                this.BucketService.creatObjectAcl(this.bucketId + '/' + this.key, param, options).subscribe((res)=> {
+                this.BucketService.creatObjectAcl(this.bucketId + '/' + this.key, body, options).subscribe((res)=> {
                     this.getObjectAclList()
                 }, (error) => {
                     console.log("Could not create Object ACL. Something went wrong.", error);

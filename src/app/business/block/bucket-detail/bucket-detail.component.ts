@@ -10,6 +10,7 @@ import { BaseRequestOptionsArgs } from 'app/shared/service/api';
 
 declare let X2JS:any;
 let lodash = require('lodash');
+let _ = require("underscore");
 
 @Component({
   selector: 'bucket-detail',
@@ -150,11 +151,22 @@ export class BucketDetailComponent implements OnInit {
       let sourceBucket = item.source;
       window['getAkSkList'](() => {
         let requestMethod = "PUT";
-        let param = {};
           let url = "/" + this.bucketId + '/' + key;
           let requestOptions: any;
           let options: any = {};
-          requestOptions = window['getSignatureKey'](requestMethod, url, '', '', '', param) ;
+          let contentHeaders = {
+            'x-amz-copy-source' : copySource,
+            'X-Amz-Metadata-Directive' : ''
+          }
+          if(sourceBucket != this.bucketId){
+            //Copy between different buckets
+            contentHeaders['X-Amz-Metadata-Directive'] = 'COPY';
+          }else{
+            //Copy in the same bucket
+            contentHeaders['X-Amz-Metadata-Directive'] = 'REPLACE';
+          }
+          console.log("ContetnHeader", contentHeaders, requestOptions);
+          requestOptions = window['getSignatureKey'](requestMethod, url, '', '', '', '', '', '', contentHeaders) ;
           options['headers'] = new Headers();
           options = this.BucketService.getSignatureOptions(requestOptions, options);
           options.headers.set('Content-Type', 'application/xml');
@@ -168,7 +180,7 @@ export class BucketDetailComponent implements OnInit {
             options.headers.set('X-Amz-Metadata-Directive', 'REPLACE');
           }
           
-          this.BucketService.copyObject(this.bucketId + '/' + key, param, options).subscribe((res) => {
+          this.BucketService.copyObject(this.bucketId + '/' + key, '', options).subscribe((res) => {
             this.isReadyPast = true;
             window.sessionStorage['searchIndex'] = "";
             this.getAlldir();

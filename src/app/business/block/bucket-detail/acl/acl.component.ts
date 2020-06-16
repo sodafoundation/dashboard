@@ -89,12 +89,16 @@ export class AclComponent implements OnInit {
                 let url = '/' + this.bucketId + "/?acl";
                 let requestOptions: any;
                 let options: any = {};
-                requestOptions = window['getSignatureKey'](requestMethod, url) ;
+                let contentHeaders = {
+                    'x-amz-acl' : user
+                };
+                let body = '';
+                requestOptions = window['getSignatureKey'](requestMethod, url, '', '', '', body, '', '', contentHeaders) ;
                 options['headers'] = new Headers();
                 options = this.BucketService.getSignatureOptions(requestOptions, options);
-                options.headers.set('Content-Length', param.length);
+                
                 options.headers.set('x-amz-acl', user);
-                this.BucketService.creatAcl(this.bucketId, param, options).subscribe((res)=> {
+                this.BucketService.creatAcl(this.bucketId, body, options).subscribe((res)=> {
                     this.getAclList()
                 }, (error) => {
                     console.log("Could not create ACL. Something went wrong.", error);

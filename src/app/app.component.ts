@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewContainerRef, ViewChild, Directive, ElementRef, HostBinding, HostListener, AfterViewInit } from '@angular/core';
 import { Http, Headers } from '@angular/http';
 import { Router } from '@angular/router';
-import { I18NService, Consts, ParamStorService, MsgBoxService, Utils } from 'app/shared/api';
+import { I18NService, Consts, ParamStorService, MsgBoxService, Utils, HttpService } from 'app/shared/api';
 import { I18nPluralPipe } from '@angular/common';
 import { MenuItem, SelectItem} from './components/common/api';
 import { akSkService } from './business/ak-sk/ak-sk.service';
@@ -11,6 +11,7 @@ import * as aws4 from "ngx-aws4";
 let d3 = window["d3"];
 declare let X2JS: any;
 let CryptoJS = require("crypto-js");
+let _ = require("underscore");
 
 @Component({
     selector: 'app-root',
@@ -150,6 +151,7 @@ export class AppComponent implements OnInit, AfterViewInit {
         private el: ElementRef,
         private viewContainerRef: ViewContainerRef,
         private http: Http,
+        private httpSvc: HttpService,
         private router: Router,
         private paramStor: ParamStorService,
         private msg: MsgBoxService,
@@ -196,84 +198,118 @@ export class AppComponent implements OnInit, AfterViewInit {
                 this.selectFileName = selectFile.name 
             }
             this.fileName = selectFile.name;
-            let uploadUrl = this.BucketService.url + bucketId + '/' + this.selectFileName;
-            window['singleUpload'](selectFile, bucketId, options, uploadUrl, cb);
+            let uploadUrl = this.BucketService.url + bucketId + '/' + this.selectFileName; 
+            if (selectFile['size'] > Consts.BYTES_PER_CHUNK) {
+                //first step get uploadId
+                window['getAkSkList'](()=>{
+                    let requestMethod = "POST";
+                    let url = '/' + bucketId + '/' + this.selectFileName + '?uploads';
+                    let requestOptions: any;
+                    let options: any = {};
+                    let contentHeaders = {
+                        'X-Amz-Content-Sha256': 'UNSIGNED-PAYLOAD'
+                    };
+                    requestOptions = window['getSignatureKey'](requestMethod, url, '', '', '', '', '', '', contentHeaders) ;
+                    options['headers'] = new Headers();
+                    options = this.BucketService.getSignatureOptions(requestOptions, options);
+                    this.httpSvc.post( uploadUrl + '?uploads', '', options).subscribe((res) => {
+                        let str = res['_body'];
+                        let x2js = new X2JS();
+                        let jsonObj = x2js.xml_str2json(str);
+                        let uploadId = jsonObj.InitiateMultipartUploadResult.UploadId;
+                        // second step part upload
+                        window['uploadPart'](selectFile, uploadId, bucketId, options, cb);
+                    },(error)=>{
+                        if(uploadNum < 5){
+                            window['startUpload'] (selectFile, bucketId, options,folderId, cb);
+                            uploadNum++;
+                        } else{
+                            uploadNum = 0;
+                            this.showPrompt = false;
+                            window['isUpload'] = false;
+                            this.msg.error("Upload failed. The network may be unstable. Please try again later.");
+                            if (cb) {
+                                cb();
+                            }
+                        }
+                    });  
+                })
+            } else {
+                window['singleUpload'](selectFile, bucketId, options, uploadUrl, cb);
+            }
         }
-
+        
         window['singleUpload'] = (selectFile, bucketId, options, uploadUrl, cb) => {
             let fileString: any;
             let fileContent: any;
             window['getAkSkList'](()=>{
                 let requestMethod = "PUT";
-                    let url = '/'+ bucketId + '/' + this.selectFileName;
-                    let requestOptions: any;
-                    let options: any = {};
-                    const reader = new FileReader();
-                   
-                    reader.readAsArrayBuffer(selectFile);
-                    reader.onloadend = (e) => {
-                        let self = this;
-                        let binary: any = "";
-                        fileContent = reader.result;
-                        let bytes = new Uint8Array(fileContent);
-                        let length = bytes.byteLength;
-                        for (var i = 0; i < length; i++) {
-                            binary += String.fromCharCode(bytes[i]);
+                let url = '/'+ bucketId + '/' + this.selectFileName;
+                let requestOptions: any;
+                let options: any = {};
+                const reader = new FileReader();
+                reader.readAsArrayBuffer(selectFile);
+                reader.onloadend = (e) => {
+                    let self = this;
+                    fileContent = reader.result;
+                    let contentHeaders = {
+                        'Content-Type' : selectFile.type,
+                        'X-Amz-Content-Sha256': 'UNSIGNED-PAYLOAD'
+                    };
+                    requestOptions = window['getSignatureKey'](requestMethod, url, '', '', '', '', '', '', contentHeaders) ;
+                    options['headers'] = new Headers();
+                    options = this.BucketService.getSignatureOptions(requestOptions, options);
+                    /* XHR Send */
+                    var xhr = new XMLHttpRequest();
+                    xhr.withCredentials = true;
+                    xhr.open('PUT', uploadUrl, true);    
+                    //xhr.responseType = "arraybuffer";
+                    xhr.setRequestHeader('Content-Type', requestOptions.headers['Content-Type']);
+                    xhr.setRequestHeader('X-Auth-Token', requestOptions.headers['X-Auth-Token']);
+                    xhr.setRequestHeader('X-Amz-Content-Sha256', requestOptions.headers['X-Amz-Content-Sha256']);
+                    xhr.setRequestHeader('X-Amz-Date', requestOptions.headers['X-Amz-Date']);
+                    xhr.setRequestHeader('Authorization', requestOptions.headers['Authorization']);
+
+                    xhr.onload = function () {
+                        if(xhr.status == 200) {
+                            self.showPrompt = false;
+                            window['isUpload'] = false;
+                            self.msg.success("Upload file ["+ selectFile.name +"] successfully.");
+                            if (cb) {
+                                cb();
+                            }
+                            uploadNum = 0;
+                        } else {
+                            self.showPrompt = false;
+                            uploadNum = 0;
+                            window['isUpload'] = false;
+                            self.msg.error("Upload failed. The network may be unstable. Please try again later.");
                         }
-                        fileString = binary;
-                        requestOptions = window['getSignatureKey'](requestMethod, url, '', '', '', fileString) ;
-                        options['headers'] = new Headers();
-                        options = this.BucketService.getSignatureOptions(requestOptions, options);
-                        /* XHR Send */
-                        var xhr = new XMLHttpRequest();
-                        xhr.withCredentials = true;
-                        xhr.open('PUT', uploadUrl, true);    
-                        //xhr.responseType = "arraybuffer";
-                        xhr.setRequestHeader('Content-Type', requestOptions.headers['Content-Type']);
-                        xhr.setRequestHeader('X-Auth-Token', requestOptions.headers['X-Auth-Token']);
-                        xhr.setRequestHeader('X-Amz-Content-Sha256', requestOptions.headers['X-Amz-Content-Sha256']);
-                        xhr.setRequestHeader('X-Amz-Date', requestOptions.headers['X-Amz-Date']);
-                        xhr.setRequestHeader('Authorization', requestOptions.headers['Authorization']);
-                        xhr.onload = function () {
-                            if(xhr.status == 200) {
-                                self.showPrompt = false;
-                                window['isUpload'] = false;
-                                self.msg.success("Upload file ["+ selectFile.name +"] successfully.");
-                                if (cb) {
-                                    cb();
-                                }
-                                uploadNum = 0;
-                              } else {
-                                    self.showPrompt = false;
-                                    uploadNum = 0;
-                                    window['isUpload'] = false;
-                                    self.msg.error("Upload failed. The network may be unstable. Please try again later.");
-                                
-                              }
-                        };
-                        xhr.send(requestOptions.body);
-                        xhr.onerror = (err)=>{
+                    };
+
+                    xhr.onerror = (err)=>{
+                        console.log(err);
+                        if(uploadNum < 5){
+                            window['singleUpload'](selectFile, bucketId, options, uploadUrl, cb);
+                            uploadNum++;
+                        }else{
+                            this.showPrompt = false;
+                            uploadNum = 0;
                             console.log(err);
-                            if(uploadNum < 5){
-                                window['singleUpload'](selectFile, bucketId, options, uploadUrl, cb);
-                                uploadNum++;
-                            }else{
-                                this.showPrompt = false;
-                                uploadNum = 0;
-                                console.log(err);
-                                window['isUpload'] = false;
-                                this.msg.error("Upload failed. The network may be unstable. Please try again later.");
-                                if (cb) {
-                                    cb();
-                                }
+                            window['isUpload'] = false;
+                            this.msg.error("Upload failed. The network may be unstable. Please try again later.");
+                            if (cb) {
+                                cb();
                             }
                         }
-                        xhr.onloadend=()=>{
-                        }
-                        /* XHR Send ends */
-                     };
-                    
-                
+                    }
+                    xhr.onloadend=()=>{
+                    }
+                    xhr.send(fileContent);
+                    /* XHR Send ends */
+                };
+
+
             })
         }
         window['uploadPart'] = (selectFile, uploadId, bucketId, options, cb) => {
@@ -308,113 +344,107 @@ export class AppComponent implements OnInit, AfterViewInit {
                 let requestOptions: any;
                 let options: any = {};
                 const reader = new FileReader();
-                reader.readAsBinaryString(chunk);
-                reader.onloadend = (e) => {
-                    fileString = reader.result;
-                    requestOptions = window['getSignatureKey'](requestMethod, url, '', '', '', chunk) ;
-                    options['headers'] = new Headers();
-                    options = this.BucketService.getSignatureOptions(requestOptions, options);
-                    this.http.put(uploadUrl + '?partNumber=' + (i + 1) + '&uploadId=' + uploadId, chunk, options).subscribe((data) => {
-                        let header = data.headers['_headers']
-                        let headerArr = header.entries()
-                        let headerArr1= Array.from(headerArr)
-                        let ETag 
-                        headerArr1.forEach((item)=>{
-                            if(item[0] == 'etag'){
-                                return ETag = item[1][0].replace(/\"/g,"")
-                            }
-                        })
-                        let obj = {}
-                        obj['PartNumber'] = i+1
-                        obj['ETag'] = ETag && ETag? ETag : ""
-                        window['uploadPartArr'].push(obj);
-                        uploadNum = 0;
-                        if (i < (chunks.length - 1)) {
-                            window['segmentUpload'](i + 1, chunks, blob, uploadId, options, bucketId, cb);
-                        } else {
-                            let marltipart = '<CompleteMultipartUpload>';
-                            window['uploadPartArr'].forEach(item => {
-                                marltipart += `<Part>
-                                <PartNumber>${item.PartNumber}</PartNumber>
-                                <ETag>${item.ETag}</ETag>
-                                </Part>`
-                            });
-                            marltipart += '</CompleteMultipartUpload>';
-                            window['CompleteMultipartUpload'](bucketId, blob, uploadId, marltipart, options, cb);
+                let contentHeaders = {
+                    'X-Amz-Content-Sha256': 'UNSIGNED-PAYLOAD'
+                };
+                requestOptions = window['getSignatureKey'](requestMethod, url, '', '', '', '', '', '', contentHeaders) ;
+                options['headers'] = new Headers();
+                options = this.BucketService.getSignatureOptions(requestOptions, options);
+                this.http.put(uploadUrl + '?partNumber=' + (i + 1) + '&uploadId=' + uploadId, chunk, options).subscribe((data) => {
+                    let header = data.headers['_headers']
+                    let headerArr = header.entries()
+                    let headerArr1= Array.from(headerArr)
+                    let ETag 
+                    headerArr1.forEach((item)=>{
+                        if(item[0] == 'etag'){
+                            return ETag = item[1][0].replace(/\"/g,"")
                         }
-                    },
-                    (error)=>{
-                        if(uploadNum < 5){
-                            window['segmentUpload'](i, chunks, blob, uploadId, options, bucketId, cb);
-                            uploadNum++;
-                        }else{
-                            this.showPrompt = false;
-                            uploadNum = 0;
-                            window['isUpload'] = false;
-                            window['getAkSkList'](()=>{
-                                
-                                    let requestMethod = "DELETE";
-                                    let url = '/'+ bucketId + '/' + this.selectFileName + '?uploadId=' + uploadId;
-                                    let requestOptions: any;
-                                    let options: any = {};
-                                    requestOptions = window['getSignatureKey'](requestMethod, url) ;
-                                    options['headers'] = new Headers();
-                                    options = this.BucketService.getSignatureOptions(requestOptions, options);
-                                    this.http.delete(uploadUrl + "?uploadId=" + uploadId, options).subscribe((data)=>{});
-                                    this.msg.error("Upload failed. The network may be unstable. Please try again later.");
-                                    if (cb) {
-                                        cb();
-                                    }
-                            })
-                        } 
-                    });
-                }
+                    })
+                    let obj = {}
+                    obj['PartNumber'] = i+1
+                    obj['ETag'] = ETag && ETag? ETag : ""
+                    window['uploadPartArr'].push(obj);
+                    uploadNum = 0;
+                    if (i < (chunks.length - 1)) {
+                        window['segmentUpload'](i + 1, chunks, blob, uploadId, options, bucketId, cb);
+                    } else {
+                        let completeMultipartStr = '<CompleteMultipartUpload>';
+                        window['uploadPartArr'].forEach(item => {
+                            completeMultipartStr += `<Part>
+                            <PartNumber>${item.PartNumber}</PartNumber>
+                            <ETag>${item.ETag}</ETag>
+                            </Part>`
+                        });
+                        completeMultipartStr += '</CompleteMultipartUpload>';
+                        window['CompleteMultipartUpload'](bucketId, blob, uploadId, completeMultipartStr, options, cb);
+                    }
+                },
+                (error)=>{
+                    if(uploadNum < 5){
+                        window['segmentUpload'](i, chunks, blob, uploadId, options, bucketId, cb);
+                        uploadNum++;
+                    }else{
+                        this.showPrompt = false;
+                        uploadNum = 0;
+                        window['isUpload'] = false;
+                        window['getAkSkList'](()=>{
+                            
+                                let requestMethod = "DELETE";
+                                let url = '/'+ bucketId + '/' + this.selectFileName + '?uploadId=' + uploadId;
+                                let requestOptions: any;
+                                let options: any = {};
+                                requestOptions = window['getSignatureKey'](requestMethod, url) ;
+                                options['headers'] = new Headers();
+                                options = this.BucketService.getSignatureOptions(requestOptions, options);
+                                this.http.delete(uploadUrl + "?uploadId=" + uploadId, options).subscribe((data)=>{});
+                                this.msg.error("Upload failed. The network may be unstable. Please try again later.");
+                                if (cb) {
+                                    cb();
+                                }
+                        })
+                    } 
+                });
             })
         }
-        window['CompleteMultipartUpload'] = (bucketId, blob, uploadId, marltipart, options, cb) => {
+        window['CompleteMultipartUpload'] = (bucketId, blob, uploadId, completeMultipartStr, options, cb) => {
             let uploadUrl = this.BucketService.url + bucketId + '/' + this.selectFileName;
             window['getAkSkList'](()=>{
-                    let fileString: any;
-                    let requestMethod = "PUT";
-                    let url = '/'+ bucketId + '/' + this.selectFileName + '?uploadId=' + uploadId;
-                    let requestOptions: any;
-                    let options: any = {};
-                    const reader = new FileReader();
-                    reader.readAsBinaryString(blob);
-                    reader.onloadend = (e) => {
-                        fileString = reader.result;
-                        requestOptions = window['getSignatureKey'](requestMethod, url, '', '', '', fileString) ;
-                        options['headers'] = new Headers();
-                        options = this.BucketService.getSignatureOptions(requestOptions, options);
-                        this.http.put(uploadUrl + '?uploadId=' + uploadId, marltipart, options).subscribe((res) => {
-                            this.showPrompt = false;
-                            window['isUpload'] = false;
-                            this.msg.success("Upload file ["+ blob.name +"] successfully.");
-                            if (cb) {
-                                cb();
-                            }
-                        },
-                        error => {
-                            if(uploadNum < 5){
-                                window['CompleteMultipartUpload'](bucketId, blob, uploadId, marltipart, options, cb);
-                                uploadNum++;
-                            }else{
-                                this.showPrompt = false;
-                                uploadNum = 0;
-                                window['isUpload'] = false;
-                                window['getAkSkList'](()=>{
-                                        let requestMethod = "DELETE";
-                                        let url = '/'+ bucketId + '/' + this.selectFileName + '?uploadId=' + uploadId;
-                                        let requestOptions: any;
-                                        let options: any = {};
-                                        requestOptions = window['getSignatureKey'](requestMethod, url) ;
-                                        options['headers'] = new Headers();
-                                        options = this.BucketService.getSignatureOptions(requestOptions, options);
-                                        this.http.delete(uploadUrl + "?uploadId=" + uploadId, options).subscribe((data)=>{});
-                                })
-                            }
-                        });
+                let fileString: any;
+                let requestMethod = "POST";
+                let url = '/'+ bucketId + '/' + this.selectFileName + '?uploadId=' + uploadId;
+                let requestOptions: any;
+                let options: any = {};
+                
+                requestOptions = window['getSignatureKey'](requestMethod, url, '', '', '', completeMultipartStr) ;
+                options['headers'] = new Headers();
+                options = this.BucketService.getSignatureOptions(requestOptions, options);
+                this.http.post(uploadUrl + '?uploadId=' + uploadId, completeMultipartStr, options).subscribe((res) => {
+                    this.showPrompt = false;
+                    window['isUpload'] = false;
+                    this.msg.success("Upload file ["+ blob.name +"] successfully.");
+                    if (cb) {
+                        cb();
                     }
+                },(error) => {
+                    if(uploadNum < 5){
+                        window['CompleteMultipartUpload'](bucketId, blob, uploadId, completeMultipartStr, options, cb);
+                        uploadNum++;
+                    }else{
+                        this.showPrompt = false;
+                        uploadNum = 0;
+                        window['isUpload'] = false;
+                        window['getAkSkList'](()=>{
+                            let requestMethod = "DELETE";
+                            let url = '/'+ bucketId + '/' + this.selectFileName + '?uploadId=' + uploadId;
+                            let requestOptions: any;
+                            let options: any = {};
+                            requestOptions = window['getSignatureKey'](requestMethod, url) ;
+                            options['headers'] = new Headers();
+                            options = this.BucketService.getSignatureOptions(requestOptions, options);
+                            this.http.delete(uploadUrl + "?uploadId=" + uploadId, options).subscribe((data)=>{});
+                        })
+                    }
+                });
             })
             
         }
@@ -493,23 +523,49 @@ export class AppComponent implements OnInit, AfterViewInit {
             this.SignatureKey['AccessKey'] = secretAccessKey.access;
         }
         //Calculation of the signature
-        window['getSignatureKey'] = (method, canonicalUri, host?, region?, service?, params?, contentType?, queryString?, headers?)=>{
+        window['getSignatureKey'] = (method, canonicalUri, host?, region?, service?, body?, contentType?, queryString?, headers?)=>{
             
             if(canonicalUri == 's3/'){
                 canonicalUri = '';
             }
+            if(body && (headers && headers['X-Amz-Content-Sha256'] == 'UNSIGNED-PAYLOAD')){
+                body = '';
+            }
+            
+            
             let requestOptions: any = {
                 host: host ? host : Consts.S3_HOST_IP + ':' + Consts.S3_HOST_PORT,
                 method: method,
                 path: canonicalUri,
                 service: service ? service : 's3',
                 region: region ? region : 'ap-south-1',
-                body: params ? params : '',
+                body: body ? body : '',
                 headers: {
                     'X-Auth-Token': localStorage['auth-token'],
-                    'Content-Type': 'application/xml'
+                    'Content-Type': headers && headers['Content-Type'] ? headers['Content-Type'] : 'application/xml'
                 }
 
+            }
+
+            /****** 
+            ToDo: 
+            Currently we are checking for the known headers in our API requests and adding them to the signature generation. 
+            This will not scale well. We have to iterate through the headers sent to the signature generation method and populate
+            the requestOptions.headers with all the headers.
+            *******/
+            
+            if(headers && headers['x-amz-acl']){
+                requestOptions.headers['x-amz-acl'] = headers['x-amz-acl'];
+            }
+            if(headers && headers['X-Amz-Metadata-Directive']){
+                requestOptions.headers['X-Amz-Metadata-Directive'] = headers['X-Amz-Metadata-Directive'];
+            }
+            if(headers && headers['x-amz-copy-source']){
+                requestOptions.headers['x-amz-copy-source'] = headers['x-amz-copy-source'];
+            }
+            
+            if(headers && headers['X-Amz-Content-Sha256'] == 'UNSIGNED-PAYLOAD'){
+                requestOptions.headers['X-Amz-Content-Sha256'] = 'UNSIGNED-PAYLOAD';
             }
             aws4.sign(requestOptions, {
                 secretAccessKey: this.SignatureKey['secretAccessKey'],

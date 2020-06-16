@@ -45,9 +45,9 @@ cat > /etc/nginx/conf.d/default.conf <<EOF
         location /${OPENSDS_ORCHESTRATION_API_VERSION}/ {
             proxy_pass ${OPENSDS_ORCHESTRATION_URL}/${OPENSDS_HOTPOT_API_VERSION}/;
         }
-
-        location /${OPENSDS_GELATO_API_VERSION}/ {
-            proxy_pass ${OPENSDS_GELATO_URL}/;
+        
+         location /${OPENSDS_GELATO_API_VERSION}/ {
+            proxy_pass ${OPENSDS_GELATO_URL}/${OPENSDS_GELATO_API_VERSION}/;
             client_max_body_size 10240m;
         }
 

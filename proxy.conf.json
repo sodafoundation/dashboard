@@ -1,14 +1,36 @@
 {
     "/v1beta": {
-        "target": "http://182.138.104.147:13151",
-        "secure": false
+        "target": "http://192.168.56.13:50040",
+
+        "secure": false,
+         "logLevel" : "debug"
+    },
+    "/orch" : {
+        "target": "http://192.168.56.13:5000",
+        "secure": false,
+         "logLevel" : "debug",
+         "changeOrigin" : true,
+         "pathRewrite" : {
+            "^/orch/" : "/v1beta/"
+         }
     },
     "/v1": {
-        "target": "http://182.138.104.147:13151",
-        "secure": false
+        "target": "http://192.168.56.13:8089",
+        "secure": false,
+         "logLevel" : "debug"
+    },
+    "/s3": {
+        "target": "http://192.168.56.13:8090",
+        "secure": false,
+         "logLevel" : "debug",
+         "changeOrigin" : true,
+         "pathRewrite" : {
+            "^/s3/" : "/"
+         }
     },
     "/v3": {
-        "target": "http://182.138.104.147:13151",
-        "secure": false
+        "target": "http://192.168.56.13/identity",
+        "secure": false,
+         "logLevel" : "debug"
     }
 }
