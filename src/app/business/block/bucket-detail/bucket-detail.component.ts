@@ -165,7 +165,6 @@ export class BucketDetailComponent implements OnInit {
             //Copy in the same bucket
             contentHeaders['X-Amz-Metadata-Directive'] = 'REPLACE';
           }
-          console.log("ContetnHeader", contentHeaders, requestOptions);
           requestOptions = window['getSignatureKey'](requestMethod, url, '', '', '', '', '', '', contentHeaders) ;
           options['headers'] = new Headers();
           options = this.BucketService.getSignatureOptions(requestOptions, options);
