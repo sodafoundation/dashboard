@@ -2031,6 +2031,10 @@ span.encryption-type {
 }
 /* Bucket Listing Page ends */
 /* Host Management Starts */
+/* Create Host */
+#create-host-page .ui-multiselect .ui-multiselect-panel{
+    width: 118%;
+}
 /* Host List */
 .host-az{
     text-align: center;

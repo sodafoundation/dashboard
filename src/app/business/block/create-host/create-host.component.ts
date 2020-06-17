@@ -69,10 +69,12 @@ export class CreateHostComponent implements OnInit {
     "hostName": {
         required: "Host Name is required.",
         maxlength: "Maximum 28 characters",
-        minlength: "Minimum 2 characters"
+        minlength: "Minimum 2 characters",
+        pattern: 'Enter valid Host Name. The host name can have only alphabets, numbers and hyphen. No special characters allowed. The name cannot start or end with a hyphen.'
     }
   };
   validRule = {
+    'validHostName': '^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\-]*[A-Za-z0-9])$',
     'validIp': '([0-9]{1,3})[.]([0-9]{1,3})[.]([0-9]{1,3})[.]([0-9]{1,3})' /* Validates IPv4 address */
   };
   
@@ -126,7 +128,7 @@ export class CreateHostComponent implements OnInit {
     ];
     this.createHostform = this.fb.group({
         'availabilityZones': new FormControl('', Validators.required),
-        'hostName': new FormControl('', {validators: [Validators.required, Validators.maxLength(28), Validators.minLength(2)]}),
+        'hostName': new FormControl('', {validators: [Validators.required, Validators.maxLength(28), Validators.minLength(2), Validators.pattern(this.validRule.validHostName)]}),
         'accessMode': new FormControl('', Validators.required),
         'osType': new FormControl('', Validators.required),
         'ip': new FormControl('', {validators:[Validators.required, Validators.pattern(this.validRule.validIp)]}),
