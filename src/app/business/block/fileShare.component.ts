@@ -16,6 +16,7 @@ let _ = require("underscore");
     providers: [ConfirmationService, MsgBoxService ]
 })
 export class FileShareComponent implements OnInit{
+    tabIndex: number = 0;
     selectedFileShares = [];
     createSnapshotShow = false;
     modifyFileShareShow = false;
@@ -55,7 +56,8 @@ export class FileShareComponent implements OnInit{
     msgs: Message[];
     allFileShareNameForCheck = [];
     checkSnapshotName = false;
-
+    fromFileShare: any;
+    fromCloudFileShare: any;
     constructor(
         private ActivatedRoute: ActivatedRoute,
         public I18N:I18NService,
@@ -80,6 +82,18 @@ export class FileShareComponent implements OnInit{
         })
     }
     ngOnInit(){
+        this.ActivatedRoute.params.subscribe(
+            (params) => {
+                if(params.fromRoute === "fromFileShare"){
+                    this.fromFileShare = true;
+                    this.tabIndex = 0;
+                }
+                if(params.fromRoute === "fromCloudFileShare"){
+                    this.fromCloudFileShare = true;
+                    this.tabIndex = 1;
+                }
+            }
+          );
         this.availabilityAclLevel =[
             {label: "Read Only", value: "Read Only"},
             {label: "Read Write", value: "Read Write"}

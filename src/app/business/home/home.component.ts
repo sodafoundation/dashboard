@@ -54,7 +54,7 @@ export class HomeComponent implements OnInit {
             type: 'text',
             name: 'region',
             formControlName: 'region',
-            arr:['aws-s3','azure-blob','hw-obs','fusionstorage-object','ceph-s3','gcp-s3','ibm-cos']
+            arr:['aws-s3','azure-blob','hw-obs','fusionstorage-object','ceph-s3','gcp-s3','ibm-cos', 'aws-storage', 'azure-storage']
         },
         {
             label: 'Endpoint',
@@ -81,7 +81,7 @@ export class HomeComponent implements OnInit {
             type: 'text',
             name: 'accessKey',
             formControlName: 'ak',
-            arr:['aws-s3','azure-blob','hw-obs','fusionstorage-object','ceph-s3','gcp-s3','ibm-cos']
+            arr:['aws-s3','azure-blob','hw-obs','fusionstorage-object','ceph-s3','gcp-s3','ibm-cos', 'aws-storage', 'azure-storage']
         },
         {
             label: 'Secret Key',
@@ -90,7 +90,7 @@ export class HomeComponent implements OnInit {
             type: 'password',
             name: 'secretKey',
             formControlName: 'sk',
-            arr:['aws-s3','azure-blob','hw-obs','fusionstorage-object','ceph-s3','gcp-s3','ibm-cos']
+            arr:['aws-s3','azure-blob','hw-obs','fusionstorage-object','ceph-s3','gcp-s3','ibm-cos', 'aws-storage', 'azure-storage']
         },
     ]
 
