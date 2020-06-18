@@ -21,7 +21,7 @@
     <form-item [required]="true" label="{{label.tags}}">
         <a class="add-tag" (click)="addNextTag()"><i class="fa fa-plus-circle" ></i></a>
         <div class="tag-array" formArrayName="tags"
-            *ngFor="let item of cloudFileShareCreateForm.controls['tags'].controls; let i = index">
+            *ngFor="let item of cloudFileShareCreateForm.get('tags')['controls']; let i = index">
             <div class="ui-g ui-fluid" [formGroupName]="i">
                 <div class="ui-g-12 ui-md-4">
                     <div class="ui-inputgroup">
@@ -35,7 +35,7 @@
                 </div>
                 <div class="ui-g-12 ui-md-2 ui-md-offset-1">
                     <div class="ui-inputgroup">
-                        <a disabled="cloudFileShareCreateForm.controls['tags'].length > 1" class="remove-tag" (click)="removeTagLink(i)"><i class="fa fa-minus-circle"></i></a>     
+                        <a disabled="cloudFileShareCreateForm.get('tags')['length'] > 1" class="remove-tag" (click)="removeTagLink(i)"><i class="fa fa-minus-circle"></i></a>     
                     </div>
                 </div>
             </div>
@@ -46,7 +46,7 @@
     <form-item [required]="true" label="{{label.metadata}}">
         <a class="add-metadata" (click)="addNextMetadata()"><i class="fa fa-plus-circle" ></i></a>
         <div class="metadata-array" formArrayName="metadata"
-            *ngFor="let item of cloudFileShareCreateForm.controls['metadata'].controls; let i = index">
+            *ngFor="let item of cloudFileShareCreateForm.get('metadata')['controls']; let i = index">
             <div class="ui-g ui-fluid" [formGroupName]="i">
                 <div class="ui-g-12 ui-md-4">
                     <div class="ui-inputgroup">
@@ -60,7 +60,7 @@
                 </div>
                 <div class="ui-g-12 ui-md-2 ui-md-offset-1">
                     <div class="ui-inputgroup">
-                        <a disabled="cloudFileShareCreateForm.controls['metadata'].length > 1" class="remove-metadata" (click)="removeMetadataLink(i)"><i class="fa fa-minus-circle"></i></a>     
+                        <a disabled="cloudFileShareCreateForm.get('metadata')['length'] > 1" class="remove-metadata" (click)="removeMetadataLink(i)"><i class="fa fa-minus-circle"></i></a>     
                     </div>
                 </div>
             </div>

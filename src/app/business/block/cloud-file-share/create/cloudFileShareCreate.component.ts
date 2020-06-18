@@ -102,9 +102,7 @@ export class CloudFileShareCreateComponent implements OnInit{
         (this.cloudFileShareCreateForm.controls['tags'] as FormArray).push(this.createTags())
     }
     removeTagLink(i: number) {
-        /* if(this.cloudFileShareCreateForm.controls['tags'].length > 1){
-            this.cloudFileShareCreateForm.controls['tags'].removeAt(i);
-        } */
+        
         if(this.cloudFileShareCreateForm.get('tags')['length'] > 1){
             this.cloudFileShareCreateForm.get('tags')['removeAt'](i);
         }
@@ -121,9 +119,7 @@ export class CloudFileShareCreateComponent implements OnInit{
         (this.cloudFileShareCreateForm.controls['metadata'] as FormArray).push(this.createMetadata())
     }
     removeMetadataLink(i: number) {
-        /* if(this.cloudFileShareCreateForm.controls['metadata'].length > 1){
-            this.cloudFileShareCreateForm.controls['metadata'].removeAt(i);
-        } */
+       
         if(this.cloudFileShareCreateForm.get('metadata')['length'] > 1){
             this.cloudFileShareCreateForm.get('metadata')['removeAt'](i);
         }
