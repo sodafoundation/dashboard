@@ -555,7 +555,7 @@ export class LifeCycleComponent implements OnInit {
                     modifyCycle = this.modifyArr.filter(item => {
                         return item.ID == value.name;
                     });
-                    modifyCleanDays = modifyCycle[0].AbortIncompleteMultipartUpload.DaysAfterInitiation;
+                    modifyCleanDays = modifyCycle[0].AbortIncompleteMultipartUpload && modifyCycle[0].AbortIncompleteMultipartUpload.DaysAfterInitiation ? modifyCycle[0].AbortIncompleteMultipartUpload.DaysAfterInitiation : 0;
                 }
             }
             if(arr == "" || arr.Rule[0] || arr.Rule.constructor === Object){
