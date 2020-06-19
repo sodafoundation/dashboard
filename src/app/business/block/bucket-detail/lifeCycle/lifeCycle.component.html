@@ -28,7 +28,7 @@
                 <p *ngFor="let col of cycle[col.field]">{{col}}</p>
             </ng-template>
         </p-column>
-        <p-column header="{{i18n.keyID['sds_block_volume_operation']}}" [style]="{'width': '180px'}">
+        <p-column header="{{i18n.keyID['sds_block_volume_operation']}}" [style]="{'width': '200px'}">
             <ng-template pTemplate="body" let-cycle="rowData" let-i="rowIndex">
                 <a (click)="createLifeCycle('update',cycle)" [innerHtml]="i18n.keyID['sds_lifeCycle_edit']"></a>
                 <a *ngIf="cycle.Status == 'Disabled'" (click)="enableLifeCycle(cycle)" [innerHtml]="i18n.keyID['sds_profile_enable']"></a>

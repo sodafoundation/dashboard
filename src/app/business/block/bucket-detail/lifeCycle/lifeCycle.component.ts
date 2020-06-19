@@ -138,8 +138,8 @@ export class LifeCycleComponent implements OnInit {
     getLifeCycleRule(item) {
         let newTrans = [];
         let string;
-        let trans = item.Transition;
-        let cleanUp = item.AbortIncompleteMultipartUpload.DaysAfterInitiation;
+        let trans = item.Transition ? item.Transition : '';
+        let cleanUp = item.AbortIncompleteMultipartUpload && item.AbortIncompleteMultipartUpload.DaysAfterInitiation ? item.AbortIncompleteMultipartUpload.DaysAfterInitiation : '';
         if (trans || item.Expiration || cleanUp) {
             if (trans) {
                 if (_.isArray(item.Transition)) {
@@ -167,7 +167,7 @@ export class LifeCycleComponent implements OnInit {
         return newTrans;
     }
     getLifeCyclePrefix(item, dialog, cycle) {
-        let prefix = item.Filter.Prefix;
+        let prefix = item.Filter && item.Filter.Prefix ? item.Filter.Prefix : "";
         //In the modified State, filter out the prefix of the selected lifeCycle 
         if (prefix != "" && (dialog != "update" || (cycle && cycle.newPrefix != prefix))) {
             this.allLifeCycleCheckPrefix.push(prefix);
@@ -207,7 +207,7 @@ export class LifeCycleComponent implements OnInit {
                                 let lifeCycleAll = {
                                     ObjectKey: item.ID,
                                     Status: item.Status,
-                                    prefix:item.Filter.Prefix,
+                                    prefix: item.Filter && item.Filter.Prefix ? item.Filter.Prefix : '',
                                     newPrefix: this.getLifeCyclePrefix(item, dialog, cycle),
                                     Rules: this.getLifeCycleRule(item)
                                 }
