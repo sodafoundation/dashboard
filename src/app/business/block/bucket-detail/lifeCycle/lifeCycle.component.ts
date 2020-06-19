@@ -964,10 +964,10 @@ export class LifeCycleComponent implements OnInit {
         let modifyCycle = this.modifyArr.filter(item => {
             return item.ID == cycle.ObjectKey;
         });
-        this.modifyTrans = modifyCycle[0].Transition;
-        let expir = modifyCycle[0].Expiration;
+        this.modifyTrans = modifyCycle[0].Transition ? modifyCycle[0].Transition : '';
+        let expir = modifyCycle[0].Expiration ? modifyCycle[0].Expiration : '';
         let expirDays = expir ? parseInt(expir.Days) : 1;
-        let cleanUp = modifyCycle[0].AbortIncompleteMultipartUpload.DaysAfterInitiation;
+        let cleanUp = modifyCycle[0].AbortIncompleteMultipartUpload && modifyCycle[0].AbortIncompleteMultipartUpload.DaysAfterInitiation ? modifyCycle[0].AbortIncompleteMultipartUpload.DaysAfterInitiation : 0;
         let cleanUpDay = parseInt(cleanUp) != 0 ? parseInt(cleanUp) : 7;
         this.transChecked = this.modifyTrans ? true : false;
         this.expirChecked = expir ? true : false;
@@ -976,7 +976,7 @@ export class LifeCycleComponent implements OnInit {
         this.ruleChecked = ruleEnable;
         this.createLifeCycleForm = this.fb.group({
             'name': new FormControl(modifyCycle[0].ID, { validators: [Validators.required, Utils.isExisted(this.allLifeCycleForCheck), Validators.pattern(this.validRule.name)], updateOn: 'change' }),
-            "prefix": new FormControl(modifyCycle[0].Filter.Prefix, { validators: [Utils.isExisted(this.allLifeCycleCheckPrefix)] }),
+            "prefix": new FormControl(modifyCycle[0].Filter && modifyCycle[0].Filter.Prefix ? modifyCycle[0].Filter.Prefix : '', { validators: [Utils.isExisted(this.allLifeCycleCheckPrefix)] }),
             "enabled": new FormControl(ruleEnable, { validators: [Validators.required], updateOn: 'change' }),
             "transEnabled": new FormControl(this.modifyTrans && ruleEnable ? ['trans'] : []),
             "expirEnabled": new FormControl(expir && ruleEnable ? ['expir'] : []),
