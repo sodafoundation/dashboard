@@ -2,7 +2,7 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { Component, OnInit, ViewContainerRef, ViewChild, Directive, ElementRef, HostBinding, HostListener, Input } from '@angular/core';
 import { I18NService, MsgBoxService, HttpService, Utils } from 'app/shared/api';
 import { BucketService } from '../../buckets.service';
-import { ConfirmationService, ConfirmDialogModule } from '../../../../components/common/api';
+import { ConfirmationService, ConfirmDialogModule, Message } from '../../../../components/common/api';
 import { trigger, state, style, transition, animate } from '@angular/animations';
 import { I18nPluralPipe } from '@angular/common';
 import { FormGroup, Validators, FormBuilder, FormControl } from '@angular/forms';
@@ -29,6 +29,8 @@ export class ObjectAclComponent implements OnInit {
     items = [];
     folderId = "";
     backetUrl;
+    msgs: Message[];
+
     constructor(
         private BucketService: BucketService,
         private ActivatedRoute: ActivatedRoute,
@@ -57,16 +59,24 @@ export class ObjectAclComponent implements OnInit {
                     let str = res['_body'];
                     let x2js = new X2JS();
                     let jsonObj = x2js.xml_str2json(str);
-                    let chooseObj = jsonObj.AccessControlPolicy.AccessControlList.Grant
+                    let publicGroup = jsonObj.AccessControlPolicy && jsonObj.AccessControlPolicy.AccessControlList.Grant ? jsonObj.AccessControlPolicy.AccessControlList.Grant : [];
                     this.checkBoxArr = []
-                    if(chooseObj){
-                        if(chooseObj.Permission =="FULL_CONTROL"){
-                            this.checkBoxArr.push('write','read');
-                        }else if(chooseObj.Permission == "READ"){
-                            this.checkBoxArr.push('read');
-                        }
+                    if(publicGroup && publicGroup.length){
+                        publicGroup.forEach(element => {
+                            if(element['Grantee']['_xsi:type']=="Group"){
+                                if(element['Permission'] =="WRITE"){
+                                    this.checkBoxArr.push('write','read');
+                                }else if(element['Permission'] == "READ"){
+                                    this.checkBoxArr.push('read');
+                                }
+                            }
+                        });
                     }
                     
+                }, (error) =>{
+                    this.msgs = [];
+                    this.msgs.push({severity: 'error', summary: "Error", detail: "Could not fetch Object ACL." + error._body});
+                    console.log("Error. Something went wrong. Could not fetch Object ACL", error);
                 })
         })
     }
@@ -103,8 +113,12 @@ export class ObjectAclComponent implements OnInit {
                 options.headers.set('Content-Length', param.length);
                 options.headers.set('x-amz-acl', user);
                 this.BucketService.creatObjectAcl(this.bucketId + '/' + this.key, body, options).subscribe((res)=> {
+                    this.msgs = [];
+                    this.msgs.push({severity: 'success', summary: 'Success', detail: 'Object ACL updated successfully.'});
                     this.getObjectAclList()
                 }, (error) => {
+                    this.msgs = [];
+                    this.msgs.push({severity: 'error', summary: "Error", detail: "Could not create Object ACL." + error._body});
                     console.log("Could not create Object ACL. Something went wrong.", error);
                 })
         })

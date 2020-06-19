@@ -1,3 +1,4 @@
+<p-growl [value]="msgs" [sticky]="false" [life]="6000"></p-growl>
 <div>
     <div class="custom-breadcrumb">
         <span *ngFor="let item of items; index as i">
@@ -29,10 +30,15 @@
                         <p-checkbox label="Yes" value="read" name="choose" [(ngModel)]="checkBoxArr"></p-checkbox>
                     </ng-template>
                 </p-column>
+                <p-column header="Write">
+                    <ng-template pTemplate="body" let-aksk="rowData" let-i="rowIndex">
+                        <p-checkbox  label="yes" value="write" name="choose" [(ngModel)]="checkBoxArr"></p-checkbox>
+                    </ng-template>
+                </p-column>
                 <p-column header="Operation">
                         <ng-template pTemplate="body" let-aksk="rowData" let-i="rowIndex">
                                 <button  class="ui-button-secondary" (click)="onSubmit()" pButton type="button"  label="Save"></button>
-                                <button class="ui-button-secondary" (click)="getAclList()" pButton type="button" label="Cancel"></button>
+                                <button class="ui-button-secondary" (click)="getObjectAclList()" pButton type="button" label="Cancel"></button>
                         </ng-template>
                     </p-column>
             </p-dataTable>
