@@ -106,7 +106,7 @@ body{
     position: absolute;
     left: calc(50% - 1.2rem);
     top: 20%;
-    width: 2.4rem;
+    width: 3rem;
     z-index: 1002;
 }
 
@@ -118,7 +118,7 @@ body{
     .logo {
         height: .75rem;
         padding-bottom: .60rem;
-        background-image: url('./assets/business/images/logo.png');
+        background-image: url('./assets/business/images/soda-footer-logo.png');
         background-position: center top;
         background-repeat: no-repeat;
     }
@@ -181,17 +181,18 @@ body{
 }
 
 #layout-topbar .logo {
-    height: 0.7rem;
+    height: 1rem;
     flex-shrink: 0;
 }
 
 #layout-topbar .logo a {
     display: inline-block;
-    background-image: url('./assets/business/images/logo-white.png');
+    background-image: url('./assets/business/images/soda-footer-logo.png');
     background-repeat: no-repeat;
     background-position: center center;
     width: 100%;
-    height: 0.40rem;
+    height: 0.7rem;
+    background-size: contain;
 }
 
 #layout-topbar .user-info {
@@ -2031,6 +2032,10 @@ span.encryption-type {
 }
 /* Bucket Listing Page ends */
 /* Host Management Starts */
+/* Create Host */
+#create-host-page .ui-multiselect .ui-multiselect-panel{
+    width: 118%;
+}
 /* Host List */
 .host-az{
     text-align: center;
