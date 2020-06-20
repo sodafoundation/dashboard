@@ -36,11 +36,11 @@
                     </ng-template>
                 </p-column>
                 <p-column header="Operation">
-                        <ng-template pTemplate="body" let-aksk="rowData" let-i="rowIndex">
-                                <button  class="ui-button-secondary" (click)="onSubmit()" pButton type="button"  label="Save"></button>
-                                <button class="ui-button-secondary" (click)="getObjectAclList()" pButton type="button" label="Cancel"></button>
-                        </ng-template>
-                    </p-column>
+                    <ng-template pTemplate="body" let-aksk="rowData" let-i="rowIndex">
+                        <button  class="ui-button-secondary" (click)="onSubmit()" pButton type="button"  label="Save"></button>
+                        <button class="ui-button-secondary" (click)="getObjectAclList()" pButton type="button" label="Cancel"></button>
+                    </ng-template>
+                </p-column>
             </p-dataTable>
         </div>
     </p-tabView>

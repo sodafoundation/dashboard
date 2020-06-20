@@ -40,36 +40,36 @@ export class AclComponent implements OnInit {
     getAclList() {
         window['getAkSkList'](()=> {
             
-                let requestMethod = "GET";
-                let url = "/"+this.bucketId+"/?acl";
-                let requestOptions: any;
-                let options: any = {};
-                requestOptions = window['getSignatureKey'](requestMethod, url) ;
-                options['headers'] = new Headers();
-                options = this.BucketService.getSignatureOptions(requestOptions, options);
-                this.BucketService.getAcl(this.bucketId,options).subscribe((res) => {
-                    let str = res['_body'];
-                    let x2js = new X2JS();
-                    let jsonObj = x2js.xml_str2json(str);
-                    let publicGroup = jsonObj.AccessControlPolicy && jsonObj.AccessControlPolicy.AccessControlList.Grant ? jsonObj.AccessControlPolicy.AccessControlList.Grant : [];
-                    this.checkBoxArr = []
-                    if(publicGroup && publicGroup.length){
-                        publicGroup.forEach(element => {
-                            if(element['Grantee']['_xsi:type']=="Group"){
-                                if(element['Permission'] =="WRITE"){
-                                    this.checkBoxArr.push('write','read');
-                                }else if(element['Permission'] == "READ"){
-                                    this.checkBoxArr.push('read');
-                                }
+            let requestMethod = "GET";
+            let url = "/"+this.bucketId+"/?acl";
+            let requestOptions: any;
+            let options: any = {};
+            requestOptions = window['getSignatureKey'](requestMethod, url) ;
+            options['headers'] = new Headers();
+            options = this.BucketService.getSignatureOptions(requestOptions, options);
+            this.BucketService.getAcl(this.bucketId,options).subscribe((res) => {
+                let str = res['_body'];
+                let x2js = new X2JS();
+                let jsonObj = x2js.xml_str2json(str);
+                let publicGroup = jsonObj.AccessControlPolicy && jsonObj.AccessControlPolicy.AccessControlList.Grant ? jsonObj.AccessControlPolicy.AccessControlList.Grant : [];
+                this.checkBoxArr = []
+                if(publicGroup && publicGroup.length){
+                    publicGroup.forEach(element => {
+                        if(element['Grantee']['_xsi:type']=="Group"){
+                            if(element['Permission'] =="WRITE"){
+                                this.checkBoxArr.push('write','read');
+                            }else if(element['Permission'] == "READ"){
+                                this.checkBoxArr.push('read');
                             }
-                        });
-                    }
-                  
-                }, (error) => {
-                    this.msgs = [];
-                    this.msgs.push({severity: 'error', summary: "Error", detail: "Could not fetch ACL." + error._body});
-                    console.log("Could not fetch ACL list.Something went wrong.", error);
-                })
+                        }
+                    });
+                }
+                
+            }, (error) => {
+                this.msgs = [];
+                this.msgs.push({severity: 'error', summary: "Error", detail: "Could not fetch ACL." + error._body});
+                console.log("Could not fetch ACL list.Something went wrong.", error);
+            })
         })
     }
     
@@ -92,34 +92,29 @@ export class AclComponent implements OnInit {
     creatAclSubmit(param,user) {
         window['getAkSkList'](()=> {
             
-                let requestMethod = "PUT";
-                let url = '/' + this.bucketId + "/?acl";
-                let requestOptions: any;
-                let options: any = {};
-                let contentHeaders = {
-                    'x-amz-acl' : user
-                };
-                let body = '';
-                requestOptions = window['getSignatureKey'](requestMethod, url, '', '', '', body, '', '', contentHeaders) ;
-                options['headers'] = new Headers();
-                options = this.BucketService.getSignatureOptions(requestOptions, options);
-                
-                options.headers.set('x-amz-acl', user);
-                this.BucketService.creatAcl(this.bucketId, body, options).subscribe((res)=> {
-                    this.msgs = [];
-                    this.msgs.push({severity: 'success', summary: 'Success', detail: 'ACL updated successfully.'});
-                    this.getAclList()
-                }, (error) => {
-                    this.msgs = [];
-                    this.msgs.push({severity: 'error', summary: "Error", detail: error._body});
-                    console.log("Could not create ACL. Something went wrong.", error);
-                })
+            let requestMethod = "PUT";
+            let url = '/' + this.bucketId + "/?acl";
+            let requestOptions: any;
+            let options: any = {};
+            let contentHeaders = {
+                'x-amz-acl' : user
+            };
+            let body = '';
+            requestOptions = window['getSignatureKey'](requestMethod, url, '', '', '', body, '', '', contentHeaders) ;
+            options['headers'] = new Headers();
+            options = this.BucketService.getSignatureOptions(requestOptions, options);
+            
+            options.headers.set('x-amz-acl', user);
+            this.BucketService.creatAcl(this.bucketId, body, options).subscribe((res)=> {
+                this.msgs = [];
+                this.msgs.push({severity: 'success', summary: 'Success', detail: 'ACL updated successfully.'});
+                this.getAclList()
+            }, (error) => {
+                this.msgs = [];
+                this.msgs.push({severity: 'error', summary: "Error", detail: error._body});
+                console.log("Could not create ACL. Something went wrong.", error);
+            })
         })
     }
 
-    // Rquest header with AK/SK authentication added
-    getSignature(options) {
-       
-        return options;
-    }
 }

@@ -528,10 +528,10 @@ export class AppComponent implements OnInit, AfterViewInit {
             if(canonicalUri == 's3/'){
                 canonicalUri = '';
             }
+            
             if(body && (headers && headers['X-Amz-Content-Sha256'] == 'UNSIGNED-PAYLOAD')){
                 body = '';
             }
-            
             
             let requestOptions: any = {
                 host: host ? host : Consts.S3_HOST_IP + ':' + Consts.S3_HOST_PORT,

@@ -182,61 +182,61 @@ export class LifeCycleComponent implements OnInit {
         this.modifyArr = [];
         window['getAkSkList'](() => {
             
-                let requestMethod = "GET";
-                let url = '/' + this.bucketId + "/?lifecycle";
-                let requestOptions: any;
-                let options: any = {};
-                requestOptions = window['getSignatureKey'](requestMethod, url);
-                options['headers'] = new Headers();
-                options = this.BucketService.getSignatureOptions(requestOptions, options);
+            let requestMethod = "GET";
+            let url = '/' + this.bucketId + "/?lifecycle";
+            let requestOptions: any;
+            let options: any = {};
+            requestOptions = window['getSignatureKey'](requestMethod, url);
+            options['headers'] = new Headers();
+            options = this.BucketService.getSignatureOptions(requestOptions, options);
 
-                let arr = [];
-                this.BucketService.getLifeCycle(this.bucketId, options).subscribe((res) => {
-                    let str = res['_body'];
-                    let x2js = new X2JS();
-                    let jsonObj = x2js.xml_str2json(str);
-                    let lifeCycleArr = jsonObj.LifecycleConfiguration.Rule;
-                    if (lifeCycleArr) {
-                        //Multiple lifeCycle
-                        if (_.isArray(lifeCycleArr)) {
-                            this.modifyArr = lifeCycleArr;
-                            lifeCycleArr.forEach(item => {
-                                if (dialog != "update" || (cycle && cycle.ObjectKey != item.ID)) {
-                                    this.allLifeCycleForCheck.push(item.ID);
-                                }
-                                let lifeCycleAll = {
-                                    ObjectKey: item.ID,
-                                    Status: item.Status,
-                                    prefix: item.Filter && item.Filter.Prefix ? item.Filter.Prefix : '',
-                                    newPrefix: this.getLifeCyclePrefix(item, dialog, cycle),
-                                    Rules: this.getLifeCycleRule(item)
-                                }
-                                arr.push(lifeCycleAll);
-                            })
-                            this.lifeCycleAlls = arr;
-                        } else {
-                            //only one lifeCycle
-                            this.modifyArr.push(lifeCycleArr);
-                            if (dialog != "update") {
-                                this.allLifeCycleForCheck.push(lifeCycleArr.ID);
+            let arr = [];
+            this.BucketService.getLifeCycle(this.bucketId, options).subscribe((res) => {
+                let str = res['_body'];
+                let x2js = new X2JS();
+                let jsonObj = x2js.xml_str2json(str);
+                let lifeCycleArr = jsonObj.LifecycleConfiguration.Rule;
+                if (lifeCycleArr) {
+                    //Multiple lifeCycle
+                    if (_.isArray(lifeCycleArr)) {
+                        this.modifyArr = lifeCycleArr;
+                        lifeCycleArr.forEach(item => {
+                            if (dialog != "update" || (cycle && cycle.ObjectKey != item.ID)) {
+                                this.allLifeCycleForCheck.push(item.ID);
                             }
                             let lifeCycleAll = {
-                                ObjectKey: lifeCycleArr.ID,
-                                Status: lifeCycleArr.Status,
-                                prefix:lifeCycleArr.Filter.Prefix,
-                                newPrefix: this.getLifeCyclePrefix(lifeCycleArr, dialog, cycle),
-                                Rules: this.getLifeCycleRule(lifeCycleArr)
+                                ObjectKey: item.ID,
+                                Status: item.Status,
+                                prefix: item.Filter && item.Filter.Prefix ? item.Filter.Prefix : '',
+                                newPrefix: this.getLifeCyclePrefix(item, dialog, cycle),
+                                Rules: this.getLifeCycleRule(item)
                             }
                             arr.push(lifeCycleAll);
-                            this.lifeCycleAlls = arr;
+                        })
+                        this.lifeCycleAlls = arr;
+                    } else {
+                        //only one lifeCycle
+                        this.modifyArr.push(lifeCycleArr);
+                        if (dialog != "update") {
+                            this.allLifeCycleForCheck.push(lifeCycleArr.ID);
                         }
+                        let lifeCycleAll = {
+                            ObjectKey: lifeCycleArr.ID,
+                            Status: lifeCycleArr.Status,
+                            prefix:lifeCycleArr.Filter.Prefix,
+                            newPrefix: this.getLifeCyclePrefix(lifeCycleArr, dialog, cycle),
+                            Rules: this.getLifeCycleRule(lifeCycleArr)
+                        }
+                        arr.push(lifeCycleAll);
+                        this.lifeCycleAlls = arr;
                     }
-                    this.submitObj = jsonObj;
-                    //the state of the modification
-                    if (dialog && dialog == "update") {
-                        this.editFile(cycle);
-                    }
-                })
+                }
+                this.submitObj = jsonObj;
+                //the state of the modification
+                if (dialog && dialog == "update") {
+                    this.editFile(cycle);
+                }
+            })
         })
     }
     // Transition Rules checkbox click
@@ -364,90 +364,90 @@ export class LifeCycleComponent implements OnInit {
         let storageClasses = "storageClasses";
         window['getAkSkList'](() => {
             
-                let requestMethod = "GET";
-                let url = '/' + storageClasses;
-                let requestOptions: any;
-                let options: any = {};
-                requestOptions = window['getSignatureKey'](requestMethod, url);
-                options['headers'] = new Headers();
-                options = this.BucketService.getSignatureOptions(requestOptions, options);
-                this.BucketService.getTransOptions(storageClasses, options).subscribe((res) => {
-                    let str = res['_body'];
-                    let x2js = new X2JS();
-                    let jsonObj = x2js.xml_str2json(str);
-                    let array = jsonObj.ListStorageClasses.Class;
-                    let transItem = [];
-                    let selectedTrans;
-                    //the state of the modification
-                    if (cycle && cycle.ObjectKey) {
-                        selectedTrans = this.createLifeCycleForm.value['transId' + (transIndex)];
-                        if(this.lifeCycleItems.length >1){
-                            if (selectedTrans == "STANDARD_IA") {
-                                array = array.filter((item, index) => {
-                                    return item.Name != "STANDARD";
-                                })
-                            } else if (selectedTrans == "GLACIER") {
-                                array = array.filter((item, index) => {
-                                    return item.Name == "GLACIER";
-                                })
+            let requestMethod = "GET";
+            let url = '/' + storageClasses;
+            let requestOptions: any;
+            let options: any = {};
+            requestOptions = window['getSignatureKey'](requestMethod, url);
+            options['headers'] = new Headers();
+            options = this.BucketService.getSignatureOptions(requestOptions, options);
+            this.BucketService.getTransOptions(storageClasses, options).subscribe((res) => {
+                let str = res['_body'];
+                let x2js = new X2JS();
+                let jsonObj = x2js.xml_str2json(str);
+                let array = jsonObj.ListStorageClasses.Class;
+                let transItem = [];
+                let selectedTrans;
+                //the state of the modification
+                if (cycle && cycle.ObjectKey) {
+                    selectedTrans = this.createLifeCycleForm.value['transId' + (transIndex)];
+                    if(this.lifeCycleItems.length >1){
+                        if (selectedTrans == "STANDARD_IA") {
+                            array = array.filter((item, index) => {
+                                return item.Name != "STANDARD";
+                            })
+                        } else if (selectedTrans == "GLACIER") {
+                            array = array.filter((item, index) => {
+                                return item.Name == "GLACIER";
+                            })
+                        }
+                    }else if(this.lifeCycleItems.length == 1){
+                        array.forEach((item, index)=>{
+                            let firstItem = array[0];
+                            if(item.Name == selectedTrans){
+                                array[0] = item;
+                                array[index] = firstItem;
                             }
-                        }else if(this.lifeCycleItems.length == 1){
-                            array.forEach((item, index)=>{
-                                let firstItem = array[0];
-                                if(item.Name == selectedTrans){
-                                    array[0] = item;
-                                    array[index] = firstItem;
-                                }
-                            })
-                        }
-                    //Add Rules under modified state
-                    } else if (this.showModifyLifeCycle){
-                        let trans = this.createLifeCycleForm.value['transId' + (transIndex -1)];
-                        selectedTrans = trans?(trans.transName ? trans.transName : trans) : "--";
-                        if(selectedTrans == "STANDARD"){
-                            array = array.filter((item, index) => {
-                                return item.Name != "STANDARD";
-                            })
-                        }else if(selectedTrans == "STANDARD_IA"){
-                            array = array.filter((item, index) => {
-                                return item.Name == "GLACIER";
-                            })
-                        }
-                    }else if(transIndex && transIndex > 0) {
-                        selectedTrans = this.createLifeCycleForm.value['transId' + (transIndex - 1)].transName;
-                        if (selectedTrans == "STANDARD") {
-                            array = array.filter((item, index) => {
-                                return item.Name != "STANDARD";
-                            })
-                        } else if (selectedTrans == "STANDARD_IA") {
-                            array = array.filter((item, index) => {
-                                return item.Name == "GLACIER";
-                            })
-                        }
+                        })
                     }
-                    array.map(arr => {
-                        if (cycle && cycle.ObjectKey && arr.Name == selectedTrans) {
-                            let event = {
-                                value: {
-                                    id: arr.Tier,
-                                    transName: arr.Name
-                                }
+                //Add Rules under modified state
+                } else if (this.showModifyLifeCycle){
+                    let trans = this.createLifeCycleForm.value['transId' + (transIndex -1)];
+                    selectedTrans = trans?(trans.transName ? trans.transName : trans) : "--";
+                    if(selectedTrans == "STANDARD"){
+                        array = array.filter((item, index) => {
+                            return item.Name != "STANDARD";
+                        })
+                    }else if(selectedTrans == "STANDARD_IA"){
+                        array = array.filter((item, index) => {
+                            return item.Name == "GLACIER";
+                        })
+                    }
+                }else if(transIndex && transIndex > 0) {
+                    selectedTrans = this.createLifeCycleForm.value['transId' + (transIndex - 1)].transName;
+                    if (selectedTrans == "STANDARD") {
+                        array = array.filter((item, index) => {
+                            return item.Name != "STANDARD";
+                        })
+                    } else if (selectedTrans == "STANDARD_IA") {
+                        array = array.filter((item, index) => {
+                            return item.Name == "GLACIER";
+                        })
+                    }
+                }
+                array.map(arr => {
+                    if (cycle && cycle.ObjectKey && arr.Name == selectedTrans) {
+                        let event = {
+                            value: {
+                                id: arr.Tier,
+                                transName: arr.Name
                             }
-                            this.getBackets(event, transIndex);
+                        }
+                        this.getBackets(event, transIndex);
 
-                        }
-                        let transObj = {
-                            label: "Tier_" + arr.Tier + "(" + arr.Name + ")",
-                            value: { id: arr.Tier, transName: arr.Name }
-                        }
-                        transItem.push(transObj)
-                    })
-                    if(this.showModifyLifeCycle && !cycle && transIndex > 0){
-                        this.createLifeCycleForm.patchValue({['transId' + transIndex]: transItem[0].value.transName});
-                        this.typeChange(transItem[0],transIndex, 'update');
                     }
-                    this.transOptions.push(transItem);
+                    let transObj = {
+                        label: "Tier_" + arr.Tier + "(" + arr.Name + ")",
+                        value: { id: arr.Tier, transName: arr.Name }
+                    }
+                    transItem.push(transObj)
                 })
+                if(this.showModifyLifeCycle && !cycle && transIndex > 0){
+                    this.createLifeCycleForm.patchValue({['transId' + transIndex]: transItem[0].value.transName});
+                    this.typeChange(transItem[0],transIndex, 'update');
+                }
+                this.transOptions.push(transItem);
+            })
         })
 
     }

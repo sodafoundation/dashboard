@@ -48,36 +48,36 @@ export class ObjectAclComponent implements OnInit {
     getObjectAclList() {
         this.items = window.sessionStorage['headerTag'] && window.sessionStorage['headerTag'] != "" ? JSON.parse(window.sessionStorage.getItem("headerTag")) : [];
         window['getAkSkList'](()=> {
-                let requestMethod = "GET";
-                let url = '/' + this.bucketId+ '/' + this.key + '/' + '?acl';
-                let requestOptions: any;
-                let options: any = {};
-                requestOptions = window['getSignatureKey'](requestMethod, url) ;
-                options['headers'] = new Headers();
-                options = this.BucketService.getSignatureOptions(requestOptions, options);
-                this.BucketService.getObjectAcl(this.bucketId + '/' + this.key,options).subscribe((res) => {
-                    let str = res['_body'];
-                    let x2js = new X2JS();
-                    let jsonObj = x2js.xml_str2json(str);
-                    let publicGroup = jsonObj.AccessControlPolicy && jsonObj.AccessControlPolicy.AccessControlList.Grant ? jsonObj.AccessControlPolicy.AccessControlList.Grant : [];
-                    this.checkBoxArr = []
-                    if(publicGroup && publicGroup.length){
-                        publicGroup.forEach(element => {
-                            if(element['Grantee']['_xsi:type']=="Group"){
-                                if(element['Permission'] =="WRITE"){
-                                    this.checkBoxArr.push('write','read');
-                                }else if(element['Permission'] == "READ"){
-                                    this.checkBoxArr.push('read');
-                                }
+            let requestMethod = "GET";
+            let url = '/' + this.bucketId+ '/' + this.key + '/' + '?acl';
+            let requestOptions: any;
+            let options: any = {};
+            requestOptions = window['getSignatureKey'](requestMethod, url) ;
+            options['headers'] = new Headers();
+            options = this.BucketService.getSignatureOptions(requestOptions, options);
+            this.BucketService.getObjectAcl(this.bucketId + '/' + this.key,options).subscribe((res) => {
+                let str = res['_body'];
+                let x2js = new X2JS();
+                let jsonObj = x2js.xml_str2json(str);
+                let publicGroup = jsonObj.AccessControlPolicy && jsonObj.AccessControlPolicy.AccessControlList.Grant ? jsonObj.AccessControlPolicy.AccessControlList.Grant : [];
+                this.checkBoxArr = []
+                if(publicGroup && publicGroup.length){
+                    publicGroup.forEach(element => {
+                        if(element['Grantee']['_xsi:type']=="Group"){
+                            if(element['Permission'] =="WRITE"){
+                                this.checkBoxArr.push('write','read');
+                            }else if(element['Permission'] == "READ"){
+                                this.checkBoxArr.push('read');
                             }
-                        });
-                    }
-                    
-                }, (error) =>{
-                    this.msgs = [];
-                    this.msgs.push({severity: 'error', summary: "Error", detail: "Could not fetch Object ACL." + error._body});
-                    console.log("Error. Something went wrong. Could not fetch Object ACL", error);
-                })
+                        }
+                    });
+                }
+                
+            }, (error) =>{
+                this.msgs = [];
+                this.msgs.push({severity: 'error', summary: "Error", detail: "Could not fetch Object ACL." + error._body});
+                console.log("Error. Something went wrong. Could not fetch Object ACL", error);
+            })
         })
     }
     
@@ -99,28 +99,28 @@ export class ObjectAclComponent implements OnInit {
     }
     creatObjectAclSubmit(param,user) {
         window['getAkSkList'](()=> {
-                let requestMethod = "PUT";
-                let url = '/' + this.bucketId+ '/' + this.key + '/' + '?acl';
-                let requestOptions: any;
-                let options: any = {};
-                let contentHeaders = {
-                    'x-amz-acl' : user
-                };
-                let body = '';
-                requestOptions = window['getSignatureKey'](requestMethod, url, '', '', '', body, '', '', contentHeaders) ;
-                options['headers'] = new Headers();
-                options = this.BucketService.getSignatureOptions(requestOptions, options);
-                options.headers.set('Content-Length', param.length);
-                options.headers.set('x-amz-acl', user);
-                this.BucketService.creatObjectAcl(this.bucketId + '/' + this.key, body, options).subscribe((res)=> {
-                    this.msgs = [];
-                    this.msgs.push({severity: 'success', summary: 'Success', detail: 'Object ACL updated successfully.'});
-                    this.getObjectAclList()
-                }, (error) => {
-                    this.msgs = [];
-                    this.msgs.push({severity: 'error', summary: "Error", detail: "Could not create Object ACL." + error._body});
-                    console.log("Could not create Object ACL. Something went wrong.", error);
-                })
+            let requestMethod = "PUT";
+            let url = '/' + this.bucketId+ '/' + this.key + '/' + '?acl';
+            let requestOptions: any;
+            let options: any = {};
+            let contentHeaders = {
+                'x-amz-acl' : user
+            };
+            let body = '';
+            requestOptions = window['getSignatureKey'](requestMethod, url, '', '', '', body, '', '', contentHeaders) ;
+            options['headers'] = new Headers();
+            options = this.BucketService.getSignatureOptions(requestOptions, options);
+            options.headers.set('Content-Length', param.length);
+            options.headers.set('x-amz-acl', user);
+            this.BucketService.creatObjectAcl(this.bucketId + '/' + this.key, body, options).subscribe((res)=> {
+                this.msgs = [];
+                this.msgs.push({severity: 'success', summary: 'Success', detail: 'Object ACL updated successfully.'});
+                this.getObjectAclList()
+            }, (error) => {
+                this.msgs = [];
+                this.msgs.push({severity: 'error', summary: "Error", detail: "Could not create Object ACL." + error._body});
+                console.log("Could not create Object ACL. Something went wrong.", error);
+            })
         })
     }
 
