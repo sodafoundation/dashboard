@@ -9,7 +9,7 @@ body{
 }
 .layout-wrapper {
     width: 100%;
-    height: 100%;
+    height: 92%;
 }
 
 /* animation login */
@@ -162,8 +162,13 @@ body{
 
 
 /* menu */
-
-#layout-topbar {
+#layout-topbar .menu-bar{
+    height: 72px; 
+    background-color: #303F9F; 
+    box-shadow: 0px 6px 25px rgba(33, 33, 33, 0.36);
+    
+}
+#layout-sidebar {
     // background-color: #242e43;
     // background-image: url('./assets/business/images/menu-bg.png');
     background-position: 0 bottom;
@@ -173,15 +178,15 @@ body{
     flex-direction: column;
     justify-content: flex-start;
     width: 320px;
-    height: 100%;
-    position: fixed;
-    top: 0;
+    
+    position: absolute;
+    top: 75px;
     left: 0;
-    z-index: 1000;
+    z-index: 999;
 }
 
 #layout-topbar .logo {
-    height: 1rem;
+    height: 0.7rem;
     flex-shrink: 0;
 }
 
@@ -191,12 +196,12 @@ body{
     background-repeat: no-repeat;
     background-position: center center;
     width: 100%;
-    height: 0.7rem;
+    height: 0.45rem;
     background-size: contain;
 }
 
 #layout-topbar .user-info {
-    padding: 0.3rem 0.3rem 0.3rem 0.4rem;
+   // padding: 0.3rem 0.3rem 0.3rem 0.4rem;
 }
 
 #layout-topbar .user-info>div {
@@ -207,7 +212,7 @@ body{
 #layout-topbar .user-info>div h1 {
     width: 100%;
     height: 0.3rem;
-    color: #cdd3dd;
+    color: #ffffff;
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
@@ -243,7 +248,7 @@ body{
     display: inline-block;
     width: 50%;
     height: 0.22rem;
-    color: #54617a;
+    color: #d9d9d9;
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
@@ -256,10 +261,10 @@ body{
     margin-right: 0.05rem;
 }
 
-.topbar-menu {
+.sidebar-menu {
     display: inline-block;
     list-style-type: none;
-    margin: 0.1rem 0 0;
+    margin: 0.75rem 0 0;
     padding: 0 0.3rem 0 0.4rem;
     height: 100%;
     overflow-y: auto;
@@ -285,15 +290,15 @@ body{
     background: #555; 
   }
 
-.topbar-menu>li:first-of-type {
+.sidebar-menu>li:first-of-type {
     border-top: 1px solid #323d54;
 }
 
-.topbar-menu>li {
+.sidebar-menu>li {
     border-bottom: 1px solid #323d54;
 }
 
-.topbar-menu>li>a {
+.sidebar-menu>li>a {
     padding: 0.18rem 0;
     text-decoration: none;
     transition: color .3s;
@@ -678,16 +683,16 @@ body{
     .layout-mask {
         display: block;
     }
-    #layout-topbar {
+    #layout-sidebar {
         text-align: center;
     }
-    #layout-topbar .menu-button {
+    #layout-sidebar .menu-button {
         display: inline-block;
     }
     #layout-topbar .logo {
         margin: 7px 0 7px 0;
     }
-    .topbar-menu {
+    .sidebar-menu {
         background-color: #363c3f;
         float: none;
         width: 100%;
@@ -695,12 +700,12 @@ body{
         margin: 0;
         text-align: center;
     }
-    .topbar-menu>li>a {
+    .sidebar-menu>li>a {
         padding-bottom: 0;
         line-height: 40px;
         min-width: 100px;
     }
-    .topbar-menu>li.topbar-menu-themes>ul {
+    .sidebar-menu>li.sidebar-menu-themes>ul {
         top: 40px;
     }
     #layout-sidebar {
@@ -716,7 +721,7 @@ body{
         margin-left: 0;
         padding-top: 100px;
     }
-    .topbar-menu>li.topbar-menu-themes>ul {
+    .sidebar-menu>li.sidebar-menu-themes>ul {
         text-align: left;
     }
     .home .introduction>div {
@@ -1702,7 +1707,7 @@ a {
     }
 }
 .ui-home-backend-container{
-    height:calc(100% - 260px);
+    height:calc(100% - 330px);
     > div{
         height: 64px;
         margin: 0 5% 0 5%;
@@ -1853,6 +1858,10 @@ a {
     border-left-color: #89898f; 
     right: -12px; 
     top: -15px;
+}
+
+.register-backend-dialog .ui-dialog-content{
+    min-height: 400px;
 }
 /* custom breadcrumb end */
 
@@ -2067,3 +2076,14 @@ a.remove-initiator {
 .input-context-help {
     padding-top: 0.1rem;
 }
+/* JoyRide Application Tour styles */
+.start-tour-button{
+    color: #ffffff;
+    background-color: #1976D2;
+    border: 1px solid #ffffff;
+    margin-top: 0.05rem;
+}
+.tour-content{
+    width: 300px;
+}
+/* Tour styles end */
