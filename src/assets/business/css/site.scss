@@ -2040,15 +2040,15 @@ span.encryption-type {
     padding: 10px;
 }
 /* Create Host page */
-.initiator-array{
+.initiator-array, .tag-array, .metadata-array{
     width: 600px;
     padding: 0 0 5px 0;
 }
-a.add-initiator{
+a.add-initiator, a.add-tag, a.add-metadata{
     color: #00b12e;
 }
 
-a.remove-initiator {
+a.remove-initiator, a.remove-tag, a.remove-metadata{
     color: #ff0000;
     padding: 8px 0 0 0;
 }

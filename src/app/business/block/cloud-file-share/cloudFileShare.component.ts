@@ -67,7 +67,13 @@ export class CloudFileShareComponent implements OnInit{
 
     getFileShares(){
         this.cloudFS.getAllFileShares().subscribe((res) => {
-            this.allFileShares = res.json().fileshares;
+
+            let shares = res.json();
+            if(_.isArray(shares)){
+                this.allFileShares = shares;
+            } else{
+                this.allFileShares = [shares];
+            }
             this.allFileShares.forEach(element => {
                 if(!element['tags']){
                     element['tags'] = [];

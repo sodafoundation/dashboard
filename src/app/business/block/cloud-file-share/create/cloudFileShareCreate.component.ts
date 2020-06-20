@@ -1,7 +1,7 @@
 import { Router,ActivatedRoute } from '@angular/router';
 import { Component, OnInit, ViewContainerRef, ViewChild, Directive, ElementRef, HostBinding, HostListener, Input } from '@angular/core';
 import { I18NService, Consts, MsgBoxService, HttpService, Utils } from 'app/shared/api';
-import { ConfirmationService, ConfirmDialogModule} from '../../../../components/common/api';
+import { ConfirmationService, ConfirmDialogModule, Message} from '../../../../components/common/api';
 import { trigger, state, style, transition, animate} from '@angular/animations';
 import { I18nPluralPipe } from '@angular/common';
 import { FormGroup, Validators, FormBuilder, FormControl, FormArray } from '@angular/forms';
@@ -28,6 +28,10 @@ export class CloudFileShareCreateComponent implements OnInit{
     listedBackends: any;
     selectedRegion: any;
     selectedBackend: any;
+    enableEncryption = false;
+    sseTypes = [];
+    selectedSse;
+    isDisabled: boolean = true;
     errorMessage = {
         "zone": { required: "Zone is required."},
         "name": { 
@@ -53,15 +57,20 @@ export class CloudFileShareCreateComponent implements OnInit{
         'description':'^[a-zA-Z]{1}([a-zA-Z0-9]){0,249}$'
     };
     label = {
+        zone: this.i18n.keyID["sds_block_volume_az"],
         name: this.i18n.keyID["sds_block_volume_name"],
         description: this.i18n.keyID["sds_block_volume_descri"],
         region: 'Region',
-        zone: this.i18n.keyID["sds_block_volume_az"],
+        encrypted: "Enable Encryption",
+        encryptionSettings: "Encryption Settings",
+        size: "Size",
         tags: "Tags",
         metadata: "Metadata",
         backend_type: "Type",
         backend: "Backend"
     };
+    msgs: Message[];
+
     constructor(
         private cloudFS: CloudFileShareService,
         private router: Router,
@@ -85,11 +94,30 @@ export class CloudFileShareCreateComponent implements OnInit{
             'backend_type' : ["",{validators:[Validators.required], updateOn:'change'}],
             'backend':["",{validators:[Validators.required], updateOn:'change'}],
             'region' : ["", {validators:[Validators.required]}],
+            "encrypted": [false, { validators: [Validators.required], updateOn: 'change' }],
+            "encryptionSettings":this.fb.array([this.createEncryptionSettings()]),
+            "size": [1, {}],
             'tags' : this.fb.array([this.createTags()]),
             'metadata' : this.fb.array([this.createMetadata()])
         });
         this.getTypes();
         this.getBackends();
+        
+        
+    }
+
+    encryptionControl(){
+        this.enableEncryption = this.cloudFileShareCreateForm.get('encrypted').value;
+        if(this.enableEncryption){
+            this.isDisabled = !this.isDisabled;
+        } 
+    }
+
+    createEncryptionSettings(){
+        return this.fb.group({
+            key: new FormControl('', Validators.required),
+            value: new FormControl('', Validators.required)
+          })
     }
 
     createTags(){
@@ -127,18 +155,28 @@ export class CloudFileShareCreateComponent implements OnInit{
 
     getFileShareDataArray(value){
         //let unit = value['capacity'] === 'GB'? 1 : 1024;
+        let enc = {};
+        value['encryptionSettings'].forEach(element => {
+            enc[element['key']] = element['value'];
+        });
+        let meta = {};
+        value['metadata'].forEach(element => {
+            meta[element['key']] = element['value'];
+        });
         let dataArr = {
             availabilityZone: value['zone'],
             name: value['name'],
             description: value['description'],
             region: value['region'],
+            encrypted: value['encrypted'],
+            encryptionSettings : enc,
+            size: value['size'],
             tags: value['tags'],
-            metadata: value['metadata']
+            metadata: meta
         }
         return dataArr;
     }
     onSubmit(value){
-        console.log("Selected Backend in submite", this.selectedBackend);
         if(!this.cloudFileShareCreateForm.valid){
             for(let i in this.cloudFileShareCreateForm.controls){
                 this.cloudFileShareCreateForm.controls[i].markAsTouched();
@@ -147,7 +185,13 @@ export class CloudFileShareCreateComponent implements OnInit{
         }
         let dataArr = this.getFileShareDataArray(value);
         this.cloudFS.createFileShare(dataArr, this.selectedBackend['id']).subscribe((res)=>{
+            this.msgs = [];
+            this.msgs.push({severity: 'success', summary: 'Success', detail: 'File share has been created successfully.'});
             this.router.navigate(['/block',"fromCloudFileShare"]);
+        }, (error) =>{
+            this.msgs = [];
+            this.msgs.push({severity: 'error', summary: "Error", detail: error._body});
+            console.log("Something went wrong. File share could not be created.", error);
         })
     }
     getAZ(){
@@ -175,9 +219,8 @@ export class CloudFileShareCreateComponent implements OnInit{
     getTypes() {
         this.allTypes = [];
         this.BucketService.getTypes().subscribe((res) => {
-            console.log("Types", res.json());
             res.json().types.forEach(element => {
-            if( element.name=='aws-storage' || element.name == 'azure-storage' ){
+            if( element.name=='aws-file' || element.name == 'azure-file' ){
                 this.allTypes.push({
                     label: Consts.CLOUD_TYPE_NAME[element.name],
                     value: element.name
@@ -204,7 +247,6 @@ export class CloudFileShareCreateComponent implements OnInit{
     getBackends() {
         this.allBackends = [];
         this.BucketService.getBckends().subscribe((res) => {
-            console.log("backends", res.json());
             res.json().forEach(element => {
                 this.allBackends.push({
                     label: element.name,
@@ -224,7 +266,6 @@ export class CloudFileShareCreateComponent implements OnInit{
         this.cloudFileShareCreateForm.patchValue({
             'region' : this.selectedRegion
         }) 
-        console.log("Create cloud fileshare form", this.cloudFileShareCreateForm.value);
     }
 
 }
