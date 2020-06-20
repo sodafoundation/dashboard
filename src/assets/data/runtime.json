@@ -1,0 +1,4 @@
+{
+    "hostIP": "${OPENSDS_S3_HOST}",
+    "hostPort": "${OPENSDS_S3_PORT}"
+}

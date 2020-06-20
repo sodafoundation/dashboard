@@ -7,6 +7,7 @@ import { trigger, state, style, transition, animate } from '@angular/animations'
 import { I18nPluralPipe } from '@angular/common';
 import { FormGroup, Validators, FormBuilder, FormControl } from '@angular/forms';
 import { DomSanitizer } from '@angular/platform-browser';
+import { Http, Headers } from '@angular/http';
 
 declare let X2JS: any;
 let _ = require("underscore");
@@ -137,8 +138,8 @@ export class LifeCycleComponent implements OnInit {
     getLifeCycleRule(item) {
         let newTrans = [];
         let string;
-        let trans = item.Transition;
-        let cleanUp = item.AbortIncompleteMultipartUpload.DaysAfterInitiation;
+        let trans = item.Transition ? item.Transition : '';
+        let cleanUp = item.AbortIncompleteMultipartUpload && item.AbortIncompleteMultipartUpload.DaysAfterInitiation ? item.AbortIncompleteMultipartUpload.DaysAfterInitiation : '';
         if (trans || item.Expiration || cleanUp) {
             if (trans) {
                 if (_.isArray(item.Transition)) {
@@ -166,7 +167,7 @@ export class LifeCycleComponent implements OnInit {
         return newTrans;
     }
     getLifeCyclePrefix(item, dialog, cycle) {
-        let prefix = item.Filter.Prefix;
+        let prefix = item.Filter && item.Filter.Prefix ? item.Filter.Prefix : "";
         //In the modified State, filter out the prefix of the selected lifeCycle 
         if (prefix != "" && (dialog != "update" || (cycle && cycle.newPrefix != prefix))) {
             this.allLifeCycleCheckPrefix.push(prefix);
@@ -180,59 +181,61 @@ export class LifeCycleComponent implements OnInit {
         this.lifeCycleAlls = [];
         this.modifyArr = [];
         window['getAkSkList'](() => {
+            
             let requestMethod = "GET";
-            let url = this.BucketService.url + '/' + this.bucketId + "/?lifecycle";
-            window['canonicalString'](requestMethod, url, () => {
-                let options: any = {};
-                this.getSignature(options);
-                let name = this.bucketId + "/?lifecycle";
-                let arr = [];
-                this.BucketService.getLifeCycle(name, options).subscribe((res) => {
-                    let str = res['_body'];
-                    let x2js = new X2JS();
-                    let jsonObj = x2js.xml_str2json(str);
-                    let lifeCycleArr = jsonObj.LifecycleConfiguration.Rule;
-                    if (lifeCycleArr) {
-                        //Multiple lifeCycle
-                        if (_.isArray(lifeCycleArr)) {
-                            this.modifyArr = lifeCycleArr;
-                            lifeCycleArr.forEach(item => {
-                                if (dialog != "update" || (cycle && cycle.ObjectKey != item.ID)) {
-                                    this.allLifeCycleForCheck.push(item.ID);
-                                }
-                                let lifeCycleAll = {
-                                    ObjectKey: item.ID,
-                                    Status: item.Status,
-                                    prefix:item.Filter.Prefix,
-                                    newPrefix: this.getLifeCyclePrefix(item, dialog, cycle),
-                                    Rules: this.getLifeCycleRule(item)
-                                }
-                                arr.push(lifeCycleAll);
-                            })
-                            this.lifeCycleAlls = arr;
-                        } else {
-                            //only one lifeCycle
-                            this.modifyArr.push(lifeCycleArr);
-                            if (dialog != "update") {
-                                this.allLifeCycleForCheck.push(lifeCycleArr.ID);
+            let url = '/' + this.bucketId + "/?lifecycle";
+            let requestOptions: any;
+            let options: any = {};
+            requestOptions = window['getSignatureKey'](requestMethod, url);
+            options['headers'] = new Headers();
+            options = this.BucketService.getSignatureOptions(requestOptions, options);
+
+            let arr = [];
+            this.BucketService.getLifeCycle(this.bucketId, options).subscribe((res) => {
+                let str = res['_body'];
+                let x2js = new X2JS();
+                let jsonObj = x2js.xml_str2json(str);
+                let lifeCycleArr = jsonObj.LifecycleConfiguration.Rule;
+                if (lifeCycleArr) {
+                    //Multiple lifeCycle
+                    if (_.isArray(lifeCycleArr)) {
+                        this.modifyArr = lifeCycleArr;
+                        lifeCycleArr.forEach(item => {
+                            if (dialog != "update" || (cycle && cycle.ObjectKey != item.ID)) {
+                                this.allLifeCycleForCheck.push(item.ID);
                             }
                             let lifeCycleAll = {
-                                ObjectKey: lifeCycleArr.ID,
-                                Status: lifeCycleArr.Status,
-                                prefix:lifeCycleArr.Filter.Prefix,
-                                newPrefix: this.getLifeCyclePrefix(lifeCycleArr, dialog, cycle),
-                                Rules: this.getLifeCycleRule(lifeCycleArr)
+                                ObjectKey: item.ID,
+                                Status: item.Status,
+                                prefix: item.Filter && item.Filter.Prefix ? item.Filter.Prefix : '',
+                                newPrefix: this.getLifeCyclePrefix(item, dialog, cycle),
+                                Rules: this.getLifeCycleRule(item)
                             }
                             arr.push(lifeCycleAll);
-                            this.lifeCycleAlls = arr;
+                        })
+                        this.lifeCycleAlls = arr;
+                    } else {
+                        //only one lifeCycle
+                        this.modifyArr.push(lifeCycleArr);
+                        if (dialog != "update") {
+                            this.allLifeCycleForCheck.push(lifeCycleArr.ID);
                         }
+                        let lifeCycleAll = {
+                            ObjectKey: lifeCycleArr.ID,
+                            Status: lifeCycleArr.Status,
+                            prefix:lifeCycleArr.Filter.Prefix,
+                            newPrefix: this.getLifeCyclePrefix(lifeCycleArr, dialog, cycle),
+                            Rules: this.getLifeCycleRule(lifeCycleArr)
+                        }
+                        arr.push(lifeCycleAll);
+                        this.lifeCycleAlls = arr;
                     }
-                    this.submitObj = jsonObj;
-                    //the state of the modification
-                    if (dialog && dialog == "update") {
-                        this.editFile(cycle);
-                    }
-                })
+                }
+                this.submitObj = jsonObj;
+                //the state of the modification
+                if (dialog && dialog == "update") {
+                    this.editFile(cycle);
+                }
             })
         })
     }
@@ -326,17 +329,19 @@ export class LifeCycleComponent implements OnInit {
     }
     getBackets(event, transIndex) {
         window['getAkSkList'](() => {
-            let requestMethod = "GET";
-            let url = this.BucketService.url;
-            window['canonicalString'](requestMethod, url, () => {
+                let requestMethod = "GET";
+                let url = this.BucketService.url;
+                let requestOptions: any;
                 let options: any = {};
-                this.getSignature(options);
+                requestOptions = window['getSignatureKey'](requestMethod, url);
+                options['headers'] = new Headers();
+                options = this.BucketService.getSignatureOptions(requestOptions, options);
                 if (Object.keys(options).length > 0) {
                     this.BucketService.getBuckets(options).subscribe((res) => {
                         let str = res._body;
                         let x2js = new X2JS();
                         let jsonObj = x2js.xml_str2json(str);
-                        let buckets = (jsonObj ? jsonObj.ListAllMyBucketsResult.Buckets : []);
+                        let buckets = (jsonObj ? jsonObj.ListAllMyBucketsResult.Buckets.Bucket : []);
                         if (Object.prototype.toString.call(buckets) === "[object Array]") {
                             buckets = buckets;
                         } else if (Object.prototype.toString.call(buckets) === "[object Object]") {
@@ -353,94 +358,95 @@ export class LifeCycleComponent implements OnInit {
                         this.getBackends(selectedTrans, tierId, newBackend, transIndex);
                     });
                 }
-            })
         })
     }
     getTransOptions(transIndex?, cycle?) {
         let storageClasses = "storageClasses";
         window['getAkSkList'](() => {
+            
             let requestMethod = "GET";
-            let url = this.BucketService.url + '/' + storageClasses;
-            window['canonicalString'](requestMethod, url, () => {
-                let options: any = {};
-                this.getSignature(options);
-                this.BucketService.getTransOptions(storageClasses, options).subscribe((res) => {
-                    let str = res['_body'];
-                    let x2js = new X2JS();
-                    let jsonObj = x2js.xml_str2json(str);
-                    let array = jsonObj.ListStorageClasses.Class;
-                    let transItem = [];
-                    let selectedTrans;
-                    //the state of the modification
-                    if (cycle && cycle.ObjectKey) {
-                        selectedTrans = this.createLifeCycleForm.value['transId' + (transIndex)];
-                        if(this.lifeCycleItems.length >1){
-                            if (selectedTrans == "STANDARD_IA") {
-                                array = array.filter((item, index) => {
-                                    return item.Name != "STANDARD";
-                                })
-                            } else if (selectedTrans == "GLACIER") {
-                                array = array.filter((item, index) => {
-                                    return item.Name == "GLACIER";
-                                })
+            let url = '/' + storageClasses;
+            let requestOptions: any;
+            let options: any = {};
+            requestOptions = window['getSignatureKey'](requestMethod, url);
+            options['headers'] = new Headers();
+            options = this.BucketService.getSignatureOptions(requestOptions, options);
+            this.BucketService.getTransOptions(storageClasses, options).subscribe((res) => {
+                let str = res['_body'];
+                let x2js = new X2JS();
+                let jsonObj = x2js.xml_str2json(str);
+                let array = jsonObj.ListStorageClasses.Class;
+                let transItem = [];
+                let selectedTrans;
+                //the state of the modification
+                if (cycle && cycle.ObjectKey) {
+                    selectedTrans = this.createLifeCycleForm.value['transId' + (transIndex)];
+                    if(this.lifeCycleItems.length >1){
+                        if (selectedTrans == "STANDARD_IA") {
+                            array = array.filter((item, index) => {
+                                return item.Name != "STANDARD";
+                            })
+                        } else if (selectedTrans == "GLACIER") {
+                            array = array.filter((item, index) => {
+                                return item.Name == "GLACIER";
+                            })
+                        }
+                    }else if(this.lifeCycleItems.length == 1){
+                        array.forEach((item, index)=>{
+                            let firstItem = array[0];
+                            if(item.Name == selectedTrans){
+                                array[0] = item;
+                                array[index] = firstItem;
                             }
-                        }else if(this.lifeCycleItems.length == 1){
-                            array.forEach((item, index)=>{
-                                let firstItem = array[0];
-                                if(item.Name == selectedTrans){
-                                    array[0] = item;
-                                    array[index] = firstItem;
-                                }
-                            })
-                        }
-                    //Add Rules under modified state
-                    } else if (this.showModifyLifeCycle){
-                        let trans = this.createLifeCycleForm.value['transId' + (transIndex -1)];
-                        selectedTrans = trans?(trans.transName ? trans.transName : trans) : "--";
-                        if(selectedTrans == "STANDARD"){
-                            array = array.filter((item, index) => {
-                                return item.Name != "STANDARD";
-                            })
-                        }else if(selectedTrans == "STANDARD_IA"){
-                            array = array.filter((item, index) => {
-                                return item.Name == "GLACIER";
-                            })
-                        }
-                    }else if(transIndex && transIndex > 0) {
-                        selectedTrans = this.createLifeCycleForm.value['transId' + (transIndex - 1)].transName;
-                        if (selectedTrans == "STANDARD") {
-                            array = array.filter((item, index) => {
-                                return item.Name != "STANDARD";
-                            })
-                        } else if (selectedTrans == "STANDARD_IA") {
-                            array = array.filter((item, index) => {
-                                return item.Name == "GLACIER";
-                            })
-                        }
+                        })
                     }
-                    array.map(arr => {
-                        if (cycle && cycle.ObjectKey && arr.Name == selectedTrans) {
-                            let event = {
-                                value: {
-                                    id: arr.Tier,
-                                    transName: arr.Name
-                                }
+                //Add Rules under modified state
+                } else if (this.showModifyLifeCycle){
+                    let trans = this.createLifeCycleForm.value['transId' + (transIndex -1)];
+                    selectedTrans = trans?(trans.transName ? trans.transName : trans) : "--";
+                    if(selectedTrans == "STANDARD"){
+                        array = array.filter((item, index) => {
+                            return item.Name != "STANDARD";
+                        })
+                    }else if(selectedTrans == "STANDARD_IA"){
+                        array = array.filter((item, index) => {
+                            return item.Name == "GLACIER";
+                        })
+                    }
+                }else if(transIndex && transIndex > 0) {
+                    selectedTrans = this.createLifeCycleForm.value['transId' + (transIndex - 1)].transName;
+                    if (selectedTrans == "STANDARD") {
+                        array = array.filter((item, index) => {
+                            return item.Name != "STANDARD";
+                        })
+                    } else if (selectedTrans == "STANDARD_IA") {
+                        array = array.filter((item, index) => {
+                            return item.Name == "GLACIER";
+                        })
+                    }
+                }
+                array.map(arr => {
+                    if (cycle && cycle.ObjectKey && arr.Name == selectedTrans) {
+                        let event = {
+                            value: {
+                                id: arr.Tier,
+                                transName: arr.Name
                             }
-                            this.getBackets(event, transIndex);
+                        }
+                        this.getBackets(event, transIndex);
 
-                        }
-                        let transObj = {
-                            label: "Tier_" + arr.Tier + "(" + arr.Name + ")",
-                            value: { id: arr.Tier, transName: arr.Name }
-                        }
-                        transItem.push(transObj)
-                    })
-                    if(this.showModifyLifeCycle && !cycle && transIndex > 0){
-                        this.createLifeCycleForm.patchValue({['transId' + transIndex]: transItem[0].value.transName});
-                        this.typeChange(transItem[0],transIndex, 'update');
                     }
-                    this.transOptions.push(transItem);
+                    let transObj = {
+                        label: "Tier_" + arr.Tier + "(" + arr.Name + ")",
+                        value: { id: arr.Tier, transName: arr.Name }
+                    }
+                    transItem.push(transObj)
                 })
+                if(this.showModifyLifeCycle && !cycle && transIndex > 0){
+                    this.createLifeCycleForm.patchValue({['transId' + transIndex]: transItem[0].value.transName});
+                    this.typeChange(transItem[0],transIndex, 'update');
+                }
+                this.transOptions.push(transItem);
             })
         })
 
@@ -496,15 +502,7 @@ export class LifeCycleComponent implements OnInit {
             }
         })
     }
-    // Rquest header with AK/SK authentication added
-    getSignature(options) {
-        let SignatureObjectwindow = window['getSignatureKey']();
-        let requestObject = this.BucketService.getSignatureOptions(SignatureObjectwindow, options);
-        options = requestObject['options'];
-        this.Signature = requestObject['Signature'];
-        this.kDate = requestObject['kDate'];
-        return options;
-    }
+    
     //create/update pop-up box
     createLifeCycle(dialog, cycle?) {
         this.modifyBakend = [];
@@ -557,7 +555,7 @@ export class LifeCycleComponent implements OnInit {
                     modifyCycle = this.modifyArr.filter(item => {
                         return item.ID == value.name;
                     });
-                    modifyCleanDays = modifyCycle[0].AbortIncompleteMultipartUpload.DaysAfterInitiation;
+                    modifyCleanDays = modifyCycle[0].AbortIncompleteMultipartUpload && modifyCycle[0].AbortIncompleteMultipartUpload.DaysAfterInitiation ? modifyCycle[0].AbortIncompleteMultipartUpload.DaysAfterInitiation : 0;
                 }
             }
             if(arr == "" || arr.Rule[0] || arr.Rule.constructor === Object){
@@ -824,22 +822,22 @@ export class LifeCycleComponent implements OnInit {
     }
     createLifeCycleSubmit(param) {
         window['getAkSkList'](() => {
-            let requestMethod = "PUT";
-            let url = this.BucketService.url + '/' + this.bucketId + "/?lifecycle";
-            window['canonicalString'](requestMethod, url, () => {
+                
+            
+                let requestMethod = "PUT";
+                let url = '/' + this.bucketId + "/?lifecycle";
+                let requestOptions: any;
                 let options: any = {};
-                this.getSignature(options);
-                options['Content-Length'] = param.length;
-                options.headers.set('Content-Type', 'application/xml');
-                // options['Content-MD5'] = CryptoJS.SHA256(param, 'base64');
-                let name = this.bucketId + "/?lifecycle";
-                this.BucketService.createLifeCycle(name, param, options).subscribe((res) => {
+                requestOptions = window['getSignatureKey'](requestMethod, url, '', '', '', param) ;
+                options['headers'] = new Headers();
+                options = this.BucketService.getSignatureOptions(requestOptions, options);
+                this.BucketService.createLifeCycle(this.bucketId , param, options).subscribe((res) => {
                     this.showCreateLifeCycle = false;
                     this.liceCycleDialog = false;
                     this.showModifyLifeCycle = false;
                     this.getLifeCycleList();
                 })
-            })
+            
         })
     }
     //Determining whether the values for transition and backend are the same is not recommended for user creation
@@ -932,11 +930,14 @@ export class LifeCycleComponent implements OnInit {
     deleteLifeCycle(value, multiple?) {
         //Multiple means batch deletion
         window['getAkSkList'](() => {
-            let requestMethod = "DELETE";
-            let url = this.BucketService.url + '/' + this.bucketId + "/?lifecycle" + "&ruleID=" + value.ObjectKey;
-            window['canonicalString'](requestMethod, url, () => {
+            
+                let requestMethod = "DELETE";
+                let url = '/' + this.bucketId + "/?lifecycle" + "&ruleID=" + value.ObjectKey;
+                let requestOptions: any;
                 let options: any = {};
-                this.getSignature(options);
+                requestOptions = window['getSignatureKey'](requestMethod, url);
+                options['headers'] = new Headers();
+                options = this.BucketService.getSignatureOptions(requestOptions, options);
                 let requestUrl = this.bucketId + "/?lifecycle" + "&ruleID=" + value.ObjectKey;
                 this.BucketService.deleteLifeCycle(requestUrl, options).subscribe((res) => {
                     let lifeCycleArr = _.filter(this.lifeCycleAlls, item=>{
@@ -956,7 +957,6 @@ export class LifeCycleComponent implements OnInit {
                         this.getLifeCycleList();
                     }
                 })
-            })
         })
     }
     //lifeCycle page initialization in modified statue
@@ -964,10 +964,10 @@ export class LifeCycleComponent implements OnInit {
         let modifyCycle = this.modifyArr.filter(item => {
             return item.ID == cycle.ObjectKey;
         });
-        this.modifyTrans = modifyCycle[0].Transition;
-        let expir = modifyCycle[0].Expiration;
+        this.modifyTrans = modifyCycle[0].Transition ? modifyCycle[0].Transition : '';
+        let expir = modifyCycle[0].Expiration ? modifyCycle[0].Expiration : '';
         let expirDays = expir ? parseInt(expir.Days) : 1;
-        let cleanUp = modifyCycle[0].AbortIncompleteMultipartUpload.DaysAfterInitiation;
+        let cleanUp = modifyCycle[0].AbortIncompleteMultipartUpload && modifyCycle[0].AbortIncompleteMultipartUpload.DaysAfterInitiation ? modifyCycle[0].AbortIncompleteMultipartUpload.DaysAfterInitiation : 0;
         let cleanUpDay = parseInt(cleanUp) != 0 ? parseInt(cleanUp) : 7;
         this.transChecked = this.modifyTrans ? true : false;
         this.expirChecked = expir ? true : false;
@@ -976,7 +976,7 @@ export class LifeCycleComponent implements OnInit {
         this.ruleChecked = ruleEnable;
         this.createLifeCycleForm = this.fb.group({
             'name': new FormControl(modifyCycle[0].ID, { validators: [Validators.required, Utils.isExisted(this.allLifeCycleForCheck), Validators.pattern(this.validRule.name)], updateOn: 'change' }),
-            "prefix": new FormControl(modifyCycle[0].Filter.Prefix, { validators: [Utils.isExisted(this.allLifeCycleCheckPrefix)] }),
+            "prefix": new FormControl(modifyCycle[0].Filter && modifyCycle[0].Filter.Prefix ? modifyCycle[0].Filter.Prefix : '', { validators: [Utils.isExisted(this.allLifeCycleCheckPrefix)] }),
             "enabled": new FormControl(ruleEnable, { validators: [Validators.required], updateOn: 'change' }),
             "transEnabled": new FormControl(this.modifyTrans && ruleEnable ? ['trans'] : []),
             "expirEnabled": new FormControl(expir && ruleEnable ? ['expir'] : []),

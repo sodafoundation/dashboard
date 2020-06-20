@@ -1,11 +1,11 @@
 export const Consts = {
-    /** 不显示的语言 **/
+    /** Unknown placeholder **/
     UNKNOW_PLACEHOLDER: "--",
 
-    /** 百分比显示小数位数 **/
+    /** Display Decimal places **/
     PRECISION_PERCENT: 2,
 
-    /** 常用日期时间格式 **/
+    /** Common Date and Time Formats **/
     DATE_FORMAT: "yyyy-MM-dd",
     TIME_FORMAT: "hh:mm:ss",
     DATETIME_FORMAT: "yyyy-MM-dd hh:mm:ss",
@@ -19,13 +19,6 @@ export const Consts = {
     WSearch: 180,
 
 
-    /** 百分比显示小数位数 **/
-
-    /** 百分比显示小数位数 **/
-
-    /** 百分比显示小数位数 **/
-
-    /** 百分比显示小数位数 **/
     /**
      * only for bucket to backend and to type
      */
@@ -53,5 +46,7 @@ export const Consts = {
         'gcp-s3': "GCP Storage",
         'ibm-cos': "IBM COS",
         'yig': "YIG"
-    }
+    },
+    S3_HOST_IP: '',
+    S3_HOST_PORT: ''
 }

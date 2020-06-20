@@ -5,7 +5,7 @@ import { ObjectAclComponent } from './object-acl.component';
 import { RouterModule } from '@angular/router';
 import {DataTableModule, DropMenuModule, DialogModule, FormModule, InputTextModule, InputTextareaModule, 
   DropdownModule ,ConfirmationService,ConfirmDialogModule,CalendarModule,CheckboxModule, InputSwitchModule, 
-  TableModule,TabViewModule,ButtonModule,SpinnerModule } from '../../../../components/common/api';
+  TableModule,TabViewModule,ButtonModule,SpinnerModule, GrowlModule } from '../../../../components/common/api';
 
 
 import { HttpService } from '../../../../shared/service/Http.service';
@@ -39,7 +39,8 @@ let routers = [{
     CheckboxModule,
     InputSwitchModule,
     TableModule,
-    SpinnerModule
+    SpinnerModule,
+    GrowlModule
   ],
   exports: [ ObjectAclComponent ],
   providers: [
