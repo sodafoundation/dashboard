@@ -43,6 +43,8 @@ declare let X2JS:any;
     ]
 })
 export class BucketsComponent implements OnInit{
+    listedBackends: any;
+    selectedRegion: any;
     selectedBuckets=[];
     allBuckets = [];
     createBucketForm:FormGroup;
@@ -196,82 +198,76 @@ export class BucketsComponent implements OnInit{
         window['getAkSkList'](()=>{
             let requestMethod = "GET";
             let url = this.BucketService.url;
-            window['canonicalString'](requestMethod, url,()=>{
-                let options: any = {};
-                this.getSignature(options);
-                if(Object.keys(options).length > 0){
-                    this.showCreateBucket = false;
-                    this.BucketService.getBuckets(options).subscribe((res) => {
-                        let str = res._body;
-                        let x2js = new X2JS();
-                        let jsonObj = x2js.xml_str2json(str);
-                        let buckets = (jsonObj ? jsonObj.ListAllMyBucketsResult.Buckets:[]);
-                        if(Object.prototype.toString.call(buckets) === "[object Array]"){
-                            this.allBuckets = buckets;
-                        }else if(Object.prototype.toString.call(buckets) === "[object Object]"){
-                            this.allBuckets = [buckets];
-                        }
-                        this.allBuckets.forEach(item=>{
-                            item.name =item.Name;
-                            this.allBucketNameForCheck.push(item.Name);
-                            item.createdAt = Utils.formatDate(item.CreationDate);
-                            this.bucketOption.push({
-                                label:item.name,
-                                value:item.name
-                            });
-                            item.encryptionEnabled = item.SSEConfiguration.SSE.enabled.toLowerCase() == "true" ? true : false;
-                            item.versionEnabled = item.VersioningConfiguration.Status.toLowerCase() == "enabled" ? true : false;
+            let requestOptions: any;
+            let options: any = {};
+            requestOptions = window['getSignatureKey'](requestMethod, url);
+            options['headers'] = new Headers();
+            options = this.BucketService.getSignatureOptions(requestOptions, options);
+            if(Object.keys(options).length > 0){
+                this.showCreateBucket = false;
+                this.BucketService.getBuckets(options).subscribe((res) => {
+                    let str = res._body;
+                    let x2js = new X2JS();
+                    let jsonObj = x2js.xml_str2json(str);
+                    let buckets = (jsonObj ? jsonObj.ListAllMyBucketsResult.Buckets.Bucket:[]);
+                    if(Object.prototype.toString.call(buckets) === "[object Array]"){
+                        this.allBuckets = buckets;
+                    }else if(Object.prototype.toString.call(buckets) === "[object Object]"){
+                        this.allBuckets = [buckets];
+                    }
+                    this.allBuckets.forEach(item=>{
+                        item.name =item.Name;
+                        this.allBucketNameForCheck.push(item.Name);
+                        item.createdAt = Utils.formatDate(item.CreationDate);
+                        this.bucketOption.push({
+                            label:item.name,
+                            value:item.name
                         });
-                        this.initBucket2backendAnd2Type();
+                        item.encryptionEnabled = item.SSEConfiguration.SSE.enabled.toLowerCase() == "true" ? true : false;
+                        item.versionEnabled = item.VersioningConfiguration.Status.toLowerCase() == "enabled" ? true : false;
                     });
-                }else{
-                    this.showCreateBucket = true;
-                }
-            })
+                    this.initBucket2backendAnd2Type();
+                });
+            }else{
+                this.showCreateBucket = true;
+            }
         })
     }
-    //Request header with AK/SK authentication added
-    getSignature(options) {
-        let SignatureObjectwindow = window['getSignatureKey']();
-        if(Object.keys(SignatureObjectwindow.SignatureKey).length > 0){
-            let requestObject = this.BucketService.getSignatureOptions(SignatureObjectwindow, options);
-            options = requestObject['options'];
-            return options;
-        }
-    }
+   
     initBucket2backendAnd2Type(){
         window['getAkSkList'](()=>{
             let requestMethod = "GET";
             let url = this.BucketService.url;
-            window['canonicalString'](requestMethod, url,()=>{
-                let options: any = {};
-                this.getSignature(options);
-                this.BucketService.getBuckets(options).subscribe((res)=>{
-                    let str = res['_body'];
-                    let x2js = new X2JS();
-                    let jsonObj = x2js.xml_str2json(str);
-                    let buckets = (jsonObj ? jsonObj.ListAllMyBucketsResult.Buckets:[]);
-                    let allBuckets = [];
-                    if(Object.prototype.toString.call(buckets) === "[object Array]"){
-                        allBuckets = buckets;
-                    }else if(Object.prototype.toString.call(buckets) === "[object Object]"){
-                        allBuckets = [buckets];
-                    }
-                    Consts.BUCKET_BACKND.clear();
-                    Consts.BUCKET_TYPE.clear();
-                    this.http.get('v1/{project_id}/backends').subscribe((res)=>{
-                        let backends = res.json().backends ? res.json().backends :[];
-                        let backendsObj = {};
-                        backends.forEach(element => {
-                            backendsObj[element.name]= element.type;
-                        });
-                        allBuckets.forEach(item=>{
-                            Consts.BUCKET_BACKND.set(item.Name,item.LocationConstraint);
-                            Consts.BUCKET_TYPE.set(item.Name,backendsObj[item.LocationConstraint]);
-                        });
+            let requestOptions: any;
+            let options: any = {};
+            requestOptions = window['getSignatureKey'](requestMethod, url);
+            options['headers'] = new Headers();
+            options = this.BucketService.getSignatureOptions(requestOptions, options);
+            this.BucketService.getBuckets(options).subscribe((res)=>{
+                let str = res['_body'];
+                let x2js = new X2JS();
+                let jsonObj = x2js.xml_str2json(str);
+                let buckets = (jsonObj ? jsonObj.ListAllMyBucketsResult.Buckets.Bucket:[]);
+                let allBuckets = [];
+                if(Object.prototype.toString.call(buckets) === "[object Array]"){
+                    allBuckets = buckets;
+                }else if(Object.prototype.toString.call(buckets) === "[object Object]"){
+                    allBuckets = [buckets];
+                }
+                Consts.BUCKET_BACKND.clear();
+                Consts.BUCKET_TYPE.clear();
+                this.http.get('v1/{project_id}/backends').subscribe((res)=>{
+                    let backends = res.json().backends ? res.json().backends :[];
+                    let backendsObj = {};
+                    backends.forEach(element => {
+                        backendsObj[element.name]= element.type;
+                    });
+                    allBuckets.forEach(item=>{
+                        Consts.BUCKET_BACKND.set(item.Name,item.LocationConstraint);
+                        Consts.BUCKET_TYPE.set(item.Name,backendsObj[item.LocationConstraint]);
                     });
                 });
-            })
+            });
         })
     }
     getTypes() {
@@ -338,6 +334,7 @@ export class BucketsComponent implements OnInit{
         this.backendsOption = [];
         this.BucketService.getBackendsByTypeId(this.selectType).subscribe((res) => {
             let backends = res.json().backends ? res.json().backends :[];
+            this.listedBackends = backends;
             backends.forEach(element => {
                 this.backendsOption.push({
                     label: element.name,
@@ -357,6 +354,14 @@ export class BucketsComponent implements OnInit{
                 })
             });
         });
+    }
+    setRegion(){
+        let selectedBackend = this.createBucketForm.value.backend;
+        this.listedBackends.forEach( element =>{
+            if(element.name == selectedBackend){
+                this.selectedRegion = element.region;
+            }
+        })
     }
     versionControl(){
         this.enableVersion = this.createBucketForm.get('version').value;
@@ -381,32 +386,32 @@ export class BucketsComponent implements OnInit{
                     </CreateBucketConfiguration>`
         window['getAkSkList'](()=>{
             let requestMethod = "PUT";
-            let url = this.BucketService.url+"/"+this.createBucketForm.value.name;
-            window['canonicalString'](requestMethod, url,()=>{
-                let options: any = {};
-                this.getSignature(options);
-                options.headers.set('Content-Type','application/xml');
-                this.BucketService.createBucket(this.createBucketForm.value.name,xmlStr,options).subscribe((res)=>{
-                    this.createBucketDisplay = false;
-                    /* Add the PUT Encryption Call here before fetching the updated list of Buckets */
-                    if(this.enableEncryption){
-                        this.bucketEncryption();
-                    }
-                    if(this.enableVersion){
-                       this.enableBucketVersioning(this.createBucketForm.value.name);
-                    }
-                    if(!this.enableEncryption && !this.enableVersion){
-                        this.getBuckets();
-                    }
-                    this.msgs = [];
-                    this.msgs.push({severity: 'success', summary: 'Success', detail: 'Bucket has been created successfully.'});
-                    /* Call the getBuckets call in the success of the encryption call */
-                    
-                },(error)=>{
-                    this.msgs = [];
-                    this.msgs.push({severity: 'error', summary: "Error", detail: error._body});
-                }); 
-            })
+            let url = '/'+this.createBucketForm.value.name;
+            let requestOptions: any;
+            let options: any = {};
+            requestOptions = window['getSignatureKey'](requestMethod, url, '', encodeURIComponent(this.selectedRegion), '', xmlStr) ;
+            options['headers'] = new Headers();
+            options = this.BucketService.getSignatureOptions(requestOptions, options);
+            this.BucketService.createBucket(this.createBucketForm.value.name,requestOptions.body,options).subscribe((res)=>{
+            this.createBucketDisplay = false;
+            /* Add the PUT Encryption Call here before fetching the updated list of Buckets */
+            if(this.enableEncryption){
+                this.bucketEncryption();
+            }
+            if(this.enableVersion){
+                this.enableBucketVersioning(this.createBucketForm.value.name);
+            }
+            if(!this.enableEncryption && !this.enableVersion){
+                this.getBuckets();
+            }
+            this.msgs = [];
+            this.msgs.push({severity: 'success', summary: 'Success', detail: 'Bucket has been created successfully.'});
+            /* Call the getBuckets call in the success of the encryption call */
+            
+            },(error)=>{
+                this.msgs = [];
+                this.msgs.push({severity: 'error', summary: "Error", detail: error._body});
+            }); 
         })           
     }
 
@@ -437,20 +442,20 @@ export class BucketsComponent implements OnInit{
     </SSEConfiguration>`;
         window['getAkSkList'](()=>{
             let requestMethod = "PUT";
-            let url = this.BucketService.url+"/"+this.createBucketForm.value.name + "/?DefaultEncryption";
-            window['canonicalString'](requestMethod, url,()=>{
-                let options: any = {};
-                this.getSignature(options);
-                options.headers.set('Content-Type','application/xml');
-                this.BucketService.setEncryption(this.createBucketForm.value.name,encryptStr,options).subscribe((res)=>{
-                    if(this.enableVersion){
-                        this.enableBucketVersioning(this.createBucketForm.value.name);
-                        this.enableVersion = false;
-                    }
-                    this.getBuckets();
-                }, (error) => {
-                    console.log("Set encryption failed", error);
-                });
+            let url = '/'+this.createBucketForm.value.name + "/?DefaultEncryption";
+            let requestOptions: any;
+            let options: any = {};
+            requestOptions = window['getSignatureKey'](requestMethod, url, '', '', '', encryptStr) ;
+            options['headers'] = new Headers();
+            options = this.BucketService.getSignatureOptions(requestOptions, options);
+            this.BucketService.setEncryption(this.createBucketForm.value.name,encryptStr,options).subscribe((res)=>{
+                if(this.enableVersion){
+                    this.enableBucketVersioning(this.createBucketForm.value.name);
+                    this.enableVersion = false;
+                }
+                this.getBuckets();
+            }, (error) => {
+                console.log("Set encryption failed", error);
             });
         })
     }
@@ -467,25 +472,25 @@ export class BucketsComponent implements OnInit{
       </VersioningConfiguration>`
         window['getAkSkList'](()=>{
             let requestMethod = "PUT";
-            let url = this.BucketService.url+"/"+bucketName + "/?versioning";
-            window['canonicalString'](requestMethod, url,()=>{
-                let options: any = {};
-                this.getSignature(options);
-                options.headers.set('Content-Type','application/xml');
-                this.BucketService.setVersioning(bucketName, versionStr, options).subscribe(()=>{
-                    
-                    if(this.enableEncryption){
-                        this.bucketEncryption();
-                        this.enableEncryption=false;
-                    }
-                    this.msgs = [];
-                    this.msgs.push({severity: 'success', summary: 'Success', detail: 'Versioning enabled successfully.'});
-                    this.getBuckets();
-                }, (error) =>{
-                    console.log("Set versioning failed", error);
-                    this.msgs = [];
-                    this.msgs.push({severity: 'error', summary: 'Error', detail: "Enable versioning failed <br/>" + error});
-                });
+            let url = '/'+bucketName + "/?versioning";
+            let requestOptions: any;
+            let options: any = {};
+            requestOptions = window['getSignatureKey'](requestMethod, url, '', '', '', versionStr) ;
+            options['headers'] = new Headers();
+            options = this.BucketService.getSignatureOptions(requestOptions, options);
+            this.BucketService.setVersioning(bucketName, versionStr, options).subscribe(()=>{
+                
+                if(this.enableEncryption){
+                    this.bucketEncryption();
+                    this.enableEncryption=false;
+                }
+                this.msgs = [];
+                this.msgs.push({severity: 'success', summary: 'Success', detail: 'Versioning enabled successfully.'});
+                this.getBuckets();
+            }, (error) =>{
+                console.log("Set versioning failed", error);
+                this.msgs = [];
+                this.msgs.push({severity: 'error', summary: 'Error', detail: "Enable versioning failed <br/>" + error});
             });
         });
     }
@@ -497,26 +502,25 @@ export class BucketsComponent implements OnInit{
         this.confirmDialog([msg,header,acceptLabel,warming,"suspend"], bucketName);
     }
     suspendVersioning(bucketName){
-        console.log("Suspend Versioning", bucketName);
         let versionStr = `<VersioningConfiguration>
                                         <Status>Suspended</Status>
                                     </VersioningConfiguration>`
         window['getAkSkList'](()=>{
             let requestMethod = "PUT";
-            let url = this.BucketService.url+"/"+bucketName + "/?versioning";
-            window['canonicalString'](requestMethod, url,()=>{
-                let options: any = {};
-                this.getSignature(options);
-                options.headers.set('Content-Type','application/xml');
-                this.BucketService.suspendVersioning(bucketName, versionStr, options).subscribe(()=>{
-                    this.msgs = [];
-                    this.msgs.push({severity: 'success', summary: 'Success', detail: 'Versioning suspended successfully.'});
-                    this.getBuckets();
-                }, (error) =>{
-                    console.log("Suspend versioning failed", error);
-                    this.msgs = [];
-                    this.msgs.push({severity: 'error', summary: 'Error', detail: "Suspend versioning failed <br/>" + error});
-                });
+            let url = '/'+bucketName + "/?versioning";
+            let requestOptions: any;
+            let options: any = {};
+            requestOptions = window['getSignatureKey'](requestMethod, url, '', '', '', versionStr) ;
+            options['headers'] = new Headers();
+            options = this.BucketService.getSignatureOptions(requestOptions, options);
+            this.BucketService.suspendVersioning(bucketName, versionStr, options).subscribe(()=>{
+                this.msgs = [];
+                this.msgs.push({severity: 'success', summary: 'Success', detail: 'Versioning suspended successfully.'});
+                this.getBuckets();
+            }, (error) =>{
+                console.log("Suspend versioning failed", error);
+                this.msgs = [];
+                this.msgs.push({severity: 'error', summary: 'Error', detail: "Suspend versioning failed <br/>" + error});
             });
         });
         
@@ -540,43 +544,44 @@ export class BucketsComponent implements OnInit{
     deleteBucket(bucket){
         window['getAkSkList'](()=>{
             let requestMethod = "GET";
-            let url = this.BucketService.url + '/' + bucket.name;
-            window['canonicalString'](requestMethod, url,()=>{
-                let options: any = {};
-                this.getSignature(options);
-                this.BucketService.getBucketById(bucket.name,options).subscribe((res) => {
-                    let str = res._body;
-                    let x2js = new X2JS();
-                    let jsonObj = x2js.xml_str2json(str);
-                    let alldir = jsonObj.ListBucketResult.Contents ? jsonObj.ListBucketResult.Contents :[] ;
-                    if(alldir.length === 0){
-                        this.http.get(`v1/{project_id}/plans?bucketname=${bucket.name}`).subscribe((res)=>{
-                            let plans = res.json().plans ? res.json().plans : [];
-                            let planNames = plans.map((item)=> item.name);
-                            if(plans.length === 0){
-                                let msg = "<div>Are you sure you want to delete the Bucket ?</div><h3>[ "+ bucket.name +" ]</h3>";
-                                let header ="Delete";
-                                let acceptLabel = "Delete";
-                                let warming = true;
-                                this.confirmDialog([msg,header,acceptLabel,warming,"delete"], bucket);
-                            }else{
-                                let msg = `<div>The bucket has created the following migration task, 
-                                and removing the bucket will remove the migration task at the same time.</div>
-                                <h5>[${planNames}]</h5>
-                                <div>Are you sure you want to delete the Bucket?</div>
-                                <h3>[${bucket.name}]</h3>
-                                `;
-                                let header ="Delete";
-                                let acceptLabel = "Delete";
-                                let warming = true;
-                                this.confirmDialog([msg,header,acceptLabel,warming,"delete"], bucket,plans);
-                            }
-                        });
-                    }else{
-                        this.msg.info("The bucket cannot be deleted. please delete objects first.");
-                    }
-                }); 
-            })
+            let url = '/' + bucket.name;
+            let requestOptions: any;
+            let options: any = {};
+            requestOptions = window['getSignatureKey'](requestMethod, url);
+            options['headers'] = new Headers();
+            options = this.BucketService.getSignatureOptions(requestOptions, options);
+            this.BucketService.getBucketById(bucket.name,options).subscribe((res) => {
+                let str = res._body;
+                let x2js = new X2JS();
+                let jsonObj = x2js.xml_str2json(str);
+                let alldir = jsonObj.ListBucketResult.Contents ? jsonObj.ListBucketResult.Contents :[] ;
+                if(alldir.length === 0){
+                    this.http.get(`v1/{project_id}/plans?bucketname=${bucket.name}`).subscribe((res)=>{
+                        let plans = res.json().plans ? res.json().plans : [];
+                        let planNames = plans.map((item)=> item.name);
+                        if(plans.length === 0){
+                            let msg = "<div>Are you sure you want to delete the Bucket ?</div><h3>[ "+ bucket.name +" ]</h3>";
+                            let header ="Delete";
+                            let acceptLabel = "Delete";
+                            let warming = true;
+                            this.confirmDialog([msg,header,acceptLabel,warming,"delete"], bucket);
+                        }else{
+                            let msg = `<div>The bucket has created the following migration task, 
+                            and removing the bucket will remove the migration task at the same time.</div>
+                            <h5>[${planNames}]</h5>
+                            <div>Are you sure you want to delete the Bucket?</div>
+                            <h3>[${bucket.name}]</h3>
+                            `;
+                            let header ="Delete";
+                            let acceptLabel = "Delete";
+                            let warming = true;
+                            this.confirmDialog([msg,header,acceptLabel,warming,"delete"], bucket,plans);
+                        }
+                    });
+                }else{
+                    this.msg.info("The bucket cannot be deleted. please delete objects first.");
+                }
+            }); 
              
         })
         
@@ -601,18 +606,20 @@ export class BucketsComponent implements OnInit{
                                             });
                                         }
                                         window['getAkSkList'](()=>{
-                                            let requestMethod = "DELETE";
-                                            let url = this.BucketService.url + '/' + name;
-                                            window['canonicalString'](requestMethod, url,()=>{
+                                            
+                                                let requestMethod = "DELETE";
+                                                let url = '/' + name;
+                                                let requestOptions: any;
                                                 let options: any = {};
-                                                this.getSignature(options);
+                                                requestOptions = window['getSignatureKey'](requestMethod, url);
+                                                options['headers'] = new Headers();
+                                                options = this.BucketService.getSignatureOptions(requestOptions, options);
                                                 this.BucketService.deleteBucket(name,options).subscribe((res) => {
                                                     this.getBuckets();
                                                 },
                                                 error=>{
                                                     this.getBuckets();
                                                 });
-                                            })
                                         })
                                         break;
                         

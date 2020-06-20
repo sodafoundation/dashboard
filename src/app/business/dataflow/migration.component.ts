@@ -97,53 +97,49 @@ export class MigrationListComponent implements OnInit {
         window['getAkSkList'](()=>{
             let requestMethod = "GET";
             let url = this.BucketService.url;
-            window['canonicalString'](requestMethod, url,()=>{
-                //Request header with AK/SK authentication added
-                let SignatureObjectwindow = window['getSignatureKey']();
-                if(Object.keys(SignatureObjectwindow.SignatureKey).length > 0){
-                    let options: any = {};
-                    let requestObject = this.BucketService.getSignatureOptions(SignatureObjectwindow,options);
-                    options = requestObject['options'];
-                    this.BucketService.getBuckets(options).subscribe((res) => {
-                        let str = res._body;
-                        let x2js = new X2JS();
-                        let jsonObj = x2js.xml_str2json(str);
-                        let buckets = (jsonObj ? jsonObj.ListAllMyBucketsResult.Buckets:[]);
-                        let allBuckets = [];
-                        if(Object.prototype.toString.call(buckets) === "[object Array]"){
-                            allBuckets = buckets;
-                        }else if(Object.prototype.toString.call(buckets) === "[object Object]"){
-                            allBuckets = [buckets];
-                        }
-                        if(Consts.BUCKET_BACKND.size > 0 && Consts.BUCKET_TYPE.size > 0 ){
-                            allBuckets.forEach(item=>{
-                                this.bucketOption.push({
-                                            label:item.Name,
-                                            value:item.Name
-                                        });
-                            });
-                            this.getMigrations();
-                        }else{
-                            this.http.get('v1/{project_id}/backends').subscribe((res)=>{
-                                let backends = res.json().backends ? res.json().backends :[];
-                                let backendsObj = {};
-                                backends.forEach(element => {
-                                    backendsObj[element.name]= element.type;
-                                });
-                                allBuckets.forEach(item=>{
-                                    Consts.BUCKET_BACKND.set(item.Name,item.LocationConstraint);
-                                    Consts.BUCKET_TYPE.set(item.Name,backendsObj[item.LocationConstraint]);
-                                    this.bucketOption.push({
-                                        label:item.Name,
-                                        value:item.Name
-                                    });
-                                });
-                                this.getMigrations();
-                            });
-                        }
-                    }); 
+            let requestOptions: any;
+            let options: any = {};
+            requestOptions = window['getSignatureKey'](requestMethod, url);
+            options['headers'] = new Headers();
+            options = this.BucketService.getSignatureOptions(requestOptions, options);
+            this.BucketService.getBuckets(options).subscribe((res) => {
+                let str = res._body;
+                let x2js = new X2JS();
+                let jsonObj = x2js.xml_str2json(str);
+                let buckets = (jsonObj ? jsonObj.ListAllMyBucketsResult.Buckets.Bucket:[]);
+                let allBuckets = [];
+                if(Object.prototype.toString.call(buckets) === "[object Array]"){
+                    allBuckets = buckets;
+                }else if(Object.prototype.toString.call(buckets) === "[object Object]"){
+                    allBuckets = [buckets];
                 }
-            })
+                if(Consts.BUCKET_BACKND.size > 0 && Consts.BUCKET_TYPE.size > 0 ){
+                    allBuckets.forEach(item=>{
+                        this.bucketOption.push({
+                                    label:item.Name,
+                                    value:item.Name
+                                });
+                    });
+                    this.getMigrations();
+                }else{
+                    this.http.get('v1/{project_id}/backends').subscribe((res)=>{
+                        let backends = res.json().backends ? res.json().backends :[];
+                        let backendsObj = {};
+                        backends.forEach(element => {
+                            backendsObj[element.name]= element.type;
+                        });
+                        allBuckets.forEach(item=>{
+                            Consts.BUCKET_BACKND.set(item.Name,item.LocationConstraint);
+                            Consts.BUCKET_TYPE.set(item.Name,backendsObj[item.LocationConstraint]);
+                            this.bucketOption.push({
+                                label:item.Name,
+                                value:item.Name
+                            });
+                        });
+                        this.getMigrations();
+                    });
+                }
+            }); 
             
         })
         
