@@ -23,6 +23,10 @@ let _ = require("underscore");
 })
 export class AppComponent implements OnInit, AfterViewInit {
     selectFileName: string;
+
+    progressValue: number = 0;
+    downloadProgressValue: number = 0;
+
     chromeBrowser: boolean = false;
 
     isLogin: boolean;
@@ -261,6 +265,10 @@ export class AppComponent implements OnInit, AfterViewInit {
                 return item.id != id
             })
         }
+        this.downloadProgressValue = 0;
+        window['downloadProgress'] = (value) =>{
+            this.downloadProgressValue = value;
+        }
         window['startUpload'] = (selectFile, bucketId, options,folderId, cb) => {
             window['isUpload'] = true;
             this.showPrompt =  true;
@@ -351,13 +359,20 @@ export class AppComponent implements OnInit, AfterViewInit {
                                 cb();
                             }
                             uploadNum = 0;
+                            self.progressValue = 0;
                         } else {
                             self.showPrompt = false;
                             uploadNum = 0;
+                            self.progressValue = 0;
                             window['isUpload'] = false;
                             self.msg.error("Upload failed. The network may be unstable. Please try again later.");
                         }
                     };
+                    xhr.upload.onprogress = function(e){
+                        let done = e.loaded;
+                        let total =  e.total;
+                        self.progressValue = Math.floor(done/total*100)
+                    }
 
                     xhr.onerror = (err)=>{
                         console.log(err);
@@ -437,6 +452,11 @@ export class AppComponent implements OnInit, AfterViewInit {
                     obj['ETag'] = ETag && ETag? ETag : ""
                     window['uploadPartArr'].push(obj);
                     uploadNum = 0;
+                    /* upload progress */
+                    let done = i;
+                    let total =  chunks.length;
+                    this.progressValue = Math.floor(done/total*100)
+                    /* Upload progress */
                     if (i < (chunks.length - 1)) {
                         window['segmentUpload'](i + 1, chunks, blob, uploadId, options, bucketId, cb);
                     } else {
@@ -494,6 +514,7 @@ export class AppComponent implements OnInit, AfterViewInit {
                     this.showPrompt = false;
                     window['isUpload'] = false;
                     this.msg.success("Upload file ["+ blob.name +"] successfully.");
+                    this.progressValue = 0;
                     if (cb) {
                         cb();
                     }
@@ -504,6 +525,7 @@ export class AppComponent implements OnInit, AfterViewInit {
                     }else{
                         this.showPrompt = false;
                         uploadNum = 0;
+                        this.progressValue = 0;
                         window['isUpload'] = false;
                         window['getAkSkList'](()=>{
                             let requestMethod = "DELETE";
