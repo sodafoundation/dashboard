@@ -7,6 +7,7 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { SharedModule } from './shared/shared.module';
 import { DropMenuModule, SelectButtonModule, ButtonModule, InputTextModule } from './components/common/api';
+import { ProgressBarModule } from './components/progressbar/progressbar';
 import { LocationStrategy, HashLocationStrategy } from '@angular/common';
 import { BucketService } from './business/block/buckets.service';
 import { HttpService } from './shared/service/Http.service';
@@ -28,7 +29,8 @@ import { MessagesModule } from './components/messages/messages';
     DropMenuModule,
     SelectButtonModule,
     ButtonModule,
-    InputTextModule
+    InputTextModule,
+    ProgressBarModule,
   ],
   providers: [
       { provide: LocationStrategy, useClass: HashLocationStrategy }, BucketService, HttpService
