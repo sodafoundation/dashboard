@@ -20,17 +20,37 @@
 
 
 <div class="layout-wrapper" (mousemove)="refreshLastTime()" *ngIf="isLogin">
-    <div id="layout-topbar">
-        <div class="user-info">
-            <div>
-                <h1>{{ username }}</h1>
-                <p-dropmenu icon="fa-chevron-circle-down" [model]="dropMenuItems" styleClass="ui-dropmenu-large"></p-dropmenu>
+    <div id="layout-topbar" style="z-index: 1001;">
+        <div class="ui-g">
+            <div class="ui-g-12 menu-bar">
+                <div class="ui-g-2">
+                    <div class="logo">
+                        <a href="#" [routerLink]="['/home']"></a>
+                    </div>
+                </div>
+                <div class="ui-g-7">
+
+                </div>
+                <div class="ui-g-1">
+                    
+                </div>
+                <div class="ui-g-2">
+                    <div class="user-info">
+                        <div>
+                            <h1>Welcome {{ username }}</h1>
+                            <p-dropmenu  icon="fa-chevron-circle-down" [model]="dropMenuItems" styleClass="ui-dropmenu-large"></p-dropmenu>
+                        </div>
+                        <p><span><i class="fa fa-map-marker"></i>default_region</span><span *ngIf=" username!='admin' "><i class="fa fa-users"></i>{{ currentTenant }}</span></p>
+                        <a href="#" [routerLink]="[akSkRouterLink]"></a>
+                    </div>
+                </div>
             </div>
-            <p><span><i class="fa fa-map-marker"></i>default_region</span><span *ngIf=" username!='admin' "><i class="fa fa-users"></i>{{ currentTenant }}</span></p>
-            <a href="#" [routerLink]="[akSkRouterLink]"></a>
         </div>
+    </div>
+    <div id="layout-sidebar">
+       
         
-        <ul class="topbar-menu">
+        <ul class="sidebar-menu">
             <li *ngFor="let menuItem of menuItems">
                 <a href="#" [routerLink]="[menuItem.routerLink]" [ngClass]="{'active-item':menuItem==activeItem}" (click)="menuItemClick($event, menuItem)">
                     <h1>{{menuItem.title}}</h1>
@@ -39,9 +59,7 @@
             </li>
         </ul>
 
-        <div class="logo">
-            <a href="#" [routerLink]="['/']"></a>
-        </div>
+        
     </div>
 
     <div id="layout-content">
