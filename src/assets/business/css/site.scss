@@ -1855,7 +1855,10 @@ a {
     top: -15px;
 }
 /* custom breadcrumb end */
-
+.uploading-title, .downloading-title{
+    color: #333333;
+    font-size: 0.16rem;
+}
 
 .upload-dialog{
     .ui-dialog-content{
