@@ -153,7 +153,7 @@ export class BucketDetailComponent implements OnInit {
       item.source + '/' + item.Key;
       let sourceBucket = item.source;
       window['getAkSkList'](() => {
-        let requestMethod = "PUT";
+          let requestMethod = "PUT";
           let url = "/" + this.bucketId + '/' + key;
           let requestOptions: any;
           let options: any = {};
