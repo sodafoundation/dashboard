@@ -75,7 +75,7 @@ export class ObjectAclComponent implements OnInit {
                 
             }, (error) =>{
                 this.msgs = [];
-                this.msgs.push({severity: 'error', summary: "Error", detail: "Could not fetch Object ACL." + error._body});
+                this.msgs.push({severity: 'error', summary: "Error", detail: "Could not fetch Object ACL." + error});
                 console.log("Error. Something went wrong. Could not fetch Object ACL", error);
             })
         })
@@ -118,7 +118,7 @@ export class ObjectAclComponent implements OnInit {
                 this.getObjectAclList()
             }, (error) => {
                 this.msgs = [];
-                this.msgs.push({severity: 'error', summary: "Error", detail: "Could not create Object ACL." + error._body});
+                this.msgs.push({severity: 'error', summary: "Error", detail: "Could not create Object ACL." + error});
                 console.log("Could not create Object ACL. Something went wrong.", error);
             })
         })
