@@ -218,29 +218,30 @@ export class HomeComponent implements OnInit {
         window['getAkSkList'](()=>{
             let requestMethod = "GET";
             let url = this.BucketService.url;
-            window['canonicalString'](requestMethod, url, ()=>{
-                let options: any = {};
-                this.getSignature(options);
-                if(Object.keys(options).length > 0 ){
-                    this.BucketService.getBuckets(options).subscribe((res)=>{
-                        let str = res['_body'];
-                        let x2js = new X2JS();
-                        let jsonObj = x2js.xml_str2json(str);
-                        let buckets = (jsonObj ? jsonObj.ListAllMyBucketsResult.Buckets:[]);
-                        let allBuckets = [];
-                        if(Object.prototype.toString.call(buckets) === "[object Array]"){
-                            allBuckets = buckets;
-                        }else if(Object.prototype.toString.call(buckets) === "[object Object]"){
-                            allBuckets = [buckets];
-                        }
-                        this.getBuckend(allBuckets);
-                    }); 
-                }else{
+            let requestOptions: any;
+            let options: any = {};
+            requestOptions = window['getSignatureKey'](requestMethod, url);
+
+            options['headers'] = new Headers();
+            options = this.BucketService.getSignatureOptions(requestOptions, options);
+            if(Object.keys(options).length > 0 ){
+                this.BucketService.getBuckets(options).subscribe((res)=>{
+                    let str = res['_body'];
+                    let x2js = new X2JS();
+                    let jsonObj = x2js.xml_str2json(str);
+                    let buckets = (jsonObj ? jsonObj.ListAllMyBucketsResult.Buckets.Bucket:[]);
                     let allBuckets = [];
+                    if(Object.prototype.toString.call(buckets) === "[object Array]"){
+                        allBuckets = buckets;
+                    }else if(Object.prototype.toString.call(buckets) === "[object Object]"){
+                        allBuckets = [buckets];
+                    }
                     this.getBuckend(allBuckets);
-                }
-                 
-            });
+                }); 
+            }else{
+                let allBuckets = [];
+                this.getBuckend(allBuckets);
+            }
         }) 
     }
     getBuckend(allBuckets){

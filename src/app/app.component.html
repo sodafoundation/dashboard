@@ -20,17 +20,37 @@
 
 
 <div class="layout-wrapper" (mousemove)="refreshLastTime()" *ngIf="isLogin">
-    <div id="layout-topbar">
-        <div class="user-info">
-            <div>
-                <h1>{{ username }}</h1>
-                <p-dropmenu icon="fa-chevron-circle-down" [model]="dropMenuItems" styleClass="ui-dropmenu-large"></p-dropmenu>
+    <div id="layout-topbar" style="z-index: 1001;">
+        <div class="ui-g">
+            <div class="ui-g-12 menu-bar">
+                <div class="ui-g-2">
+                    <div class="logo">
+                        <a href="#" [routerLink]="['/home']"></a>
+                    </div>
+                </div>
+                <div class="ui-g-7">
+
+                </div>
+                <div class="ui-g-1">
+                    
+                </div>
+                <div class="ui-g-2">
+                    <div class="user-info">
+                        <div>
+                            <h1>Welcome {{ username }}</h1>
+                            <p-dropmenu  icon="fa-chevron-circle-down" [model]="dropMenuItems" styleClass="ui-dropmenu-large"></p-dropmenu>
+                        </div>
+                        <p><span><i class="fa fa-map-marker"></i>default_region</span><span *ngIf=" username!='admin' "><i class="fa fa-users"></i>{{ currentTenant }}</span></p>
+                        <a href="#" [routerLink]="[akSkRouterLink]"></a>
+                    </div>
+                </div>
             </div>
-            <p><span><i class="fa fa-map-marker"></i>default_region</span><span *ngIf=" username!='admin' "><i class="fa fa-users"></i>{{ currentTenant }}</span></p>
-            <a href="#" [routerLink]="[akSkRouterLink]"></a>
         </div>
+    </div>
+    <div id="layout-sidebar">
+       
         
-        <ul class="topbar-menu">
+        <ul class="sidebar-menu">
             <li *ngFor="let menuItem of menuItems">
                 <a href="#" [routerLink]="[menuItem.routerLink]" [ngClass]="{'active-item':menuItem==activeItem}" (click)="menuItemClick($event, menuItem)">
                     <h1>{{menuItem.title}}</h1>
@@ -39,9 +59,7 @@
             </li>
         </ul>
 
-        <div class="logo">
-            <a href="#" [routerLink]="['/']"></a>
-        </div>
+        
     </div>
 
     <div id="layout-content">
@@ -59,11 +77,20 @@
 </div>
 
 <div *ngIf="showPrompt" style="padding:15px 20px; z-index: 99999; line-height:18px;position: fixed;bottom: 10px;left:10px;background:rgba(255,255,255,0.75); border-radius: 5px; box-shadow:0 0 10px rgba(0,0,0,0.3);">
-    <span>Uploading file [ {{fileName}} ]</span>
+    <span class="uploading-title">Uploading file [ {{fileName}} ]</span>
+    <div class="ui-g">
+        <div class="ui-g-12">
+            <p-progressBar [value]="progressValue"></p-progressBar>
+        </div>
+    </div>
 </div> 
 <ul style=" z-index: 99999; line-height:18px;position: fixed;bottom: 10px;left:10px;">
     <li *ngFor="let downfile of downLoadArr;index as i" style="display: inline-block;  padding:15px; background:rgba(255,255,255,0.75); border-radius: 5px; box-shadow:0 0 10px rgba(0,0,0,0.3);">
-        <span *ngIf="i==0">downloading file</span>
-        <span>[ {{downfile.name}} ]</span>
+        <span class="downloading-title" *ngIf="i==0">downloading file [ {{downfile.name}} ]</span>
+        <div class="ui-g">
+            <div class="ui-g-12">
+                <p-progressBar [value]="downloadProgressValue"></p-progressBar>
+            </div>
+        </div>
     </li>
 </ul>
