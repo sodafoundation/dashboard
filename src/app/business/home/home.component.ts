@@ -295,7 +295,6 @@ export class HomeComponent implements OnInit {
         this.allBackends_count.azureblob = this.Allbackends['azure-blob'] ? this.Allbackends['azure-blob'].length :0;
         this.allBackends_count.huaweipub = this.Allbackends['hw-obs'] ? this.Allbackends['hw-obs'].length :0;
 
-        }
         if( this.Allbackends['ceph-s3']){
             this.allBackends_count.localBKD += this.Allbackends['ceph-s3'].length;
         }
