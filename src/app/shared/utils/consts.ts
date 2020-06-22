@@ -35,7 +35,7 @@ export const Consts = {
         "ceph-s3": "ceph.svg",
         "ibm-cos": "ibm.svg",
         "gcp-s3": "google.svg",
-        "yig": "yig.png"
+        "yig": "yig.png",
         'alibaba-oss': 'alibaba.svg'
     },
     CLOUD_TYPE_NAME: {
