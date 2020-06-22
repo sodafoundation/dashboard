@@ -223,7 +223,7 @@ export class LifeCycleComponent implements OnInit {
                         let lifeCycleAll = {
                             ObjectKey: lifeCycleArr.ID,
                             Status: lifeCycleArr.Status,
-                            prefix:lifeCycleArr.Filter.Prefix,
+                            prefix: lifeCycleArr.Filter && lifeCycleArr.Filter.Prefix ? lifeCycleArr.Filter.Prefix: '',
                             newPrefix: this.getLifeCyclePrefix(lifeCycleArr, dialog, cycle),
                             Rules: this.getLifeCycleRule(lifeCycleArr)
                         }
