@@ -24,11 +24,12 @@ export class HomeComponent implements OnInit {
     showBackends = false;
     allBackends_count={
         aws:0,
-        huaweipri:0,
+        azureblob:0,
         huaweipub:0,
         localBKD:0,
         ibmcos:0,
-        gcp:0
+        gcp:0,
+        alibaba:0
     }
     counts= {
         volumesCount:0,
@@ -54,7 +55,7 @@ export class HomeComponent implements OnInit {
             type: 'text',
             name: 'region',
             formControlName: 'region',
-            arr:['aws-s3','azure-blob','hw-obs','fusionstorage-object','ceph-s3','gcp-s3','ibm-cos']
+            arr:['aws-s3','azure-blob','hw-obs','fusionstorage-object','ceph-s3','gcp-s3','ibm-cos', 'alibaba-oss']
         },
         {
             label: 'Endpoint',
@@ -63,7 +64,7 @@ export class HomeComponent implements OnInit {
             type: 'text',
             name: 'endpoint',
             formControlName: 'endpoint',
-            arr:['aws-s3','azure-blob','hw-obs','fusionstorage-object','ceph-s3','gcp-s3','ibm-cos','yig']
+            arr:['aws-s3','azure-blob','hw-obs','fusionstorage-object','ceph-s3','gcp-s3','ibm-cos','yig', 'alibaba-oss']
         },
         {
             label: 'Bucket',
@@ -72,7 +73,7 @@ export class HomeComponent implements OnInit {
             type: 'text',
             name: 'bucket',
             formControlName: 'bucket',
-            arr:['aws-s3','azure-blob','hw-obs','fusionstorage-object','ceph-s3','gcp-s3','ibm-cos']
+            arr:['aws-s3','azure-blob','hw-obs','fusionstorage-object','ceph-s3','gcp-s3','ibm-cos', 'alibaba-oss']
         },
         {
             label: 'Access Key',
@@ -81,7 +82,7 @@ export class HomeComponent implements OnInit {
             type: 'text',
             name: 'accessKey',
             formControlName: 'ak',
-            arr:['aws-s3','azure-blob','hw-obs','fusionstorage-object','ceph-s3','gcp-s3','ibm-cos']
+            arr:['aws-s3','azure-blob','hw-obs','fusionstorage-object','ceph-s3','gcp-s3','ibm-cos', 'alibaba-oss']
         },
         {
             label: 'Secret Key',
@@ -90,7 +91,7 @@ export class HomeComponent implements OnInit {
             type: 'password',
             name: 'secretKey',
             formControlName: 'sk',
-            arr:['aws-s3','azure-blob','hw-obs','fusionstorage-object','ceph-s3','gcp-s3','ibm-cos']
+            arr:['aws-s3','azure-blob','hw-obs','fusionstorage-object','ceph-s3','gcp-s3','ibm-cos', 'alibaba-oss']
         },
     ]
 
@@ -102,6 +103,7 @@ export class HomeComponent implements OnInit {
     @ViewChild("cloud_hw_p") c_HWP: ElementRef;
     @ViewChild("svgCon") svgCon: ElementRef;
     @ViewChild("cloud_gcp") c_GCP: ElementRef;
+    @ViewChild("cloud_alibaba") c_AOS: ElementRef;
     
     scaleX = 1;
     scaleY = 1;
@@ -184,7 +186,7 @@ export class HomeComponent implements OnInit {
             that.scaleX = svgConW/240; 
             that.scaleY = 5;
 
-            let clouds = [that.c_GCP.nativeElement, that.c_HWP.nativeElement, that.c_IBMCOS.nativeElement, that.c_HW.nativeElement, that.c_AWS.nativeElement];
+            let clouds = [that.c_GCP.nativeElement, that.c_HWP.nativeElement, that.c_IBMCOS.nativeElement, that.c_AOS.nativeElement, that.c_HW.nativeElement, that.c_AWS.nativeElement];
             clouds.forEach((item, index) => {
                 let totalLength = that.path.nativeElement.getTotalLength();
                 let point = totalLength/clouds.length * (index+1) + moveX + initPos;
@@ -289,22 +291,24 @@ export class HomeComponent implements OnInit {
         },[]);
         this.Allbackends = result;
         this.allBackends_count.localBKD = 0;
-        this.allBackends_count.aws = this.Allbackends[this.cloud_type[0]] ? this.Allbackends[Consts.CLOUD_TYPE[0]].length :0;
-        this.allBackends_count.huaweipri = this.Allbackends[this.cloud_type[1]] ? this.Allbackends[Consts.CLOUD_TYPE[1]].length :0;
-        this.allBackends_count.huaweipub = this.Allbackends[this.cloud_type[2]] ? this.Allbackends[Consts.CLOUD_TYPE[2]].length :0;
-        if( this.Allbackends[this.cloud_type[3]]){
-            this.allBackends_count.localBKD += this.Allbackends[this.cloud_type[3]].length;
+        this.allBackends_count.aws = this.Allbackends['aws-s3'] ? this.Allbackends['aws-s3'].length :0;
+        this.allBackends_count.azureblob = this.Allbackends['azure-blob'] ? this.Allbackends['azure-blob'].length :0;
+        this.allBackends_count.huaweipub = this.Allbackends['hw-obs'] ? this.Allbackends['hw-obs'].length :0;
+
+        if( this.Allbackends['ceph-s3']){
+            this.allBackends_count.localBKD += this.Allbackends['ceph-s3'].length;
         }
-        if( this.Allbackends[this.cloud_type[4]]){
-            this.allBackends_count.localBKD += this.Allbackends[this.cloud_type[4]].length;
+        if( this.Allbackends['yig']){
+            this.allBackends_count.localBKD += this.Allbackends['yig'].length;
         }
-        if( this.Allbackends[this.cloud_type[7]]){
-            this.allBackends_count.localBKD += this.Allbackends[this.cloud_type[7]].length;
+        if( this.Allbackends['fusionstorage-object']){
+            this.allBackends_count.localBKD += this.Allbackends['fusionstorage-object'].length;
         }
 
 
-        this.allBackends_count.ibmcos = this.Allbackends[this.cloud_type[5]] ? this.Allbackends[Consts.CLOUD_TYPE[5]].length :0;
-        this.allBackends_count.gcp = this.Allbackends[this.cloud_type[6]] ? this.Allbackends[Consts.CLOUD_TYPE[6]].length :0;
+        this.allBackends_count.ibmcos = this.Allbackends['ibm-cos'] ? this.Allbackends['ibm-cos'].length :0;
+        this.allBackends_count.gcp = this.Allbackends['gcp-s3'] ? this.Allbackends['gcp-s3'].length :0;
+        this.allBackends_count.alibaba = this.Allbackends['alibaba-oss'] ? this.Allbackends['alibaba-oss'].length :0;
     }
 
     getType(){
