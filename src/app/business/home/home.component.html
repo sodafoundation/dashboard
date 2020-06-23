@@ -11,7 +11,7 @@
             <div (click)="showBackendsDetail()" class="cloud-center" >
                 <div class="ui-home-backend-count">{{allBackends_count.localBKD}}</div>
             </div>
-            <div #cloud_aws class="cloud" (click)="showBackendsDetail(cloud_type[0])">
+            <div #cloud_aws class="cloud" (click)="showBackendsDetail('aws-s3')">
                 <div class="ui-home-backend-count">{{allBackends_count.aws}}</div>
                 <div class="ui-home-backend-logo">
                     <img src="assets/business/images/common/aws.svg" width="64px"/>
@@ -20,8 +20,8 @@
                     <span>Amazon S3</span>
                 </div>
             </div>
-            <div #cloud_hw class="cloud" (click)="showBackendsDetail(cloud_type[1])">
-                <div class="ui-home-backend-count">{{allBackends_count.huaweipri}}</div>
+            <div #cloud_hw class="cloud" (click)="showBackendsDetail('azure-blob')">
+                <div class="ui-home-backend-count">{{allBackends_count.azureblob}}</div>
                 <div class="ui-home-backend-logo">
                     <img src="assets/business/images/common/azure.svg"  width="64px"/>
                 </div>
@@ -29,7 +29,7 @@
                     <span>Azure Storage</span>
                 </div>
             </div>            
-            <div #cloud_hw_p class="cloud" (click)="showBackendsDetail(cloud_type[2])">
+            <div #cloud_hw_p class="cloud" (click)="showBackendsDetail('hw-obs')">
                 <div class="ui-home-backend-count">{{allBackends_count.huaweipub}}</div>
                 <div class="ui-home-backend-logo">
                     <img src="assets/business/images/common/huawei.svg"  width="64px"/>
@@ -38,7 +38,7 @@
                     <span>Huawei</span>
                 </div>
             </div>
-            <div #cloud_ibmcos class="cloud" (click)="showBackendsDetail(cloud_type[5])">
+            <div #cloud_ibmcos class="cloud" (click)="showBackendsDetail('imb-cos')">
                 <div class="ui-home-backend-count">{{allBackends_count.ibmcos}}</div>
                 <div class="ui-home-backend-logo">
                     <img src="assets/business/images/common/ibm.svg"  width="64px"/>
@@ -47,13 +47,22 @@
                     <span>IBM COS</span>
                 </div>
             </div>
-            <div #cloud_gcp class="cloud" (click)="showBackendsDetail(cloud_type[6])">
+            <div #cloud_gcp class="cloud" (click)="showBackendsDetail('gcp-s3')">
                 <div class="ui-home-backend-count">{{allBackends_count.gcp}}</div>
                 <div class="ui-home-backend-logo">
                     <img src="assets/business/images/common/google.svg"  width="64px"/>
                 </div>
                 <div class="ui-home-backend-name">
                     <span>GCP</span>
+                </div>
+            </div>
+            <div #cloud_alibaba class="cloud" (click)="showBackendsDetail('alibaba-oss')">
+                <div class="ui-home-backend-count">{{allBackends_count.alibaba}}</div>
+                <div class="ui-home-backend-logo">
+                    <img src="assets/business/images/common/alibaba-cloud.png"  width="64px"/>
+                </div>
+                <div class="ui-home-backend-name">
+                    <span>Alibaba Object Storage</span>
                 </div>
             </div>
         </div>
@@ -104,7 +113,7 @@
             </p-card>
         </div>
     </div>
-    <p-dialog  header="Modify" [(visible)]="modifyBackendshow" [width]="600" modal="modal">
+    <p-dialog styleClass="modify-backend-dialog" header="Modify" [(visible)]="modifyBackendshow" [width]="600" modal="modal">
         <form [grid]="{label: 'ui-g-3', content:'ui-g-20'}" [formGroup]="modifyBackendForm" [errorMessage]="errorMessage">
             <form-item label="Access Key" [required]="true">
                 <input type="text" pInputText formControlName="ak" />
@@ -121,7 +130,7 @@
 </div>
 
 
-<p-home-dialog header="Register Storage Backend" [(visible)]="showRegisterFlag" [width]="510" [height]="790" modal="modal" [style]="{'opacity':'0.95','right':'46px','top':'80px','background':'rgb(44,63,97)'}" >
+<p-home-dialog  styleClass="register-backend-dialog" header="Register Storage Backend" [(visible)]="showRegisterFlag" [width]="510" [height]="790" modal="modal" [style]="{'opacity':'0.95','right':'46px','top':'80px','background':'rgb(44,63,97)'}" >
         <form [grid]="{label: 'ui-g-5', content:'ui-g-20'}" [formGroup]="backendForm" [errorMessage]="errorMessage">
             <form-item label="Name" [required]="true">
                 <input id="name" type="text" name="name" formControlName="name"  pInputText />
@@ -137,7 +146,7 @@
             <button type="button" class="ui-button-secondary" pButton (click)="createBackend()" label="{{I18N.keyID['ok']}}" ></button>
         </div>
 </p-home-dialog>
-<p-home-dialog header="Storage Backends" [(visible)]="showBackends" [width]="710" [height]="790" modal="modal" [style]="{'opacity':'0.8','right':'46px','top':'80px','background':'rgb(44,63,97)'}" >
+<p-home-dialog styleClass="show-all-backend-dialog" header="Storage Backends" [(visible)]="showBackends" [width]="710" [height]="790" modal="modal" [style]="{'opacity':'0.8','right':'46px','top':'80px','background':'rgb(44,63,97)'}" >
     <p-dataTable id="home-backend-detail" [value]="typeDetail" [rows]="10">
         <p-column field="name" header="{{I18N.keyID['sds_block_volume_name']}}" ></p-column>
         <p-column field="typeName" header="Type" ></p-column>
