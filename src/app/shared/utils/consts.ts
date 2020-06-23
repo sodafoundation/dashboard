@@ -26,7 +26,7 @@ export const Consts = {
     BUCKET_TYPE:new Map<string,string>(),
     BYTES_PER_CHUNK : 1024 * 1024 * 5,
     TIMEOUT: 30 * 60 * 1000,
-    CLOUD_TYPE:['aws-s3','azure-blob','hw-obs','fusionstorage-object','ceph-s3','ibm-cos','gcp-s3', 'yig'],
+    CLOUD_TYPE:['aws-s3','azure-blob','hw-obs','fusionstorage-object','ceph-s3','ibm-cos','gcp-s3', 'yig', 'alibaba-oss'],
     TYPE_SVG:{
         "aws-s3":'aws.svg',
         "hw-obs":"huawei.svg",
@@ -35,7 +35,8 @@ export const Consts = {
         "ceph-s3": "ceph.svg",
         "ibm-cos": "ibm.svg",
         "gcp-s3": "google.svg",
-        "yig": "yig.png"
+        "yig": "yig.png",
+        'alibaba-oss': 'alibaba.svg'
     },
     CLOUD_TYPE_NAME: {
         'aws-s3': 'AWS S3',
@@ -45,7 +46,8 @@ export const Consts = {
         'ceph-s3': "Ceph S3",
         'gcp-s3': "GCP Storage",
         'ibm-cos': "IBM COS",
-        'yig': "YIG"
+        'yig': "YIG Ceph",
+        'alibaba-oss' : "Alibaba Object Storage",
     },
     S3_HOST_IP: '',
     S3_HOST_PORT: ''
