@@ -13,20 +13,19 @@ export class CloudFileShareService {
 
     //get fileShareList
     getAllFileShares():Observable<any>{
+        //return this.http.get('../../../../assets/data/cloud-file-share-data.json');
         return this.http.get(this.url);
     }
 
     //get fileShareList by backend
     getFileSharesByBackend(backend):Observable<any>{
-        let getUrl =  'v1/{project_id}/backends/' + backend + '/file/shares'
+        let getUrl =  'v1/{project_id}/file/shares/?backendId=' + backend + '/sync'
         return this.http.get(this.url);
     }
 
     //create fileShare
-    createFileShare(param, backend){
-        console.log("Inside create cloud file share", param, backend)
-        let createUrl = 'v1/{project_id}/backends/' + backend + '/file/shares'
-        return this.http.post(createUrl,param);
+    createFileShare(param){
+        return this.http.post(this.url,param);
     }
 
     //update fileShare

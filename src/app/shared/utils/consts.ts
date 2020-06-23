@@ -53,8 +53,8 @@ export const Consts = {
         'ibm-cos': "IBM COS",
         'yig': "YIG Ceph",
         'alibaba-oss' : "Alibaba Object Storage",
-        'aws-file' : 'AWS Storage',
-        'azure-file' : 'Azure Storage'
+        'aws-file' : 'AWS File Service',
+        'azure-file' : 'Azure File Service'
     },
     S3_HOST_IP: '',
     S3_HOST_PORT: ''

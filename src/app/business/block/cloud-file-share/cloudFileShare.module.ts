@@ -6,8 +6,8 @@ import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { ButtonModule, DataTableModule, DropMenuModule, DialogModule, FormModule, InputTextModule, InputTextareaModule, DropdownModule , ConfirmationService,ConfirmDialogModule, MultiSelectModule, GrowlModule } from '../../../components/common/api';
 import { HttpService } from '../../../shared/service/Http.service';
 
-import { CloudFileShareComponent } from './cloudFileShare.component';
-import { CloudFileShareService} from './cloudFileShare.service';
+import { CloudFileShareComponent } from './cloud-file-share.component';
+import { CloudFileShareService} from './cloud-file-share.service';
 
 
 

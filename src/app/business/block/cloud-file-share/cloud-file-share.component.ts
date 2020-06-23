@@ -5,18 +5,22 @@ import { ConfirmationService, ConfirmDialogModule, MenuItem, Message} from '../.
 import { trigger, state, style, transition, animate} from '@angular/animations';
 import { I18nPluralPipe } from '@angular/common';
 import { FormGroup, Validators, FormBuilder, FormControl } from '@angular/forms';
-import { CloudFileShareService} from './cloudFileShare.service';
-import { ProfileService } from '../../profile/profile.service';
+import { CloudFileShareService} from './cloud-file-share.service';
+import { BucketService } from '../buckets.service';
 
 let _ = require("underscore");
 @Component({
     selector: 'app-cloud-file-share',
-    templateUrl: './cloudFileShare.component.html',
+    templateUrl: './cloud-file-share.component.html',
     styleUrls: [],
     providers: [ConfirmationService, MsgBoxService ]
 })
 export class CloudFileShareComponent implements OnInit{
-    allFileShares: any;
+    allFileShares: any = [];
+    allBackends: any = [];
+    allAWSFileShares: any = [];
+    allAzureFileShares: any = [];
+    selectedBackends = [];
     selectedFileShares = [];
     selectedFileShare: any;
     msgs: Message[];
@@ -32,20 +36,39 @@ export class CloudFileShareComponent implements OnInit{
         region: "Region",
         status: "Status",
         availabilityZone: "Availability Zone",
-        tags: "Tags"
+        tags: "Tags",
+        metadata: "Metadata"
     };
 
     constructor(private cloudFS: CloudFileShareService,
+        private ActivatedRoute: ActivatedRoute,
         public I18N:I18NService,
         private http: HttpService,
         private fb: FormBuilder,
         private msg: MsgBoxService,
-        private confirmationService: ConfirmationService)
-        {}
+        private confirmationService: ConfirmationService,
+        private bucketService: BucketService)
+        {
+            this.msgs = [];
+            this.ActivatedRoute.queryParamMap.subscribe(params => {
+                let message = params.get('message');
+                if(message){
+                    this.msgs.push(JSON.parse(message));
+                }
+            });
+        }
 
     ngOnInit(){
+        this.getBackends();
         this.getFileShares();
         this.menuDeleDisableItems = [
+            {
+                "label": this.I18N.keyID['sds_block_volume_modify'],
+                command: () => {
+                    this.modifyFileshare(this.selectedFileShare);
+                },
+                disabled:false
+            },
             {
                 "label": this.I18N.keyID['sds_block_volume_delete'],
                 command: () => {
@@ -56,35 +79,57 @@ export class CloudFileShareComponent implements OnInit{
         ];
         this.menuItems = [
             {
+                "label": this.I18N.keyID['sds_block_volume_modify'],
+                command: () => {
+                    this.modifyFileshare(this.selectedFileShare);
+                },
+                disabled:false
+            },
+            {
                 "label": this.I18N.keyID['sds_block_volume_delete'],
                 command: () => {
                     this.batchDelete(this.selectedFileShare);
                 },
                 disabled:false
             }
+            
         ];
     }
 
-    getFileShares(){
-        this.cloudFS.getAllFileShares().subscribe((res) => {
-
-            let shares = res.json();
-            if(_.isArray(shares)){
-                this.allFileShares = shares;
-            } else{
-                this.allFileShares = [shares];
-            }
-            this.allFileShares.forEach(element => {
-                if(!element['tags']){
-                    element['tags'] = [];
+    getBackends() {
+        this.http.get('v1/{project_id}/backends').subscribe((res)=>{
+            this.allBackends = res.json().backends ? res.json().backends :[];
+            this.allBackends.forEach(element => {
+                if(element.type == 'aws-file' || element.type == 'azure-file'){
+                    this.selectedBackends.push(element);
                 }
             });
+        });
+    }
+
+    getFileShares(){
+        
+        this.cloudFS.getAllFileShares().subscribe((res) => {
+            let shares = res.json() && res.json().fileshares ? res.json().fileshares : [];
+            this.allFileShares = shares;
+           
+            if(this.allFileShares.length){
+                this.allFileShares.forEach(element => {
+                    if(!element['tags']){
+                        element['tags'] = [];
+                    }
+                  
+                });
+            }
         }, (error) => {
             console.log("Something went wrong. Error fetching file shares", error);
         })
     }
-    
+
     createFileShare(){
+
+    }
+    modifyFileshare(fileShare){
 
     }
     returnSelectedFileShare(selectedFileShare){
@@ -125,7 +170,7 @@ export class CloudFileShareComponent implements OnInit{
             this.getFileShares();
         }, (error)=>{
             this.msgs = [];
-            this.msgs.push({severity: 'error', summary: 'Error', detail: 'Error deleting Fileshare' + error._body});
+            this.msgs.push({severity: 'error', summary: 'Error', detail: 'Error deleting Fileshare'});
         });
     }
 }

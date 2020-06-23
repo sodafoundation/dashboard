@@ -18,6 +18,11 @@
         <p-column selectionMode="multiple" [style]="{'width': '30px'}"></p-column>
         <p-column field="name" header="Name"></p-column>
         <p-column field="backend" header="Backend"></p-column>
+        <p-column field="status" header="Status">
+            <ng-template pTemplate="body" let-fileshare="rowData">
+                {{fileshare.status}}
+            </ng-template>
+        </p-column>
         <p-column field="createdAt" header="Created At">
             <ng-template pTemplate="body" let-fileshare="rowData">
                 <span>{{fileshare.createdAt ? (fileshare.createdAt | date:'long') : '--'}}</span>
@@ -105,6 +110,17 @@
                 </div>
                 <div class="ui-grid-row volume-basic-item-class">
                     <p-dataTable [value]="fileshare.tags">
+                        <p-column field="key" header="Key"></p-column>
+                        <p-column field="value" header="Value"></p-column>
+                    </p-dataTable>
+                </div>
+                <div class="ui-grid-row volume-basic-item-class">
+                    <div class="ui-grid-col-12">
+                        {{label.metadata}}:
+                    </div>
+                </div>
+                <div class="ui-grid-row volume-basic-item-class">
+                    <p-dataTable [value]="fileshare.metadataArr">
                         <p-column field="key" header="Key"></p-column>
                         <p-column field="value" header="Value"></p-column>
                     </p-dataTable>

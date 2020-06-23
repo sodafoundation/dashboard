@@ -2,17 +2,17 @@ import { NgModule, APP_INITIALIZER } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 
-import { CloudFileShareCreateComponent } from './cloudFileShareCreate.component';
+import { CloudFileShareCreateComponent } from './cloud-file-share-create.component';
 
 import { RouterModule } from '@angular/router';
 import {DataTableModule, DropMenuModule, DialogModule, FormModule, InputTextModule, InputTextareaModule, 
   DropdownModule ,ConfirmationService,ConfirmDialogModule,CalendarModule,CheckboxModule, InputSwitchModule, 
-  TableModule,TabViewModule, ButtonModule, SpinnerModule } from '../../../../components/common/api';
+  TableModule,TabViewModule, ButtonModule, SpinnerModule, GrowlModule } from '../../../../components/common/api';
 import { HttpService } from '../../../../shared/service/Http.service';
 import { AvailabilityZonesService } from '../../../resource/resource.service';
 import { ProfileService } from '../../../profile/profile.service';
 import { FileShareService } from '../../fileShare.service';
-import { CloudFileShareService } from '../cloudFileShare.service';
+import { CloudFileShareService } from '../cloud-file-share.service';
 
 let routers = [{
     path: '',
@@ -44,7 +44,8 @@ let routers = [{
     CheckboxModule,
     InputSwitchModule,
     TableModule,
-    SpinnerModule
+    SpinnerModule,
+    GrowlModule
   ],
   exports: [ CloudFileShareCreateComponent ],
   providers: [

@@ -1,3 +1,4 @@
+<p-growl [value]="msgs" [sticky]="false" [life]="6000"></p-growl>
 <div class="content-header">
     <h1>{{i18n.keyID['sds_creatFileShare']}}</h1>
 </div>
@@ -7,10 +8,7 @@
         <p-dropdown [style]="{'min-width':'150px','width':'220px'}" placeholder="Please select" [options]="allTypes" (onChange)="getBackendsByTypeId()" name='selectType' [(ngModel)]='selectType' formControlName="backend_type"></p-dropdown>
     </form-item>
     <form-item label="{{label.backend}}" [required]="true">
-        <p-dropdown [style]="{'min-width':'150px','width':'220px'}" placeholder="Please select" [options]="backendsOption" (onChange)="setRegion()" formControlName="backend"></p-dropdown>
-    </form-item>
-    <form-item [required]="true" label="{{label.zone}}">
-        <p-dropdown [options]="availabilityZones" formControlName="zone" [style]="{'min-width':96}" placeholder="Please choose"></p-dropdown>
+        <p-dropdown [style]="{'min-width':'150px','width':'220px'}" placeholder="Please select" [options]="backendsOption" (onChange)="updateFormAndRegion()" formControlName="backend"></p-dropdown>
     </form-item>
     <form-item [required]="true" label="{{label.name}}">
         <input formControlName="name" type="text" size="30" pInputText [maxlength]="128" [minlength]="2"> 
@@ -18,11 +16,11 @@
     <form-item label="{{label.description}}">
         <textarea [rows]="5" [cols]="30" pInputTextarea formControlName="description" [maxlength]="250"></textarea>
     </form-item>
-    <form-item label="Enable Encryption?" >
+    <form-item *ngIf="cloudFileShareCreateForm.controls['encrypted']" label="Enable Encryption?" >
         <p-inputSwitch formControlName="encrypted" onLabel="Yes" offLabel="No" (onChange)="encryptionControl()"></p-inputSwitch>
     </form-item>
     
-    <form-item  label="{{label.encryptionSettings}}">
+    <form-item *ngIf="cloudFileShareCreateForm.controls['encryptionSettings'] && isVisible"  label="{{label.encryptionSettings}}">
         
         <div  class="encryption-settings-array" formArrayName="encryptionSettings"
             *ngFor="let item of cloudFileShareCreateForm.get('encryptionSettings')['controls']; let i = index">
@@ -46,10 +44,10 @@
         </div>
         
     </form-item>
-    <form-item label="{{label.size}}">
-        <p-spinner formControlName="size" [min]="1" [max]="512"></p-spinner><span class="size-symbol">GiB</span>
+    <form-item *ngIf="cloudFileShareCreateForm.controls['size']" label="{{label.size}}">
+        <input formControlName="size" type="text" size="30" pInputText> 
     </form-item>
-    <form-item [required]="true" label="{{label.tags}}">
+    <form-item *ngIf="cloudFileShareCreateForm.controls['tags']" [required]="true" label="{{label.tags}}">
         <a class="add-tag" (click)="addNextTag()"><i class="fa fa-plus-circle" ></i></a>
         <div class="tag-array" formArrayName="tags"
             *ngFor="let item of cloudFileShareCreateForm.get('tags')['controls']; let i = index">
@@ -74,7 +72,7 @@
         
     </form-item>
 
-    <form-item [required]="true" label="{{label.metadata}}">
+    <form-item *ngIf="cloudFileShareCreateForm.controls['metadata']" [required]="true" label="{{label.metadata}}">
         <a class="add-metadata" (click)="addNextMetadata()"><i class="fa fa-plus-circle" ></i></a>
         <div class="metadata-array" formArrayName="metadata"
             *ngFor="let item of cloudFileShareCreateForm.get('metadata')['controls']; let i = index">
@@ -91,7 +89,12 @@
                 </div>
                 <div class="ui-g-12 ui-md-2 ui-md-offset-1">
                     <div class="ui-inputgroup">
-                        <a disabled="cloudFileShareCreateForm.get('metadata')['length'] > 1" class="remove-metadata" (click)="removeMetadataLink(i)"><i class="fa fa-minus-circle"></i></a>     
+                        <a *ngIf="(key != 'PerformanceMode') || (key != 'ThroughputMode') || (key != 'ProvisionedThroughputInMibps')" 
+                            disabled="cloudFileShareCreateForm.get('metadata')['length'] > 1" 
+                            class="remove-metadata" 
+                            (click)="removeMetadataLink(i)">
+                            <i class="fa fa-minus-circle"></i>
+                        </a>     
                     </div>
                 </div>
             </div>

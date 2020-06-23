@@ -2,6 +2,7 @@ import { Component, OnInit, ViewContainerRef, ViewChild, Directive, ElementRef, 
 import { Http, Headers } from '@angular/http';
 import { Router } from '@angular/router';
 import { I18NService, Consts, ParamStorService, MsgBoxService, Utils, HttpService } from 'app/shared/api';
+import { Button } from 'app/components/button/button';
 import { I18nPluralPipe } from '@angular/common';
 import { MenuItem, SelectItem} from './components/common/api';
 import { akSkService } from './business/ak-sk/ak-sk.service';
