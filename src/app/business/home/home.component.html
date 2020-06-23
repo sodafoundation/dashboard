@@ -11,7 +11,7 @@
             <div joyrideStep="homeAllBackends" stepPosition="bottom" text="Click here to view all Other Backends (YIG, CEPH, and other File Storage)" (click)="showBackendsDetail()" class="cloud-center" >
                 <div class="ui-home-backend-count">{{allBackends_count.localBKD}}</div>
             </div>
-            <div joyrideStep="homeAWSBackends" stepPosition="left" text="Click here to view all AWS S3 Backends" #cloud_aws class="cloud" (click)="showBackendsDetail(cloud_type[0])">
+            <div joyrideStep="homeAWSBackends" stepPosition="left" text="Click here to view all AWS S3 Backends" #cloud_aws class="cloud" (click)="showBackendsDetail('aws-s3')">
                 <div class="ui-home-backend-count">{{allBackends_count.aws}}</div>
                 <div class="ui-home-backend-logo">
                     <img src="assets/business/images/common/aws.svg" width="64px"/>
@@ -20,7 +20,8 @@
                     <span>Amazon S3</span>
                 </div>
             </div>
-            <div joyrideStep="homeAzureBackends" stepPosition="left" text="Click here to view all Azure Backends" #cloud_hw class="cloud" (click)="showBackendsDetail(cloud_type[1])">
+
+            <div joyrideStep="homeAzureBackends" stepPosition="left" text="Click here to view all Azure Backends" #cloud_hw class="cloud" (click)="showBackendsDetail('azure-blob')">
                 <div class="ui-home-backend-count">{{allBackends_count.huaweipri}}</div>
                 <div class="ui-home-backend-logo">
                     <img src="assets/business/images/common/azure.svg"  width="64px"/>
@@ -29,7 +30,8 @@
                     <span>Azure Storage</span>
                 </div>
             </div>            
-            <div joyrideStep="homeHuaweiBackends" stepPosition="left" text="Click here to view all Huawei Backends" #cloud_hw_p class="cloud" (click)="showBackendsDetail(cloud_type[2])">
+
+            <div joyrideStep="homeHuaweiBackends" stepPosition="left" text="Click here to view all Huawei Backends" #cloud_hw_p class="cloud" (click)="showBackendsDetail(hw-obs')">
                 <div class="ui-home-backend-count">{{allBackends_count.huaweipub}}</div>
                 <div class="ui-home-backend-logo">
                     <img src="assets/business/images/common/huawei.svg"  width="64px"/>
@@ -38,7 +40,9 @@
                     <span>Huawei</span>
                 </div>
             </div>
-            <div joyrideStep="homeIBMBackends" stepPosition="left" text="Click here to view all IBM Backends" #cloud_ibmcos class="cloud" (click)="showBackendsDetail(cloud_type[5])">
+
+            <div joyrideStep="homeIBMBackends" stepPosition="left" text="Click here to view all IBM Backends" #cloud_ibmcos class="cloud" (click)="showBackendsDetail('imb-cos')">
+
                 <div class="ui-home-backend-count">{{allBackends_count.ibmcos}}</div>
                 <div class="ui-home-backend-logo">
                     <img src="assets/business/images/common/ibm.svg"  width="64px"/>
@@ -47,13 +51,23 @@
                     <span>IBM COS</span>
                 </div>
             </div>
-            <div joyrideStep="homeGCPBackends" stepPosition="left" text="Click here to view all GCP Backends" #cloud_gcp class="cloud" (click)="showBackendsDetail(cloud_type[6])">
+
+            <div joyrideStep="homeGCPBackends" stepPosition="left" text="Click here to view all GCP Backends" #cloud_gcp class="cloud" (click)="showBackendsDetail('gcp-s3')">
                 <div class="ui-home-backend-count">{{allBackends_count.gcp}}</div>
                 <div class="ui-home-backend-logo">
                     <img src="assets/business/images/common/google.svg"  width="64px"/>
                 </div>
                 <div class="ui-home-backend-name">
                     <span>GCP</span>
+                </div>
+            </div>
+            <div #cloud_alibaba class="cloud" (click)="showBackendsDetail('alibaba-oss')">
+                <div class="ui-home-backend-count">{{allBackends_count.alibaba}}</div>
+                <div class="ui-home-backend-logo">
+                    <img src="assets/business/images/common/alibaba-cloud.png"  width="64px"/>
+                </div>
+                <div class="ui-home-backend-name">
+                    <span>Alibaba Object Storage</span>
                 </div>
             </div>
         </div>
