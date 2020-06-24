@@ -87,7 +87,7 @@ export class AppComponent implements OnInit, AfterViewInit {
             "description": "Profiles",
             "routerLink": "/profile",
             "joyrideStep" : "menuProfile",
-            "text" : "A profile is a set of configurations on service capabilities (including resource tuning, QoS) of storage resources. A profile must be specified when volume is created."
+            "text" : "A profile is a set of configurations on service capabilities (including resource tuning, QoS) of storage resources. A profile must be specified when volume or fileshare is created."
         },
         {
             "title": "Resource",
