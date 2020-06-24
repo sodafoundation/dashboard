@@ -711,6 +711,10 @@ export class AppComponent implements OnInit, AfterViewInit {
     }
     /* Joyride ends */
 
+    openUserGuide(){
+        this.isHomePage = false;
+        this.router.navigate(['/help']);
+    }
     checkTimeOut() {
         this.currentTime = new Date().getTime(); //update current time
         let timeout = this.paramStor.TOKEN_PERIOD() ? this.paramStor.TOKEN_PERIOD() : this.defaultExpireTime;
