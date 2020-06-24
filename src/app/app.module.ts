@@ -11,6 +11,7 @@ import { ProgressBarModule } from './components/progressbar/progressbar';
 import { LocationStrategy, HashLocationStrategy } from '@angular/common';
 import { BucketService } from './business/block/buckets.service';
 import { HttpService } from './shared/service/Http.service';
+import { JoyrideModule } from 'ngx-joyride';
 
 import { MessagesModule } from './components/messages/messages';
 
@@ -26,6 +27,7 @@ import { MessagesModule } from './components/messages/messages';
     HttpModule,
     BrowserAnimationsModule,
     SharedModule.forRoot(),
+    JoyrideModule.forRoot(),
     DropMenuModule,
     SelectButtonModule,
     ButtonModule,

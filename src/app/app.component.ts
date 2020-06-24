@@ -2,11 +2,13 @@ import { Component, OnInit, ViewContainerRef, ViewChild, Directive, ElementRef, 
 import { Http, Headers } from '@angular/http';
 import { Router } from '@angular/router';
 import { I18NService, Consts, ParamStorService, MsgBoxService, Utils, HttpService } from 'app/shared/api';
+import { Button } from 'app/components/button/button';
 import { I18nPluralPipe } from '@angular/common';
 import { MenuItem, SelectItem} from './components/common/api';
 import { akSkService } from './business/ak-sk/ak-sk.service';
 import { BucketService } from './business/block/buckets.service';
 import * as aws4 from "ngx-aws4";
+import { JoyrideService } from 'ngx-joyride';
 
 let d3 = window["d3"];
 declare let X2JS: any;
@@ -70,37 +72,50 @@ export class AppComponent implements OnInit, AfterViewInit {
     canonicalString = "";
 
     menuItems = [];
+    tourSteps = [];
 
     menuItems_tenant = [
         {
             "title": "Home",
             "description": "Resource statistics",
-            "routerLink": "/home"
+            "routerLink": "/home",
+            "joyrideStep" : "menuHome",
+            "text" : "This page shows you the overall view of the backends available, volumes provisioned, buckets created and object storage migrations performed."
         },
         {
             "title": "Profile",
             "description": "Profiles",
-            "routerLink": "/profile"
+            "routerLink": "/profile",
+            "joyrideStep" : "menuProfile",
+            "text" : "A profile is a set of configurations on service capabilities (including resource tuning, QoS) of storage resources. A profile must be specified when volume or fileshare is created."
         },
         {
             "title": "Resource",
             "description": "Volumes / Buckets / File Share / Hosts",
-            "routerLink": "/block"
+            "routerLink": "/block",
+            "joyrideStep" : "menuResource",
+            "text" : "View and manage Buckets, Volumes, Volume Groups, File shares and Hosts that have been manually created or applied for through service templates."
         },
         {
             "title": "Dataflow",
             "description": "Through migration / replication capability.",
-            "routerLink": "/dataflow"
+            "routerLink": "/dataflow",
+            "joyrideStep" : "menuDataflow",
+            "text" : "Data flow through buckets by migration / replication."
         },
         {
             "title": "Monitor",
             "description": "Telemetry information.",
-            "routerLink": "/monitor"
+            "routerLink": "/monitor",
+            "joyrideStep" : "menuMonitor",
+            "text" : "Links to Telemetry services"
         },
         {
             "title": "Services",
             "description": "Orchestration services.",
-            "routerLink": "/services"
+            "routerLink": "/services",
+            "joyrideStep" : "menuServices",
+            "text" : "This page demonstrates the Orchestration service that allows to Create and Manage Service Instances"
         }
     ]
 
@@ -108,45 +123,101 @@ export class AppComponent implements OnInit, AfterViewInit {
         {
             "title": "Home",
             "description": "Resource statistics",
-            "routerLink": "/home"
+            "routerLink": "/home",
+            "joyrideStep" : "menuHome",
+            "text" : "This page shows you the overall view of the backends available, volumes provisioned, buckets created and object storage migrations performed."
         },
         {
             "title": "Profile",
             "description": "Profiles",
-            "routerLink": "/profile"
+            "routerLink": "/profile",
+            "joyrideStep" : "menuProfile",
+            "text" : "A profile is a set of configurations on service capabilities (including resource tuning, QoS) of storage resources. A profile must be specified when volume is created."
         },
         {
             "title": "Resource",
             "description": "Volumes / Buckets / File Share / Hosts",
-            "routerLink": "/block"
+            "routerLink": "/block",
+            "joyrideStep" : "menuResource",
+            "text" : "View and manage Buckets, Volumes, Volume Groups, File shares and Hosts that have been manually created or applied for through service templates."
         },
         {
             "title": "Dataflow",
             "description": "Through migration / replication capability.",
-            "routerLink": "/dataflow"
+            "routerLink": "/dataflow",
+            "joyrideStep" : "menuDataflow",
+            "text" : "Data flow through buckets by migration / replication."
         },
         {
             "title": "Monitor",
             "description": "Telemetry information.",
-            "routerLink": "/monitor"
+            "routerLink": "/monitor",
+            "joyrideStep" : "menuMonitor",
+            "text" : "Links to Telemetry services"
         },
 	    {
             "title": "Services",
             "description": "Orchestration services.",
-            "routerLink": "/services"
+            "routerLink": "/services",
+            "joyrideStep" : "menuServices",
+            "text" : "This page demonstrates the Orchestration service that allows to Create and Manage Service Instances"
         },
         {
             "title": "Infrastructure",
             "description": "Regions, availability zones and storage",
-            "routerLink": "/resource"
+            "routerLink": "/resource",
+            "joyrideStep" : "menuInfrastructure",
+            "text" : "A quick overview of the block, Object and File infrastructure."
         },
         {
             "title": "Identity",
             "description": "Managing tenants and users",
-            "routerLink": "/identity"
+            "routerLink": "/identity",
+            "joyrideStep" : "menuIdentity",
+            "text" : "Managing Tenants and Users"
         }
     ];
 
+    tourSteps_admin = [
+        'homeWelcome',
+        'homeUserProfile',
+        'menuHome',
+        'menuProfile',
+        'menuResource',
+        'menuDataflow',
+        'menuMonitor',
+        'menuServices',
+        'menuInfrastructure',
+        'menuIdentity',
+        'homeResourceCard@/home',
+        'homeDataflowCard@/home',
+        'homeAddBackendBtn@/home',
+        'homeAWSBackends@/home',
+        'homeGCPBackends@/home',
+        'homeHuaweiBackends@/home',
+        'homeIBMBackends@/home',
+        'homeAzureBackends@/home',
+        'homeAllBackends@/home'
+    ];
+    tourSteps_tenant = [
+        'homeWelcome',
+        'homeUserProfile',
+        'menuHome',
+        'menuProfile',
+        'menuResource',
+        'menuDataflow',
+        'menuMonitor',
+        'menuServices',
+        'homeResourceCard@/home',
+        'homeDataflowCard@/home',
+        'homeAddBackendBtn@/home',
+        'homeAWSBackends@/home',
+        'homeGCPBackends@/home',
+        'homeHuaweiBackends@/home',
+        'homeIBMBackends@/home',
+        'homeAzureBackends@/home',
+        'homeAllBackends@/home'
+    ];
     activeItem: any;
 
     private msgs: any = [{ severity: 'warn', summary: 'Warn Message', detail: 'There are unsaved changes' }];
@@ -161,7 +232,8 @@ export class AppComponent implements OnInit, AfterViewInit {
         private msg: MsgBoxService,
         private akSkService: akSkService,
         public I18N: I18NService,
-        private BucketService: BucketService
+        private BucketService: BucketService,
+        private readonly joyrideService: JoyrideService
     ) { }
 
     // Wave params
@@ -594,10 +666,50 @@ export class AppComponent implements OnInit, AfterViewInit {
                 accessKeyId: this.SignatureKey['AccessKey']
             })
             return requestOptions;
-           
-
-        }
+    	}
     }
+    /* Joyride */
+    stepVisible: any;
+    title: any;
+    toggleAction() {
+        this.stepVisible = true;
+    }
+    stepDone() {
+        setTimeout(() => {
+            this.title = 'Tour Finished!';
+            console.log('Step done!');
+        }, 3000);
+    }
+    onPrev() {
+        console.log('Prev Clicked');
+    }
+    startTour() {
+        const options = {
+            steps: this.tourSteps,
+            // startWith: 'step3@app',
+            // waitingTime: 3000,
+            //stepDefaultPosition: 'top',
+            themeColor: '#243680',
+            showPrevButton: true,
+            logsEnabled: true
+            // customTexts: { prev: of('<<').pipe(delay(2000)), next: '>>'}
+        };
+        this.joyrideService.startTour(options).subscribe(
+            step => {
+                let scrollElm = document.scrollingElement;
+                scrollElm.scrollTop = 0;
+                console.log('Next:', step);
+            },
+            e => {
+                console.log('Error', e);
+            },
+            () => {
+                this.stepDone();
+                console.log('Tour finished');
+            }
+        );
+    }
+    /* Joyride ends */
 
     openUserGuide(){
         this.isHomePage = false;
@@ -796,6 +908,7 @@ export class AppComponent implements OnInit, AfterViewInit {
 
                 if (this.username == "admin") {
                     this.menuItems = this.menuItems_admin;
+                    this.tourSteps = this.tourSteps_admin;
                     this.dropMenuItems = [
                         {
                             label: "Switch Region",
@@ -821,6 +934,7 @@ export class AppComponent implements OnInit, AfterViewInit {
                     ];
                 } else {
                     this.menuItems = this.menuItems_tenant;
+                    this.tourSteps = this.tourSteps_tenant;
                     this.dropMenuItems = [
                         {
                             label: "Switch Region",
