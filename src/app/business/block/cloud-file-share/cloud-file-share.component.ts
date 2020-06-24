@@ -41,6 +41,7 @@ export class CloudFileShareComponent implements OnInit{
     };
 
     constructor(private cloudFS: CloudFileShareService,
+        private router: Router,
         private ActivatedRoute: ActivatedRoute,
         public I18N:I18NService,
         private http: HttpService,
@@ -65,7 +66,7 @@ export class CloudFileShareComponent implements OnInit{
             {
                 "label": this.I18N.keyID['sds_block_volume_modify'],
                 command: () => {
-                    this.modifyFileshare(this.selectedFileShare);
+                    this.modifyFileshare(this.selectedFileShare['id']);
                 },
                 disabled:false
             },
@@ -81,7 +82,7 @@ export class CloudFileShareComponent implements OnInit{
             {
                 "label": this.I18N.keyID['sds_block_volume_modify'],
                 command: () => {
-                    this.modifyFileshare(this.selectedFileShare);
+                    this.modifyFileshare(this.selectedFileShare['id']);
                 },
                 disabled:false
             },
@@ -130,7 +131,7 @@ export class CloudFileShareComponent implements OnInit{
 
     }
     modifyFileshare(fileShare){
-
+        this.router.navigate(['/modifyCloudFileShare',fileShare]);
     }
     returnSelectedFileShare(selectedFileShare){
         this.selectedFileShare = selectedFileShare;
@@ -138,15 +139,16 @@ export class CloudFileShareComponent implements OnInit{
 
     batchDelete(fileShare){
         if(fileShare){
-            let  msg, arr = [];
+            let  msg, arr = [], selectedNames=[];
             if(_.isArray(fileShare)){
                 fileShare.forEach((item,index)=> {
                     arr.push(item.id);
+                    selectedNames.push(item['name']);
                 })
-                msg = "<div>Are you sure you want to delete the selected FileShare?</div><h3>[ "+ fileShare.length +" FileShare ]</h3>";
+                msg = "<h3>Are you sure you want to delete the selected " + fileShare.length + " FileShares?</h3><h4>[ "+ selectedNames.join(',') +" FileShare(s) ]</h4>";
             }else{
                 arr.push(fileShare.id)
-                msg = "<div>Are you sure you want to delete the selected FileShare?</div><h3>[ "+ fileShare.name +" ]</h3>"; 
+                msg = "<h3>Are you sure you want to delete the selected FileShare?</h3><h4>[ "+ fileShare.name +" ]</h4>"; 
             }
             this.confirmationService.confirm({
                 message: msg,

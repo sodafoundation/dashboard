@@ -17,6 +17,10 @@ export class CloudFileShareService {
         return this.http.get(this.url);
     }
 
+    getFileShareById(fileShareId):Observable<any>{
+        return this.http.get(this.url+'/'+fileShareId);
+    }
+
     //get fileShareList by backend
     getFileSharesByBackend(backend):Observable<any>{
         let getUrl =  'v1/{project_id}/file/shares/?backendId=' + backend + '/sync'

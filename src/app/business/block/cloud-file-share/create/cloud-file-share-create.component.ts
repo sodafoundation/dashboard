@@ -46,7 +46,6 @@ export class CloudFileShareCreateComponent implements OnInit{
         "backend" : {
             required: "Backend is required"
         },
-        "region": { required: "Region is required" },
         "description" : {
             maxLength: "Maximum 250 characters",
             pattern: "Must start with a character. Can contain alphabets, numbers and underscore. No special characters allowed."
@@ -54,12 +53,11 @@ export class CloudFileShareCreateComponent implements OnInit{
     };
     validRule= {
         'name':'^[a-zA-Z]{1}([a-zA-Z0-9]|[-_]){0,127}$',
-        'description':'^[a-zA-Z]{1}([a-zA-Z0-9]){0,249}$'
+        'description':'^[a-zA-Z ]{1}([a-zA-Z0-9 ]){0,249}$'
     };
     label = {
         name: this.i18n.keyID["sds_block_volume_name"],
         description: this.i18n.keyID["sds_block_volume_descri"],
-        region: 'Region',
         encrypted: "Enable Encryption",
         encryptionSettings: "Encryption Settings",
         size: "Size",
@@ -90,7 +88,6 @@ export class CloudFileShareCreateComponent implements OnInit{
             'backend':["",{validators:[Validators.required], updateOn:'change'}],
             'name': new FormControl('', {validators:[Validators.required, Validators.minLength(2), Validators.maxLength(128), Validators.pattern(this.validRule.name),Utils.isExisted(this.allNamesForCheck)]}),
             'description': new FormControl('', {validators:[Validators.maxLength(250),Validators.pattern(this.validRule.description)]}),
-            'region' : ["", {validators:[Validators.required]}]
         });
         this.getTypes();
         this.getBackends();
@@ -160,8 +157,8 @@ export class CloudFileShareCreateComponent implements OnInit{
             }
             this.cloudFileShareCreateForm.addControl('tags', this.fb.array([this.createTags('Name','')]));
             if(!this.cloudFileShareCreateForm.controls['metadata']){
-                this.cloudFileShareCreateForm.addControl('metadata', this.fb.array([this.createMetadata('PerformanceMode', '')]));
-                this.addNextMetadata('ThroughputMode', '');
+                this.cloudFileShareCreateForm.addControl('metadata', this.fb.array([this.createMetadata('PerformanceMode', 'generalPurpose')]));
+                this.addNextMetadata('ThroughputMode', 'bursting');
                 this.addNextMetadata('ProvisionedThroughputInMibps', '');
             }
             
