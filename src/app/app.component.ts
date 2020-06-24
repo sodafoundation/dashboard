@@ -125,7 +125,7 @@ export class AppComponent implements OnInit, AfterViewInit {
             "description": "Resource statistics",
             "routerLink": "/home",
             "joyrideStep" : "menuHome",
-            "text" : "This page shows you the overall view of the backends available, volumes provisioned, buckets created and migrations performed."
+            "text" : "This page shows you the overall view of the backends available, volumes provisioned, buckets created and object storage migrations performed."
         },
         {
             "title": "Profile",
