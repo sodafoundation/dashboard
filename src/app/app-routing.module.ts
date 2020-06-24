@@ -6,6 +6,7 @@ import { AzResolver } from './business/block/modify-host/az-resolver.service';
 const routes: Routes = [
     {path: '', redirectTo: '/home', pathMatch: 'full'},
     {path: 'home', loadChildren: './business/home/home.module#HomeModule'},
+    {path: 'help', loadChildren: './business/help/help.module#HelpModule'},
     {path: 'block', loadChildren: './business/block/block.module#BlockModule'},
     {path: 'createVolume', loadChildren: './business/block/create-volume/create-volume.module#CreateVolumeModule'},
     {path: 'volumeDetails/:volumeId', loadChildren: './business/block/volume-detail/volume-detail.module#VolumeDetailModule'},
