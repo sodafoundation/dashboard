@@ -109,7 +109,7 @@ export class CloudFileShareComponent implements OnInit{
     }
 
     getFileShares(){
-        
+        let self = this;
         this.cloudFS.getAllFileShares().subscribe((res) => {
             let shares = res.json() && res.json().fileshares ? res.json().fileshares : [];
             this.allFileShares = shares;
@@ -118,6 +118,67 @@ export class CloudFileShareComponent implements OnInit{
                 this.allFileShares.forEach(element => {
                     if(!element['tags']){
                         element['tags'] = [];
+                    }
+
+                    let metadataArr = [];
+                    if(element['metadata']){
+                        let meta = element['metadata']['fields'];
+                        _.each(meta, function(value, key){
+                            let metaitem = {};
+                            if(key=="PerformanceMode"){
+                                if(value['Kind'].hasOwnProperty('StringValue')){
+                                    metaitem = {
+                                        key: "PerformanceMode",
+                                        value : value['Kind']['StringValue'],
+                                        type : 'string'
+                                    }
+                                }
+                                if(value['Kind'].hasOwnProperty('NumberValue')){
+                                    metaitem = {
+                                        key: "PerformanceMode", 
+                                        value : value['Kind']['NumberValue'],
+                                        type : 'number'
+                                    }
+                                }
+                                metadataArr.push(metaitem);
+                            }
+                            if(key=="ThroughputMode"){
+                                if(value['Kind'].hasOwnProperty('StringValue')){
+                                    metaitem = {
+                                        key : "ThroughputMode", 
+                                        value : value['Kind']['StringValue'],
+                                        type : 'string'
+                                    }
+                                }
+                                if(value['Kind'].hasOwnProperty('NumberValue')){
+                                    metaitem = {
+                                        key: "ThroughputMode", 
+                                        value : value['Kind']['NumberValue'],
+                                        type : 'number'
+                                    }
+                                }
+                                metadataArr.push(metaitem);
+                            }
+                            if(key=="ProvisionedThroughputInMibps"){
+                                if(value['Kind'].hasOwnProperty('StringValue')){
+                                    metaitem = {
+                                        key : "ProvisionedThroughputInMibps", 
+                                        value : value['Kind']['StringValue'],
+                                        type : 'string'
+                                    }
+                                }
+                                if(value['Kind'].hasOwnProperty('NumberValue')){
+                                    metaitem = {
+                                        key: "ProvisionedThroughputInMibps", 
+                                        value : value['Kind']['NumberValue'],
+                                        type : 'number'
+                                    }
+                                }
+                                metadataArr.push(metaitem);
+                            } 
+                            
+                        })
+                        element['metadataArr'] = metadataArr;
                     }
                   
                 });
