@@ -6,6 +6,7 @@ import { VolumeListModule } from './volumeList.module';
 import { VolumeGroupModule } from './volumeGroup.module';
 import { BucketsModule } from './buckets.module';
 import { FileShareModule } from './fileShare.module';
+import { CloudBlockServiceModule } from './cloud-block-service/cloud-block-service.module';
 import { HostsModule } from './hosts.module';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
@@ -27,6 +28,7 @@ let routers = [{
     ButtonModule,
     BucketsModule,
     FileShareModule,
+    CloudBlockServiceModule,
     HostsModule,
     ReactiveFormsModule,
     FormsModule,
