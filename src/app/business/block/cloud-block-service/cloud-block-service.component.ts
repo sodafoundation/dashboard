@@ -7,8 +7,7 @@ import { trigger, state, style, transition, animate} from '@angular/animations';
 import { I18nPluralPipe } from '@angular/common';
 import { CloudBlockServiceService} from './cloud-block-service.service';
 import { BucketService } from '../buckets.service';
-import { size } from 'underscore';
-import { type } from 'os';
+
 
 let _ = require("underscore");
 @Component({
