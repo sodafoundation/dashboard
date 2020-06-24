@@ -24,27 +24,32 @@
         <div class="ui-g">
             <div class="ui-g-12 menu-bar">
                 <div class="ui-g-2">
-                    <div class="logo">
+                    <div joyrideStep="homeWelcome" stepPosition="bottom" [title]="'Welcome to SODA Foundation'" [stepContent]="homeWelcomeContent" [text]="'Welcome to the SODA Foundation dashboard. This dashboard gives you a UI to check out the various features and APIs from various SODA Foundation projects.'" class="logo">
                         <a href="#" [routerLink]="['/home']"></a>
                     </div>
                 </div>
+
                 <div class="ui-g-4">
+
 
                 </div>
                 <div class="ui-g-2">
                     <button type="button" class="user-guide-btn ui-button" pButton label="Need Help?" icon="fa-question-circle" (click)="openUserGuide()"></button>
                 </div>
                 <div class="ui-g-1">
-                    
+                </div>
+                <div class="ui-g-1">
+                    <button type="button" pButton class="start-tour-button ui-button" (click)="startTour()" label="Start Tour"></button>
                 </div>
                 <div class="ui-g-1">
                     <a class="soda-foundation-website-logo" title="Click here to visit the SODA Foundation website." href="https://sodafoundation.io" target="_blank"><img src="/assets/business/images/soda-foundation-header-logo.png" height="48px"></a>
+
                 </div>
                 <div class="ui-g-2">
                     <div class="user-info">
                         <div>
                             <h1>Welcome {{ username }}</h1>
-                            <p-dropmenu  icon="fa-chevron-circle-down" [model]="dropMenuItems" styleClass="ui-dropmenu-large"></p-dropmenu>
+                            <p-dropmenu joyrideStep="homeUserProfile" stepPosition="bottom" [title]="'User menu'" [text]="'You can switch region, navigate to Key Management System (AK/SK), Monitor Configuration and Logout'" icon="fa-chevron-circle-down" [model]="dropMenuItems" styleClass="ui-dropmenu-large"></p-dropmenu>
                         </div>
                         <p><span><i class="fa fa-map-marker"></i>default_region</span><span *ngIf=" username!='admin' "><i class="fa fa-users"></i>{{ currentTenant }}</span></p>
                         <a href="#" [routerLink]="[akSkRouterLink]"></a>
@@ -58,7 +63,7 @@
         
         <ul class="sidebar-menu">
             <li *ngFor="let menuItem of menuItems">
-                <a href="#" [routerLink]="[menuItem.routerLink]" [ngClass]="{'active-item':menuItem==activeItem}" (click)="menuItemClick($event, menuItem)">
+                <a href="#" [joyrideStep]="menuItem.joyrideStep" [text]="menuItem.text" stepPosition="right" [routerLink]="[menuItem.routerLink]" [ngClass]="{'active-item':menuItem==activeItem}" (click)="menuItemClick($event, menuItem)">
                     <h1>{{menuItem.title}}</h1>
                     <p>{{menuItem.description}}</p>
                 </a> 
@@ -74,6 +79,13 @@
         </div>
     </div>
 </div>
+<ng-template #homeWelcomeContent>
+    <div class="tour-content">
+        SODA Dashboard provides a unified interface to the underlying capabilities from the SODA Framework components. This dashboard is built mainly to illustrate/showcase various use cases that could run on SODA ecosystem projects.
+
+        It is a direct client to SODA API and other projects which are getting integrated to SODA Ecosystem.
+    </div>
+</ng-template>
 
 <div style="position: fixed; left: 0; bottom: -10px; right:0; z-index: -1;">
     <svg width="100%" height="150">
