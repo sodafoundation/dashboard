@@ -1,0 +1,12 @@
+<h4>A profile is a set of configurations on service capabilities (including resource tuning, QoS) of storage resources. A profile must be specified when volume is created.</h4>
+<p><strong>To create a new profile click on the Create button in the Profile page and fill the details.</strong></p>
+<ul>
+<li><strong>Name:</strong> has to be unique</li>
+<li><strong>Description:</strong> What is this profile for?</li>
+<li><strong>Storage Type:</strong> Block or File?</li>
+<li><strong>Provisioning Type:</strong> iSCSI, FC, RBD in case of Block type. NFS, CIFS in case of File type.</li>
+<li><strong>Storage Access Capability</strong> (only File type): read, write, execute.<br />Additionally you can also set some policies like:</li>
+<li><strong>QoS Policy</strong> (Both Block and File type): Maximum IOPS, Minimum IOPS, Maximum BWS, Minimum BWS and Latency</li>
+<li><strong>Snapshot Policy</strong> (Both Block and File type): Enable Automatic snapshot, Schedule, Execution time and Retention.</li>
+<li><strong>Replication Policy</strong> (Block type only): Type, Mode, Period, Bandwidth, RGO, RTO, RPO, Consistency.</li>
+</ul>
