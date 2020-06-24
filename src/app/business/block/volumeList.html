@@ -1,7 +1,7 @@
 <p-growl [value]="msgs" [sticky]="false" [life]="6000"></p-growl>
 <p-tabView styleClass="ui-tabview-large" [activeIndex]="tabIndex">
     
-    <p-tabPanel header="On Premise" [selected]="fromFileShare">
+    <p-tabPanel header="On Premise" [selected]="fromVolume">
         <div class="content-header">
             <p>{{I18N.keyID['sds_block_volumes_descrip']}}</p>
         </div>
@@ -38,7 +38,7 @@
             </p-column>
         </p-dataTable>
     </p-tabPanel>
-    <p-tabPanel header="Cloud" [selected]="fromCloudFileShare">
+    <p-tabPanel header="Cloud" [selected]="fromCloudVolume">
         <div class="content-header">
             <p>{{I18N.keyID['sds_cloud_blockService_descrip']}}</p>
         </div>
