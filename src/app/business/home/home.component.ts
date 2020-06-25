@@ -55,7 +55,7 @@ export class HomeComponent implements OnInit {
             type: 'text',
             name: 'region',
             formControlName: 'region',
-            arr:['aws-s3','azure-blob','hw-obs','fusionstorage-object','ceph-s3','gcp-s3','ibm-cos', 'alibaba-oss']
+            arr:['aws-s3','azure-blob','hw-obs','fusionstorage-object','ceph-s3','gcp-s3','ibm-cos', 'alibaba-oss', 'aws-file', 'azure-file']
         },
         {
             label: 'Endpoint',
@@ -82,7 +82,7 @@ export class HomeComponent implements OnInit {
             type: 'text',
             name: 'accessKey',
             formControlName: 'ak',
-            arr:['aws-s3','azure-blob','hw-obs','fusionstorage-object','ceph-s3','gcp-s3','ibm-cos', 'alibaba-oss']
+            arr:['aws-s3','azure-blob','hw-obs','fusionstorage-object','ceph-s3','gcp-s3','ibm-cos', 'alibaba-oss', 'aws-file', 'azure-file']
         },
         {
             label: 'Secret Key',
@@ -91,7 +91,7 @@ export class HomeComponent implements OnInit {
             type: 'password',
             name: 'secretKey',
             formControlName: 'sk',
-            arr:['aws-s3','azure-blob','hw-obs','fusionstorage-object','ceph-s3','gcp-s3','ibm-cos', 'alibaba-oss']
+            arr:['aws-s3','azure-blob','hw-obs','fusionstorage-object','ceph-s3','gcp-s3','ibm-cos','alibaba-oss', 'aws-file', 'azure-file']
         },
     ]
 
@@ -291,6 +291,7 @@ export class HomeComponent implements OnInit {
         },[]);
         this.Allbackends = result;
         this.allBackends_count.localBKD = 0;
+
         this.allBackends_count.aws = this.Allbackends['aws-s3'] ? this.Allbackends['aws-s3'].length :0;
         this.allBackends_count.azureblob = this.Allbackends['azure-blob'] ? this.Allbackends['azure-blob'].length :0;
         this.allBackends_count.huaweipub = this.Allbackends['hw-obs'] ? this.Allbackends['hw-obs'].length :0;
@@ -309,6 +310,7 @@ export class HomeComponent implements OnInit {
         this.allBackends_count.ibmcos = this.Allbackends['ibm-cos'] ? this.Allbackends['ibm-cos'].length :0;
         this.allBackends_count.gcp = this.Allbackends['gcp-s3'] ? this.Allbackends['gcp-s3'].length :0;
         this.allBackends_count.alibaba = this.Allbackends['alibaba-oss'] ? this.Allbackends['alibaba-oss'].length :0;
+
     }
 
     getType(){
@@ -360,7 +362,9 @@ export class HomeComponent implements OnInit {
             let fs_arr = this.Allbackends['fusionstorage-object'] ? this.Allbackends['fusionstorage-object'] : [];
             let ceph_arr = this.Allbackends['ceph-s3'] ? this.Allbackends['ceph-s3'] : [];
             let yig_arr = this.Allbackends['yig'] ? this.Allbackends['yig'] : [];
-            this.typeDetail = fs_arr.concat(ceph_arr,yig_arr);
+            let aws_fs_arr = this.Allbackends['aws-file'] ? this.Allbackends['aws-file'] : [];
+            let azure_fs_arr = this.Allbackends['azure-file'] ? this.Allbackends['azure-file'] : [];
+            this.typeDetail = fs_arr.concat(ceph_arr,yig_arr,aws_fs_arr,azure_fs_arr);
         }
     }
 
