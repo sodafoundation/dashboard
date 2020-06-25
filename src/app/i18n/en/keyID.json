@@ -11,6 +11,7 @@
     "sds_block_volumes_descrip":"View and manage Volumes that have been manually created or applied for through service templates.",
     "sds_block_volumesGroup_descrip":"View and manage Volume Groups that have been manually created or applied for through service templates.",
     "sds_block_fileShare_descrip":"View and manage File Shares that have been manually created or applied for through service templates.",
+    "sds_cloud_blockService_descrip":"View and manage Cloud Volumes that have been manually created or applied for through service templates.",
     "sds_cloud_fileShare_descrip":"View and manage Cloud File Shares that have been manually created or applied for through service templates.",
     "sds_block_hosts_descrip":"View and manage Hosts.",
     "sds_home_tenants":"Tenants",
