@@ -1,37 +1,51 @@
 <p-growl [value]="msgs" [sticky]="false" [life]="6000"></p-growl>
+<p-tabView styleClass="ui-tabview-large" [activeIndex]="tabIndex">
+    <p-tabPanel header="On Premise" [selected]="fromFileShare">
+        <div class="content-header">
+            <p>{{I18N.keyID['sds_block_fileShare_descrip']}}</p>
+        </div>
+        <div class="table-toolbar">
+            <div class="left">
+                <button class="ui-button-secondary" pButton type="button" label="{{I18N.keyID['sds_block_volume_create']}}" [routerLink]="['/createFileShare']"></button>
+                <button pButton type="button" label="{{I18N.keyID['sds_block_volume_delete']}}" (click)="batchDelete(selectedFileShares)" [disabled]="selectedFileShares.length == 0"></button>
+            </div>
+            <div class="right">
+                <div class="ui-inputsearch">
+                    <input type="text" #searchByName pInputText placeholder="{{I18N.keyID['sds_block_volume_search']}}">
+                    <button pButton type="button" icon="fa-search"></button>
+                </div> 
+                <button class="" pButton type="button" (click)="getFileShares()" icon="fa-refresh"></button>
+            </div>
+        </div>
+        <p-dataTable [value]="fileShares" [globalFilter]="searchByName" [(selection)]="selectedFileShares" [showHeaderCheckbox]="true" resizableColumns="true" [rows]="10" [paginator]="true" [pageLinks]="3" [rowsPerPageOptions]="[10,20,50,100]">
+            <p-column selectionMode="multiple" [style]="{'width': '60px'}"></p-column>
+            <p-column field="name" header="{{I18N.keyID['sds_block_volume_name']}}" [style]="{'width': '140px'}" >
+                <ng-template pTemplate="body" let-fileShare="rowData">
+                    <a [routerLink]="['/fileShareDetail/' + fileShare.id]"  title="{{fileShare.name}}">{{fileShare.name}}</a>
+                </ng-template>
+            </p-column>
+            <p-column field="size" header="Capacity" ></p-column>
+            <p-column field="status" header="{{I18N.keyID['sds_block_volume_status']}}"></p-column>
+            <p-column field="profileName" header="{{I18N.keyID['sds_block_volume_profile']}}"></p-column>
+            <p-column field="availabilityZone" header="{{I18N.keyID['sds_block_volume_az']}}" [style]="{'width': '15%'}"></p-column>
+            <p-column header="{{I18N.keyID['sds_block_volume_operation']}}" [style]="{'width': '335px'}">
+                <ng-template pTemplate="body" let-fileShare="rowData" let-i="rowIndex">
+                    <a (click)="returnSelectedFileShare(fileShare,'snapshot')" [innerHtml]="I18N.keyID['sds_block_volume_createsna']"></a>
+                    <a (click)="returnSelectedFileShare(fileShare,'acl')">Create Access</a>
+                    <p-dropmenu label="{{I18N.keyID['sds_block_volume_more']}}" [model]="fileShare['disabled'] ? menuDeleDisableItems: menuItems" (click)="returnSelectedFileShare(fileShare)"></p-dropmenu>
+                </ng-template>
+            </p-column>
+        </p-dataTable>
+    </p-tabPanel>
+    <p-tabPanel header="Cloud" [selected]="fromCloudFileShare">
+        <div class="content-header">
+            <p>{{I18N.keyID['sds_cloud_fileShare_descrip']}}</p>
+        </div>
+        <app-cloud-file-share></app-cloud-file-share>
+    </p-tabPanel>
+</p-tabView>
 <div>
-    <div class="table-toolbar">
-        <div class="left">
-            <button class="ui-button-secondary" pButton type="button" label="{{I18N.keyID['sds_block_volume_create']}}" [routerLink]="['/createFileShare']"></button>
-            <button pButton type="button" label="{{I18N.keyID['sds_block_volume_delete']}}" (click)="batchDelete(selectedFileShares)" [disabled]="selectedFileShares.length == 0"></button>
-        </div>
-        <div class="right">
-            <div class="ui-inputsearch">
-                <input type="text" #searchByName pInputText placeholder="{{I18N.keyID['sds_block_volume_search']}}">
-                <button pButton type="button" icon="fa-search"></button>
-            </div> 
-            <button class="" pButton type="button" (click)="getFileShares()" icon="fa-refresh"></button>
-        </div>
-    </div>
-    <p-dataTable [value]="fileShares" [globalFilter]="searchByName" [(selection)]="selectedFileShares" [showHeaderCheckbox]="true" resizableColumns="true" [rows]="10" [paginator]="true" [pageLinks]="3" [rowsPerPageOptions]="[10,20,50,100]">
-        <p-column selectionMode="multiple" [style]="{'width': '60px'}"></p-column>
-        <p-column field="name" header="{{I18N.keyID['sds_block_volume_name']}}" [style]="{'width': '140px'}" >
-            <ng-template pTemplate="body" let-fileShare="rowData">
-                <a [routerLink]="['/fileShareDetail/' + fileShare.id]"  title="{{fileShare.name}}">{{fileShare.name}}</a>
-            </ng-template>
-        </p-column>
-        <p-column field="size" header="Capacity" ></p-column>
-        <p-column field="status" header="{{I18N.keyID['sds_block_volume_status']}}"></p-column>
-        <p-column field="profileName" header="{{I18N.keyID['sds_block_volume_profile']}}"></p-column>
-        <p-column field="availabilityZone" header="{{I18N.keyID['sds_block_volume_az']}}" [style]="{'width': '15%'}"></p-column>
-        <p-column header="{{I18N.keyID['sds_block_volume_operation']}}" [style]="{'width': '335px'}">
-            <ng-template pTemplate="body" let-fileShare="rowData" let-i="rowIndex">
-                <a (click)="returnSelectedFileShare(fileShare,'snapshot')" [innerHtml]="I18N.keyID['sds_block_volume_createsna']"></a>
-                <a (click)="returnSelectedFileShare(fileShare,'acl')">Create Access</a>
-                <p-dropmenu label="{{I18N.keyID['sds_block_volume_more']}}" [model]="fileShare['disabled'] ? menuDeleDisableItems: menuItems" (click)="returnSelectedFileShare(fileShare)"></p-dropmenu>
-            </ng-template>
-        </p-column>
-    </p-dataTable>
+
     
     <p-dialog *ngIf="createSnapshotShow" header="Create Snapshot" [(visible)]="createSnapshotShow" [width]="600" modal="modal">
         <form [grid]="{label: 'ui-g-3', content:'ui-g-20'}" [formGroup]="createSnapshotForm" [errorMessage]="errorMessage">
