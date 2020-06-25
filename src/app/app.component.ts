@@ -196,6 +196,7 @@ export class AppComponent implements OnInit, AfterViewInit {
         'homeGCPBackends@/home',
         'homeHuaweiBackends@/home',
         'homeIBMBackends@/home',
+        'homeAlibabaBackends@/home',
         'homeAzureBackends@/home',
         'homeAllBackends@/home'
     ];
@@ -215,6 +216,7 @@ export class AppComponent implements OnInit, AfterViewInit {
         'homeGCPBackends@/home',
         'homeHuaweiBackends@/home',
         'homeIBMBackends@/home',
+        'homeAlibabaBackends@/home',
         'homeAzureBackends@/home',
         'homeAllBackends@/home'
     ];

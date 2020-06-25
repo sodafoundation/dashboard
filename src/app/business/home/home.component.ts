@@ -55,7 +55,7 @@ export class HomeComponent implements OnInit {
             type: 'text',
             name: 'region',
             formControlName: 'region',
-            arr:['aws-s3','azure-blob','hw-obs','fusionstorage-object','ceph-s3','gcp-s3','ibm-cos', 'alibaba-oss', 'aws-file', 'azure-file']
+            arr:['aws-s3','azure-blob','hw-obs','fusionstorage-object', 'gcp-s3','ibm-cos', 'alibaba-oss', 'aws-file', 'azure-file']
         },
         {
             label: 'Endpoint',
@@ -305,7 +305,12 @@ export class HomeComponent implements OnInit {
         if( this.Allbackends['fusionstorage-object']){
             this.allBackends_count.localBKD += this.Allbackends['fusionstorage-object'].length;
         }
-
+        if( this.Allbackends['aws-file']){
+            this.allBackends_count.localBKD += this.Allbackends['aws-file'].length;
+        }
+        if( this.Allbackends['azure-file']){
+            this.allBackends_count.localBKD += this.Allbackends['azure-file'].length;
+        }
 
         this.allBackends_count.ibmcos = this.Allbackends['ibm-cos'] ? this.Allbackends['ibm-cos'].length :0;
         this.allBackends_count.gcp = this.Allbackends['gcp-s3'] ? this.Allbackends['gcp-s3'].length :0;
