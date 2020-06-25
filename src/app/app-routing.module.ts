@@ -32,6 +32,8 @@ const routes: Routes = [
     {path: 'akSkManagement', loadChildren: './business/ak-sk/ak-sk.module#AkSkModule'},
     {path: 'monitor', loadChildren: './business/monitor/monitor.module#MonitorModule'},
     {path: 'createFileShare', loadChildren: './business/block/create-file-share/create-file-share.module#CreateFileShareModule'},
+    {path: 'createCloudFileShare', loadChildren: './business/block/cloud-file-share/create/cloud-file-share-create.module#CloudFileShareCreateModule'},
+    {path: 'modifyCloudFileShare/:fileShareId', loadChildren: './business/block/cloud-file-share/modify/cloud-file-share-modify.module#CloudFileShareModifyModule'},
     {path: 'fileShareDetail/:fileShareId', loadChildren: './business/block/file-share-detail/file-share-detail.module#FileShareDetailModule'},
     {path: 'services', loadChildren: './business/services/services.module#ServicesModule'}
 ];
