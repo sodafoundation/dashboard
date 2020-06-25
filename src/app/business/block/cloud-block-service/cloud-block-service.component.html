@@ -1,0 +1,135 @@
+<p-growl [value]="msgs" [sticky]="false" [life]="6000"></p-growl>
+<div>
+    <div class="table-toolbar">
+        <div class="left">
+            <button class="ui-button-secondary" pButton type="button" label="{{I18N.keyID['sds_cloud_file_share_create']}}" (click)="showCreate()"></button>
+        </div>
+        <div class="right">
+            <div class="ui-inputsearch">
+                <input type="text" #searchByName pInputText placeholder="{{I18N.keyID['sds_commmon_search']}}">
+                <button pButton type="button" icon="fa-search"></button>
+            </div> 
+            <button class="" pButton type="button" (click)="getVolumes()" icon="fa-refresh"></button>
+        </div>
+    </div>
+    <p-dataTable [value]="allAWSVolumes" [globalFilter]="searchByName" [(selection)]="selectedVolumes" [expandableRows]="true" [showHeaderCheckbox]="true" resizableColumns="true" [rows]="10" [paginator]="true" [pageLinks]="3" [rowsPerPageOptions]="[10,20,50,100]">
+        <p-column expander="true" styleClass="col-icon" [style]="{'width': '30px'}"></p-column>
+        <p-column selectionMode="multiple" [style]="{'width': '30px'}"></p-column>
+        <p-column field="name" header="Name"></p-column>
+        <p-column field="size" header="Size"></p-column>
+        <p-column field="type" header="Type"></p-column>
+        <p-column field="state" header="State">
+            <ng-template pTemplate="body" let-volume="rowData">
+                {{volume.state}}
+            </ng-template>
+        </p-column>
+        <p-column field="createdAt" header="Created At">
+            <ng-template pTemplate="body" let-volume="rowData">
+                <span>{{volume.createdAt ? (volume.createdAt | date:'long') : '--'}}</span>
+            </ng-template>
+        </p-column>
+        <p-column header="{{I18N.keyID['sds_block_volume_operation']}}" [style]="{'width': '200px'}">
+            
+        </p-column>
+        <ng-template let-volume pTemplate="rowexpansion">
+            <div class="ui-grid ui-grid-responsive ui-grid-pad ui-fluid">
+                <div class="ui-grid-row volume-basic-item-class">
+                        <div class="ui-grid-col-2">
+                            {{label.name}}:
+                        </div>
+                        <div class="ui-grid-col-2 volume-basic-item-value-color">
+                            {{volume.name}}
+                        </div>
+                        <div class="ui-grid-col-2">
+                            {{label.state}}:
+                        </div>
+                        <div class="ui-grid-col-2 volume-basic-item-value-color">
+                            {{volume.state? volume.state : '--'}}
+                        </div>
+                        <div class="ui-grid-col-2">
+                            {{label.createdAt}}:
+                        </div>
+                        <div class="ui-grid-col-3 volume-basic-item-value-color">
+                            {{volume.createdAt ? (volume.createdAt | date:'long') : '--'}}
+                        </div>
+                        
+                    </div>
+                    <div class="ui-grid-row volume-basic-item-class">
+                        <div class="ui-grid-col-2">
+                            {{label.type}}:
+                        </div>
+                        <div class="ui-grid-col-2 volume-basic-item-value-color">
+                            {{volume.type}}
+                        </div>
+                        <div class="ui-grid-col-2">
+                            {{label.size}}:
+                        </div>
+                        <div class="ui-grid-col-2 volume-basic-item-value-color">
+                            {{volume.size}}
+                        </div>
+                        <div class="ui-grid-col-2">
+                            {{label.volumeId}}:
+                        </div>
+                        <div class="ui-grid-col-3 volume-basic-item-value-color">
+                            {{volume.volumeId}}
+                        </div>
+                        
+                    </div>
+                    <div class="ui-grid-row volume-basic-item-class">
+                        <div class="ui-grid-col-2">
+                            {{label.availabilityZone}}:
+                        </div>
+                        <div class="ui-grid-col-2 volume-basic-item-value-color">
+                            {{volume.availabilityZone}}
+                        </div>
+                        <div class="ui-grid-col-2">
+                            
+                        </div>
+                        <div class="ui-grid-col-2 volume-basic-item-value-color">
+                            
+                        </div>
+                        
+                        <div class="ui-grid-col-2">
+                            
+                        </div>
+                        <div class="ui-grid-col-3 volume-basic-item-value-color">
+                            
+                        </div>
+                    </div>
+                
+            </div>
+    </ng-template>
+    </p-dataTable>
+    <p-confirmDialog></p-confirmDialog>
+</div>
+
+<p-dialog styleClass="create-cloud-volume-dialog"  header="Create Volume" [(visible)]="createVolumeDisplay" [width]="900" modal="modal" [height]="700">
+    <form [grid]="{label: 'ui-g-3', content:'ui-g-20'}" [formGroup]="createVolumeForm" [errorMessage]="errorMessage">
+        <form-item label="Name" [required]="true">
+            <input type="text" pInputText formControlName="name" />
+        </form-item>
+        <form-item label="type" [required]="true">
+            <p-dropdown [style]="{'min-width':'150px','width':'220px'}" placeholder="Please select" [options]="allTypes" (onChange)="getBackendsByTypeId()" name='selectType' [(ngModel)]='selectType' formControlName="backend_type"></p-dropdown>
+        </form-item>
+        <form-item label="Backend" [required]="true">
+            <p-dropdown [style]="{'min-width':'150px','width':'220px'}" placeholder="Please select" [options]="backendsOption" (onChange)="setRegion()" formControlName="backendId"></p-dropdown>
+        </form-item>
+        <form-item label="Availability Zone" [required]="true">
+            <input type="text" pInputText formControlName="availabilityZone" />
+        </form-item>
+        <form-item label="Size" [required]="true">
+            <input type="text" pInputText formControlName="size" />
+        </form-item>
+        <form-item label="Type" [required]="true">
+            <input type="text" pInputText formControlName="type" />
+        </form-item>
+        <form-item label="IOPS" [required]="true">
+            <input type="text" pInputText formControlName="iops" />
+        </form-item>
+    </form>
+    <p-footer>
+        <button type="submit" class="ui-button-secondary" pButton (click)="createVolume()"  label="{{I18N.keyID['ok']}}" [disabled]="createVolumeForm.invalid"></button>
+        <button type="button" pButton (click)="createVolumeDisplay=false"  label="{{I18N.keyID['cancel']}}"></button>
+    </p-footer>
+
+</p-dialog>

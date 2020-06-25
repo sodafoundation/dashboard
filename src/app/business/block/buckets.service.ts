@@ -64,7 +64,7 @@ export class BucketService {
   }
 
   getBckends(): Observable<any> {
-    return this.http.get('v1beta/{project_id}/backend');
+    return this.http.get('v1/{project_id}/backends');
   }
 
   getFilesByBucketId(bucketId): Observable<any> {
