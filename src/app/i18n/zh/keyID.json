@@ -1,4 +1,9 @@
 {
+    "sds_commmon_create" : "Create",
+    "sds_commmon_modify" : "Modify",
+    "sds_commmon_delete" : "Delete",
+    "sds_commmon_search" : "Search",
+    "sds_commmon_profile" : "Profile",
     "sds_required":"{0} is required.",
     "sds_pattern":"Beginning with a letter with a length of 1-128, it can contain letters / numbers / underlines.",
     "sds_profileNull":"profile is required",
@@ -7,6 +12,7 @@
     "sds_block_volumesGroup_descrip":"View and manage Volume Groups that have been manually created or applied for through service templates.",
     "sds_block_fileShare_descrip":"View and manage File Shares that have been manually created or applied for through service templates.",
     "sds_cloud_blockService_descrip":"View and manage Cloud Volumes that have been manually created or applied for through service templates.",
+    "sds_cloud_fileShare_descrip":"View and manage Cloud File Shares that have been manually created or applied for through service templates.",
     "sds_block_hosts_descrip":"View and manage Hosts.",
     "sds_home_tenants":"Tenants",
     "sds_home_users":"Users",
@@ -134,6 +140,7 @@
     "sds_lifeCycle_edit": "Edit",
     "sds_backend": "backend",
     "sds_creatFileShare": "Create File Share",
+    "sds_modifyFileShare": "Modify File Share",
     "sds_fileShare_detail": "File Share detail",
     "sds_fileShare_protocol": "Protocols",
     "sds_fileShare_shareSize": "shareSize",
@@ -165,5 +172,7 @@
     "sds_host_initiators": "Initiators",
     "sds_host_availability_zones": "Availability Zones",
     "sds_block_createHost_desc" : "Add a new host",
-    "sds_block_host_delete":"Delete Host"
+    "sds_block_host_delete":"Delete Host",
+    "sds_cloud_file_share_create": "Create",
+    "sds_cloud_file_share_delete": "Delete"
 }

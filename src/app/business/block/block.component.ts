@@ -41,6 +41,7 @@ export class BlockComponent implements OnInit{
     fromVolume:boolean = false;
     fromFileShare:boolean = false;
     fromCloudVolume: boolean = false;
+    fromCloudFileShare:boolean = false;
     fromHosts: boolean = false;
     countItems = [];
     constructor(
@@ -54,8 +55,11 @@ export class BlockComponent implements OnInit{
             (params) => {
                 this.fromGroup = params.fromRoute === "fromGroup";
                 this.fromBuckets = params.fromRoute === "fromBuckets";
+
                 this.fromVolume = params.fromRoute === "fromVolume" || params.fromRoute === "fromCloudVolume";
-                this.fromFileShare = params.fromRoute === "fromFileShare";
+
+                this.fromFileShare = params.fromRoute === "fromFileShare" || params.fromRoute === "fromCloudFileShare";
+
                 this.fromHosts = params.fromRoute === "fromHosts";
             }
           );
