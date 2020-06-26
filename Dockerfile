@@ -18,7 +18,7 @@
 # 	docker run -d -p 8088:8088 sodafoundation/dashboard:latest
 
 FROM nginx:alpine
-MAINTAINER Anvith KS <anvith3@gmail.com>
+
 # Current directory is always /opt/dashboard.
 WORKDIR /opt/dashboard
 
