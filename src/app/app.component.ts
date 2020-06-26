@@ -701,7 +701,6 @@ export class AppComponent implements OnInit, AfterViewInit {
             step => {
                 let scrollElm = document.scrollingElement;
                 scrollElm.scrollTop = 0;
-                console.log('Next:', step);
             },
             e => {
                 console.log('Error', e);
