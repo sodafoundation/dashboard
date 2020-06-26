@@ -50,7 +50,7 @@
                             {{label.createdAt}}:
                         </div>
                         <div class="ui-grid-col-3 volume-basic-item-value-color">
-                            {{volume.createdAt ? (volume.createdAt | date:'long') : '--'}}
+                            {{volume.createdAt ? volume.createdAt : '--'}}
                         </div>
                         
                     </div>
