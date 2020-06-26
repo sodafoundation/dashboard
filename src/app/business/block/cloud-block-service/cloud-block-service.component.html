@@ -25,7 +25,7 @@
         </p-column>
         <p-column field="createdAt" header="Created At">
             <ng-template pTemplate="body" let-volume="rowData">
-                <span>{{volume.createdAt ? (volume.createdAt | date:'long') : '--'}}</span>
+                <span>{{volume.createdAt ? volume.createdAt  : '--'}}</span>
             </ng-template>
         </p-column>
         <p-column header="{{I18N.keyID['sds_block_volume_operation']}}" [style]="{'width': '200px'}">

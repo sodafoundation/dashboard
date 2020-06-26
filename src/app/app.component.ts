@@ -440,6 +440,7 @@ export class AppComponent implements OnInit, AfterViewInit {
                 options['headers'] = new Headers();
                 options = this.BucketService.getSignatureOptions(requestOptions, options);
                 this.http.put(uploadUrl + '?partNumber=' + (i + 1) + '&uploadId=' + uploadId, chunk, options).subscribe((data) => {
+                    this.refreshLastTime();
                     let header = data.headers['_headers']
                     let headerArr = header.entries()
                     let headerArr1= Array.from(headerArr)
@@ -1005,6 +1006,8 @@ export class AppComponent implements OnInit, AfterViewInit {
             this.username = "";
             this.password = "";
             this.isLogin = false;
+            this.showPrompt = false;
+            window['isUpload'] = false;
         }, 500);
 
     }
