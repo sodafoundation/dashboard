@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-IMAGE = opensdsio/dashboard
+IMAGE = sodafoundation/dashboard
 VERSION := latest
 
 all:build
