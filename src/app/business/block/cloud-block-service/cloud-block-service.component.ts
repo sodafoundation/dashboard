@@ -151,14 +151,16 @@ export class CloudBlockServiceComponent implements OnInit{
 
 
             });
-            this.cloudBS.getVolumesByBackend(this.backendId).subscribe((res) => {
-                let vols = res.json() && res.json().volumes ? res.json().volumes : [];
-                this.allAWSVolumes = vols;
-                
-            }, (error) => {
-                this.allAWSVolumes = [];
-                console.log("Something went wrong. Error fetching file shares", error);
-            })
+            if(this.backendId){
+                this.cloudBS.getVolumesByBackend(this.backendId).subscribe((res) => {
+                    let vols = res.json() && res.json().volumes ? res.json().volumes : [];
+                    this.allAWSVolumes = vols;
+                    
+                }, (error) => {
+                    this.allAWSVolumes = [];
+                    console.log("Something went wrong. Error fetching file shares", error);
+                })
+            }
         });
     }
 

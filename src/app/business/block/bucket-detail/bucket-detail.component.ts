@@ -256,7 +256,7 @@ export class BucketDetailComponent implements OnInit {
           let backupAllDir = JSON.parse( JSON.stringify( this.allDir ) );
           this.resolveObject();
           //Data in folder
-          if(this.folderId !=""){
+          if(this.folderId && this.folderId !=""){
             if(!this.folderId.endsWith(this.colon)){
               this.folderId = this.folderId + this.colon;
             }
