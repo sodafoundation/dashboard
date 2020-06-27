@@ -31,8 +31,8 @@
             <p-column field="availabilityZone" header="{{I18N.keyID['sds_block_volume_az']}}" [style]="{'width': '15%'}"></p-column>
             <p-column header="{{I18N.keyID['sds_block_volume_operation']}}" [style]="{'width': '350px'}">
                 <ng-template pTemplate="body" let-volume="rowData" let-i="rowIndex">
-                    <a (click)="returnSelectedVolume(volume,'snapshot')">{{I18N.keyID['sds_block_volume_createsna']}}</a>
-                    <a [ngClass]="{'a-rep-disabled':volume['isDisableRep']}" (click)="returnSelectedVolume(volume,'replication')">{{I18N.keyID['sds_block_volume_createrep']}}</a>
+                    <a [ngClass]="{'a-rep-disabled':volume['status']=='error'?true:false}" (click)="returnSelectedVolume(volume,'snapshot')">{{I18N.keyID['sds_block_volume_createsna']}}</a>
+                    <a [ngClass]="{'a-rep-disabled':volume['isDisableRep'] || (volume['status']=='error'?true:false)}" (click)="returnSelectedVolume(volume,'replication')">{{I18N.keyID['sds_block_volume_createrep']}}</a>
                     <p-dropmenu label="{{I18N.keyID['sds_block_volume_more']}}" [model]="volume['disabled'] ? menuDeleDisableItems: menuItems" (click)="returnSelectedVolume(volume)"></p-dropmenu>
                 </ng-template>
             </p-column>
