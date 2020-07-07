@@ -559,8 +559,12 @@ export class AppComponent implements OnInit, AfterViewInit {
                     'X-Auth-Token': localStorage['auth-token']
                 } 
             }
+            window['akskWarning'] = false;
             this.akSkService.getAkSkList(request,options).subscribe(res=>{
                 let response = res.json();
+                if(!response.credentials.length){
+                    window['akskWarning']=true;
+                }
                 let detailArr = [];
                 response.credentials.forEach(item=>{
                     if(item.user_id == window['userId']){
@@ -571,6 +575,7 @@ export class AppComponent implements OnInit, AfterViewInit {
                 this.SignatureKey = [];
                 if(detailArr.length > 0){
                     window['getParameters'](detailArr); 
+                    window['akskWarning'] = false;
                 }
                 if (cb) {
                     cb();

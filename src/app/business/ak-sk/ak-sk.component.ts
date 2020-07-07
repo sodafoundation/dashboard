@@ -54,6 +54,9 @@ export class AkSkComponent implements OnInit{
         this.akSkService.getAkSkList(request,this.options).subscribe(res=>{
             let response = res.json();
             let detailArr = [];
+            if(!response.credentials.length){
+                window['akskWarning']=true;
+            }
             response.credentials.forEach(item=>{
                 if(item.user_id == window['userId']){
                     let accessKey = JSON.parse(item.blob);
@@ -74,6 +77,9 @@ export class AkSkComponent implements OnInit{
             if(this.akSkDetail.length > 0){
                 window['getParameters'](this.akSkDetail);
             }
+        }, (error) => {
+            console.log("Something went wrong. Could not fetch the credentials.", error);
+            window['akskWarning'] = true;
         })
     }
     addKey(){
@@ -95,6 +101,7 @@ export class AkSkComponent implements OnInit{
             this.createAkId = JSON.parse(response.credential.blob).access;
             this.credentialId = response.credential.id; 
             this.addAkSkFlag = true;
+            window['akskWarning'] = false;
             this.manageAkSk();
         })
     }

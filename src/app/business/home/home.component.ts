@@ -244,6 +244,8 @@ export class HomeComponent implements OnInit {
                 let allBuckets = [];
                 this.getBuckend(allBuckets);
             }
+        }, (error)=>{
+            console.log("Could not fetch AK/SK", error);
         }) 
     }
     getBuckend(allBuckets){
