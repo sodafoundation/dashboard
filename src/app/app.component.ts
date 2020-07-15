@@ -149,6 +149,13 @@ export class AppComponent implements OnInit, AfterViewInit {
             "text" : "Data flow through buckets by migration / replication."
         },
         {
+            "title": "Delfin",
+            "description": "SODA Infrastructure Manager",
+            "routerLink": "/delfin",
+            "joyrideStep" : "menuDelfin",
+            "text" : "This is the SODA Infrastructre Manager."
+        },
+        {
             "title": "Monitor",
             "description": "Telemetry information.",
             "routerLink": "/monitor",
@@ -185,6 +192,7 @@ export class AppComponent implements OnInit, AfterViewInit {
         'menuProfile',
         'menuResource',
         'menuDataflow',
+        'menuDelfin',
         'menuMonitor',
         'menuServices',
         'menuInfrastructure',

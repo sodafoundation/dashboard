@@ -35,7 +35,8 @@ const routes: Routes = [
     {path: 'createCloudFileShare', loadChildren: './business/block/cloud-file-share/create/cloud-file-share-create.module#CloudFileShareCreateModule'},
     {path: 'modifyCloudFileShare/:fileShareId', loadChildren: './business/block/cloud-file-share/modify/cloud-file-share-modify.module#CloudFileShareModifyModule'},
     {path: 'fileShareDetail/:fileShareId', loadChildren: './business/block/file-share-detail/file-share-detail.module#FileShareDetailModule'},
-    {path: 'services', loadChildren: './business/services/services.module#ServicesModule'}
+    {path: 'services', loadChildren: './business/services/services.module#ServicesModule'},
+    {path: 'delfin', loadChildren: './business/delfin/delfin.module#DelfinModule'}
 ];
 
 @NgModule({
