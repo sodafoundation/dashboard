@@ -57,5 +57,34 @@ export const Consts = {
         'azure-file' : 'Azure File Service'
     },
     S3_HOST_IP: '',
-    S3_HOST_PORT: ''
+    S3_HOST_PORT: '',
+    API: {
+        AUTH : {
+            'getToken' : 'identity/v3/auth/tokens'
+        },
+        DELFIN : {
+            'storages' : 'delfin/storages',
+            'storagePools' : 'delfin/storage-pools',
+            'volumes' : 'delfin/volumes',
+        },
+        HOTPOT : {
+            'profiles' : 'v1beta/{project_id}/profiles',
+            'volumes' : 'v1beta/{project_id}/block/volumes',
+            'getVolumeSnapshots' : 'v1beta/{project_id}/block/snapshots?VolumeId=',
+            'getVolumeReplications' : 'v1beta/{project_id}/block/replications/detail',
+            'createVolumeReplications' : 'v1beta/{project_id}/block/replications',
+            'createVolumeSnapshots' : 'v1beta/{project_id}/block/snapshots',
+            'volumeGroups' : 'v1beta/{project_id}/block/volumeGroups',
+            'getVolumeGroupAttachments' : 'v1beta/{project_id}/block/volumes?GroupId=',
+            'attachVolumeToGroup' : 'v1beta/{project_id}/block/volumeGroups',
+            'fileShares' : 'v1beta/{project_id}/file/shares',
+            'fileShareAcls' : 'v1beta/{project_id}/file/acls',
+            'fileShareSnapshots' : 'v1beta/{project_id}/file/snapshots',
+            'hosts' : 'v1beta/{project_id}/host/hosts',
+            'attachments' : 'v1beta/{project_id}/block/attachments',
+        },
+        GELATO : {
+
+        },
+    }
 }
