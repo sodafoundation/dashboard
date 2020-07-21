@@ -36,6 +36,7 @@ const routes: Routes = [
     {path: 'modifyCloudFileShare/:fileShareId', loadChildren: './business/block/cloud-file-share/modify/cloud-file-share-modify.module#CloudFileShareModifyModule'},
     {path: 'fileShareDetail/:fileShareId', loadChildren: './business/block/file-share-detail/file-share-detail.module#FileShareDetailModule'},
     {path: 'services', loadChildren: './business/services/services.module#ServicesModule'},
+    {path: 'registerStorage', loadChildren: './business/delfin/register-storage/register-storage.module#RegisterStorageModule'},
     {path: 'delfin', loadChildren: './business/delfin/delfin.module#DelfinModule'}
 ];
 

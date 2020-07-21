@@ -2062,16 +2062,16 @@ span.encryption-type {
     font-size: 14px;
     padding: 10px;
 }
-/* Create Host page */
-.initiator-array, .tag-array, .metadata-array{
+/* Create Host page, Create Cloud File Share, Register Storage device */
+.initiator-array, .tag-array, .metadata-array, .extra-attribute-array{
     width: 600px;
     padding: 0 0 5px 0;
 }
-a.add-initiator, a.add-tag, a.add-metadata{
+a.add-initiator, a.add-tag, a.add-metadata, a.add-extra-attribute{
     color: #00b12e;
 }
 
-a.remove-initiator, a.remove-tag, a.remove-metadata{
+a.remove-initiator, a.remove-tag, a.remove-metadata, a.remove-extra-attribute{
     color: #ff0000;
     padding: 8px 0 0 0;
 }
@@ -2108,3 +2108,8 @@ a.remove-initiator, a.remove-tag, a.remove-metadata{
     margin: 10px 0;
 }
 /* Help Section Ends */
+/* Delfin Styles start */
+.delfin-storage-list-page .ui-dataview-layout-options.ui-selectbutton .ui-togglebutton.ui-button.ui-state-default, .ui-selectbutton .ui-button.ui-state-default{
+padding: 0 0.15rem;
+}
+/* Delfin Styles end */

@@ -1,34 +1,84 @@
-<div class="content-header">
-    <h1>Storages</h1>
-    <p>SODA Infrastructure Manager.</p>
-</div>
-<p-table #dt [value]="allStorages" [paginator]="true" [rows]="10">
-    <ng-template pTemplate="caption">
-        <div style="text-align: right">        
-            <i class="fa fa-search" style="margin:4px 4px 0 0"></i>
-            <input type="text" pInputText size="50" placeholder="Global Filter" (input)="dt.filterGlobal($event.target.value, 'contains')" style="width:auto">
+<p-growl [value]="msgs" [sticky]="false" [life]="6000"></p-growl>
+<div class="delfin-storage-list-page">
+    <div class="content-header">
+        <h1>Storages</h1>
+        <p>SODA Infrastructure Manager.</p>
+    </div>
+    <div class="table-toolbar">
+        <div class="left">
+            <button class="ui-button-secondary" pButton type="button" label="Register" [routerLink]="['/registerStorage']"></button>
+            <button pButton type="button" label="{{I18N.keyID['sds_block_volume_delete']}}" [disabled]="selectedStorages.length == 0" (click)="batchDeleteStorages(selectedStorages)"></button></div>
+        <div class="right">
+            <div class="ui-inputsearch">
+                <input type="text" #searchByName pInputText placeholder="{{I18N.keyID['sds_block_volume_search']}}">
+                <button pButton type="button" icon="fa-search"></button>
+            </div>
+            
+            <button title="List View" class="" pButton type="button" (click)="showListView=true" icon="fa-th-list"></button>
+            <button title="Grid View" class="" pButton type="button" (click)="showListView=false" icon="fa-th"></button>
+            <button class="" pButton type="button" (click)="getAllStorages()" icon="fa-refresh"></button>
         </div>
-    </ng-template>
-    <ng-template pTemplate="header">
-        <tr>
-            <th>Name</th>
-            <th>Model</th>
-            <th>Vendor</th>
-            <th>Capacity (Used / Total)</th>
-            <th>Free Capacity</th>
-            <th>Updated At</th>
-            <th>Created At</th>
-        </tr>
-    </ng-template>
-    <ng-template pTemplate="body" let-storage>
-        <tr>
-            <td>{{storage.name}}</td>
-            <td>{{storage.model}}</td>
-            <td>{{storage.vendor}}</td>
-            <td>{{storage.used_capacity}}/{{storage.total_capacity}}</td>
-            <td>{{storage.free_capacity}}</td>
-            <td>{{storage.updated_at ? (storage.updated_at | date:'long') : '--'}}</td>
-            <td>{{storage.created_at ? (storage.created_at | date:'long') : '--'}}</td>
-        </tr>
-    </ng-template>
-</p-table>
+    </div>
+    <div *ngIf="showListView">
+        <p-table #dt [value]="allStorages" [paginator]="true" [rows]="10">
+            <ng-template pTemplate="caption">
+                <div style="text-align: right">        
+                    <i class="fa fa-search" style="margin:4px 4px 0 0"></i>
+                    <input type="text" pInputText size="50" placeholder="Global Filter" (input)="dt.filterGlobal($event.target.value, 'contains')" style="width:auto">
+                </div>
+            </ng-template>
+            <ng-template pTemplate="header">
+                <tr>
+                    <th>Name</th>
+                    <th>Model</th>
+                    <th>Vendor</th>
+                    <th>Capacity (Used / Total)</th>
+                    <th>Free Capacity</th>
+                    <th>Updated At</th>
+                    <th>Created At</th>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-storage>
+                <tr>
+                    <td>{{storage.name}}</td>
+                    <td>{{storage.model}}</td>
+                    <td>{{storage.vendor}}</td>
+                    <td>{{storage.used_capacity}}/{{storage.total_capacity}}</td>
+                    <td>{{storage.free_capacity}}</td>
+                    <td>{{storage.updated_at ? (storage.updated_at | date:'long') : '--'}}</td>
+                    <td>{{storage.created_at ? (storage.created_at | date:'long') : '--'}}</td>
+                </tr>
+            </ng-template>
+        </p-table>
+    </div>
+    <div *ngIf="!showListView">
+        <div class="ui-g">
+            <div *ngFor="let storage of allStorages" class="ui-g-3">
+               <p-card title="{{storage.name}}" subtitle="{{storage.description}}" styleClass="ui-card-shadow">
+                    <p-header>
+                        <span class="grid-storage-vendor">{{storage.vendor}}</span> / <span class="grid-storage-model">{{storage.model}}</span>
+                        <button pButton type="button" icon="fa-check"></button>
+                    </p-header>
+                    <div>
+                       <span class="capacity-free">{{storage.free_capacity}} / </span>
+                       <span class="capacity-used">{{storage.used_capacity}} / </span>
+                       <span class="capacity-total">{{storage.total_capacity}}</span>
+                    </div>
+                    <p-footer>
+                        <div class="ui-g">
+                            <div class="ui-g-6">
+                                Updated At: <span>{{storage.updated_at}}</span>
+                            </div>
+                            <div class="ui-g-6">
+                                Created At: <span>{{storage.created_at}}</span>
+                            </div>
+                        </div>
+                    </p-footer>
+                </p-card>
+            </div>
+           <!--  -->
+           <!--  -->
+           <!--  -->
+        </div>
+    </div>
+</div>

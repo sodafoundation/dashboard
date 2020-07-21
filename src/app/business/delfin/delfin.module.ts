@@ -1,7 +1,7 @@
 import { NgModule, APP_INITIALIZER } from '@angular/core';
-import { RouterModule } from '@angular/router';
+import { RouterModule, Routes } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { ButtonModule, DataTableModule, InputTextModule, DropMenuModule, DialogModule,FormModule,MultiSelectModule, GrowlModule ,DropdownModule,InputTextareaModule} from '../../components/common/api';
+import { ButtonModule, DataTableModule, CardModule, InputTextModule, DropMenuModule, DialogModule,FormModule,MultiSelectModule, GrowlModule ,DropdownModule,InputTextareaModule} from '../../components/common/api';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { HttpService } from './../../shared/service/Http.service';
 import { DelfinComponent } from './delfin.component';
@@ -11,11 +11,13 @@ import { ConfirmationService,ConfirmDialogModule} from '../../components/common/
 import { TooltipModule } from '../../components/tooltip/tooltip';
 import { StoragesComponent } from './storages/storages.component';
 import { TableModule } from '../../components/table/table';
+import { DataViewModule } from '../../components/dataview/dataview';
 
-let routers = [{
+const routers: Routes = [{
     path: '',
     component: DelfinComponent
-  }]
+  }
+]
 
 @NgModule({
   declarations: [ DelfinComponent, StoragesComponent ],
@@ -24,7 +26,9 @@ let routers = [{
     CommonModule, 
     ButtonModule, 
     TableModule,
+    DataViewModule,
     DataTableModule, 
+    CardModule,
     InputTextModule, 
     DropMenuModule, 
     DialogModule,
@@ -38,7 +42,7 @@ let routers = [{
     InputTextareaModule,
     TooltipModule
     ],
-  exports: [ ],
+  exports: [ DelfinComponent ],
   providers: [
     HttpService,
     DelfinService,

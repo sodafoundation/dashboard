@@ -18,7 +18,10 @@ let _ = require("underscore");
 })
 export class StoragesComponent implements OnInit {
     allStorages: any = [];
-
+    selectedStorages: any = [];
+    showListView: boolean = true;
+    msgs: Message[];
+    
     constructor(
         public I18N: I18NService,
         public ds : DelfinService,
@@ -32,6 +35,11 @@ export class StoragesComponent implements OnInit {
         this.getAllStorages();
     }
 
+    toggleView(){
+        this.showListView = this.showListView ? this.showListView : !this.showListView;
+        console.log("ShowlistView", this.showListView);
+    }
+
     getAllStorages(){
         this.ds.getAllStorages().subscribe((res)=>{
             console.log("All Storages", res.json().storages);
@@ -39,5 +47,9 @@ export class StoragesComponent implements OnInit {
         }, (error)=>{
             console.log("Something went wrong. Could not fetch all storages", error);
         })
+    }
+
+    batchDeleteStorages(storages){
+        console.log("Inside batch delete storages.")
     }
 }
