@@ -1,7 +1,7 @@
 import { NgModule, APP_INITIALIZER } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { ButtonModule, DataTableModule, CardModule, InputTextModule, DropMenuModule, DialogModule,FormModule,MultiSelectModule, GrowlModule ,DropdownModule,InputTextareaModule} from '../../components/common/api';
+import { ButtonModule, DataTableModule, ChartModule, CardModule, TabViewModule, InputTextModule, DropMenuModule, DialogModule,FormModule,MultiSelectModule, GrowlModule ,DropdownModule,InputTextareaModule} from '../../components/common/api';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { HttpService } from './../../shared/service/Http.service';
 import { DelfinComponent } from './delfin.component';
@@ -12,7 +12,8 @@ import { TooltipModule } from '../../components/tooltip/tooltip';
 import { StoragesComponent } from './storages/storages.component';
 import { TableModule } from '../../components/table/table';
 import { DataViewModule } from '../../components/dataview/dataview';
-
+import { StorageVolumesComponent } from './volumes/volumes.component';
+import { StoragePoolsComponent } from './storage-pools/storage-pools.component';
 const routers: Routes = [{
     path: '',
     component: DelfinComponent
@@ -26,9 +27,11 @@ const routers: Routes = [{
     CommonModule, 
     ButtonModule, 
     TableModule,
+    ChartModule,
     DataViewModule,
     DataTableModule, 
     CardModule,
+    TabViewModule,
     InputTextModule, 
     DropMenuModule, 
     DialogModule,

@@ -22,6 +22,8 @@ export class StoragesComponent implements OnInit {
     selectStorage;
     showListView: boolean = true;
     menuItems: MenuItem[];
+    capacityData: any;
+    chartOptions: any;
     msgs: Message[];
 
     label = {
@@ -36,7 +38,10 @@ export class StoragesComponent implements OnInit {
         password: "Password",
         extra_attributes: "Extra Attributes",
         created_at: "Created At",
-        updated_at: "Updated At"
+        updated_at: "Updated At",
+        firmware_version: "Firmware Version",
+        serial_number : "Serial Number",
+        location : "Location",
     };
     
     constructor(
@@ -68,8 +73,40 @@ export class StoragesComponent implements OnInit {
 
     getAllStorages(){
         this.ds.getAllStorages().subscribe((res)=>{
-            console.log("All Storages", res.json().storages);
+            
             this.allStorages = res.json().storages;
+            this.allStorages.forEach((element, index) => {
+                let capData = {
+                    labels: ['Used','Free'],
+                    datasets: [
+                        {
+                            data: [element['used_capacity'], element['free_capacity']],
+                            backgroundColor: [
+                                "#FF6384",
+                                "#45e800"
+                            ],
+                            hoverBackgroundColor: [
+                                "#FF6384",
+                                "#45e800"
+                            ]
+                        }]    
+                };
+
+                let opt = {
+                    legend:{
+                        position: 'right'
+                    }
+                }
+                element['capacityData'] = capData;
+                element['chartOptions'] = opt;
+                /* FIXME REMOVE BEFORE MERGING FOR LOCAL TESTING ONLY */
+                if(index%2){
+                    element['status'] = 'abnormal';
+                    element['description'] = "This is a test for a very long description. If this is truncated it will be visible in the info tooltip."
+                }
+                /* FIXME REMOVE BEFORE MERGING FOR LOCAL TESTING ONLY */
+            });
+            console.log("All Storages", this.allStorages);
         }, (error)=>{
             console.log("Something went wrong. Could not fetch all storages", error);
         })

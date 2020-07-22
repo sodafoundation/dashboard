@@ -1,0 +1,138 @@
+<div>
+    <div class="custom-breadcrumb">
+        <span *ngFor="let item of items; index as i">
+          <a [ngClass]="{'font-color-class': i===0}" [routerLink]="[item.url]">{{item.label}}</a>
+          <span *ngIf="(i+1) !== items.length">></span>
+        </span>
+    </div>
+    <p-tabView styleClass="ui-tabview-large">
+        <p-tabPanel header="Configuration">
+            <div class="details-basic-info">
+                <h3>{{i18n.keyID['sds_block_volume_base_info']}}</h3>
+                <div class="ui-grid ui-grid-responsive ui-grid-pad ui-fluid">
+                    <div class="ui-grid-row details-basic-item-class">
+                        <div class="ui-grid-col-2">
+                            {{label.name}}:
+                        </div>
+                        <div class="ui-grid-col-2 details-basic-item-value-color" *ngIf="selectedStorage">
+                            {{selectedStorage.name}}
+                        </div>
+                        <div class="ui-grid-col-2">
+                            {{label.status}}:
+                        </div>
+                        <div class="ui-grid-col-2 details-basic-item-value-color" *ngIf="selectedStorage">
+                            <span class="storage-status-icon" [ngClass]="{normal: selectedStorage.status=='normal', abnormal: selectedStorage.status=='abnormal'}"><i class="fa fa-circle"></i></span>
+                            <span *ngIf="selectedStorage.status=='normal'">Normal</span>
+                            <span *ngIf="selectedStorage.status=='abnormal'">Abnormal</span>
+                        </div>
+                        <div class="ui-grid-col-2">
+                            {{label.created_at}}:
+                        </div>
+                        <div class="ui-grid-col-3 details-basic-item-value-color" *ngIf="selectedStorage">
+                            {{selectedStorage.created_at ? (selectedStorage.created_at | date:'long') : '--'}}
+                        </div>
+                       
+                    </div>
+                    <div class="ui-grid-row details-basic-item-class">
+                        <div class="ui-grid-col-2">
+                            {{label.host}}:
+                        </div>
+                        <div class="ui-grid-col-2 details-basic-item-value-color" *ngIf="selectedStorage">
+                            {{selectedStorage.host ? selectedStorage.host : '--'}}
+                        </div>
+                        <div class="ui-grid-col-2">
+                            {{label.vendor}} / {{label.model}}:
+                        </div>
+                        <div class="ui-grid-col-2 details-basic-item-value-color" *ngIf="selectedStorage">
+                            {{selectedStorage.vendor}} / {{selectedStorage.model}}
+                        </div>
+                        <div class="ui-grid-col-2">
+                            {{label.updated_at}}:
+                        </div>
+                        <div class="ui-grid-col-3 details-basic-item-value-color" *ngIf="selectedStorage">
+                            {{selectedStorage.updated_at ? (selectedStorage.updated_at | date:'long') : '--'}}
+                        </div>
+                        
+                    </div>
+                    <div class="ui-grid-row details-basic-item-class">
+                            <div class="ui-grid-col-2">
+                                {{label.port}}:
+                            </div>
+                            <div class="ui-grid-col-2 details-basic-item-value-color" *ngIf="selectedStorage">
+                                {{selectedStorage.port ? selectedStorage.port : '--'}}
+                            </div>
+                            <div class="ui-grid-col-2">
+                                {{label.firmware_version}}:
+                            </div>
+                            <div class="ui-grid-col-2 details-basic-item-value-color" *ngIf="selectedStorage">
+                                {{selectedStorage.firmware_version}}
+                            </div>
+                            
+                            <div class="ui-grid-col-2">
+                                {{label.location}}:
+                            </div>
+                            <div class="ui-grid-col-3 details-basic-item-value-color" *ngIf="selectedStorage">
+                                {{selectedStorage.location}}
+                            </div>
+                    </div>
+                        <div class="ui-grid-row details-basic-item-class">
+                            <div class="ui-grid-col-2">
+                                {{label.description}}:
+                            </div>
+                            <div class="ui-grid-col-2 details-basic-item-value-color" *ngIf="selectedStorage">
+                                {{selectedStorage.description}}
+                            </div>
+                            
+                        </div>
+                        <div class="ui-grid-row details-basic-item-class">
+                            <div class="ui-grid-col-2">
+                                {{label.serial_number}}:
+                            </div>
+                            <div class="ui-grid-col-3 details-basic-item-value-color" *ngIf="selectedStorage">
+                                {{selectedStorage.serial_number}}
+                            </div>
+                        </div>
+                        <div class="ui-grid-row details-basic-item-class">
+                            <div class="ui-grid-col-12">
+                                {{label.extra_attributes}}:
+                            </div>
+                        </div>
+                </div>
+            </div>
+            <div class="configuration-tabs">
+                <p-tabView styleClass="ui-tabview-large">
+                    <p-tabPanel header="Volumes">
+                        <ng-template pTemplate="content">
+                            <app-delfin-volumes [(selectedStorage)]="selectedStorage"></app-delfin-volumes>
+                        </ng-template>
+                    </p-tabPanel>
+                    <p-tabPanel header="Storage pools">
+                        <app-delfin-storage-pools [(selectedStorage)]="selectedStorage"></app-delfin-storage-pools>
+                    </p-tabPanel>
+                    
+                </p-tabView>
+            </div>
+        </p-tabPanel>
+        <p-tabPanel header="Capacity">
+            <ng-template pTemplate="content">
+                <div class="ui-grid-row">
+                    <div class="ui-g-4">
+                        <dl class="storage-capacity-list">
+                            <dt>Used Capacity</dt>
+                            <dd>{{selectedStorage.used_capacity}}</dd>
+                            <dt>Free Capacity</dt>
+                            <dd>{{selectedStorage.free_capacity}}</dd>
+                            <dt>Total Capacity</dt>
+                            <dd>{{selectedStorage.total_capacity}}</dd>
+                        </dl>
+                    </div>
+                    <div class="ui-g-4">
+                        <p-chart type="doughnut" [data]="capacityData"></p-chart>
+                    </div>
+                </div>
+            </ng-template>
+        </p-tabPanel>
+    </p-tabView>
+    
+</div>
+

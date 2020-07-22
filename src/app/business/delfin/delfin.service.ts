@@ -50,4 +50,24 @@ export class DelfinService {
     modifyAccessinfoByStorageId(id, param){
         return this.http.put(this.delfinStoragesUrl + '/' + id + '/access-info', param);
     }
+
+    //get all Volumes
+    getAllVolumes(): Observable<any> {
+        return this.http.get(this.delfinVolumesUrl);
+    }
+
+     //get Volume Details
+     getVolumeDetails(id): Observable<any> {
+        return this.http.get(this.delfinVolumesUrl+'/'+id);
+    }
+
+    //get all Storage pools
+    getAllStoragePools(): Observable<any> {
+        return this.http.get(this.delfinStoragePoolsUrl);
+    }
+
+     //get Storage Pool details
+     getStoragePoolDetails(id): Observable<any> {
+        return this.http.get(this.delfinStoragePoolsUrl+'/'+id);
+    }
 }

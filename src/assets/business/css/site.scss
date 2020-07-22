@@ -1039,25 +1039,25 @@ a {
     background-color: rgba(243, 246, 247, 1);
 }
 
-.volume-basic-info {
+.volume-basic-info, .details-basic-info {
     background: #f3f6f7;
     margin-bottom: .3rem;
     padding: .2rem;
     border-radius: 12px;
 }
 
-.volume-basic-info h3 {
+.volume-basic-info h3, .details-basic-info h3 {
     padding: 0 .08rem .2rem;
 }
-.volume-basic-info p {
+.volume-basic-info p, .details-basic-info p {
     padding: 0 .08rem .1rem;
 }
 
-.volume-basic-item-class {
+.volume-basic-item-class, .details-basic-item-class {
     padding: 0.5em 0;
 }
 
-.volume-basic-item-value-color {
+.volume-basic-item-value-color, .details-basic-item-value-color {
     color: #2E3039 !important;
 }
 
@@ -2111,5 +2111,27 @@ a.remove-initiator, a.remove-tag, a.remove-metadata, a.remove-extra-attribute{
 /* Delfin Styles start */
 .delfin-storage-list-page .ui-dataview-layout-options.ui-selectbutton .ui-togglebutton.ui-button.ui-state-default, .ui-selectbutton .ui-button.ui-state-default{
 padding: 0 0.15rem;
+}
+dl.storage-capacity-list dt{
+    float: left;
+    clear: left;
+    width: 9.5em;
+    font-weight: bold;
+    padding: 1em 1.5em;
+    font-size: 1.2em;
+}
+dl.storage-capacity-list dd{
+    float: left;
+    padding: 1em 3em;
+    font-size: 1.2em;
+}
+.storage-status-icon i{
+    font-size: 0.12rem;
+}
+.storage-status-icon.normal i{
+    color: #4CAF50;
+}
+.storage-status-icon.abnormal i{
+    color: #F44336;
 }
 /* Delfin Styles end */
