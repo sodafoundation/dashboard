@@ -19,11 +19,28 @@ let _ = require("underscore");
 export class StoragesComponent implements OnInit {
     allStorages: any = [];
     selectedStorages: any = [];
+    selectStorage;
     showListView: boolean = true;
+    menuItems: MenuItem[];
     msgs: Message[];
+
+    label = {
+        name: this.i18n.keyID["sds_block_volume_name"],
+        description: this.i18n.keyID["sds_block_volume_descri"],
+        vendor: "Vendor",
+        model: "Model",
+        status: "Status",
+        host: "Host IP",
+        port: "Port",
+        username: "Username",
+        password: "Password",
+        extra_attributes: "Extra Attributes",
+        created_at: "Created At",
+        updated_at: "Updated At"
+    };
     
     constructor(
-        public I18N: I18NService,
+        public i18n: I18NService,
         public ds : DelfinService,
         private confirmationService: ConfirmationService,
         private fb: FormBuilder
@@ -33,6 +50,15 @@ export class StoragesComponent implements OnInit {
 
     ngOnInit() {
         this.getAllStorages();
+        this.menuItems = [
+            {
+                "label": this.i18n.keyID['sds_block_volume_delete'],
+                command: () => {
+                    this.batchDeleteStorages(this.selectStorage);
+                },
+                disabled:false
+            }
+        ];
     }
 
     toggleView(){
@@ -49,7 +75,49 @@ export class StoragesComponent implements OnInit {
         })
     }
 
+    returnSelectedStorage(selectedStorage){
+        this.selectStorage = selectedStorage;
+    }
+
     batchDeleteStorages(storages){
         console.log("Inside batch delete storages.")
+        if(storages){
+            let  msg, arr = [], selectedNames=[];
+            if(_.isArray(storages)){
+                storages.forEach((item,index)=> {
+                    arr.push(item.id);
+                    selectedNames.push(item['name']);
+                })
+                msg = "<h3>Are you sure you want to delete the selected " + storages.length + " Storages?</h3><h4>[ "+ selectedNames.join(',') +" Storage(s) ]</h4>";
+            }else{
+                arr.push(storages.id)
+                msg = "<h3>Are you sure you want to delete the selected Storage?</h3><h4>[ "+ storages.name +" ]</h4>"; 
+            }
+            this.confirmationService.confirm({
+                message: msg,
+                header: this.i18n.keyID['sds_fileShare_delete'],
+                acceptLabel: this.i18n.keyID['sds_block_volume_delete'],
+                isWarning: true,
+                accept: ()=>{
+                    arr.forEach((item,index)=> {
+                        this.deleteStorage(item)
+                    })
+                },
+                reject:()=>{}
+            })
+        }
+    }
+
+    deleteStorage(storage){
+
+        this.ds.deleteStorage(storage).subscribe(res=>{
+            this.msgs = [];
+            this.msgs.push({severity: 'success', summary: 'Success', detail: 'Storage deleted successfully.'});
+            this.getAllStorages();
+        }, (error)=>{
+            this.msgs = [];
+            this.msgs.push({severity: 'error', summary: 'Error', detail: 'Error deleting Storage'});
+            console.log("Something went wrong. Could not delete storage", error);
+        });
     }
 }

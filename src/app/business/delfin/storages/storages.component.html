@@ -7,10 +7,10 @@
     <div class="table-toolbar">
         <div class="left">
             <button class="ui-button-secondary" pButton type="button" label="Register" [routerLink]="['/registerStorage']"></button>
-            <button pButton type="button" label="{{I18N.keyID['sds_block_volume_delete']}}" [disabled]="selectedStorages.length == 0" (click)="batchDeleteStorages(selectedStorages)"></button></div>
+            <button pButton type="button" label="{{i18n.keyID['sds_block_volume_delete']}}" [disabled]="selectedStorages.length == 0" (click)="batchDeleteStorages(selectedStorages)"></button></div>
         <div class="right">
             <div class="ui-inputsearch">
-                <input type="text" #searchByName pInputText placeholder="{{I18N.keyID['sds_block_volume_search']}}">
+                <input type="text" #searchAll pInputText placeholder="{{i18n.keyID['sds_block_volume_search']}}">
                 <button pButton type="button" icon="fa-search"></button>
             </div>
             
@@ -20,36 +20,109 @@
         </div>
     </div>
     <div *ngIf="showListView">
-        <p-table #dt [value]="allStorages" [paginator]="true" [rows]="10">
-            <ng-template pTemplate="caption">
-                <div style="text-align: right">        
-                    <i class="fa fa-search" style="margin:4px 4px 0 0"></i>
-                    <input type="text" pInputText size="50" placeholder="Global Filter" (input)="dt.filterGlobal($event.target.value, 'contains')" style="width:auto">
+        <p-dataTable [value]="allStorages" [globalFilter]="searchAll" [(selection)]="selectedStorages" [expandableRows]="true" [showHeaderCheckbox]="true" resizableColumns="true" [rows]="10" [paginator]="true" [pageLinks]="3" [rowsPerPageOptions]="[10,20,50,100]">
+            <p-column expander="true" styleClass="col-icon" [style]="{'width': '30px'}"></p-column>
+            <p-column selectionMode="multiple" [style]="{'width': '30px'}"></p-column>
+            <p-column field="name" header="Name"></p-column>
+            <p-column field="vendor" header="Vendor"></p-column>
+            <p-column field="model" header="Model"></p-column>
+            <p-column field="status" header="Status">
+                <ng-template pTemplate="body" let-storage="rowData">
+                    {{storage.status}}
+                </ng-template>
+            </p-column>
+            <p-column header="Capacity">
+                <ng-template pTemplate="body" let-storage="rowData">
+                    <span class="capacity-free">{{storage.free_capacity}} / </span>
+                    <span class="capacity-used">{{storage.used_capacity}} / </span>
+                    <span class="capacity-total">{{storage.total_capacity}}</span>
+                </ng-template>
+            </p-column>
+            <p-column field="created_at" header="Created At">
+                <ng-template pTemplate="body" let-storage="rowData">
+                    <span>{{storage.created_at ? (storage.created_at | date:'long') : '--'}}</span>
+                </ng-template>
+            </p-column>
+            <p-column field="updated_at" header="Updated At">
+                <ng-template pTemplate="body" let-storage="rowData">
+                    <span>{{storage.updated_at ? (storage.updated_at | date:'long') : '--'}}</span>
+                </ng-template>
+            </p-column>
+            <p-column header="{{i18n.keyID['sds_block_volume_operation']}}" [style]="{'width': '335px'}">
+                <ng-template pTemplate="body" let-storage="rowData" let-i="rowIndex">
+                    <p-dropmenu label="{{i18n.keyID['sds_block_volume_more']}}" [model]="storage['disabled'] ? menuDeleDisableItems: menuItems" (click)="returnSelectedStorage(storage)"></p-dropmenu>
+                </ng-template>
+            </p-column>
+            <ng-template let-storage pTemplate="rowexpansion">
+                <div class="ui-grid ui-grid-responsive ui-grid-pad ui-fluid">
+                    <div class="ui-grid-row volume-basic-item-class">
+                            <div class="ui-grid-col-2">
+                                {{label.name}}:
+                            </div>
+                            <div class="ui-grid-col-2 volume-basic-item-value-color">
+                                {{storage.name}}
+                            </div>
+                            <div class="ui-grid-col-2">
+                                {{label.status}}:
+                            </div>
+                            <div class="ui-grid-col-2 volume-basic-item-value-color">
+                                {{storage.status? storage.status : '--'}}
+                            </div>
+                            <div class="ui-grid-col-2">
+                                {{label.created_at}}:
+                            </div>
+                            <div class="ui-grid-col-3 volume-basic-item-value-color">
+                                {{storage.created_at ? (storage.created_at | date:'long') : '--'}}
+                            </div>
+                            
+                        </div>
+                        <div class="ui-grid-row volume-basic-item-class">
+                            <div class="ui-grid-col-2">
+                                {{label.description}}:
+                            </div>
+                            <div class="ui-grid-col-2 volume-basic-item-value-color">
+                                {{storage.description}}
+                            </div>
+                            <div class="ui-grid-col-2">
+                                {{label.vendor}} / {{label.model}}:
+                            </div>
+                            <div class="ui-grid-col-2 volume-basic-item-value-color">
+                                {{storage.vendor}} / {{storage.model}}
+                            </div>
+                            <div class="ui-grid-col-2">
+                                {{label.updated_at}}:
+                            </div>
+                            <div class="ui-grid-col-3 volume-basic-item-value-color">
+                                {{storage.updated_at ? (storage.updated_at | date:'long') : '--'}}
+                            </div>
+                            
+                        </div>
+                        <div class="ui-grid-row volume-basic-item-class">
+                                <div class="ui-grid-col-2">
+                                    
+                                </div>
+                                <div class="ui-grid-col-2 volume-basic-item-value-color">
+                                    
+                                </div>
+                                <div class="ui-grid-col-2">
+                                    
+                                </div>
+                                <div class="ui-grid-col-2 volume-basic-item-value-color">
+                                    
+                                </div>
+                                
+                                <div class="ui-grid-col-2">
+                                    
+                                </div>
+                                <div class="ui-grid-col-3 volume-basic-item-value-color">
+                                    
+                                </div>
+                            </div>
+                    
                 </div>
-            </ng-template>
-            <ng-template pTemplate="header">
-                <tr>
-                    <th>Name</th>
-                    <th>Model</th>
-                    <th>Vendor</th>
-                    <th>Capacity (Used / Total)</th>
-                    <th>Free Capacity</th>
-                    <th>Updated At</th>
-                    <th>Created At</th>
-                </tr>
-            </ng-template>
-            <ng-template pTemplate="body" let-storage>
-                <tr>
-                    <td>{{storage.name}}</td>
-                    <td>{{storage.model}}</td>
-                    <td>{{storage.vendor}}</td>
-                    <td>{{storage.used_capacity}}/{{storage.total_capacity}}</td>
-                    <td>{{storage.free_capacity}}</td>
-                    <td>{{storage.updated_at ? (storage.updated_at | date:'long') : '--'}}</td>
-                    <td>{{storage.created_at ? (storage.created_at | date:'long') : '--'}}</td>
-                </tr>
-            </ng-template>
-        </p-table>
+        </ng-template>
+        </p-dataTable>
+        
     </div>
     <div *ngIf="!showListView">
         <div class="ui-g">
@@ -57,7 +130,7 @@
                <p-card title="{{storage.name}}" subtitle="{{storage.description}}" styleClass="ui-card-shadow">
                     <p-header>
                         <span class="grid-storage-vendor">{{storage.vendor}}</span> / <span class="grid-storage-model">{{storage.model}}</span>
-                        <button pButton type="button" icon="fa-check"></button>
+                        <p-dropmenu label="{{i18n.keyID['sds_block_volume_more']}}" [model]="storage['disabled'] ? menuDeleDisableItems: menuItems" (click)="returnSelectedStorage(storage)"></p-dropmenu>
                     </p-header>
                     <div>
                        <span class="capacity-free">{{storage.free_capacity}} / </span>
@@ -81,4 +154,5 @@
            <!--  -->
         </div>
     </div>
+    <p-confirmDialog></p-confirmDialog>
 </div>
