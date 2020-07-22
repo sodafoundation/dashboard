@@ -49,7 +49,7 @@ cat > /etc/nginx/conf.d/default.conf <<EOF
         }
 
          location /${SODA_DELFIN_API_VERSION}/ {
-            proxy_pass ${SODA_DELFIN_URL}/${OPENSDS_HOTPOT_API_VERSION}/;
+            proxy_pass ${SODA_DELFIN_URL}/${OPENSDS_GELATO_API_VERSION}/;
         }
         
          location /${OPENSDS_GELATO_API_VERSION}/ {
