@@ -15,8 +15,8 @@ export class DelfinService {
     delfinVolumesUrl = Consts.API.DELFIN.volumes;
     
     //register storage
-    registerStorage(param){
-        return this.http.post(this.delfinStoragesUrl,param);
+    registerStorage(params){
+        return this.http.post(this.delfinStoragesUrl,params);
     }
     //get All Storages
     getAllStorages(): Observable<any> {
@@ -31,8 +31,8 @@ export class DelfinService {
       return this.http.delete(this.delfinStoragesUrl + "/" + id);
     }
     //modify storage
-    modifyStorage(id,param): Observable<any> {
-      return this.http.put(this.delfinStoragesUrl + "/" + id,param);
+    modifyStorage(id,params): Observable<any> {
+      return this.http.put(this.delfinStoragesUrl + "/" + id, params);
     }
     //Sync all storages
     syncAllStorages(param){
@@ -47,8 +47,8 @@ export class DelfinService {
         return this.http.get(this.delfinStoragesUrl + '/' + id + '/access-info');
     }
     //modify Access info by storage id
-    modifyAccessinfoByStorageId(id, param){
-        return this.http.put(this.delfinStoragesUrl + '/' + id + '/access-info', param);
+    modifyAccessinfoByStorageId(id, params){
+        return this.http.put(this.delfinStoragesUrl + '/' + id + '/access-info', params);
     }
 
     //get all Volumes
@@ -69,5 +69,25 @@ export class DelfinService {
      //get Storage Pool details
      getStoragePoolDetails(id): Observable<any> {
         return this.http.get(this.delfinStoragePoolsUrl+'/'+id);
+    }
+
+    //get all alert sources
+    getAllAlertSources(id): Observable<any>{
+        return this.http.get(this.delfinStoragesUrl + '/' + id + '/alert-source')
+    }
+
+    //Modify alert source
+    registerAlertSource(id, params): Observable<any>{
+        return this.http.put(this.delfinStoragesUrl + '/' + id + '/alert-source', params)
+    }
+
+    //delete alert source
+    deleteAlertSource(id): Observable<any>{
+        return this.http.delete(this.delfinStoragesUrl + '/' + id + '/alert-source')
+    }
+
+     //delete alerts
+     deleteAlerts(id, seqNum): Observable<any>{
+        return this.http.delete(this.delfinStoragesUrl + '/' + id + '/alerts/' + seqNum);
     }
 }

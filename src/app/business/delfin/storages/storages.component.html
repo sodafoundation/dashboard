@@ -204,3 +204,42 @@
     </div>
     <p-confirmDialog></p-confirmDialog>
 </div>
+<p-dialog styleClass="register-alert-source-dialog"  header="Register Alert Source" [(visible)]="showRegisterAlertSourceForm" [width]="900" modal="modal" [height]="700">
+    <form [formGroup]="registerAlertSourceForm" [grid]="{label: 'ui-g-3', content:'ui-g-20'}" [errorMessage]="errorMessage">
+        <form-item label="{{alertSourceFormlabel.version}}" [required]="true">
+            <p-dropdown [style]="{'min-width':'150px','width':'220px'}" placeholder="Please select" [options]="versionOptions" (onChange)="setFormByVersion(selectedVersion)" name='selectedVersion' [(ngModel)]='selectedVersion' formControlName="version"></p-dropdown>
+        </form-item>
+        <form-item *ngIf="v2cFields" label="{{alertSourceFormlabel.community_string}}">
+            <input formControlName="community_string" type="text" size="30" pInputText> 
+        </form-item>
+        <form-item *ngIf="v3Fields" label="{{alertSourceFormlabel.username}}">
+            <input formControlName="username" type="text" size="30" pInputText> 
+        </form-item>
+        <form-item *ngIf="v3Fields" label="{{alertSourceFormlabel.engine_id}}">
+            <input formControlName="engine_id" type="text" size="30" pInputText> 
+        </form-item>
+        <form-item *ngIf="v3Fields" label="{{alertSourceFormlabel.security_level}}">
+            <p-dropdown [style]="{'min-width':'150px','width':'220px'}" placeholder="Please select" [options]="securityLeveloptions" name='selectedSecurityLevel' [(ngModel)]='selectedSecurityLevel' formControlName="security_level"></p-dropdown>
+        </form-item>
+        <form-item *ngIf="v3Fields && (selectedSecurityLevel=='AuthNoPriv' || selectedSecurityLevel=='AuthPriv')" label="{{alertSourceFormlabel.auth_protocol}}">
+            <p-dropdown [style]="{'min-width':'150px','width':'220px'}" placeholder="Please select" [options]="authProtocolOptions" name='selectedAuthProtocol' [(ngModel)]='selectedAuthProtocol' formControlName="auth_protocol"></p-dropdown>
+        </form-item>
+        <form-item *ngIf="v3Fields && (selectedSecurityLevel=='AuthNoPriv' || selectedSecurityLevel=='AuthPriv')" label="{{alertSourceFormlabel.auth_key}}">
+            <input formControlName="auth_key" type="text" size="30" pInputText> 
+        </form-item>
+        <form-item *ngIf="v3Fields && selectedSecurityLevel=='AuthPriv'" label="{{alertSourceFormlabel.privacy_protocol}}">
+            <p-dropdown [style]="{'min-width':'150px','width':'220px'}" placeholder="Please select" [options]="privacyProtocolOptions" name='selectedPrivacyProtocol' [(ngModel)]='selectedPrivacyProtocol' formControlName="privacy_protocol"></p-dropdown>
+        </form-item>
+        <form-item *ngIf="v3Fields && selectedSecurityLevel=='AuthPriv'" label="{{alertSourceFormlabel.privacy_key}}">
+            <input formControlName="privacy_key" type="text" size="30" pInputText> 
+        </form-item>
+        <form-item [required]="true" label="{{alertSourceFormlabel.host}}">
+            <input formControlName="host" type="text" size="30" pInputText> 
+        </form-item>
+    </form>
+    <p-footer>
+        <button type="submit" class="ui-button-secondary" pButton (click)="registerAlertSource(registerAlertSourceForm.value)"  label="{{i18n.keyID['ok']}}"></button>
+        <button type="button" pButton (click)="showRegisterAlertSourceForm=false"  label="{{i18n.keyID['cancel']}}"></button>
+    </p-footer>
+
+</p-dialog>

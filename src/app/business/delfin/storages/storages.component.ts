@@ -19,11 +19,24 @@ let _ = require("underscore");
 export class StoragesComponent implements OnInit {
     allStorages: any = [];
     selectedStorages: any = [];
+    selectedStorageId: any;
     selectStorage;
     showListView: boolean = true;
     menuItems: MenuItem[];
     capacityData: any;
     chartOptions: any;
+    versionOptions: any;
+    selectedVersion: any;
+    securityLeveloptions: any;
+    selectedSecurityLevel: any;
+    authProtocolOptions: any;
+    selectedAuthProtocol: any;
+    privacyProtocolOptions: any;
+    selectedPrivacyProtocol: any;
+    registerAlertSourceForm: any;
+    showRegisterAlertSourceForm: boolean = false;
+    v2cFields: boolean = false;
+    v3Fields: boolean = false;
     msgs: Message[];
 
     label = {
@@ -43,12 +56,39 @@ export class StoragesComponent implements OnInit {
         serial_number : "Serial Number",
         location : "Location",
     };
+
+    alertSourceFormlabel = {
+        "version": "Version",
+        "community_string": "Community String",
+        "username": "Username",
+        "engine_id": "Engine ID",
+        "security_level": "Security Level",
+        "auth_protocol": "Auth Protocol",
+        "auth_key": "Auth Key",
+        "privacy_protocol": "Privacy Protocol",
+        "privacy_key": "Privacy Key",
+        "host": "Host"
+    }
+
+    errorMessage = {
+        "version" : {
+            required: "Version is required"
+        },
+        "host" : {
+            required: "Host IP address is required",
+            pattern: "Enter valid IPv4 address"
+        }
+    };
+    validRule= {
+        'validIp': '([0-9]{1,3})[.]([0-9]{1,3})[.]([0-9]{1,3})[.]([0-9]{1,3})' /* Validates IPv4 address */
+    };
     
     constructor(
         public i18n: I18NService,
         public ds : DelfinService,
         private confirmationService: ConfirmationService,
-        private fb: FormBuilder
+        private fb: FormBuilder,
+        private router: Router,
     ) {
        
     }
@@ -57,6 +97,21 @@ export class StoragesComponent implements OnInit {
         this.getAllStorages();
         this.menuItems = [
             {
+                "label": "Register Alert Source",
+                command: () => {
+                    console.log("Alert Source registered");
+                    this.showAlertSourceDialog(this.selectStorage);
+                },
+                disabled:false
+            },
+            {
+                "label": "Remove Alert Source",
+                command: () => {
+                    console.log("Alert Source removed");
+                },
+                disabled:false
+            },
+            {
                 "label": this.i18n.keyID['sds_block_volume_delete'],
                 command: () => {
                     this.batchDeleteStorages(this.selectStorage);
@@ -64,6 +119,70 @@ export class StoragesComponent implements OnInit {
                 disabled:false
             }
         ];
+        this.versionOptions = [
+            {
+                label: "SNMPV2C",
+                value: 'SNMPv2v'
+            },
+            {
+              label: "SNMPV3",
+              value: 'SNMPv3'
+            }
+        ];
+
+        this.securityLeveloptions = [
+            {
+                label: "NoAuthnoPriv",
+                value: "NoAuthnoPriv"
+            },
+            {
+                label: "AuthNoPriv",
+                value: "AuthNoPriv"
+            },
+            {
+                label: "AuthPriv",
+                value: "AuthPriv"
+            }
+        ];
+
+        this.authProtocolOptions = [
+            {
+                label: "MD5",
+                value: "MD5"
+            },
+            {
+                label: "SHA",
+                value: "SHA"
+            }
+        ];
+
+        this.privacyProtocolOptions = [
+            {
+                label: "3DES",
+                value: "3DES"
+            },
+            {
+                label: "DES",
+                value: "DES"
+            },
+            {
+                label: "AES",
+                value: "AES"
+            }
+        ];
+
+        this.registerAlertSourceForm = this.fb.group({
+            'version': new FormControl('', Validators.required),
+            'community_string': new FormControl(''),
+            'username': new FormControl('', Validators.required),
+            'engine_id': new FormControl(''),
+            'security_level': new FormControl(''),
+            'auth_protocol': new FormControl(''),
+            'auth_key': new FormControl(''),
+            'privacy_protocol': new FormControl(''),
+            'privacy_key': new FormControl(''),
+            'host': new FormControl('', {validators:[Validators.required, Validators.pattern(this.validRule.validIp)]})
+        });
     }
 
     toggleView(){
@@ -156,5 +275,71 @@ export class StoragesComponent implements OnInit {
             this.msgs.push({severity: 'error', summary: 'Error', detail: 'Error deleting Storage'});
             console.log("Something went wrong. Could not delete storage", error);
         });
+    }
+
+    showAlertSourceDialog(storage){
+        this.showRegisterAlertSourceForm = true;
+        this.v2cFields = false;
+        this.v3Fields = false;
+        this.selectedStorageId = storage['id']
+        this.registerAlertSourceForm.reset();
+    }
+
+    prepareFormDataArray(value){
+        let dataArr = {
+            version: value['version'],
+            username: value['username'],
+            engine_id: value['engine_id'],
+            security_level: value['security_level'],
+            auth_protocol: value['auth_protocol'],
+            auth_key: value['auth_key'],
+            privacy_protocol: value['privacy_protocol'],
+            privacy_key: value['privacy_key'],
+            host: value['host'],
+        };
+
+        if(value['community_string']){
+            dataArr['community_string'] = value['community_string'];
+        }
+
+        return dataArr;
+    }
+    setFormByVersion(version){
+        switch (version) {
+            case 'SNMPv2c':
+                    this.v2cFields = true;
+                    this.v3Fields = false;
+                break;
+            case 'SNMPv3':
+                    this.v2cFields = false;
+                    this.v3Fields = true;
+                break;
+
+            default:
+                break;
+        }
+    }
+
+    registerAlertSource(value){
+        if(!this.registerAlertSourceForm.valid){
+            for(let i in this.registerAlertSourceForm.controls){
+                this.registerAlertSourceForm.controls[i].markAsTouched();
+            }
+            return;
+        }
+        let dataArr = this.prepareFormDataArray(value);
+
+        this.ds.registerAlertSource(this.selectedStorageId, dataArr).subscribe((res)=>{
+            this.msgs = [];
+            this.msgs.push({severity: 'success', summary: 'Success', detail: 'Storage device registered successfully.'});
+            let queryParams = {
+                "message": JSON.stringify({severity: 'success', summary: 'Success', detail: 'Storage device registered successfully.'})
+            };
+            this.router.navigate(['/delfin'], {queryParams: queryParams});
+        }, (error) =>{
+            this.msgs = [];
+            this.msgs.push({severity: 'error', summary: "Error", detail:"Something went wrong. Storage device could not be registered."});
+            console.log("Something went wrong. Storage device could not be registered.", error);
+        })
     }
 }
