@@ -7,7 +7,7 @@ import { I18nPluralPipe } from '@angular/common';
 import { HttpService } from './../../../shared/api';
 import { FormControl, FormGroup, FormBuilder, Validators, ValidatorFn, AbstractControl } from '@angular/forms';
 
-import { ButtonModule ,ConfirmationService} from './../../../components/common/api';
+import { ButtonModule ,ConfirmationService, Message} from './../../../components/common/api';
 import { ProfileService } from './../profile.service';
 
 // import {CardModule} from 'primeng/card';
@@ -55,6 +55,7 @@ export class ProfileCardComponent implements OnInit {
     modifyProfileForm: FormGroup;
     dropMenuItems = [];
     isAdministrator = true;
+    msgs: Message[];
     @Input() 
     set cardData(data: any) {
         this.data = data;
@@ -214,6 +215,11 @@ export class ProfileCardComponent implements OnInit {
     deleteProfile(id) {
         this.ProfileService.deleteProfile(id).subscribe((res) => {
             this.checkParam.emit(false);
+        }, (error) => {
+            console.log("Error deleting profile", error.json().message);
+            this.msgs = [];
+            this.msgs.push({severity: 'error', summary: "Error", detail: 'Profile could not be deleted.' + '<br />' + 'Code:' + error.json().code + '<br />' + 'Message:' + error.json().message});
+            this.checkParam.emit(this.msgs);
         });
     }
     confirmDialog([msg,header,acceptLabel,warming=true,func]){
