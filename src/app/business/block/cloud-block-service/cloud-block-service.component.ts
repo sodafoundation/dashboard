@@ -147,10 +147,8 @@ export class CloudBlockServiceComponent implements OnInit{
                 if(element.type == 'aws-file'){
                     this.selectedBackends.push(element);
                 }
-                this.backendId = this.selectedBackends[0]['id'];
-
-
             });
+            this.backendId = this.selectedBackends[0]['id'];
             if(this.backendId){
                 this.cloudBS.getVolumesByBackend(this.backendId).subscribe((res) => {
                     let vols = res.json() && res.json().volumes ? res.json().volumes : [];
