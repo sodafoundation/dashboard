@@ -6,7 +6,7 @@ import { trigger, state, style, transition, animate } from '@angular/animations'
 import { I18nPluralPipe } from '@angular/common';
 
 import { ProfileService, PoolService } from './profile.service';
-import { ConfirmationService,ConfirmDialogModule} from '../../components/common/api';
+import { ConfirmationService,ConfirmDialogModule, Message} from '../../components/common/api';
 let lodash = require('lodash');
 
 @Component({
@@ -47,6 +47,7 @@ export class ProfileComponent implements OnInit {
     isAdministrator = true;
     allProfileNameForCheck = [];
     pools = [];
+    msgs: Message[];
     constructor(
         public I18N: I18NService,
         // private router: Router
@@ -67,7 +68,10 @@ export class ProfileComponent implements OnInit {
         }
     }
 
-    checkRep(){
+    checkRep(message?){
+        if(message){
+            this.msgs = message;
+        }
         this.getProfiles();
     }
     getProfiles() {
