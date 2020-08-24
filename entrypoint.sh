@@ -66,7 +66,7 @@ cat /etc/nginx/conf.d/default.conf
 echo "Starting application..."
 echo "OPENSDS_S3_HOST = ${OPENSDS_S3_HOST}"
 echo "OPENSDS_S3_PORT = ${OPENSDS_S3_PORT}"
-envsubst '\${OPENSDS_S3_HOST} \${OPENSDS_S3_PORT}' < "/var/www/html/assets/data/runtime.json" > "/var/www/html/assets/data/runtime.json"
+echo "{\"hostIP\": \"$OPENSDS_S3_HOST\",\"hostPort\": \"$OPENSDS_S3_PORT\"}" >/var/www/html/assets/data/runtime.json
 
 # start nginx service
 /usr/sbin/nginx -g "daemon off;"
