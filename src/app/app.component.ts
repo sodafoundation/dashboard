@@ -4,7 +4,7 @@ import { Router } from '@angular/router';
 import { I18NService, Consts, ParamStorService, MsgBoxService, Utils, HttpService } from 'app/shared/api';
 import { Button } from 'app/components/button/button';
 import { I18nPluralPipe } from '@angular/common';
-import { MenuItem, SelectItem} from './components/common/api';
+import { MenuItem, ConfirmationService, SelectItem} from './components/common/api';
 import { akSkService } from './business/ak-sk/ak-sk.service';
 import { BucketService } from './business/block/buckets.service';
 import * as aws4 from "ngx-aws4";
@@ -18,7 +18,7 @@ let _ = require("underscore");
 @Component({
     selector: 'app-root',
     templateUrl: './app.component.html',
-    providers: [MsgBoxService, akSkService],
+    providers: [MsgBoxService, akSkService, ConfirmationService],
     styleUrls: []
 })
 export class AppComponent implements OnInit, AfterViewInit {
@@ -233,10 +233,13 @@ export class AppComponent implements OnInit, AfterViewInit {
         private paramStor: ParamStorService,
         private msg: MsgBoxService,
         private akSkService: akSkService,
+        private confirmationService: ConfirmationService,
         public I18N: I18NService,
         private BucketService: BucketService,
         private readonly joyrideService: JoyrideService
-    ) { }
+    ) { 
+        window['akskWarning'] = false;
+    }
 
     // Wave params
     svg_height = 150;
@@ -559,8 +562,20 @@ export class AppComponent implements OnInit, AfterViewInit {
                     'X-Auth-Token': localStorage['auth-token']
                 } 
             }
+            
             this.akSkService.getAkSkList(request,options).subscribe(res=>{
                 let response = res.json();
+                if(!response.credentials.length){
+                    window['akskWarning']=true;
+                    
+                }
+                if(window['akskWarning'] && this.router.url != 'akSkManagement'){
+                    let msg = "SODA Dashboard requires AK/SK authentication for all multi-cloud operations. The current system does not have an AK/SK. Click below to go to AK/SK management and add one."
+                    let header = "AK/SK Not Found!";
+                    let acceptLabel = "Add AK/SK";
+                    let warning=true;
+                    this.confirmDialog([msg,header,acceptLabel,warning]);
+                }
                 let detailArr = [];
                 response.credentials.forEach(item=>{
                     if(item.user_id == window['userId']){
@@ -571,6 +586,7 @@ export class AppComponent implements OnInit, AfterViewInit {
                 this.SignatureKey = [];
                 if(detailArr.length > 0){
                     window['getParameters'](detailArr); 
+                    window['akskWarning'] = false;
                 }
                 if (cb) {
                     cb();
@@ -670,6 +686,21 @@ export class AppComponent implements OnInit, AfterViewInit {
             })
             return requestOptions;
     	}
+    }
+    confirmDialog([msg,header,acceptLabel,warning]){
+        this.confirmationService.confirm({
+            message: msg,
+            header: header,
+            acceptLabel: acceptLabel,
+            isWarning: warning,
+            key: 'akskWarningPrompt',
+            accept: ()=>{
+                this.isHomePage = false;
+                window['akskWarning'] = false;
+                this.router.navigateByUrl('/akSkManagement');
+            },
+            reject:()=>{}
+        })
     }
     /* Joyride */
     stepVisible: any;
