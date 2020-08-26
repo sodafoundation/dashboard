@@ -6,7 +6,7 @@ import { HttpModule } from "@angular/http";
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { SharedModule } from './shared/shared.module';
-import { DropMenuModule, PanelModule, SelectButtonModule, ButtonModule, InputTextModule } from './components/common/api';
+import { DropMenuModule, PanelModule, SelectButtonModule, ButtonModule, InputTextModule, ConfirmationService,ConfirmDialogModule } from './components/common/api';
 import { ProgressBarModule } from './components/progressbar/progressbar';
 import { ScrollPanelModule } from './components/scrollpanel/scrollpanel';
 import { LocationStrategy, HashLocationStrategy } from '@angular/common';
@@ -36,9 +36,10 @@ import { MessagesModule } from './components/messages/messages';
     ButtonModule,
     InputTextModule,
     ProgressBarModule,
+    ConfirmDialogModule
   ],
   providers: [
-      { provide: LocationStrategy, useClass: HashLocationStrategy }, BucketService, HttpService
+      { provide: LocationStrategy, useClass: HashLocationStrategy }, BucketService, HttpService, ConfirmationService
   ],
   bootstrap: [AppComponent]
 })
