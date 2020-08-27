@@ -9,7 +9,8 @@ import { HttpService } from './../../../shared/api';
 import { ProfileService } from './../../profile/profile.service';
 import { AvailabilityZonesService } from './../../resource/resource.service';
 import { DelfinService } from '../delfin.service';
-import { InputTextModule, CheckboxModule, ButtonModule, DropdownModule, MultiSelectModule, DialogModule, Message, GrowlModule, SpinnerModule, FormModule } from './../../../components/common/api';
+import { InputTextModule, InputSwitchModule, CheckboxModule, ButtonModule, DropdownModule, MultiSelectModule, DialogModule, Message, GrowlModule, SpinnerModule, FormModule } from './../../../components/common/api';
+import { FieldsetModule } from '../../../components/fieldset/fieldset';
 
 let routers = [{
   path: '',
@@ -21,8 +22,10 @@ let routers = [{
     RouterModule.forChild(routers),
     ReactiveFormsModule,
     FormsModule,
+    FieldsetModule,
     CommonModule,
     InputTextModule,
+    InputSwitchModule,
     CheckboxModule,
     ButtonModule,
     DropdownModule,

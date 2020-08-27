@@ -22,56 +22,86 @@ export class RegisterStorageComponent implements OnInit {
     vendorOptions: any;
     allStorageModels: any;
     modelOptions: any;
+    pubKeyTypeOptions: any;
     registerStorageForm: any;
     selectedVendor: any;
     selectedModel: any;
+    selectedPubKeyType; any;
+    showExtraAttribs: boolean = false;
+    showSsh: boolean = true;
+    showRest: boolean = true;
 
     label = {
-        name: this.i18n.keyID["sds_block_volume_name"],
-        description: this.i18n.keyID["sds_block_volume_descri"],
+        /* name: this.i18n.keyID["sds_block_volume_name"],
+        description: this.i18n.keyID["sds_block_volume_descri"], */
         vendor: "Vendor",
         model: "Model",
-        host: "Host IP",
-        port: "Port",
-        username: "Username",
-        password: "Password",
+        restHost: "Host IP",
+        restPort: "Port",
+        restUsername: "Username",
+        restPassword: "Password",
+        sshHost: "Host IP",
+        sshPort: "Port",
+        sshUsername: "Username",
+        sshPassword: "Password",
+        sshPubKey: "Pub Key",
+        sshPubKeyType: "Pub Key Type",
         extra_attributes: "Extra Attributes"
     };
 
     errorMessage = {
-        "name": { 
+        /* "name": { 
             minlength: "Minimum 2 characters",
             maxlength: "Maximum 128 characters",
             pattern: "Must start with a character. Can contain alphabets, numbers and underscore. No special characters allowed."
-        },
+        }, */
         "vendor" : {
             required: "Vendor is required"
         },
         "model" : {
             required: "Model is required"
         },
-        "host" : {
+        "restHost" : {
             required: "Host IP address is required",
             pattern: "Enter valid IPv4 address"
         },
-        "port" : {
+        "restPort" : {
             required: "Port is required"
         },
-        "username" : {
+        "restUsername" : {
             required: "Username is required"
         },
-        "password" : {
+        "restPassword" : {
             required: "Password is required"
         },
+        "sshHost" : {
+            required: "Host IP address is required",
+            pattern: "Enter valid IPv4 address"
+        },
+        "sshPort" : {
+            required: "Port is required"
+        },
+        "sshUsername" : {
+            required: "Username is required"
+        },
+        "sshPassword" : {
+            required: "Password is required"
+        },
+        "sshPubKey" : {
+            required: "Public Key is required"
+        },
+        "sshPubKeyType" : {
+            required: "Public Key type is required"
+        },/* ,
         "description" : {
             minlength: "Minimum 2 characters",
             maxlength: "Maximum 250 characters",
             pattern: "Must start with a character. Can contain alphabets, numbers and underscore. No special characters allowed."
-        }
+        } */
     };
     validRule= {
-        'name':'^[a-zA-Z]{1}([a-zA-Z0-9]|[-_]){0,127}$',
-        'description':'^[a-zA-Z ]{1}([a-zA-Z0-9 ]){0,249}$',
+        /* 'name':'^[a-zA-Z]{1}([a-zA-Z0-9]|[-_]){0,127}$',
+        'description':'^[a-zA-Z ]{1}([a-zA-Z0-9 ]){0,249}$', */
         'validIp': '([0-9]{1,3})[.]([0-9]{1,3})[.]([0-9]{1,3})[.]([0-9]{1,3})' /* Validates IPv4 address */
     };
     msgs: Message[];
@@ -138,20 +168,65 @@ export class RegisterStorageComponent implements OnInit {
             ]
         };
 
+        this.pubKeyTypeOptions = [
+            {
+                label: "ssh-ed25519",
+                value: "ssh-ed25519"
+            },
+            {
+                label: "ecdsa-sha2-nistp256",
+                value: "ecdsa-sha2-nistp256"
+            },
+            {
+                label: "ecdsa-sha2-nistp384",
+                value: "ecdsa-sha2-nistp384"
+            },
+            {
+                label: "ecdsa-sha2-nistp521",
+                value: "ecdsa-sha2-nistp521"
+            },
+            {
+                label: "ssh-rsa",
+                value: "ssh-rsa"
+            },
+            {
+                label: "ssh-dss",
+                value: "ssh-dss"
+            }
+        ]
+
         this.registerStorageForm = this.fb.group({
-            'name': new FormControl('', {validators:[Validators.minLength(2), Validators.maxLength(128), Validators.pattern(this.validRule.name)]}),
-            'description': new FormControl('', {validators:[Validators.minLength(2), Validators.maxLength(250),Validators.pattern(this.validRule.description)]}),
+            /* 'name': new FormControl('', {validators:[Validators.minLength(2), Validators.maxLength(128), Validators.pattern(this.validRule.name)]}),
+            'description': new FormControl('', {validators:[Validators.minLength(2), Validators.maxLength(250),Validators.pattern(this.validRule.description)]}), */
             'vendor': new FormControl('', Validators.required),
             'model': new FormControl('', Validators.required),
-            'host': new FormControl('', {validators:[Validators.required, Validators.pattern(this.validRule.validIp)]}),
-            'port': new FormControl('', Validators.required),
-            'username': new FormControl('', Validators.required),
-            'password': new FormControl('', Validators.required),
+            "enable_rest": [true, { validators: [Validators.required], updateOn: 'change' }],
+            'restHost': new FormControl('', {validators:[Validators.required, Validators.pattern(this.validRule.validIp)]}),
+            'restPort': new FormControl('', Validators.required),
+            'restUsername': new FormControl('', Validators.required),
+            'restPassword': new FormControl('', Validators.required),
+            "enable_ssh": [true, { validators: [Validators.required], updateOn: 'change' }],
+            'sshHost': new FormControl('', {validators:[Validators.required, Validators.pattern(this.validRule.validIp)]}),
+            'sshPort': new FormControl('', Validators.required),
+            'sshUsername': new FormControl('', Validators.required),
+            'sshPassword': new FormControl('', Validators.required),
+            'sshPubKey': new FormControl('', Validators.required),
+            'sshPubKeyType': new FormControl('', Validators.required),
+            "enable_extra_attribs": [false, { validators: [Validators.required], updateOn: 'change' }],
             'extra_attributes' : this.fb.array([this.createAttributes()])
         });
        
     }
 
+    extraAttribsControl(){
+        this.showExtraAttribs = this.registerStorageForm.get('enable_extra_attribs').value;
+    }
+    showSshControl(){
+        this.showSsh = this.registerStorageForm.get('enable_ssh').value;
+    }
+    showRestControl(){
+        this.showRest = this.registerStorageForm.get('enable_rest').value;
+    }
     getAllStorages(){
         this.ds.getAllStorages().subscribe((res)=>{
             console.log("All Storages", res.json().storages);
@@ -198,18 +273,34 @@ export class RegisterStorageComponent implements OnInit {
         let dataArr = {
             vendor: value['vendor'],
             model: value['model'],
-            host: value['host'],
-            port: value['port'],
-            username: value['username'],
-            password: value['password'],
             extra_attributes: meta
         };
-        if(value['name']){
+        if(this.showRest){
+            let rest = {
+                host: value['restHost'],
+                port: Number(value['restPort']),
+                username: value['restUsername'],
+                password: value['restPassword'],
+            }
+            dataArr['rest'] = rest;
+        }
+        if(this.showSsh){
+            let sshConfig = {
+                host: value['sshHost'],
+                port: Number(value['sshPort']),
+                username: value['sshUsername'],
+                password: value['sshPassword'],
+                pub_key: value['sshPubKey'],
+                pub_key_type: value['sshPubKeytype'],
+            }
+            dataArr['ssh'] = sshConfig;
+        }
+        /* if(value['name']){
             dataArr['name'] = value['name'];
         }
         if(value['description']){
             dataArr['description'] = value['description'];
-        }
+        } */
 
         return dataArr;
     }
