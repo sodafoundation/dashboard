@@ -19,7 +19,7 @@ import { DataViewModule } from '../../components/dataview/dataview';
 import { StorageVolumesComponent } from './volumes/volumes.component';
 import { StoragePoolsComponent } from './storage-pools/storage-pools.component';
 import { FieldsetModule } from '../../components/fieldset/fieldset'
-import { OverviewPanelComponent } from './overview-panel/overview-panel.component';
+
 const routers: Routes = [{
     path: '',
     component: DelfinComponent
