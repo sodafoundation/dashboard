@@ -10,8 +10,8 @@ import { HttpService } from '../../../shared/api';
 import { ProfileService } from '../../profile/profile.service';
 import { AvailabilityZonesService } from '../../resource/resource.service';
 import { DelfinService } from '../delfin.service';
-import { TabViewModule, DataTableModule, ChartModule, InputTextModule, CheckboxModule, ButtonModule, DropdownModule, MultiSelectModule, DialogModule, Message, GrowlModule, SpinnerModule, FormModule } from '../../../components/common/api';
-
+import { TabViewModule, PanelModule, DataTableModule, ChartModule, OverlayPanelModule, CardModule, InputTextModule, CheckboxModule, ButtonModule, SplitButtonModule, DropdownModule, MultiSelectModule, DialogModule, Message, GrowlModule, SpinnerModule, FormModule } from '../../../components/common/api';
+import { TooltipModule } from '../../../components/tooltip/tooltip';
 let routers = [{
   path: '',
   component: StorageDetailsComponent
@@ -24,17 +24,22 @@ let routers = [{
     FormsModule,
     CommonModule,
     TabViewModule,
+    PanelModule,
     DataTableModule,
     ChartModule,
+    OverlayPanelModule,
+    CardModule,
     InputTextModule,
     CheckboxModule,
     ButtonModule,
+    SplitButtonModule,
     DropdownModule,
     MultiSelectModule,
     DialogModule,
     GrowlModule,
     SpinnerModule,
-    FormModule
+    FormModule,
+    TooltipModule
   ],
   declarations: [ StorageDetailsComponent, StorageVolumesComponent, StoragePoolsComponent ],
   providers: [

@@ -7,6 +7,9 @@ import { I18nPluralPipe } from '@angular/common';
 import { trigger, state, style, transition, animate } from '@angular/animations';
 import { Message, MenuItem ,ConfirmationService} from '../../../components/common/api';
 import { DelfinService } from '../../delfin/delfin.service';
+import { TreeNode } from '../../../components/common/api';
+import { isArray } from 'underscore';
+import { OverlayPanel } from 'app/components/overlaypanel/overlaypanel';
 
 let _ = require("underscore");
 @Component({
@@ -17,6 +20,8 @@ let _ = require("underscore");
     animations: []
 })
 export class StoragesComponent implements OnInit {
+    allArrays: TreeNode[];
+    arrayTreeData: TreeNode[];
     allStorages: any = [];
     selectedStorages: any = [];
     selectedStorageId: any;
@@ -25,6 +30,9 @@ export class StoragesComponent implements OnInit {
     menuItems: MenuItem[];
     capacityData: any;
     chartOptions: any;
+    vendorOptions;
+    modelOptions;
+    allStorageModels;
     versionOptions: any;
     selectedVersion: any;
     securityLeveloptions: any;
@@ -37,6 +45,21 @@ export class StoragesComponent implements OnInit {
     showRegisterAlertSourceForm: boolean = false;
     v2cFields: boolean = false;
     v3Fields: boolean = false;
+    volumesArr = [];
+    allVolumes: any = [];
+    poolsArr = [];
+    allPools: any = [];
+    dataSource: any = [];
+    totalRecords: number;
+    loading: boolean;
+    storageOverview;
+    volumeOverview;
+    poolOverview;
+    groupedByVendor;
+    totalArrayRawCapacity: any;
+    totalArrayUsableCapacity: any;
+    totalArrayFreeCapacity: any;
+    allActiveAlerts: any = [];
     msgs: Message[];
 
     label = {
@@ -94,7 +117,9 @@ export class StoragesComponent implements OnInit {
     }
 
     ngOnInit() {
+        this.loading = true;
         this.getAllStorages();
+        this.getAllActiveAlerts();
         this.menuItems = [
             {
                 "label": "Register Alert Source",
@@ -119,6 +144,45 @@ export class StoragesComponent implements OnInit {
                 disabled:false
             }
         ];
+        this.vendorOptions = [
+            {
+                label: "Dell EMC",
+                value: 'dellemc'
+            },
+            {
+              label: "Huawei",
+              value: 'huawei'
+            },
+            {
+                label: "Fake Storage",
+                value: 'fake_storage'
+            }
+        ];
+
+        this.allStorageModels = {
+            'dellemc' : [
+                {
+                    label: "VMAX3",
+                    value: 'vmax'
+                },
+                {
+                    label: "VMAX4",
+                    value: 'vmax4'
+                }
+            ],
+            'huawei' : [
+                {
+                    label: "OceanStor V3",
+                    value: 'oceanstor'
+                }
+            ],
+            'fake_storage' : [
+                {
+                    label: "Fake Driver",
+                    value: 'fake_driver'
+                }
+            ]
+        };
         this.versionOptions = [
             {
                 label: "SNMPV2C",
@@ -185,16 +249,150 @@ export class StoragesComponent implements OnInit {
         });
     }
 
+    getAllActiveAlerts(){
+        this.allActiveAlerts.push(
+            {
+                'alert_id' : '255911',
+                'alert_name' : 'TP VV allocation failure',
+                'severity' : 'Critical',
+                'category' : 'Fault',
+                'type' : 'EquipmentAlarm',
+                'sequence_number' : 657,
+                'occur_time' : 1514140673000,
+                'description' : 'Thin provisioned VV LUN_performance_test.531 unable to allocate SD space from CPG cpg_zhu',
+                'resource_type' : 'Storage',
+                'location' : 'sw_vv:20656:LUN_performance_test.899',
+                'storage_id' : '4ec28b27-0d3d-4876-8da7-a16876ea489c',
+                'storage_name' : 'HPEDevice',
+                'vendor' : 'HPE',
+                'model' : 'HP_3PAR 8450',
+                'serial_number' : 'XXYYZZ1234'
+            },
+            {
+                'alert_id' : '255912',
+                'alert_name' : 'Storage Array Usable Free Space is less than 20%',
+                'severity' : 'Critical',
+                'category' : 'Fault',
+                'type' : 'EquipmentAlarm',
+                'sequence_number' : 658,
+                'occur_time' : 1514140673010,
+                'description' : 'Storage Array Usable Free Space is less than 20% was triggered.',
+                'resource_type' : 'Storage',
+                'location' : 'sw_vv:20656:LUN_performance_test.900',
+                'storage_id' : '4ec28b27-0d3d-4876-8da7-a16876ea479c',
+                'storage_name' : 'DellVMAX250F',
+                'vendor' : 'Dell EMC',
+                'model' : 'VMAX250F',
+                'serial_number' : 'XXYY5678'
+            },
+            {
+                'alert_id' : '255915',
+                'alert_name' : 'Pool Usable Free Space is less than 20%',
+                'severity' : 'Warning',
+                'category' : 'Fault',
+                'type' : 'EquipmentAlarm',
+                'sequence_number' : 659,
+                'occur_time' : 1514140674050,
+                'description' : 'Pool Usable Free Space is less than 20% was triggered.',
+                'resource_type' : 'Storage',
+                'location' : 'sw_vv:20656:LUN_performance_test.900',
+                'storage_id' : '4ec28b27-0d3d-4876-8da7-a16876ea479c',
+                'storage_name' : 'OceanStorV3',
+                'vendor' : 'Huawei',
+                'model' : 'OceanStor V3',
+                'serial_number' : 'XXYY9101'
+            },
+            {
+                'alert_id' : '255811',
+                'alert_name' : 'TP VV allocation failure',
+                'severity' : 'Critical',
+                'category' : 'Fault',
+                'type' : 'EquipmentAlarm',
+                'sequence_number' : 657,
+                'occur_time' : 1514140673000,
+                'description' : 'Thin provisioned VV LUN_performance_test.531 unable to allocate SD space from CPG cpg_zhu',
+                'resource_type' : 'Storage',
+                'location' : 'sw_vv:20656:LUN_performance_test.899',
+                'storage_id' : '4ec28b27-0d3d-4876-8da7-a16876ea489c',
+                'storage_name' : 'HPEDevice',
+                'vendor' : 'HPE',
+                'model' : 'HP_3PAR 8450',
+                'serial_number' : 'XXYYZZ1234'
+            },
+            {
+                'alert_id' : '255812',
+                'alert_name' : 'Storage Array Usable Free Space is less than 20%',
+                'severity' : 'Critical',
+                'category' : 'Fault',
+                'type' : 'EquipmentAlarm',
+                'sequence_number' : 658,
+                'occur_time' : 1514140673010,
+                'description' : 'Storage Array Usable Free Space is less than 20% was triggered.',
+                'resource_type' : 'Storage',
+                'location' : 'sw_vv:20656:LUN_performance_test.900',
+                'storage_id' : '4ec28b27-0d3d-4876-8da7-a16876ea479c',
+                'storage_name' : 'DellVMAX250F',
+                'vendor' : 'Dell EMC',
+                'model' : 'VMAX250F',
+                'serial_number' : 'XXYY5678'
+            },
+            {
+                'alert_id' : '255815',
+                'alert_name' : 'Pool Usable Free Space is less than 20%',
+                'severity' : 'Warning',
+                'category' : 'Fault',
+                'type' : 'EquipmentAlarm',
+                'sequence_number' : 659,
+                'occur_time' : 1514140674050,
+                'description' : 'Pool Usable Free Space is less than 20% was triggered.',
+                'resource_type' : 'Storage',
+                'location' : 'sw_vv:20656:LUN_performance_test.900',
+                'storage_id' : '4ec28b27-0d3d-4876-8da7-a16876ea479c',
+                'storage_name' : 'OceanStorV3',
+                'vendor' : 'Huawei',
+                'model' : 'OceanStor V3',
+                'serial_number' : 'XXYY9101'
+            }
+        );
+    }
+
     toggleView(){
         this.showListView = this.showListView ? this.showListView : !this.showListView;
         console.log("ShowlistView", this.showListView);
     }
-
+    
     getAllStorages(){
         this.ds.getAllStorages().subscribe((res)=>{
             
             this.allStorages = res.json().storages;
+            
             this.allStorages.forEach((element, index) => {
+                //console.log("Used Capacity", Utils.formatBytes(element['used_capacity']));
+                //console.log("Free Capacity", Utils.formatBytes(element['free_capacity']));
+                element['volumes'] = [];
+                element['storagePools'] = [];
+                let vols = [];
+                let pools = [];
+                /* this.ds.getAllVolumes().subscribe((res)=>{
+                    this.allVolumes = res.json().volumes;
+                    this.allVolumes.forEach(volElement => {
+                        if(volElement['storage_id'] == element['id']){
+                            vols.push(volElement);
+                        }
+                    });
+                }, (error)=>{
+                    console.log("Something went wrong. Could not fetch Volumes.", element['id'], error)
+                });
+                this.ds.getAllStoragePools().subscribe((res)=>{
+                    this.allPools = res.json().storage_pools;
+                    this.allPools.forEach(poolElement => {
+                        if(poolElement['storage_id'] == element['id']){
+                            pools.push(poolElement);
+                        }
+                    });
+                }, (error)=>{
+                    console.log("Something went wrong. Could not fetch Pools.", element['id'], error)
+                }); */
                 let capData = {
                     labels: ['Used','Free'],
                     datasets: [
@@ -218,17 +416,352 @@ export class StoragesComponent implements OnInit {
                 }
                 element['capacityData'] = capData;
                 element['chartOptions'] = opt;
+                element['volumes'] = vols;
+                element['storagePools'] = pools;
+                //element['pools'] = poolsInStorage;
                 /* FIXME REMOVE BEFORE MERGING FOR LOCAL TESTING ONLY */
+                
                 if(index%2){
                     element['status'] = 'abnormal';
                     element['description'] = "This is a test for a very long description. If this is truncated it will be visible in the info tooltip."
                 }
                 /* FIXME REMOVE BEFORE MERGING FOR LOCAL TESTING ONLY */
             });
+            this.allStorages.push(
+                {
+                    "created_at": "2020-07-20T06:12:18.882671",
+                    "updated_at": "2020-07-20T06:12:19.906748",
+                    "deleted_at": null,
+                    "deleted": 0,
+                    "id": "4ec28b27-0d3d-4876-8da7-a16876ea489c",
+                    "name": "DellVMAX250F",
+                    "vendor": "Dell EMC",
+                    "description": "",
+                    "model": "VMAX250F",
+                    "status": "normal",
+                    "serial_number": "000297801855",
+                    "firmware_version": null,
+                    "location": "",
+                    "total_capacity": 26300318136401,
+                    "used_capacity": 19835189765079,
+                    "free_capacity": 6465128371322,
+                    "sync_status": "SYNCED"
+                },
+                {
+                    "created_at": "2020-07-20T06:12:18.882671",
+                    "updated_at": "2020-07-20T06:12:19.906748",
+                    "deleted_at": null,
+                    "deleted": 0,
+                    "id": "4ec28b27-0d3d-4876-8da7-a16876ea479c",
+                    "name": "EMC-VMAX-123456",
+                    "vendor": "Dell EMC",
+                    "description": "",
+                    "model": "VMAX250F",
+                    "status": "normal",
+                    "serial_number": "000297801856",
+                    "firmware_version": null,
+                    "location": "",
+                    "total_capacity": 26300318136401,
+                    "used_capacity": 19835189765079,
+                    "free_capacity": 6465128371322,
+                    "sync_status": "SYNCED"
+                },
+                {
+                    "created_at": "2020-07-20T06:12:18.882671",
+                    "updated_at": "2020-07-20T06:12:19.906748",
+                    "deleted_at": null,
+                    "deleted": 0,
+                    "id": "4ec28b27-0d3d-4876-8da7-a16876ea469c",
+                    "name": "OceanStor Dorado",
+                    "vendor": "Huawei",
+                    "description": "",
+                    "model": "OceanStor V3",
+                    "status": "normal",
+                    "serial_number": "000297801856",
+                    "firmware_version": null,
+                    "location": "",
+                    "total_capacity": 26300318136401,
+                    "used_capacity": 19835189765079,
+                    "free_capacity": 6465128371322,
+                    "sync_status": "SYNCED"
+                },
+                {
+                    "created_at": "2020-07-20T06:12:18.882671",
+                    "updated_at": "2020-07-20T06:12:19.906748",
+                    "deleted_at": null,
+                    "deleted": 0,
+                    "id": "4ec28b27-0d3d-4876-8da7-a16876ea459c",
+                    "name": "OceanStor Dorado V3",
+                    "vendor": "Huawei",
+                    "description": "",
+                    "model": "OceanStor V3",
+                    "status": "normal",
+                    "serial_number": "000297801856",
+                    "firmware_version": null,
+                    "location": "",
+                    "total_capacity": 26300318136401,
+                    "used_capacity": 19835189765079,
+                    "free_capacity": 6465128371322,
+                    "sync_status": "SYNCED"
+                }
+            );
             console.log("All Storages", this.allStorages);
+            this.prepareTree(this.allStorages);
+            this.loading = false;
         }, (error)=>{
             console.log("Something went wrong. Could not fetch all storages", error);
+            this.loading = false;
         })
+        
+    }
+
+    getStorageArrayRawCapacity(storages){
+
+    }
+
+    getStorageArrayUsableCapacity(){
+
+    }
+
+    getVolumesByStorage(storageId){
+        this.ds.getAllVolumes().subscribe((res)=>{
+            this.allVolumes = res.json().volumes;
+            this.allVolumes.forEach(element => {
+                if(element['storage_id'] == storageId){
+                    this.volumesArr.push(element);
+                }
+            });
+            //this.totalRecords = this.dataSource.length;
+            //this.volumesArr = this.dataSource.slice(0, 10);
+            console.log("Selected Volumes", this.volumesArr);
+            return this.volumesArr;
+        }, (error)=>{
+            console.log("Something went wrong. Could not fetch Volumes.", error)
+            this.volumesArr = [];
+            return this.volumesArr;
+        });
+    }
+
+    getPoolsByStorage(storageId){
+        this.ds.getAllStoragePools().subscribe((res)=>{
+            this.allPools  = res.json().storage_pools;
+            this.allPools.forEach(element => {
+                if(element['storage_id'] == storageId){
+                    this.poolsArr.push(element);
+                }
+            });
+            //this.totalRecords = this.dataSource.length;
+            //this.volumesArr = this.dataSource.slice(0, 10);
+            console.log("Selected Pools", this.poolsArr);
+            return this.poolsArr;
+        }, (error)=>{
+            console.log("Something went wrong. Could not fetch pools.", error)
+            this.poolsArr = [];
+            return this.poolsArr;
+        });
+    }
+
+    groupStorageByVendor(storages){
+        let group = _.groupBy(storages, 'vendor');
+        return group;
+    }
+
+    prepareTree(storages){
+        let self = this;
+        let treeData = [];
+        console.log("All Storage Arrays in preparing Tree", storages);
+        
+        // Group the Storage Devices by Vendors
+        let groupedData = this.groupStorageByVendor(storages);
+        
+        console.log("Grouped Data", groupedData);
+        // Prepare the tree object with Top level Vendors as the first nodes
+        _.each(groupedData, function(value, key){
+            let parentTreeNode = {
+                label: key,
+                collapsedIcon: 'fa-folder',
+                expandedIcon: 'fa-folder-open',
+                type: 'array'
+            }
+            // Check if if the grouped devices exist and prepare the second level of nodes as children.
+            if(isArray(value) && value.length){
+                parentTreeNode['children'] = [];
+                console.log("Storage devices", value);
+                _.each(value, function(storageDevice){
+                    let parentTreeNodeChild = {
+                        label: storageDevice['name'],
+                        collapsedIcon: 'fa-hdd-o',
+                        expandedIcon: 'fa-hdd-o',
+                        children: [],
+                        type: 'device'
+                    }
+                    // Populate Volumes children
+                    let parentVolNode = {};
+                    if(storageDevice['volumes'] && storageDevice['volumes'].length){
+                        parentVolNode = {
+                            label : "Volumes",
+                            collapsedIcon: 'fa-database',
+                            expandedIcon: 'fa-database',
+                            type: 'volParent'
+                        }
+                        parentTreeNodeChild['children'].push(parentVolNode);
+                    }
+                    
+                    
+                    // Populate Storage Pool children
+                    // let parentPoolNode;
+                    //if(storageDevice['storagePools'] && storageDevice['storagePools'].length){
+                        /* let parentPoolNode = {
+                            label : "Pools",
+                            collapsedIcon: 'fa-cubes',
+                            expandedIcon: 'fa-cubes',
+                            type: 'poolParent'
+                        } */
+                    //}
+                    //parentTreeNodeChild['children'].push(parentPoolNode);
+                    
+                    /* // Populate Storage Pool children
+                    if(storageDevice['storagePools'] && storageDevice['storagePools'].length){
+                        parentTreeNodeChild['children'] = [];
+                        _.each(storageDevice['storagePools'], function(poolItem){
+                            let storageNode = {
+                                label : poolItem['name'],
+                                collapsedIcon: 'fa-cubes',
+                                expandedIcon: 'fa-cubes'
+                            }
+                            parentTreeNodeChild['children'].push(storageNode)
+                        });
+                        
+                    } */
+                    // Push each storage device as a child of the vendor node
+                    parentTreeNode['children'].push(parentTreeNodeChild);
+                });
+            }
+            // Push each Vendor as a node in the Tree
+            treeData.push(parentTreeNode);
+        })
+        this.arrayTreeData = treeData;
+        console.log("Final Tree Data: ", this.arrayTreeData);
+        this.allArrays = [
+            {
+                label: 'Folder 1',
+                collapsedIcon: 'fa-folder',
+                expandedIcon: 'fa-folder-open',
+                children: [
+                    {
+                        label: 'Pool 1',
+                        collapsedIcon: 'fa-hdd-o',
+                        expandedIcon: 'fa-hdd-o',
+                            children: [
+                                {
+                                    label: 'File 2',
+                                    icon: 'fa-file-o'
+                                }
+                            ]
+                    },
+                    {
+                        label: 'Folder 2',
+                        collapsedIcon: 'fa-folder',
+                        expandedIcon: 'fa-folder-open'
+                    },
+                    {
+                        label: 'File 1',
+                        icon: 'fa-file-o'
+                    }
+                ]
+            },
+            {
+                label: 'Folder 2',
+                collapsedIcon: 'fa-folder',
+                expandedIcon: 'fa-folder-open',
+                children: [
+                    {
+                        label: 'Pool 1',
+                        collapsedIcon: 'fa-hdd-o',
+                        expandedIcon: 'fa-hdd-o',
+                        children: [
+                            {
+                                label: 'File 2',
+                                icon: 'fa-file-o'
+                            }
+                        ]   
+                    },
+                    {
+                        label: 'Folder 2',
+                        collapsedIcon: 'fa-folder',
+                        expandedIcon: 'fa-folder-open'
+                    },
+                    {
+                        label: 'File 1',
+                        icon: 'fa-file-o'
+                    }
+                ]
+            },
+            {
+                label: 'Folder 3',
+                collapsedIcon: 'fa-folder',
+                expandedIcon: 'fa-folder-open',
+                children: [
+                    {
+                        label: 'Pool 1',
+                        collapsedIcon: 'fa-hdd-o',
+                        expandedIcon: 'fa-hdd-o',
+                        children: [
+                            {
+                                label: 'File 2',
+                                icon: 'fa-file-o'
+                            }
+                        ]
+                    },
+                    {
+                        label: 'Folder 2',
+                        collapsedIcon: 'fa-folder',
+                        expandedIcon: 'fa-folder-open'
+                    },
+                    {
+                        label: 'File 1',
+                        icon: 'fa-file-o'
+                    }
+                ]
+            }
+        ];
+    }
+
+    lazyLoadTreeChildren(event){
+
+    }
+
+    showOverview(event, storage, overlaypanel: OverlayPanel){
+        this.storageOverview = storage;
+        console.log("Overlayshown", this.storageOverview);
+        overlaypanel.toggle(event);
+    }
+    overviewNode(event, node){
+        console.log("Event", event);
+        console.log("Node", node);
+    }
+    /* showVolumeOverview(event, volume, overlaypanel: OverlayPanel){
+        this.volumeOverview = volume;
+        console.log("Overlayshown", this.volumeOverview);
+        overlaypanel.toggle(event);
+    } */
+
+    /* showPoolOverview(event, pool, overlaypanel: OverlayPanel){
+        this.poolOverview = pool;
+        console.log("Overlayshown", this.poolOverview);
+        overlaypanel.toggle(event);
+    } */
+
+    getModelsByVendor(vendor){
+        let self =this;
+        _.each(this.allStorageModels, function(value, key){
+            console.log("storage models value", value);
+            console.log("storage models key", key);
+            if(key==vendor){
+                self.modelOptions = value;
+            }
+        })
+        console.log("modeloptions", self.modelOptions);
     }
 
     returnSelectedStorage(selectedStorage){

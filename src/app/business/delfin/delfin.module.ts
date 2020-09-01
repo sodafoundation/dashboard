@@ -1,7 +1,11 @@
 import { NgModule, APP_INITIALIZER } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { ButtonModule, DataTableModule, ChartModule, CardModule, TabViewModule, InputTextModule, DropMenuModule, DialogModule,FormModule,MultiSelectModule, GrowlModule ,DropdownModule,InputTextareaModule} from '../../components/common/api';
+import { ButtonModule, DataTableModule, PanelModule, OverlayPanelModule,  ChartModule, CardModule, TabViewModule, InputTextModule, DropMenuModule, DialogModule,FormModule,MultiSelectModule, GrowlModule ,DropdownModule,InputTextareaModule} from '../../components/common/api';
+import { ScrollPanelModule } from '../../components/scrollpanel/scrollpanel';
+import { DataScrollerModule } from '../../components/datascroller/datascroller';
+import { TreeModule } from '../../components/tree/tree';
+import { ProgressBarModule } from '../../components/progressbar/progressbar';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { HttpService } from './../../shared/service/Http.service';
 import { DelfinComponent } from './delfin.component';
@@ -14,6 +18,8 @@ import { TableModule } from '../../components/table/table';
 import { DataViewModule } from '../../components/dataview/dataview';
 import { StorageVolumesComponent } from './volumes/volumes.component';
 import { StoragePoolsComponent } from './storage-pools/storage-pools.component';
+import { FieldsetModule } from '../../components/fieldset/fieldset'
+import { OverviewPanelComponent } from './overview-panel/overview-panel.component';
 const routers: Routes = [{
     path: '',
     component: DelfinComponent
@@ -28,8 +34,14 @@ const routers: Routes = [{
     ButtonModule, 
     TableModule,
     ChartModule,
+    FieldsetModule,
     DataViewModule,
-    DataTableModule, 
+    DataTableModule,
+    PanelModule, 
+    OverlayPanelModule,
+    ScrollPanelModule,
+    DataScrollerModule,
+    TreeModule,
     CardModule,
     TabViewModule,
     InputTextModule, 
@@ -43,7 +55,8 @@ const routers: Routes = [{
     FormsModule,
     ConfirmDialogModule,
     InputTextareaModule,
-    TooltipModule
+    TooltipModule,
+    ProgressBarModule
     ],
   exports: [ DelfinComponent ],
   providers: [

@@ -7,6 +7,7 @@ import { I18nPluralPipe } from '@angular/common';
 import { trigger, state, style, transition, animate } from '@angular/animations';
 import { Message, MenuItem ,ConfirmationService, LazyLoadEvent} from '../../../components/common/api';
 import { DelfinService } from '../delfin.service';
+import { OverlayPanel } from 'app/components/overlaypanel/overlaypanel';
 
 
 let _ = require("underscore");
@@ -27,7 +28,7 @@ export class StorageVolumesComponent implements OnInit {
     capacityData: any;
     dataSource: any = [];
     totalRecords: number;
-
+    volumeOverview: any;
     label = {
         name: this.i18n.keyID["sds_block_volume_name"],
         description: this.i18n.keyID["sds_block_volume_descri"],
@@ -133,5 +134,14 @@ export class StorageVolumesComponent implements OnInit {
         }, (error)=>{
             console.log("Something went wrong. Could not fetch Volumes.", error)
         });
+    }
+
+    showVolumeOverview(event, volume, overlaypanel: OverlayPanel){
+        this.volumeOverview = volume;
+        console.log("Overlayshown", this.volumeOverview);
+        overlaypanel.toggle(event);
+    }
+    fetchVolume(){
+        console.log("Volume Fetched", this.volumeOverview);
     }
 }
