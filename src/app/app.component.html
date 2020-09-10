@@ -55,18 +55,29 @@
         </div>
     </div>
     <div id="layout-sidebar">
-       
+        <p-scrollPanel [style]="{width: '100%', height: '900px'}" styleClass="sidebar-menu-container">
         
         <ul class="sidebar-menu">
             <li *ngFor="let menuItem of menuItems">
-                <a href="#" [joyrideStep]="menuItem.joyrideStep" [text]="menuItem.text" stepPosition="right" [routerLink]="[menuItem.routerLink]" [ngClass]="{'active-item':menuItem==activeItem}" (click)="menuItemClick($event, menuItem)">
+                <a *ngIf="!menuItem.group" href="#" [joyrideStep]="menuItem.joyrideStep" [text]="menuItem.text" stepPosition="right" [routerLink]="[menuItem.routerLink]" [ngClass]="{'active-item':menuItem==activeItem}" (click)="menuItemClick($event, menuItem)">
                     <h1>{{menuItem.title}}</h1>
                     <p>{{menuItem.description}}</p>
                 </a> 
+                <p-panel styleClass="menuGroup" [header]="menuItem.title" *ngIf="menuItem.group" [joyrideStep]="menuItem.joyrideStep" [text]="menuItem.text" stepPosition="right" [toggleable]="true" [collapsed]="true" expandIcon="fa-chevron-down" collapseIcon="fa-chevron-up">
+                    <ul class="menuGroup-list">
+                        <li class="menuGroup-child" *ngFor="let child of menuItem.children">
+                            <a href="#" [routerLink]="[child.routerLink]" [ngClass]="{'active-item':child==activeItem}" (click)="menuItemClick($event, child)">
+                                <h1>
+                                    {{child.title}}
+                                </h1>
+                            </a>
+                        </li>
+                    </ul>
+                </p-panel>
             </li>
         </ul>
 
-        
+    </p-scrollPanel>
     </div>
 
     <div id="layout-content">
