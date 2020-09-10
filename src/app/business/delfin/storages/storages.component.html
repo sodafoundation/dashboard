@@ -38,7 +38,7 @@
                         <p-scrollPanel [style]="{width: '100%', height: '300px'}" styleClass="storage-summary-panel-2">
                             <p-tree [value]="arrayTreeData" [loading]="loading" [style]="{width: '100%', height: '100%', 'overflow':'auto'}">
                                 <ng-template let-node pTemplate="device">
-                                    <!-- <a [routerLink]="['/storageDetails/' + node.details.id]"  (mouseenter)="showOverview($event, node, op1)" (mouseleave)="showOverview($event, node, op1)">{{node.label}}</a> -->
+                                    
                                     <a (mouseenter)="showOverview($event, node, op1)" (mouseleave)="showOverview($event, node, op1)">{{node.label}}</a>
                                 </ng-template>
                             </p-tree>
@@ -181,20 +181,7 @@
                                         </span>
                                     </div>
                                 </div>
-                                <!-- <div *ngIf="device.capacity && device.capacity.usage" class="storage-usage-bar" style="padding: 5px 25px 5px 5px;">
-                                    <div id="raw-capacity-bar">
-                                        <div class="usable-capacity">
-                                            <span class="label">
-                                                    75%
-                                            </span>
-                                        </div>
-                                        <div class="system-used">
-                                            <span class="label">
-                                                25%
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div> -->
+                                
                             </div>
                         </p-scrollPanel>
                     </div>
