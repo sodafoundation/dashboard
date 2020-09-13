@@ -111,7 +111,7 @@ export class StoragesComponent implements OnInit {
         }
     };
     validRule= {
-        'validIp': '\b((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)(\.|$)){4}\b' /* Validates IPv4 address */
+        'validIp': '((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)(\.|$)){4}' /* Validates IPv4 address */
     };
     
     constructor(
