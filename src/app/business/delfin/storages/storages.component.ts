@@ -71,8 +71,6 @@ export class StoragesComponent implements OnInit {
         status: "Status",
         host: "Host IP",
         port: "Port",
-        username: "Username",
-        password: "Password",
         extra_attributes: "Extra Attributes",
         created_at: "Created At",
         updated_at: "Updated At",
@@ -587,15 +585,15 @@ export class StoragesComponent implements OnInit {
 
         this.ds.registerAlertSource(this.selectedStorageId, dataArr).subscribe((res)=>{
             this.msgs = [];
-            this.msgs.push({severity: 'success', summary: 'Success', detail: 'Storage device registered successfully.'});
+            this.msgs.push({severity: 'success', summary: 'Success', detail: 'Alert source registered successfully.'});
             let queryParams = {
-                "message": JSON.stringify({severity: 'success', summary: 'Success', detail: 'Storage device registered successfully.'})
+                "message": JSON.stringify({severity: 'success', summary: 'Success', detail: 'Alert source registered successfully.'})
             };
             this.router.navigate(['/delfin'], {queryParams: queryParams});
         }, (error) =>{
             this.msgs = [];
-            this.msgs.push({severity: 'error', summary: "Error", detail:"Something went wrong. Storage device could not be registered."});
-            console.log("Something went wrong. Storage device could not be registered.", error);
+            this.msgs.push({severity: 'error', summary: "Error", detail:"Something went wrong. Alert source could not be registered."});
+            console.log("Something went wrong. Alert source could not be registered.", error);
         })
     }
 }
