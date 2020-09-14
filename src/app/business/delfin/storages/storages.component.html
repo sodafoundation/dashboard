@@ -7,6 +7,7 @@
     <div class="table-toolbar">
         <div class="left">
             <button class="ui-button-secondary" pButton type="button" label="Register" [routerLink]="['/registerStorage']"></button>
+            <button pButton type="button" (click)="syncAllStorageDevices()" icon="fa-exchange" label="Sync All Devices"></button>
             <button *ngIf="showListView" pButton type="button" label="{{i18n.keyID['sds_block_volume_delete']}}" [disabled]="selectedStorages.length == 0" (click)="batchDeleteStorages(selectedStorages)"></button></div>
         <div class="right">
             <div *ngIf="showListView" class="ui-inputsearch">
@@ -16,7 +17,7 @@
             
             <button title="List View" class="" pButton type="button" (click)="showListView=true" icon="fa-th-list"></button>
             <button title="Grid View" class="" pButton type="button" (click)="showListView=false" icon="fa-th"></button>
-            <button class="" pButton type="button" (click)="getAllStorages()" icon="fa-refresh"></button>
+            <button class="" title="Refresh lists" pButton type="button" (click)="getAllStorages()" icon="fa-refresh"></button>
         </div>
     </div>
     <div *ngIf="!showListView">
@@ -36,10 +37,11 @@
                     </p-header>
                     <div>
                         <p-scrollPanel [style]="{width: '100%', height: '300px'}" styleClass="storage-summary-panel-2">
-                            <p-tree [value]="arrayTreeData" [loading]="loading" [style]="{width: '100%', height: '100%', 'overflow':'auto'}">
+                            <p-tree [value]="arrayTreeData" [loading]="loading" emptyMessage="No records found." [style]="{width: '100%', height: '100%', 'overflow':'auto'}">
+                                
                                 <ng-template let-node pTemplate="device">
                                     
-                                    <a (mouseenter)="showOverview($event, node, op1)" (mouseleave)="showOverview($event, node, op1)">{{node.label}}</a>
+                                    <a (mouseenter)="showOverview($event, node, deviceOverviewPanel)" (mouseenter)="showOverview($event, node, deviceOverviewPanel)">{{node.label}}</a>
                                 </ng-template>
                             </p-tree>
                         </p-scrollPanel>
@@ -111,7 +113,7 @@
                             <div *ngFor="let device of allStorages" class="single-storage-item">
                                 <div class="ui-g storage-title">
                                     <div class="ui-g-6">
-                                        <h4> <a [routerLink]="['/storageDetails/' + device.id]"> {{device.name}}</a> </h4>
+                                        <h4> <a (mouseenter)="showOverview($event, device, deviceOverviewPanel)" (mouseleave)="showOverview($event, device, deviceOverviewPanel)" [routerLink]="['/storageDetails/' + device.id]"> {{device.name}}</a> </h4>
                                     </div>
                                     <div class="ui-g-5 capacity-stats-bar">
                                         <span class="free-storage">
@@ -132,7 +134,7 @@
                                 <div *ngIf="device.capacity && device.capacity.usage" class="storage-usage-bar" style="padding: 5px 25px 5px 5px;">
                                     <p-progressBar [ngClass]="{'capacity-usage-normal': device.capacity.usage < 75, 
                                         'capacity-usage-warning': device.capacity.usage > 75 && device.capacity.usage < 95, 
-                                        'capacity-usage-full' : device.capacity.usage > 95 }" [value]="device.capacity.usage"></p-progressBar>
+                                        'capacity-usage-full' : device.capacity.usage > 95 }" [value]="device.capacity.usage" unit="% used"></p-progressBar>
                                 </div>
                             </div>
                         </p-scrollPanel>
@@ -199,9 +201,9 @@
                 <p-dataTable [value]="allStorages" [globalFilter]="searchAll" [(selection)]="selectedStorages" [expandableRows]="true" [showHeaderCheckbox]="true" [rows]="10" [paginator]="true" [pageLinks]="3" [rowsPerPageOptions]="[10,20,50,100]" #st>
                     <p-column expander="true" styleClass="col-icon" [style]="{'width': '3%'}"></p-column>
                     <p-column selectionMode="multiple" [style]="{'width': '3%'}"></p-column>
-                    <p-column field="name" header="Name" [style]="{'width': '10%'}" [sortable]="true">
+                    <p-column field="name" header="Name" [style]="{'width': '15%'}" [sortable]="true">
                         <ng-template pTemplate="body" let-storage="rowData">
-                            <a [routerLink]="['/storageDetails/' + storage.id]"  title="{{storage.name}}">{{storage.name}}</a>
+                            <a [routerLink]="['/storageDetails/' + storage.id]" (mouseenter)="showOverview($event, storage, deviceOverviewPanel)" (mouseleave)="showOverview($event, storage, deviceOverviewPanel)"  title="{{storage.name}}">{{storage.name}}</a>
                         </ng-template>
                     </p-column>
                     <p-column field="vendor" header="Vendor" [style]="{'width': '10%'}" [sortable]="true">
@@ -217,12 +219,21 @@
                     </p-column>
                     <p-column header="Capacity" [style]="{'width': '8%'}">
                         <ng-template pTemplate="body" let-storage="rowData">
-                            <meter pTooltip="{{storage.capacity.used}} / {{storage.capacity.total}}" tooltipPosition="top"  id="capacityUsage" [value]="storage.used_capacity" min="0" [max]="storage.total_capacity"></meter>
+                            <meter class="capacity-usage-meter" pTooltip="{{storage.capacity.used}} / {{storage.capacity.total}}" tooltipPosition="top"  id="capacityUsage" [value]="storage.used_capacity" min="0" [max]="storage.total_capacity"></meter>
                         </ng-template>
                     </p-column>
-                    <p-column field="created_at" header="Created At">
+                    <p-column field="sync_status" header="Sync Status" [style]="{'width': '8%'}">
                         <ng-template pTemplate="body" let-storage="rowData">
-                            <span>{{storage.created_at ? (storage.created_at | date:'long') : '--'}}</span>
+                            <span>{{storage.sync_status ? storage.sync_status : '--'}}</span>
+                            <span *ngIf="storage.sync_status=='SYNCING'" ><i class="fa fa-spinner fa-pulse"></i></span>
+                        </ng-template>
+                    </p-column>
+                    <p-column field="serial_number" header="Serial Number" [style]="{'width': '8%'}" [sortable]="true">
+                        <ng-template pTemplate="body" let-storage="rowData">
+                            {{ storage.serial_number | slice:0:10 }}
+                            <a *ngIf="storage.serial_number.length > 10" pTooltip="{{storage.serial_number}}" tooltipPosition="top">
+                                ...
+                            </a>
                         </ng-template>
                     </p-column>
                     <p-column field="updated_at" header="Updated At">
@@ -230,7 +241,7 @@
                             <span>{{storage.updated_at ? (storage.updated_at | date:'long') : '--'}}</span>
                         </ng-template>
                     </p-column>
-                    <p-column header="{{i18n.keyID['sds_block_volume_operation']}}" [style]="{'width': '10%'}">
+                    <p-column header="{{i18n.keyID['sds_block_volume_operation']}}" [style]="{'width': '8%'}">
                         <ng-template pTemplate="body" let-storage="rowData" let-i="rowIndex">
                             <p-dropmenu label="{{i18n.keyID['sds_block_volume_more']}}" [model]="storage['disabled'] ? menuDeleDisableItems: menuItems" (click)="returnSelectedStorage(storage)"></p-dropmenu>
                         </ng-template>
@@ -256,10 +267,11 @@
                                             <span *ngIf="storage.status=='offline'">Offline</span>
                                         </div>
                                         <div class="ui-grid-col-2">
-                                            {{label.created_at}}:
+                                            {{label.sync_status}}
                                         </div>
                                         <div class="ui-grid-col-3 details-basic-item-value-color" *ngIf="storage">
-                                            {{storage.created_at ? (storage.created_at | date:'long') : '--'}}
+                                            <span>{{storage.sync_status ? storage.sync_status : '--'}}</span>
+                                            <span *ngIf="storage.sync_status=='SYNCING'" ><i class="fa fa-spinner fa-pulse"></i></span>
                                         </div>
                                     
                                     </div>
@@ -280,10 +292,10 @@
                                             {{storage.firmware_version}}
                                         </div>
                                         <div class="ui-grid-col-2">
-                                            {{label.updated_at}}:
+                                            {{label.created_at}}:
                                         </div>
                                         <div class="ui-grid-col-3 details-basic-item-value-color" *ngIf="storage">
-                                            {{storage.updated_at ? (storage.updated_at | date:'long') : '--'}}
+                                            {{storage.created_at ? (storage.created_at | date:'long') : '--'}}
                                         </div>
                                         
                                     </div>
@@ -305,10 +317,10 @@
                                             </div>
                                             
                                             <div class="ui-grid-col-2">
-                                                {{label.location}}:
+                                                {{label.updated_at}}:
                                             </div>
                                             <div class="ui-grid-col-3 details-basic-item-value-color" *ngIf="storage">
-                                                {{storage.location}}
+                                                {{storage.updated_at ? (storage.updated_at | date:'long') : '--'}}
                                             </div>
                                     </div>
                                     <div class="ui-grid-row details-basic-item-class">
@@ -322,6 +334,23 @@
                                             </a>
                                         </div>
                                         <div class="ui-grid-col-2">
+                                            {{label.location}}:
+                                        </div>
+                                        <div class="ui-grid-col-2 details-basic-item-value-color" *ngIf="storage">
+                                            {{storage.location ? storage.location : '--'}}
+                                        </div>
+                                        <div class="ui-grid-col-2">
+                                        </div>
+                                        <div class="ui-grid-col-3 details-basic-item-value-color" *ngIf="storage">
+                                        </div>
+                                    </div>
+                                    <div class="ui-grid-row details-basic-item-class">
+                                        <div class="ui-grid-col-12">
+                                            <span>Capacity Summary</span>
+                                        </div>
+                                    </div>
+                                    <div class="ui-grid-row details-basic-item-class">
+                                        <div class="ui-grid-col-2">
                                             {{label.raw_capacity}}:
                                         </div>
                                         <div class="ui-grid-col-2 details-basic-item-value-color" *ngIf="storage">
@@ -330,8 +359,14 @@
                                         <div class="ui-grid-col-2">
                                             {{label.subscribed_capacity}}:
                                         </div>
-                                        <div class="ui-grid-col-3 details-basic-item-value-color" *ngIf="storage">
+                                        <div class="ui-grid-col-2 details-basic-item-value-color" *ngIf="storage">
                                             {{ storage.capacity.subscribed}}
+                                        </div>
+                                        <div class="ui-grid-col-2">
+                                            {{label.system_used}}:
+                                        </div>
+                                        <div class="ui-grid-col-3 details-basic-item-value-color" *ngIf="storage">
+                                            {{ storage.capacity.system_used}}
                                         </div>
                                     </div>
                                     <div class="ui-grid-row details-basic-item-class">
@@ -445,83 +480,92 @@
 
 </p-dialog>
 
-<p-overlayPanel styleClass="volume-overview-panel" #op1>
+<p-overlayPanel styleClass="overview-panel" #deviceOverviewPanel>
     <div class="ui-g overview-title">
-        <h4>{{storageOverview && storageOverview.details.name}}</h4>
+        <h4>{{storageOverview && storageOverview.name}}</h4>
     </div>
-    <div class="ui-g ui-g-nopad" >
+    <div class="ui-g ui-g-nopad overview-item" >
         <div class="ui-g-6">
-            <span>Status: </span>
+            <span class="overview-item-label">Status: </span>
         </div>
         <div class="ui-g-6">
-            <span class="storage-status-icon" [ngClass]="{normal:  storageOverview && storageOverview.details.status =='normal', abnormal: storageOverview && storageOverview.details.status =='abnormal'}"><i class="fa fa-circle"></i></span>
-            <span *ngIf="storageOverview && storageOverview.details.status=='normal'">Normal</span>
-            <span *ngIf=" storageOverview && storageOverview.details.status=='abnormal'">Abnormal</span>
-            <span *ngIf=" storageOverview && storageOverview.details.status=='offline'">Offline</span>
-        </div>
-    </div>
-    <div class="ui-g">
-        <div class="ui-g-6">
-            <span>Vendor</span>
-        </div>
-        <div class="ui-g-6">
-            {{storageOverview && storageOverview.details.vendor}}
+            <span class="storage-status-icon" [ngClass]="{normal:  storageOverview && storageOverview.status =='normal', abnormal: storageOverview && storageOverview.status =='abnormal'}"><i class="fa fa-circle"></i></span>
+            <span *ngIf="storageOverview && storageOverview.status=='normal'">Normal</span>
+            <span *ngIf=" storageOverview && storageOverview.status=='abnormal'">Abnormal</span>
+            <span *ngIf=" storageOverview && storageOverview.status=='offline'">Offline</span>
         </div>
     </div>
-    <div class="ui-g">
+    <div class="ui-g overview-item">
         <div class="ui-g-6">
-            <span>
+            <span class="overview-item-label">Vendor</span>
+        </div>
+        <div class="ui-g-6">
+            {{storageOverview && storageOverview.vendor}}
+        </div>
+    </div>
+    <div class="ui-g overview-item">
+        <div class="ui-g-6">
+            <span class="overview-item-label">
                 Model
             </span>
         </div>
         <div class="ui-g-6">
             <span>
-                {{storageOverview && storageOverview.details.model}}
+                {{storageOverview && storageOverview.model}}
             </span>
         </div>
     </div>
     <hr />
-    <div *ngIf="storageOverview && storageOverview.details.capacity" class="ui-g">
+    <div *ngIf="storageOverview && storageOverview.capacity" class="ui-g overview-item">
         <div class="ui-g-8">
-            <span>Raw Capacity</span>
+            <span class="overview-item-label">Raw Capacity</span>
         </div>
         <div class="ui-g-4">
             <span>
-                {{storageOverview && storageOverview.details.capacity.raw}}
+                {{storageOverview && storageOverview.capacity.raw}}
             </span>
         </div>
         <div class="ui-g-8">
-            <span>Subscribed Capacity</span>
+            <span class="overview-item-label">Subscribed Capacity</span>
         </div>
         <div class="ui-g-4">
             <span>
-                {{storageOverview && storageOverview.details.capacity.subscribed}}
+                {{storageOverview && storageOverview.capacity.subscribed}}
             </span>
         </div>
         <div class="ui-g-8">
-            <span>System used</span>
+            <span class="overview-item-label">System used</span>
         </div>
         <div class="ui-g-4">
             <span>
-                {{storageOverview && storageOverview.details.capacity.system_used}}
+                {{storageOverview && storageOverview.capacity.system_used}}
             </span>
         </div>
     </div>
     <hr />
-    <div class="ui-g">
+    <div class="ui-g overview-item">
         <div class="ui-g-12">
-            <span>Usable Capacity Summary (F / U / T)</span>
+            <span class="overview-item-label">Usable Capacity Summary (F / U / T)</span>
         </div>
     </div>
-    <div class="ui-g">
-        <div *ngIf="storageOverview && storageOverview.details.capacity" class="capacity-stats-bar">
-            <span class="free-storage">{{storageOverview.details.capacity && storageOverview.details.capacity.free ? storageOverview.details.capacity.free : '-'}} <span class="capacity-type">Free</span></span> <span>/</span>
-            <span class="used-storage">{{storageOverview.details.capacity && storageOverview.details.capacity.used ? storageOverview.details.capacity.used : '-'}} <span class="capacity-type">Used</span></span> <span>/</span>
-            <span class="total-storage">{{storageOverview.details.capacity && storageOverview.details.capacity.total ? storageOverview.details.capacity.total : '-'}} <span class="capacity-type">Total</span></span>
+    <div class="ui-g overview-item">
+        <div *ngIf="storageOverview && storageOverview.capacity" class="capacity-stats-bar">
+            <table class="capacity-table" *ngIf="storageOverview && storageOverview.capacity">
+                <thead>
+                    <th class="capacity-header">Free</th>
+                    <th class="capacity-header">Used</th>
+                    <th class="capacity-header">Total</th>
+                </thead>
+                <tbody>
+                    <td class="capacity-field"><span class="free-storage">{{storageOverview.capacity && storageOverview.capacity.free ? storageOverview.capacity.free : '-'}} </span></td>
+                    <td class="capacity-field"><span class="used-storage">{{storageOverview.capacity && storageOverview.capacity.used ? storageOverview.capacity.used : '-'}} </span></td>
+                    <td class="capacity-field"><span class="total-storage">{{storageOverview.capacity && storageOverview.capacity.total ? storageOverview.capacity.total : '-'}} </span></td>
+                </tbody>
+            </table>
             <div class="storage-usage-bar" >
-                <p-progressBar [ngClass]="{'capacity-usage-normal': storageOverview.details.capacity.usage < 75, 
-                    'capacity-usage-warning': storageOverview.details.capacity.usage > 75 && storageOverview.details.capacity.usage < 95, 
-                    'capacity-usage-full' : storageOverview.details.capacity.usage > 95 }" [value]="storageOverview.details.capacity.usage"></p-progressBar>
+                <p-progressBar [ngClass]="{'capacity-usage-normal': storageOverview.capacity.usage < 75, 
+                    'capacity-usage-warning': storageOverview.capacity.usage > 75 && storageOverview.capacity.usage < 95, 
+                    'capacity-usage-full' : storageOverview.capacity.usage > 95 }" [value]="storageOverview.capacity.usage" unit="% used"></p-progressBar>
             </div>
         </div>
     </div>

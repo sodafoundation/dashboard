@@ -53,6 +53,8 @@ export class StoragesComponent implements OnInit {
     totalRecords: number;
     loading: boolean;
     storageOverview;
+    vendorOverView;
+    modelOverview;
     volumeOverview;
     poolOverview;
     groupedByVendor;
@@ -72,7 +74,7 @@ export class StoragesComponent implements OnInit {
         host: "Host IP",
         port: "Port",
         extra_attributes: "Extra Attributes",
-        created_at: "Created At",
+        created_at: "Registered At",
         updated_at: "Updated At",
         firmware_version: "Firmware Version",
         serial_number : "Serial Number",
@@ -82,7 +84,9 @@ export class StoragesComponent implements OnInit {
         total_capacity: "Total Capacity",
         raw_capacity: "Raw capacity",
         subscribed_capacity: "Subscribed Capacity",
-        id: "ID",
+        system_used: "System Used",
+        id: "Delfin ID",
+        sync_status : "Sync Status"
 
     };
 
@@ -168,6 +172,10 @@ export class StoragesComponent implements OnInit {
                 value: 'huawei'
             },
             {
+                label: "HPE",
+                value: 'hpe'
+            },
+            {
                 label: "Fake Storage",
                 value: 'fake_storage'
             }
@@ -176,18 +184,20 @@ export class StoragesComponent implements OnInit {
         this.allStorageModels = {
             'dellemc' : [
                 {
-                    label: "VMAX3",
+                    label: "VMAX",
                     value: 'vmax'
-                },
-                {
-                    label: "VMAX4",
-                    value: 'vmax4'
                 }
             ],
             'huawei' : [
                 {
-                    label: "OceanStor V3",
+                    label: "OceanStor",
                     value: 'oceanstor'
+                }
+            ],
+            'hpe' : [
+                {
+                    label: "3PAR",
+                    value: '3par'
                 }
             ],
             'fake_storage' : [
@@ -347,6 +357,106 @@ export class StoragesComponent implements OnInit {
         
     }
 
+    groupStorageByVendor(storages){
+        let group = _.groupBy(storages, 'vendor');
+        return group;
+    }
+    groupStorageByModel(storages){
+        let group = _.groupBy(storages, function(item){
+            return item.model.toLowerCase();
+        });
+        return group;
+    }
+
+    // This method
+    prepareTree(storages){
+        let self = this;
+        let treeData = [];
+        // Group the Storage Devices by Vendors
+        let groupedByVendorData = this.groupStorageByVendor(storages);
+
+        
+        // Prepare the tree object with Top level Vendors as the first nodes
+        _.each(groupedByVendorData, function(value, key){
+            
+            // Group the devices by models.
+            let groupedByModelData = self.groupStorageByModel(value);
+            
+
+            let vendorTreeNode = {
+                label: key,
+                collapsedIcon: 'fa-folder',
+                expandedIcon: 'fa-folder-open',
+                type: 'array'
+            }
+
+            // Populate the vendor tree node with children grouped by models.
+            if(isArray(value) && value.length){
+                vendorTreeNode['children'] = [];
+                _.each(groupedByModelData, function(modelValue, modelKey){
+                    let modelGroupNode = {
+                        label: modelKey,
+                        collapsedIcon: 'fa-folder',
+                        expandedIcon: 'fa-folder-open',
+                        type: 'modelGroup',
+                        children: [],
+                        details: {
+                            totalUsableCapacity: 0,
+                            totalFreeCapacity: 0,
+                            totalUsedCapacity: 0,
+                            totalUsagePercent: 0,
+                            totalRawCapacity: 0,
+                            totalSubscribedCapacity: 0,
+                            totalSystemUsedCapacity: 0,
+                            displayTotal: "",
+                            displayFree: "",
+                            displayUsed: "",
+                            displayRaw: "",
+                            displaySubscribed: "",
+                            displaySystemUsed: ""
+                        }
+                    }
+                    if(isArray(modelValue) && modelValue.length){
+                        _.each(modelValue, function(storageDevice){
+                            let modelTreeNode = {
+                                label: storageDevice['name'],
+                                collapsedIcon: 'fa-hdd-o',
+                                expandedIcon: 'fa-hdd-o',
+                                children: [],
+                                type: 'device',
+                                details: storageDevice
+                            }
+                            //Create the capacity stats for each model group by summing together the capacity of each device 
+                            modelGroupNode.details.totalUsableCapacity+=storageDevice['total_capacity'];
+                            modelGroupNode.details.totalUsedCapacity+=storageDevice['used_capacity'];
+                            modelGroupNode.details.totalFreeCapacity+=storageDevice['free_capacity'];
+                            modelGroupNode.details.totalRawCapacity+=storageDevice['raw_capacity'];
+                            modelGroupNode.details.totalSubscribedCapacity+=storageDevice['subscribed_capacity'];
+                            modelGroupNode.details.totalUsagePercent = Math.ceil((storageDevice['used_capacity']/storageDevice['total_capacity']) * 100);
+                            modelGroupNode.details.totalSystemUsedCapacity = Math.ceil((storageDevice['raw_capacity'] - storageDevice['total_capacity']));
+                            
+                            // Push each storage device as a child of the model node
+                            modelGroupNode['children'].push(modelTreeNode);
+                        });
+                    }
+                    
+                    modelGroupNode.details.displayTotal = Utils.formatBytes(modelGroupNode.details.totalUsableCapacity);
+                    modelGroupNode.details.displayFree = Utils.formatBytes(modelGroupNode.details.totalFreeCapacity);
+                    modelGroupNode.details.displayUsed = Utils.formatBytes(modelGroupNode.details.totalUsedCapacity);
+                    modelGroupNode.details.displayRaw = Utils.formatBytes(modelGroupNode.details.totalRawCapacity);
+                    modelGroupNode.details.displaySubscribed = Utils.formatBytes(modelGroupNode.details.totalSubscribedCapacity);
+                    modelGroupNode.details.displaySystemUsed = Utils.formatBytes(modelGroupNode.details.totalSystemUsedCapacity);
+                    
+                    vendorTreeNode['children'].push(modelGroupNode);
+                });
+            }
+            
+            treeData.push(vendorTreeNode);
+        })
+        this.arrayTreeData = treeData;
+        
+    }
+
     showChart(){
         
     }
@@ -359,8 +469,17 @@ export class StoragesComponent implements OnInit {
 
     }
 
-    syncAllStorages(){
-
+    syncAllStorageDevices(){
+        this.ds.syncAllStorages() .subscribe((res)=>{
+            this.msgs = [];
+            this.msgs.push({severity: 'success', summary: 'Success', detail: 'Sync request has been sent. Please check back in some time.'});
+            this.getAllStorages();
+        }, (error)=>{
+            this.msgs = [];
+            let errorMsg = 'Error Syncing devices.' + error.error_msg;
+            this.msgs.push({severity: 'error', summary: 'Error', detail: error});
+            console.log("Something went wrong. Could not initiate the sync.", error);
+        });
     }
 
     syncStorage(storageId){
@@ -413,68 +532,37 @@ export class StoragesComponent implements OnInit {
         });
     }
 
-    groupStorageByVendor(storages){
-        let group = _.groupBy(storages, 'vendor');
-        return group;
-    }
+    
 
-    prepareTree(storages){
-        let self = this;
-        let treeData = [];
-        // Group the Storage Devices by Vendors
-        let groupedData = this.groupStorageByVendor(storages);
-        // Prepare the tree object with Top level Vendors as the first nodes
-        _.each(groupedData, function(value, key){
-            let parentTreeNode = {
-                label: key,
-                collapsedIcon: 'fa-folder',
-                expandedIcon: 'fa-folder-open',
-                type: 'array'
-            }
-            // Check if if the grouped devices exist and prepare the second level of nodes as children.
-            if(isArray(value) && value.length){
-                parentTreeNode['children'] = [];
-                _.each(value, function(storageDevice){
-                    let parentTreeNodeChild = {
-                        label: storageDevice['name'],
-                        collapsedIcon: 'fa-hdd-o',
-                        expandedIcon: 'fa-hdd-o',
-                        children: [],
-                        type: 'device',
-                        details: storageDevice
-                    }
-                    // Populate Volumes children
-                    let parentVolNode = {};
-                    if(storageDevice['volumes'] && storageDevice['volumes'].length){
-                        parentVolNode = {
-                            label : "Volumes",
-                            collapsedIcon: 'fa-database',
-                            expandedIcon: 'fa-database',
-                            type: 'volParent',
-                            children: []
-                        }
-                        parentTreeNodeChild['children'].push(parentVolNode);
-                    }
-                    
-                    // Push each storage device as a child of the vendor node
-                    parentTreeNode['children'].push(parentTreeNodeChild);
-                });
-            }
-            // Push each Vendor as a node in the Tree
-            treeData.push(parentTreeNode);
-        })
-        this.arrayTreeData = treeData;
-        
-    }
+    
 
     lazyLoadTreeChildren(event){
 
     }
 
     //Show the overview panel when hovering on device in the tree.
-    showOverview(event, storage, overlaypanel: OverlayPanel){
-        this.storageOverview = storage;
-        overlaypanel.toggle(event);
+    showOverview(event, node, overlaypanel: OverlayPanel){
+        let deviceOverlaypanel, modelOverlayPanel;
+        switch (node.type) {
+            case "device":
+                this.storageOverview = node.details;
+                deviceOverlaypanel = overlaypanel;
+                deviceOverlaypanel.toggle(event);
+                break;
+
+            case "modelGroup":
+                    this.modelOverview = node;
+                    modelOverlayPanel = overlaypanel;
+                    modelOverlayPanel.toggle(event);
+                break;
+        
+            default:
+                this.storageOverview = node;
+                overlaypanel.toggle(event);
+                break;
+        }
+        
+        
     }
 
     getModelsByVendor(vendor){
@@ -505,7 +593,7 @@ export class StoragesComponent implements OnInit {
             }
             this.confirmationService.confirm({
                 message: msg,
-                header: this.i18n.keyID['sds_fileShare_delete'],
+                header: this.i18n.keyID['sds_common_delete'] + " Storage(s)",
                 acceptLabel: this.i18n.keyID['sds_block_volume_delete'],
                 isWarning: true,
                 accept: ()=>{

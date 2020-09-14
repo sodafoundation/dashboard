@@ -2193,8 +2193,13 @@ dl.storage-capacity-list dd{
 }
 
 .storage-usage-bar{
+    .ui-progressbar{
+        height: 1.6em;
+    }
+    
     .capacity-usage-normal .ui-progressbar-value{
         background: #26988f;
+        padding-top: 2px;
     }
 }
 
@@ -2204,6 +2209,7 @@ dl.storage-capacity-list dd{
     }
     .capacity-usage-warning .ui-progressbar-label{
         color: #fff;
+        padding-top: 2px;
     }
 }
 .storage-usage-bar {
@@ -2212,6 +2218,7 @@ dl.storage-capacity-list dd{
     }
     .capacity-usage-full .ui-progressbar-label{
         color: #fff;
+        padding-top: 2px;
     }
 }
 
@@ -2236,13 +2243,13 @@ dl.storage-capacity-list dd{
     color: #000;
 }
 
-.volume-overview-panel{
+.overview-panel{
     width: 300px;
     min-height: 300px;
     .capacity-stats-bar{
         width: 100%;
         text-align: left;
-        padding-left: 5px;
+        padding: 0 0 5px 5px;
         font-size: 0.9em;
     }
     .storage-usage-bar{
@@ -2250,23 +2257,22 @@ dl.storage-capacity-list dd{
     }
     .overview-title{
         border-bottom: 1px solid #444;
+        padding: 0 0 5px 5px;
         h4{
             font-weight: 700;
         }   
     }
+    .capacity-table{
+        width: 100%;
+        .capacity-header{
+            text-align: left;
+        }
+        .capacity-field{
+            text-align: left;
+        }
+    }
 }
-.volume-overview-panel-card{
-    height: 100%;
-}
-.volume-overview-panel-card .overview-panel-header{
-    padding: 0.4rem;
-}
-.volume-overview-panel-card .overview-panel-header span.left{
-    float: left;
-}
-.volume-overview-panel-card .overview-panel-header span.right{
-    float: right;
-}
+
 .capacity-usage-warning.ui-progressbar-value{
     background-color: #ff0000;
 }
