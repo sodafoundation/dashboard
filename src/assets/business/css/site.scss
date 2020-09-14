@@ -2199,6 +2199,9 @@ dl.storage-capacity-list dd{
     
     .capacity-usage-normal .ui-progressbar-value{
         background: #26988f;
+    }
+    .capacity-usage-normal .ui-progressbar-label{
+        color: #fff;
         padding-top: 2px;
     }
 }
