@@ -35,7 +35,7 @@ export class DelfinService {
       return this.http.put(this.delfinStoragesUrl + "/" + id, params);
     }
     //Sync all storages
-    syncAllStorages(param){
+    syncAllStorages(param?){
         return this.http.post(this.delfinStoragesUrl+'/sync', null);
     }
     //Sync storage by id
