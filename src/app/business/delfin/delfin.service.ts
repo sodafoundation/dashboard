@@ -91,3 +91,4 @@ export class DelfinService {
         return this.http.delete(this.delfinStoragesUrl + '/' + id + '/alerts/' + seqNum);
     }
 }
+

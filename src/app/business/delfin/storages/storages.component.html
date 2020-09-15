@@ -573,3 +573,85 @@
         </div>
     </div>
 </p-overlayPanel>
+
+<p-overlayPanel styleClass="overview-panel" #modelOverviewPanel>
+    <div class="ui-g overview-title">
+        <h4>{{modelOverview && modelOverview.label}}</h4>
+    </div>
+    <div class="ui-g overview-item overview-item">
+        <div class="ui-g-6">
+            <span class="overview-item-label">Vendor</span>
+        </div>
+        <div class="ui-g-4 ui-g-offset-2">
+            {{modelOverview && modelOverview.parent.label}}
+        </div>
+    </div>
+    <div class="ui-g overview-item">
+        <div class="ui-g-6">
+            <span class="overview-item-label">
+                Number of Devices: 
+            </span>
+        </div>
+        <div class="ui-g-4 ui-g-offset-2">
+            <span>
+                {{modelOverview && modelOverview.children.length}}
+            </span>
+        </div>
+    </div>
+    <hr />
+    <div *ngIf="modelOverview && modelOverview.details" class="ui-g overview-item">
+        <div class="ui-g-8">
+            <span class="overview-item-label">Total Raw Capacity</span>
+        </div>
+        <div class="ui-g-4">
+            <span>
+                {{modelOverview && modelOverview.details.displayRaw}}
+            </span>
+        </div>
+        <div class="ui-g-8">
+            <span class="overview-item-label">Subscribed Capacity</span>
+        </div>
+        <div class="ui-g-4">
+            <span>
+                {{modelOverview && modelOverview.details.displaySubscribed}}
+            </span>
+        </div>
+        <div class="ui-g-8">
+            <span class="overview-item-label">System used</span>
+        </div>
+        <div class="ui-g-4">
+            <span>
+                {{modelOverview && modelOverview.details.displaySystemUsed}}
+            </span>
+        </div>
+    </div>
+    <hr />
+    <div class="ui-g overview-item">
+        <div class="ui-g-12">
+            <span class="overview-item-label">Usable Capacity Summary</span>
+        </div>
+        
+    </div>
+    <div class="ui-g overview-item">
+        <div *ngIf="modelOverview && modelOverview.details" class="capacity-stats-bar">
+            <table class="capacity-table" *ngIf="modelOverview && modelOverview.details">
+                <thead>
+                    <th class="capacity-header">Free</th>
+                    <th class="capacity-header">Used</th>
+                    <th class="capacity-header">Total</th>
+                </thead>
+                <tbody>
+                    <td class="capacity-field"><span class="free-storage">{{modelOverview.details && modelOverview.details.displayFree ? modelOverview.details.displayFree : '-'}} </span> </td>
+                    <td class="capacity-field"><span class="used-storage">{{modelOverview.details && modelOverview.details.displayUsed ? modelOverview.details.displayUsed : '-'}} </span> </td>
+                    <td class="capacity-field"><span class="total-storage">{{modelOverview.details && modelOverview.details.displayTotal ? modelOverview.details.displayTotal : '-'}} </span></td>
+                </tbody>
+            </table>
+            <div class="storage-usage-bar" >
+                <p-progressBar [ngClass]="{'capacity-usage-normal': modelOverview.details.totalUsagePercent < 75, 
+                    'capacity-usage-warning': modelOverview.details.totalUsagePercent > 75 && modelOverview.details.totalUsagePercent < 95, 
+                    'capacity-usage-full' : modelOverview.details.totalUsagePercent > 95 }" [value]="modelOverview.details.totalUsagePercent" unit="% used"></p-progressBar>
+            </div>
+        </div>
+    </div>
+</p-overlayPanel>
+

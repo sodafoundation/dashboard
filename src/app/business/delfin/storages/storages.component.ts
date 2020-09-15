@@ -685,3 +685,4 @@ export class StoragesComponent implements OnInit {
         })
     }
 }
+
