@@ -1,4 +1,11 @@
 export const Consts = {
+    
+    /**
+     * Constants to be used for conversion of capacity value in appropriate display values.
+     */
+    GiB_CONVERTER : 1024,
+    GB_CONVERTER : 1000,
+    
     /** Unknown placeholder **/
     UNKNOW_PLACEHOLDER: "--",
 
@@ -57,5 +64,13 @@ export const Consts = {
         'azure-file' : 'Azure File Service'
     },
     S3_HOST_IP: '',
-    S3_HOST_PORT: ''
+    S3_HOST_PORT: '',
+    API: {
+        
+        DELFIN : {
+            'storages' : 'delfin/storages',
+            'storagePools' : 'delfin/storage-pools',
+            'volumes' : 'delfin/volumes'
+        }
+    }
 }
