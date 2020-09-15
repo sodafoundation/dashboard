@@ -43,8 +43,8 @@
                                     <a (mouseenter)="showOverview($event, model, modelOverviewPanel)" (mouseleave)="showOverview($event, model, modelOverviewPanel)">{{model.label}}</a>
                                 </ng-template>
                                 <ng-template let-node pTemplate="device">
+                                    <a [routerLink]="['/storageDetails/' + node.details.id]"  (mouseenter)="showOverview($event, node, deviceOverviewPanel)" (mouseleave)="showOverview($event, node, deviceOverviewPanel)">{{node.label}}</a>
                                     
-                                    <a (mouseenter)="showOverview($event, node, deviceOverviewPanel)" (mouseleave)="showOverview($event, node, deviceOverviewPanel)">{{node.label}}</a>
                                 </ng-template>
                             </p-tree>
                         </p-scrollPanel>
@@ -548,7 +548,7 @@
     <hr />
     <div class="ui-g overview-item">
         <div class="ui-g-12">
-            <span class="overview-item-label">Usable Capacity Summary (F / U / T)</span>
+            <span class="overview-item-label">Usable Capacity Summary</span>
         </div>
     </div>
     <div class="ui-g overview-item">

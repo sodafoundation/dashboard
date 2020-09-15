@@ -16,7 +16,8 @@ import { TooltipModule } from '../../components/tooltip/tooltip';
 import { StoragesComponent } from './storages/storages.component';
 import { TableModule } from '../../components/table/table';
 import { DataViewModule } from '../../components/dataview/dataview';
-
+import { StorageVolumesComponent } from './volumes/volumes.component';
+import { StoragePoolsComponent } from './storage-pools/storage-pools.component';
 import { FieldsetModule } from '../../components/fieldset/fieldset'
 
 const routers: Routes = [{
