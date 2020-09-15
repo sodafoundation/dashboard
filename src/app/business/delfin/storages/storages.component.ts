@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewContainerRef, ViewChild, Directive, ElementRef, HostBinding, HostListener } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { I18NService, Utils } from 'app/shared/api';
 import { FormControl, FormGroup, FormBuilder, Validators, ValidatorFn, AbstractControl } from '@angular/forms';
 import { AppService } from 'app/app.service';
@@ -122,8 +122,15 @@ export class StoragesComponent implements OnInit {
         private confirmationService: ConfirmationService,
         private fb: FormBuilder,
         private router: Router,
+        private ActivatedRoute: ActivatedRoute,
     ) {
-       
+        this.msgs = [];
+            this.ActivatedRoute.queryParamMap.subscribe(params => {
+                let message = params.get('message');
+                if(message){
+                    this.msgs.push(JSON.parse(message));
+                }
+            });
     }
 
     ngOnInit() {
