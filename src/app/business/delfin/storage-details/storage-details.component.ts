@@ -19,6 +19,10 @@ let _ = require("underscore");
 })
 export class StorageDetailsComponent implements OnInit {
     allStorages: any = [];
+    allStorageVolumes: any = [];
+    allVolumesCountAndCapacity;
+    allStoragePools: any = [];
+    allPoolsCountAndCapacity
     selectedStorage: any;
     selectedStorageId: any;
     items: any;
@@ -26,6 +30,10 @@ export class StorageDetailsComponent implements OnInit {
     usableCapacityChartOptions: any;
     rawCapacityChartData: any;
     rawCapacityChartOptions: any;
+    volumesCapacityChartData: any;
+    volumesCapacityChartOptions: any;
+    poolsCapacityChartData: any;
+    poolsCapacityChartOptions: any;
     allActiveAlerts: any = [];
     detailsTabIndex: number = 0;
     configTabIndex: number = 0;
@@ -82,7 +90,8 @@ export class StorageDetailsComponent implements OnInit {
                 url: '/storageDetails' 
             }
         ];
-        
+        this.getStorageVolumes(this.selectedStorageId);
+        this.getStoragePools(this.selectedStorageId);
         
     }
     changeDetailsTab(e){
@@ -95,7 +104,7 @@ export class StorageDetailsComponent implements OnInit {
                 break;
             case 1:
                 this.detailsTabIndex = 1;
-                this.getStorageById(this.selectedStorageId);
+                this.refreshAllLists();
                 this.prepareCapacityCharts(this.selectedStorage);
                 break;
             case 2:
@@ -121,6 +130,11 @@ export class StorageDetailsComponent implements OnInit {
         }
     }
 
+    refreshAllLists(){
+        this.getStorageById(this.selectedStorageId);
+        this.getStorageVolumes(this.selectedStorageId);
+        this.getStoragePools(this.selectedStorageId);
+    }
     getAllStorages(){
         this.ds.getAllStorages().subscribe((res)=>{
             let storages = res.json().storages;
@@ -152,6 +166,62 @@ export class StorageDetailsComponent implements OnInit {
         })
     }
 
+    getStorageVolumes(id){
+        let countAndCapacity = {
+            'total' : 0,
+            'total_capacity' : 0,
+            'used_capacity' : 0,
+            'free_capacity' : 0,
+            'displayTotal' : '',
+            'displayUsed' : '',
+            'displayFree' : ''
+        };
+        // Get all the volumes associated with the Storage device
+        this.ds.getAllVolumes(id).subscribe((res)=>{
+            let vols = res.json().volumes;
+            _.each(vols, function(volItem){
+                countAndCapacity['total_capacity'] += volItem['total_capacity'];
+                countAndCapacity['used_capacity'] += volItem['used_capacity'];
+                countAndCapacity['free_capacity'] += volItem['free_capacity'];
+            })
+            countAndCapacity['total'] = vols.length;
+            countAndCapacity['displayTotal'] = Utils.formatBytes(countAndCapacity['total_capacity']);
+            countAndCapacity['displayUsed'] = Utils.formatBytes(countAndCapacity['used_capacity']);
+            countAndCapacity['displayFree'] = Utils.formatBytes(countAndCapacity['free_capacity']);
+            this.allStorageVolumes = vols;
+            this.allVolumesCountAndCapacity = countAndCapacity;
+        }, (error)=>{
+            console.log("Something went wrong. Could not fetch Volumes.", error)
+        });
+    }
+
+    getStoragePools(id){
+        let countAndCapacity = {
+            'total' : 0,
+            'total_capacity' : 0,
+            'used_capacity' : 0,
+            'free_capacity' : 0,
+            'displayTotal' : '',
+            'displayUsed' : '',
+            'displayFree' : ''
+        };
+        this.ds.getAllStoragePools(id).subscribe((res)=>{
+            let pools = res.json().storage_pools;
+            _.each(pools, function(poolItem){
+                countAndCapacity['total_capacity'] += poolItem['total_capacity'];
+                countAndCapacity['used_capacity'] += poolItem['used_capacity'];
+                countAndCapacity['free_capacity'] += poolItem['free_capacity'];
+            })
+            countAndCapacity['total'] = pools.length;
+            countAndCapacity['displayTotal'] = Utils.formatBytes(countAndCapacity['total_capacity']);
+            countAndCapacity['displayUsed'] = Utils.formatBytes(countAndCapacity['used_capacity']);
+            countAndCapacity['displayFree'] = Utils.formatBytes(countAndCapacity['free_capacity']);
+            this.allStoragePools = pools;
+            this.allPoolsCountAndCapacity = countAndCapacity;
+        }, (error)=>{
+            console.log("Something went wrong. Could not fetch Storage Pools.", error)
+        });
+    }
     prepareCapacityCharts(storage){
         this.usableCapacityChartData = {
             labels: ['Used: ' + storage['capacity'].used,'Free: ' + storage['capacity'].free],
@@ -159,17 +229,17 @@ export class StorageDetailsComponent implements OnInit {
                 {
                     data: [storage['used_capacity'], storage['free_capacity']],
                     backgroundColor: [
-                        'rgba(255, 99, 132, 0.2)',
-                        'rgba(54, 162, 235, 0.2)',
+                        'rgba(219, 68, 55, 0.5)',
+                        'rgba(103, 178, 20, 0.5)',
                       ],
                       borderColor: [
-                        'rgba(255,99,132,1)',
-                        'rgba(54, 162, 235, 1)',
+                        'rgba(219, 68, 55,1)',
+                        'rgba(103, 178, 20, 1)',
                       ],
                     borderWidth: 1,
                     hoverBackgroundColor: [
-                        'rgba(255, 99, 132, 1)',
-                        'rgba(54, 162, 235, 1)'
+                        'rgba(219, 68, 55, 1)',
+                        'rgba(103, 178, 20, 1)'
                     ]
                 }]    
         };
@@ -250,6 +320,102 @@ export class StorageDetailsComponent implements OnInit {
               displayColors: false
             }
           };
+          this.volumesCapacityChartData = {
+            labels: ['Used: ' + this.allVolumesCountAndCapacity['displayUsed'], 'Free: ' + this.allVolumesCountAndCapacity['displayFree']],
+            datasets: [
+                {
+                    data: [this.allVolumesCountAndCapacity['used_capacity'], this.allVolumesCountAndCapacity['free_capacity']],
+                    backgroundColor: [
+                        'rgba(219, 68, 55, 0.5)',
+                        'rgba(94, 186, 204, 1)',
+                      ],
+                      borderColor: [
+                        'rgba(219, 68, 55,1)',
+                        'rgba(94, 186, 204, 1)',
+                      ],
+                    borderWidth: 1,
+                    hoverBackgroundColor: [
+                        'rgba(219, 68, 55, 1)',
+                        'rgba(94, 186, 204, 1)'
+                    ]
+                }]    
+        };
+        this.volumesCapacityChartOptions = {
+            legend: {
+                display: true,
+                position: 'right',
+                labels: {
+                    fontColor: 'rgb(0,0,0)',
+                    fontSize: 14
+                }
+            },
+            tooltips: {
+              callbacks: {
+                title: function(tooltipItem, data) {
+                  return data['labels'][tooltipItem[0]['index']];
+                },
+                label: function(tooltipItem, data) {
+                },
+                afterLabel: function(tooltipItem, data) {
+                }
+              },
+              backgroundColor: '#ccc',
+              titleFontSize: 14,
+              titleFontColor: '#0066ff',
+              bodyFontColor: '#000',
+              bodyFontSize: 14,
+              displayColors: false
+            }
+        };
+
+        this.poolsCapacityChartData = {
+            labels: ['Used: ' + this.allPoolsCountAndCapacity['displayUsed'], 'Free: ' + this.allPoolsCountAndCapacity['displayFree']],
+            datasets: [
+                {
+                    data: [this.allPoolsCountAndCapacity['used_capacity'], this.allPoolsCountAndCapacity['free_capacity']],
+                    backgroundColor: [
+                        'rgba(219, 68, 55, 0.5)',
+                        'rgba(48, 210, 255, 1)',
+                      ],
+                      borderColor: [
+                        'rgba(219, 68, 55,1)',
+                        'rgba(48, 210, 255, 1)',
+                      ],
+                    borderWidth: 1,
+                    hoverBackgroundColor: [
+                        'rgba(219, 68, 55, 1)',
+                        'rgba(48, 210, 255, 1)'
+                    ]
+                }]    
+        };
+        this.poolsCapacityChartOptions = {
+            legend: {
+                display: true,
+                position: 'right',
+                labels: {
+                    fontColor: 'rgb(0,0,0)',
+                    fontSize: 14
+                }
+            },
+            tooltips: {
+              callbacks: {
+                title: function(tooltipItem, data) {
+                  return data['labels'][tooltipItem[0]['index']];
+                },
+                label: function(tooltipItem, data) {
+                },
+                afterLabel: function(tooltipItem, data) {
+                }
+              },
+              backgroundColor: '#ccc',
+              titleFontSize: 14,
+              titleFontColor: '#0066ff',
+              bodyFontColor: '#000',
+              bodyFontSize: 14,
+              displayColors: false
+            }
+        };
+
     }
 
     syncStorage(storageId){

@@ -181,6 +181,59 @@
             <p-tabPanel header="Capacity">
                 <ng-template pTemplate="content">
                     <div class="ui-grid-row">
+                        <div class="ui-g-4 capacity-overview-container total">
+                            <div class="ui-g-6 capacity-overview-label-tile">
+                                {{label.total_capacity}}:
+                            </div>
+                            <div class="ui-g-6 capacity-overview-value-tile">
+                                {{ selectedStorage.capacity.total}}
+                            </div>
+                        </div>
+                        <div class="ui-g-4 capacity-overview-container free">
+                            <div class="ui-g-6 capacity-overview-label-tile">
+                                {{label.free_capacity}}:
+                            </div>
+                            <div class="ui-g-6 capacity-overview-value-tile">
+                                {{ selectedStorage.capacity.free}}
+                            </div>
+                        </div>
+                        <div class="ui-g-4 capacity-overview-container used">
+                            <div class="ui-g-6 capacity-overview-label-tile">
+                                {{label.used_capacity}}:
+                            </div>
+                            <div class="ui-g-6 capacity-overview-value-tile">
+                                {{ selectedStorage.capacity.used}}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ui-grid-row">
+                        <div class="ui-g-4 capacity-overview-container raw">
+                            <div class="ui-g-6 capacity-overview-label-tile">
+                                {{label.raw_capacity}}:
+                            </div>
+                            <div class="ui-g-6 capacity-overview-value-tile">
+                                {{ selectedStorage.capacity.raw}}
+                            </div>
+                        </div>
+                        <div class="ui-g-4 capacity-overview-container system-used">
+                            <div class="ui-g-6 capacity-overview-label-tile">
+                                {{label.system_used}}:
+                            </div>
+                            <div class="ui-g-6 capacity-overview-value-tile">
+                                {{ selectedStorage.capacity.system_used}}
+                            </div>
+                        </div>
+                        <div class="ui-g-4 capacity-overview-container subscribed">
+                            <div class="ui-g-6 capacity-overview-label-tile">
+                                {{label.subscribed_capacity}}:
+                            </div>
+                            <div class="ui-g-6 capacity-overview-value-tile">
+                                {{ selectedStorage.capacity.subscribed}}
+                            </div>
+                        </div>
+                    </div>
+                   
+                    <div class="ui-grid-row">
                         <div class="ui-g-6">
                             <p-card styleClass="ui-card-shadow">
                                 <p-header style="padding: 0.15rem 0.2rem 0 0.2rem;">
@@ -225,11 +278,48 @@
                         </div>
                     </div>
                     <div class="ui-grid-row">
-                        <div class="ui-g-4">
-                            
+                        <div class="ui-g-6">
+                            <p-card styleClass="ui-card-shadow">
+                                <p-header style="padding: 0.15rem 0.2rem 0 0.2rem;">
+                                    <div class="ui-g-row summary-card-header-container" >
+                                        <div class="ui-g-10 left-items" style="padding-left: 0.2rem;">
+                                            <div class="ui-card-title">Volumes Overview</div>
+                                            <div class="ui-card-subtitle">
+                                                <span>Total Number of Volumes: {{allVolumesCountAndCapacity.total }}</span> <br /> 
+                                                <span>Total Volumes Capacity: {{allVolumesCountAndCapacity && allVolumesCountAndCapacity.displayTotal}}</span>
+                                            </div>
+                                        </div>
+                                        
+                                    </div>
+                                </p-header>
+                                <div>
+                                    <p-chart type="doughnut" [data]="volumesCapacityChartData" [options]="volumesCapacityChartOptions" [responsive]="true"></p-chart>
+                                </div>
+                                
+                                <p-footer>
+                                </p-footer>
+                            </p-card>
                         </div>
-                        <div class="ui-g-8">
-                            
+                        <div class="ui-g-6">
+                            <p-card styleClass="ui-card-shadow">
+                                <p-header style="padding: 0.15rem 0.2rem 0 0.2rem;">
+                                    <div class="ui-g-row summary-card-header-container" >
+                                        <div class="ui-g-10 left-items" style="padding-left: 0.2rem;">
+                                            <div class="ui-card-title">Storage Pools Overview</div>
+                                            <div class="ui-card-subtitle">
+                                                <span>Total Number of Pools: {{allPoolsCountAndCapacity.total }}</span> <br />
+                                                <span>Total Storage Pools Capacity: {{allPoolsCountAndCapacity && allPoolsCountAndCapacity.displayTotal}}</span>
+                                            </div>
+                                        </div>
+                                        
+                                    </div>
+                                </p-header>
+                                <div>
+                                    <p-chart type="doughnut" [data]="poolsCapacityChartData" [options]="poolsCapacityChartOptions" [responsive]="true"></p-chart>
+                                </div>
+                                <p-footer>
+                                </p-footer>
+                            </p-card>
                         </div>
                     </div>
                 </ng-template>
