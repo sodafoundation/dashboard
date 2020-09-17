@@ -28,6 +28,7 @@ export class StoragesComponent implements OnInit {
     selectStorage;
     showListView: boolean = false;
     menuItems: MenuItem[];
+    contextMenuItems: MenuItem[];
     capacityData: any;
     chartOptions: any;
     vendorOptions;
@@ -454,10 +455,22 @@ export class StoragesComponent implements OnInit {
                                 }
                                 modelTreeNode['children'].push(parentVolNode);
                             }
-
+                            let volChildNode ={};
+                            if(storageDevice['volumes'].length){
+                                _.each(storageDevice['volumes'], function(volItem){
+                                    volChildNode = {
+                                        label : volItem['name'],
+                                        collapsedIcon: 'fa-database',
+                                        expandedIcon: 'fa-database',
+                                        type: 'volNode',
+                                        details: volItem
+                                    }
+                                })
+                                
+                            }
                             // Create the Storage Pool parent Node
                             let parentPoolNode = {};
-                            if(storageDevice['storagePools'] ){
+                            if(storageDevice['storagePools']){
                                 parentPoolNode = {
                                     label : "Storage Pools",
                                     collapsedIcon: 'fa-cubes',
@@ -490,6 +503,50 @@ export class StoragesComponent implements OnInit {
         this.arrayTreeData = treeData;
         
     }
+    public deviceNodeMenu(event, node, overlaypanel: OverlayPanel) {
+       overlaypanel.hide();
+        if(node['type']='device'){
+            this.contextMenuItems = [
+                {
+                    "label": "Register Alert Source",
+                    command: () => {
+                        this.showAlertSourceDialog(node['details']);
+                    },
+                    disabled:false
+                },
+                
+                {
+                    "label": "Remove Alert Source",
+                    command: () => {
+                        
+                        console.log("Alert Source removed");
+                    	//TODO: Add remove alert source
+                    },
+                    disabled:false
+                },
+                {
+                    "label": "Sync Storage Device",
+                    command: () => {
+                        this.syncStorage(node['details'].id);
+                    },
+                    disabled:false
+                },
+                {
+                    "label": this.i18n.keyID['sds_block_volume_delete'],
+                    command: () => {
+                        this.batchDeleteStorages(node['details']);
+                    },
+                    disabled:false
+                }
+            ];
+        } else{
+            this.contextMenuItems = [];
+        }
+        
+        return false;
+    }
+
+
 
     showChart(){
         

@@ -6,6 +6,7 @@ import { ScrollPanelModule } from '../../components/scrollpanel/scrollpanel';
 import { DataScrollerModule } from '../../components/datascroller/datascroller';
 import { TreeModule } from '../../components/tree/tree';
 import { ProgressBarModule } from '../../components/progressbar/progressbar';
+import { ContextMenuModule } from '../../components/contextmenu/contextmenu';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { HttpService } from './../../shared/service/Http.service';
 import { DelfinComponent } from './delfin.component';
@@ -56,7 +57,8 @@ const routers: Routes = [{
     ConfirmDialogModule,
     InputTextareaModule,
     TooltipModule,
-    ProgressBarModule
+    ProgressBarModule,
+    ContextMenuModule
     ],
   exports: [ DelfinComponent ],
   providers: [
