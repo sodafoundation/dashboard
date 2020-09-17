@@ -194,11 +194,13 @@
                         </p-scrollPanel>
                     </div>
                     <p-footer>
-                        <hr />
-                        <span>Last updated: <strong> </strong></span>
+                        <span> <strong> </strong></span>
                     </p-footer>
                 </p-card>
             </div>
+        </div>
+        <div class="ui-g-row">
+            
         </div>
     </div>
     <div *ngIf="showListView">
@@ -215,7 +217,7 @@
                     <p-column field="vendor" header="Vendor" [style]="{'width': '10%'}" [sortable]="true">
                     </p-column>
                     <p-column field="model" header="Model" [style]="{'width': '8%'}" [sortable]="true"></p-column>
-                    <p-column field="status" header="Status" [style]="{'width': '8%'}">
+                    <p-column field="status" header="Status" [style]="{'width': '6%'}">
                         <ng-template pTemplate="body" let-storage="rowData">
                             <span class="storage-status-icon" [ngClass]="{normal: storage.status=='normal', abnormal: storage.status=='abnormal' || storage.status=='offline'}"><i class="fa fa-circle"></i></span>
                             <span *ngIf="storage.status=='normal'">Normal</span>
@@ -234,7 +236,7 @@
                             <span *ngIf="storage.sync_status=='SYNCING'" ><i class="fa fa-spinner fa-pulse"></i></span>
                         </ng-template>
                     </p-column>
-                    <p-column field="serial_number" header="Serial Number" [style]="{'width': '8%'}" [sortable]="true">
+                    <p-column field="serial_number" header="Serial Number" [style]="{'width': '10%'}" [sortable]="true">
                         <ng-template pTemplate="body" let-storage="rowData">
                             {{ storage.serial_number | slice:0:10 }}
                             <a *ngIf="storage.serial_number.length > 10" pTooltip="{{storage.serial_number}}" tooltipPosition="top">
