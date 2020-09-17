@@ -287,7 +287,9 @@ export class StoragesComponent implements OnInit {
             'host': new FormControl('', {validators:[Validators.required, Validators.pattern(this.validRule.validIp)]})
         });
     }
-
+    updateAccessInfo(storage){
+        this.router.navigate(['/modifyStorage', storage['id']]);
+    }
     getAllActiveAlerts(){
        this.allActiveAlerts = [];
     }
