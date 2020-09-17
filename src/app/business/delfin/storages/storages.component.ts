@@ -321,17 +321,7 @@ export class StoragesComponent implements OnInit {
         ];
 
         this.registerAlertSourceForm = this.fb.group({});
-            'version': new FormControl('', Validators.required),
-            'community_string': new FormControl(''),
-            'username': new FormControl('', Validators.required),
-            'engine_id': new FormControl(''),
-            'security_level': new FormControl(''),
-            'auth_protocol': new FormControl(''),
-            'auth_key': new FormControl(''),
-            'privacy_protocol': new FormControl(''),
-            'privacy_key': new FormControl(''),
-            'host': new FormControl('', {validators:[Validators.required, Validators.pattern(this.validRule.validIp)]})
-        });
+           
     }
 
     getAllActiveAlerts(){
