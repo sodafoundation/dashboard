@@ -2158,6 +2158,20 @@ a.remove-initiator, a.remove-tag, a.remove-metadata, a.remove-extra-attribute{
 }
 /* Help Section Ends */
 /* Delfin Styles start */
+td.ui-datatable-emptymessage{
+    text-align: center;
+}
+.storage-array-tree-view {
+    width: 100%;
+    height: 100%; 
+    overflow: auto;
+
+    .ui-tree-empty-message {
+        padding: .25em;
+        text-align: center;
+        padding-top: 1.5rem;
+    }
+}
 .delfin-storage-list-page .ui-dataview-layout-options.ui-selectbutton .ui-togglebutton.ui-button.ui-state-default, .ui-selectbutton .ui-button.ui-state-default{
 padding: 0 0.15rem;
 }
@@ -2177,6 +2191,13 @@ dl.storage-capacity-list dd{
 .storage-summary-panel-2{
     height: 400px;
     min-height: 350px;
+    .ui-scrollpanel-content{
+        height: calc(100%);
+    }
+    .no-records-found {
+        text-align: center;
+        padding-top: 2rem;
+    }
 }
 .storage-status-icon i{
     font-size: 0.12rem;
@@ -2201,7 +2222,7 @@ dl.storage-capacity-list dd{
         background: #26988f;
     }
     .capacity-usage-normal .ui-progressbar-label{
-        color: #fff;
+        color: #000;
         padding-top: 2px;
     }
 }
@@ -2311,6 +2332,38 @@ dl.storage-capacity-list dd{
             }
         }
     }
+}
+
+.ui-grid-row .capacity-overview-container {
+    box-shadow: 5px 5px 25px rgba(51, 59, 69, 0.14902);
+    -webkit-box-shadow: 10px 5px 25px rgba(51, 59, 69, 0.14902);
+    -moz-box-shadow: 5px 5px 25px rgba(51, 59, 69, 0.14902);
+    border: 1px solid #D5D5D5;
+    background-color: #1D7CEC;
+    color: #657D95;
+    border: 25px solid #fff;
+}
+.capacity-overview-container.free{
+    background-color: #67B214;
+}
+.capacity-overview-container.used{
+    background-color: #db4437;
+}
+.capacity-overview-container.raw{
+    background-color: #48917b;
+}
+.capacity-overview-container.system-used{
+    background-color: #444;
+}
+.capacity-overview-container.subscribed{
+    background-color: #134d8e;
+}
+.capacity-overview-label-tile, .capacity-overview-value-tile {
+    color: #fff;
+    text-align: center;
+    padding: 20px 5px;
+    font-size: 1.25em;
+    font-weight: 600;
 }
 /* Delfin Styles end */
 
