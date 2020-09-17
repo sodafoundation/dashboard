@@ -38,7 +38,8 @@ const routes: Routes = [
     {path: 'services', loadChildren: './business/services/services.module#ServicesModule'},
     {path: 'delfin', loadChildren: './business/delfin/delfin.module#DelfinModule'},
     {path: 'registerStorage', loadChildren: './business/delfin/register-storage/register-storage.module#RegisterStorageModule'},
-    {path: 'storageDetails/:storageId', loadChildren: './business/delfin/storage-details/storage-details.module#StorageDetailsModule'}
+    {path: 'storageDetails/:storageId', loadChildren: './business/delfin/storage-details/storage-details.module#StorageDetailsModule'},
+    {path: 'modifyStorage/:storageId', loadChildren: './business/delfin/modify-storage/modify-storage.module#ModifyStorageModule'}
 ];
 
 @NgModule({

@@ -141,6 +141,13 @@ export class StoragesComponent implements OnInit {
         
         this.menuItems = [
             {
+                "label": "Update Access Info",
+                command: () => {
+                    this.updateAccessInfo(this.selectStorage);
+                },
+                disabled:false
+            },
+            {
                 "label": "Register Alert Source",
                 command: () => {
                     this.showAlertSourceDialog(this.selectStorage);
@@ -514,6 +521,13 @@ export class StoragesComponent implements OnInit {
        overlaypanel.hide();
         if(node['type']='device'){
             this.contextMenuItems = [
+                {
+                    "label": "Update Access Info",
+                    command: () => {
+                        this.updateAccessInfo(node['details']);
+                    },
+                    disabled:false
+                },
                 {
                     "label": "Register Alert Source",
                     command: () => {
