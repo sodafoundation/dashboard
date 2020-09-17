@@ -26,6 +26,7 @@ export class StoragesComponent implements OnInit {
     selectedStorages: any = [];
     selectedStorageId: any;
     selectStorage;
+    selectedAlertSource;
     showListView: boolean = false;
     menuItems: MenuItem[];
     contextMenuItems: MenuItem[];
@@ -101,13 +102,42 @@ export class StoragesComponent implements OnInit {
         "auth_key": "Auth Key",
         "privacy_protocol": "Privacy Protocol",
         "privacy_key": "Privacy Key",
-        "host": "Host"
+        "host": "Host",
+        "port": "Port",
+        "context_name" : "Context Name",
+        "retry_num" : "Max Retries",
+        "expiration" : "Expiration time (sec)"
     }
 
     errorMessage = {
         "version" : {
             required: "Version is required"
         },
+        "community_string" : {
+            required: "Community String is required"
+        },
+        "username" : {
+            required: "Username is required"
+        },
+        "engine_id" : {
+            required: "Engine ID is required"
+        },
+        "security_level" : {
+            required: "Security Level is required"
+        },
+        "auth_protocol" : {
+            required: "Auth Protocol is required"
+        },
+        "auth_key" : {
+            required: "Auth key is required"
+        },
+        "privacy_protocol" : {
+            required: "Privacy Protocol is required"
+        },
+        "privacy_key" : {
+            required: "Privacy key is required"
+        },
+
         "host" : {
             required: "Host IP address is required",
             pattern: "Enter valid IPv4 address"
@@ -130,11 +160,11 @@ export class StoragesComponent implements OnInit {
     ngOnInit() {
         this.loading = true;
         this.getAllStorages();
-        this.getAllActiveAlerts();
+        
         
         this.menuItems = [
             {
-                "label": "Register Alert Source",
+                "label": "Configure Alert Source",
                 command: () => {
                     this.showAlertSourceDialog(this.selectStorage);
                 },
@@ -143,8 +173,8 @@ export class StoragesComponent implements OnInit {
             {
                 "label": "Remove Alert Source",
                 command: () => {
-                    console.log("Alert Source removed");
-                    //TODO: Add remove alert source
+                    
+                    this.showDeleteAlertSource(this.selectStorage);
                 },
                 disabled:false
             },
@@ -211,45 +241,61 @@ export class StoragesComponent implements OnInit {
         this.versionOptions = [
             {
                 label: "SNMPV2C",
-                value: 'SNMPv2v'
+                value: 'SNMPv2c'
             },
             {
               label: "SNMPV3",
               value: 'SNMPv3'
             }
         ];
-
+        // Supported security levels
+        // ['authPriv', 'authNoPriv', 'noAuthnoPriv']
         this.securityLeveloptions = [
             {
-                label: "NoAuthnoPriv",
-                value: "NoAuthnoPriv"
+                label: "noAuthnoPriv",
+                value: "noAuthnoPriv"
             },
             {
-                label: "AuthNoPriv",
-                value: "AuthNoPriv"
+                label: "authNoPriv",
+                value: "authNoPriv"
             },
             {
-                label: "AuthPriv",
-                value: "AuthPriv"
+                label: "authPriv",
+                value: "authPriv"
             }
         ];
-
+        // Supported Auth Protocols
+        //['HMACSHA', 'HMACMD5', 'HMCSHA2224', 'HMCSHA2256', 'HMCSHA2384', 'HMCSHA2512']
         this.authProtocolOptions = [
             {
-                label: "MD5",
-                value: "MD5"
+                label: "HMACSHA",
+                value: "HMACSHA"
             },
             {
-                label: "SHA",
-                value: "SHA"
+                label: "HMACMD5",
+                value: "HMACMD5"
+            },
+            {
+                label: "HMCSHA2224",
+                value: "HMCSHA2224"
+            },
+            {
+                label: "HMCSHA2256",
+                value: "HMCSHA2256"
+            },
+            {
+                label: "HMCSHA2384",
+                value: "HMCSHA2384"
+            },
+            {
+                label: "HMCSHA2512",
+                value: "HMCSHA2512"
             }
+        
         ];
-
+        //Supported Types
+        //['DES', 'AES', 'AES192', 'AES256', '3DES']
         this.privacyProtocolOptions = [
-            {
-                label: "3DES",
-                value: "3DES"
-            },
             {
                 label: "DES",
                 value: "DES"
@@ -257,10 +303,24 @@ export class StoragesComponent implements OnInit {
             {
                 label: "AES",
                 value: "AES"
-            }
+            },
+            {
+                label: "AES192",
+                value: "AES192"
+            },
+            {
+                label: "AES256",
+                value: "AES256"
+            },
+            {
+                label: "3DES",
+                value: "3DES"
+            },
+            
+            
         ];
 
-        this.registerAlertSourceForm = this.fb.group({
+        this.registerAlertSourceForm = this.fb.group({});
             'version': new FormControl('', Validators.required),
             'community_string': new FormControl(''),
             'username': new FormControl('', Validators.required),
@@ -275,7 +335,15 @@ export class StoragesComponent implements OnInit {
     }
 
     getAllActiveAlerts(){
-       this.allActiveAlerts = [];
+        this.ds.getAllAlerts().subscribe((res)=>{
+            this.allActiveAlerts = res.json().alerts;
+        }, (error)=>{
+            this.allActiveAlerts = [];
+            console.log("Something went wrong. Could not fetch alerts.", error);
+            this.msgs = [];
+            let errorMsg = 'Error fetching alerts.' + error.error_msg;
+            this.msgs.push({severity: 'error', summary: 'Error', detail: error});
+        })
     }
 
     toggleView(){
@@ -288,7 +356,6 @@ export class StoragesComponent implements OnInit {
         this.ds.getAllStorages().subscribe((res)=>{
             
             let storages = res.json().storages;
-            
             this.allStorages = storages;
 
             this.allStorages.forEach((element, index) => {
@@ -309,13 +376,22 @@ export class StoragesComponent implements OnInit {
                 element['storagePools'] = [];
                 let vols = [];
                 let pools = [];
+                let alerts = [];
+
+                //Get all Alerts for the storage
+                this.ds.getAlertsByStorageId(element['id']).subscribe((res)=>{
+                    alerts = res.json().alerts;
+                    element['alerts'] = alerts;
+                }, (error)=>{
+                    console.log("Something went wrong. Could not fetch Alerts for storage.", error)
+                });
 
                 // Get all the Storage pools associated with the Storage device
                 this.ds.getAllStoragePools(element['id']).subscribe((res)=>{
                     pools = res.json().storage_pools;
                     element['storagePools'] = pools;
                 }, (error)=>{
-                    console.log("Something went wrong. Could not fetch Storage Pools.", element['id'], error)
+                    console.log("Something went wrong. Could not fetch Storage Pools.", error)
                 });
 
                 // Get all the volumes associated with the Storage device
@@ -323,8 +399,10 @@ export class StoragesComponent implements OnInit {
                     vols = res.json().volumes;
                     element['volumes'] = vols;
                 }, (error)=>{
-                    console.log("Something went wrong. Could not fetch Volumes.", element['id'], error)
+                    console.log("Something went wrong. Could not fetch Volumes.", error)
                 });
+
+                
                 
                 let capData = {
                     labels: ['Used','Free'],
@@ -433,7 +511,7 @@ export class StoragesComponent implements OnInit {
                                 type: 'device',
                                 details: storageDevice
                             }
-                            //Create the capacity stats for each model group by summing together the capacity of each device 
+                            //Create the capacity stats for each model group by summing together the capacity of each device
                             modelGroupNode.details.totalUsableCapacity+=storageDevice['total_capacity'];
                             modelGroupNode.details.totalUsedCapacity+=storageDevice['used_capacity'];
                             modelGroupNode.details.totalFreeCapacity+=storageDevice['free_capacity'];
@@ -443,7 +521,7 @@ export class StoragesComponent implements OnInit {
                             modelGroupNode.details.totalSystemUsedCapacity = Math.ceil((storageDevice['raw_capacity'] - storageDevice['total_capacity']));
                             
                             // Create the Volume parent Node
-                            console.log("storageDevice", storageDevice);
+                            
                             let parentVolNode = {};
                             if(storageDevice['volumes'] ){
                                 parentVolNode = {
@@ -505,22 +583,21 @@ export class StoragesComponent implements OnInit {
     }
     public deviceNodeMenu(event, node, overlaypanel: OverlayPanel) {
        overlaypanel.hide();
+       this.getAlertSourcebyStorage(node['details'].id);
         if(node['type']='device'){
             this.contextMenuItems = [
                 {
-                    "label": "Register Alert Source",
+                    "label": "Configure Alert Source",
                     command: () => {
                         this.showAlertSourceDialog(node['details']);
                     },
                     disabled:false
                 },
-                
                 {
                     "label": "Remove Alert Source",
                     command: () => {
                         
-                        console.log("Alert Source removed");
-                    	//TODO: Add remove alert source
+                        this.showDeleteAlertSource(node['details']);
                     },
                     disabled:false
                 },
@@ -552,11 +629,8 @@ export class StoragesComponent implements OnInit {
         
     }
 
-    getStorageArrayRawCapacity(storages){
-
-    }
-
-    getStorageArrayUsableCapacity(){
+    refreshAllLists(){
+        this.getAllStorages();
 
     }
 
@@ -585,15 +659,28 @@ export class StoragesComponent implements OnInit {
             console.log("Something went wrong. Could not initiate the sync.", error);
         });
     }
-    
 
-    
-
-    
-
-    lazyLoadTreeChildren(event){
-
+   getVolumesByStorage(storageId){
+        // Get all the volumes associated with the Storage device
+        this.ds.getAllVolumes(storageId).subscribe((res)=>{
+            let vols = res.json().volumes;
+           return vols;
+        }, (error)=>{
+            console.log("Something went wrong. Could not fetch Volumes.", error)
+        });
+       
     }
+
+    getPoolsByStorage(storageId){
+       // Get all the Storage pools associated with the Storage device
+       this.ds.getAllStoragePools(storageId).subscribe((res)=>{
+            let pools = res.json().storage_pools;
+            return pools;
+        }, (error)=>{
+            console.log("Something went wrong. Could not fetch Storage Pools.", error)
+        });
+       
+    } 
 
     //Show the overview panel when hovering on device in the tree.
     showOverview(event, node, overlaypanel: OverlayPanel){
@@ -617,7 +704,6 @@ export class StoragesComponent implements OnInit {
                 break;
         }
         
-        
     }
 
     getModelsByVendor(vendor){
@@ -629,8 +715,15 @@ export class StoragesComponent implements OnInit {
         })
     }
 
-    returnSelectedStorage(selectedStorage){
+    onClickOperationMenu(selectedStorage){
         this.selectStorage = selectedStorage;
+        this.ds.getAlertSource(selectedStorage['id']).subscribe((res)=>{
+            let alertSource = res.json();
+            
+            this.selectedAlertSource = alertSource;
+        }, (error)=>{
+            console.log("Something went wrong. Could not fetch Alert source for storage.", error)
+        });
     }
 
     batchDeleteStorages(storages){
@@ -674,48 +767,149 @@ export class StoragesComponent implements OnInit {
         });
     }
 
-    showAlertSourceDialog(storage){
-        this.showRegisterAlertSourceForm = true;
-        this.v2cFields = false;
-        this.v3Fields = false;
-        this.selectedStorageId = storage['id']
-        this.registerAlertSourceForm.reset();
+    getAlertSourcebyStorage(storageId){
+        if(storageId){
+            this.ds.getAlertSource(storageId).subscribe((res)=>{
+               let alertSource = res.json();
+                this.selectedAlertSource = alertSource;
+            }, (error)=>{
+               console.log("Something went wrong. Could not fetch alert source.");
+            })
+        }
+        
     }
 
+    showAlertSourceDialog(storage){
+        this.registerAlertSourceForm.addControl('version', this.fb.control(this.selectedAlertSource && this.selectedAlertSource['version'] ? this.selectedAlertSource['version'] : '', Validators.required))
+        if(this.selectedAlertSource && this.selectedAlertSource['version']=='SNMPv2c'){
+            this.selectedVersion = this.selectedAlertSource['version'];
+            this.v2cFields = true;
+        } else if(this.selectedAlertSource && this.selectedAlertSource['version']=='SNMPv3'){
+            this.selectedVersion = this.selectedAlertSource['version'];
+            this.v3Fields = true;
+        } else{
+            this.v2cFields = false;
+            this.v3Fields = false;
+        }
+        this.registerAlertSourceForm.addControl('host', this.fb.control(this.selectedAlertSource && this.selectedAlertSource['host'] ? this.selectedAlertSource['host'] : '', Validators.required))
+        this.registerAlertSourceForm.addControl('context_name', this.fb.control(this.selectedAlertSource && this.selectedAlertSource['context_name'] ? this.selectedAlertSource['context_name'] : ''))
+        this.registerAlertSourceForm.addControl('retry_num', this.fb.control(this.selectedAlertSource && this.selectedAlertSource['retry_num'] ? this.selectedAlertSource['retry_num'] : 1))
+        this.registerAlertSourceForm.addControl('expiration', this.fb.control(this.selectedAlertSource && this.selectedAlertSource['expiration'] ? this.selectedAlertSource['expiration'] : 2))
+        this.registerAlertSourceForm.addControl('port', this.fb.control(this.selectedAlertSource && this.selectedAlertSource['port'] ? this.selectedAlertSource['port'] : 161))
+
+        this.showRegisterAlertSourceForm = true;
+        this.selectedStorageId = storage['id']
+        this.setFormByVersion();
+    }
+
+    closeAlertSourceDialog(){
+        this.selectedAlertSource = {};
+        this.v2cFields = false;
+        this.v3Fields = false;
+        this.showRegisterAlertSourceForm = false;
+    }
+    
+
+    setFormByVersion(){
+        if(this.selectedVersion == 'SNMPv2c'){
+            this.v2cFields = true;
+            this.v3Fields = false;
+            this.registerAlertSourceForm.addControl('community_string', this.fb.control(this.selectedAlertSource && this.selectedAlertSource['community_string'] ? this.selectedAlertSource['community_string'] : '', Validators.required));
+            this.registerAlertSourceForm.removeControl('username');
+            this.registerAlertSourceForm.removeControl('engine_id');
+            this.registerAlertSourceForm.removeControl('security_level');
+            this.registerAlertSourceForm.removeControl('auth_protocol');
+            this.registerAlertSourceForm.removeControl('auth_key');
+            this.registerAlertSourceForm.removeControl('privacy_protocol');
+            this.registerAlertSourceForm.removeControl('privacy_key');
+            
+        }
+        if(this.selectedVersion == 'SNMPv3'){
+            this.v2cFields = false;
+            this.v3Fields = true;
+            this.registerAlertSourceForm.removeControl('community_string');
+            this.registerAlertSourceForm.addControl('username', this.fb.control(this.selectedAlertSource && this.selectedAlertSource['username'] ? this.selectedAlertSource['username'] : '', Validators.required));
+            this.registerAlertSourceForm.addControl('engine_id', this.fb.control(this.selectedAlertSource && this.selectedAlertSource['engine_id'] ? this.selectedAlertSource['engine_id'] : '', Validators.required));
+            if(this.selectedAlertSource && this.selectedAlertSource['security_level']){
+                this.selectedSecurityLevel = this.selectedAlertSource['security_level'];
+            }
+            this.registerAlertSourceForm.addControl('security_level', this.fb.control(this.selectedAlertSource && this.selectedAlertSource['security_level'] ? this.selectedAlertSource['security_level'] : '', Validators.required));
+            this.registerAlertSourceForm.addControl('auth_protocol', this.fb.control(this.selectedAlertSource && this.selectedAlertSource['auth_protocol'] ? this.selectedAlertSource['auth_protocol'] : ''));
+            this.registerAlertSourceForm.addControl('auth_key', this.fb.control(''));
+            this.registerAlertSourceForm.addControl('privacy_protocol', this.fb.control(this.selectedAlertSource && this.selectedAlertSource['privacy_protocol'] ? this.selectedAlertSource['privacy_protocol'] : ''));
+            this.registerAlertSourceForm.addControl('privacy_key', this.fb.control(''));
+            this.onSelectSecuritylevel();
+            if(this.selectedAlertSource && this.selectedAlertSource['auth_protocol']){
+                this.selectedAuthProtocol = this.selectedAlertSource['auth_protocol'];
+            }
+            if(this.selectedAlertSource && this.selectedAlertSource['privacy_protocol']){
+                this.selectedPrivacyProtocol = this.selectedAlertSource['privacy_protocol'];
+            }
+            
+        }
+    }
+    onSelectSecuritylevel(){
+        if(this.selectedSecurityLevel=='noAuthNoPriv'){
+            this.registerAlertSourceForm.removeControl('auth_protocol');
+            this.registerAlertSourceForm.removeControl('auth_key');
+            this.registerAlertSourceForm.removeControl('privacy_protocol');
+            this.registerAlertSourceForm.removeControl('privacy_key');
+        }
+        if(this.selectedSecurityLevel=='authNoPriv'){
+            if(!this.registerAlertSourceForm.get('auth_protocol')){
+                this.registerAlertSourceForm.addControl('auth_protocol', this.fb.control(this.selectedAlertSource && this.selectedAlertSource['auth_protocol'] ? this.selectedAlertSource['auth_protocol'] : '', Validators.required));
+            }
+            if(!this.registerAlertSourceForm.get('auth_key')){
+                this.registerAlertSourceForm.addControl('auth_key', this.fb.control('', Validators.required));
+            }
+            this.registerAlertSourceForm.removeControl('privacy_protocol');
+            this.registerAlertSourceForm.removeControl('privacy_key');
+        }
+        if(this.selectedSecurityLevel=='authPriv'){
+            if(!this.registerAlertSourceForm.get('auth_protocol')){
+                this.registerAlertSourceForm.addControl('auth_protocol', this.fb.control(this.selectedAlertSource && this.selectedAlertSource['auth_protocol'] ? this.selectedAlertSource['auth_protocol'] : '', Validators.required));
+            }
+            if(!this.registerAlertSourceForm.get('auth_key')){
+                this.registerAlertSourceForm.addControl('auth_key', this.fb.control('', Validators.required));
+            }
+            if(!this.registerAlertSourceForm.get('privacy_protocol')){
+                this.registerAlertSourceForm.addControl('privacy_protocol', this.fb.control(this.selectedAlertSource && this.selectedAlertSource['privacy_protocol'] ? this.selectedAlertSource['privacy_protocol'] : '', Validators.required));
+                
+            }
+            if(!this.registerAlertSourceForm.get('privacy_key')){
+                this.registerAlertSourceForm.addControl('privacy_key', this.fb.control('', Validators.required));
+            }
+            
+        }
+    }
+
+    
     prepareFormDataArray(value){
         let dataArr = {
             version: value['version'],
-            username: value['username'],
-            engine_id: value['engine_id'],
-            security_level: value['security_level'],
-            auth_protocol: value['auth_protocol'],
-            auth_key: value['auth_key'],
-            privacy_protocol: value['privacy_protocol'],
-            privacy_key: value['privacy_key'],
             host: value['host'],
+            port: value['port'],
+            retry_num: value['retry_num'],
+            expiration: value['expiration'],
+            context_name: value['context_name'],
         };
 
-        if(value['community_string']){
+        if(this.v3Fields){
+            dataArr['username'] = value['username'];
+            dataArr['engine_id'] = value['engine_id'];
+            dataArr['security_level'] = value['security_level'];
+            dataArr['auth_protocol'] = value['auth_protocol'];
+            dataArr['auth_key'] = value['auth_key'];
+            dataArr['privacy_protocol'] = value['privacy_protocol'];
+            dataArr['privacy_key'] = value['privacy_key'];
+        }
+        if(this.v2cFields && value['community_string']){
             dataArr['community_string'] = value['community_string'];
         }
 
         return dataArr;
     }
-    setFormByVersion(version){
-        switch (version) {
-            case 'SNMPv2c':
-                    this.v2cFields = true;
-                    this.v3Fields = false;
-                break;
-            case 'SNMPv3':
-                    this.v2cFields = false;
-                    this.v3Fields = true;
-                break;
-
-            default:
-                break;
-        }
-    }
+    
 
     registerAlertSource(value){
         if(!this.registerAlertSourceForm.valid){
@@ -727,16 +921,40 @@ export class StoragesComponent implements OnInit {
         let dataArr = this.prepareFormDataArray(value);
 
         this.ds.registerAlertSource(this.selectedStorageId, dataArr).subscribe((res)=>{
+            this.showRegisterAlertSourceForm=false;
             this.msgs = [];
             this.msgs.push({severity: 'success', summary: 'Success', detail: 'Alert source registered successfully.'});
-            let queryParams = {
-                "message": JSON.stringify({severity: 'success', summary: 'Success', detail: 'Alert source registered successfully.'})
-            };
-            this.router.navigate(['/delfin'], {queryParams: queryParams});
         }, (error) =>{
             this.msgs = [];
             this.msgs.push({severity: 'error', summary: "Error", detail:"Something went wrong. Alert source could not be registered."});
             console.log("Something went wrong. Alert source could not be registered.", error);
+        })
+    }
+
+    showDeleteAlertSource(storage){
+        let  msg = "<h3>Are you sure you want to delete the alert source?</h3>"; 
+        this.confirmationService.confirm({
+            message: msg,
+            header: this.i18n.keyID['sds_common_delete'] + " Alert source",
+            acceptLabel: this.i18n.keyID['sds_block_volume_delete'],
+            isWarning: true,
+            accept: ()=>{
+                    this.deleteAlertSource(storage.id)
+            },
+            reject:()=>{}
+        })
+    }
+
+    deleteAlertSource(storageId){
+        this.ds.deleteAlertSource(storageId).subscribe((res)=>{
+            this.msgs = [];
+            this.msgs.push({severity: 'success', summary: 'Success', detail: 'Alert source deleted successfully.'});
+            this.registerAlertSourceForm.reset();
+            this.selectedAuthProtocol = '';
+        }, (error)=>{
+            this.msgs = [];
+            this.msgs.push({severity: 'error', summary: "Error", detail:"Something went wrong. Alert source could not be deleted."});
+            console.log("Something went wrong. Alert source could not be deleted.", error);
         })
     }
 }

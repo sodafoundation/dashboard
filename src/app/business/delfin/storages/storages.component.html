@@ -7,7 +7,7 @@
     <div class="table-toolbar">
         <div class="left">
             <button class="ui-button-secondary" pButton type="button" label="Register" [routerLink]="['/registerStorage']"></button>
-            <button pButton type="button" (click)="syncAllStorageDevices()" icon="fa-exchange" label="Sync All Devices"></button>
+            <button [disabled]="!allStorages.length" pButton type="button" (click)="syncAllStorageDevices()" icon="fa-exchange" label="Sync All Devices"></button>
             <button *ngIf="showListView" pButton type="button" label="{{i18n.keyID['sds_block_volume_delete']}}" [disabled]="selectedStorages.length == 0" (click)="batchDeleteStorages(selectedStorages)"></button></div>
         <div class="right">
             <div [ngStyle]="{'visibility': showListView ? 'visible' : 'hidden'}" class="ui-inputsearch">
@@ -17,7 +17,7 @@
             
             <button title="List View" class="" pButton type="button" (click)="showListView=true" icon="fa-th-list"></button>
             <button title="Grid View" class="" pButton type="button" (click)="showListView=false" icon="fa-th"></button>
-            <button class="" title="Refresh lists" pButton type="button" (click)="getAllStorages()" icon="fa-refresh"></button>
+            <button class="" title="Refresh lists" pButton type="button" (click)="refreshAllLists()" icon="fa-refresh"></button>
         </div>
     </div>
     <div *ngIf="!showListView">
@@ -167,7 +167,7 @@
                             <div *ngFor="let device of allStorages" class="single-storage-item">
                                 <div class="ui-g storage-title">
                                     <div class="ui-g-6">
-                                        <h3> <a [routerLink]="['/storageDetails/' + device.id]"> {{device.name}} </a> </h3>
+                                        <h4> <a (mouseenter)="showOverview($event, device, deviceOverviewPanel)" (mouseleave)="showOverview($event, device, deviceOverviewPanel)" [routerLink]="['/storageDetails/' + device.id]"> {{device.name}}</a> </h4>
                                     
                                     </div>
                                     <div class="ui-g-5 capacity-stats-bar">
@@ -249,7 +249,7 @@
                     </p-column>
                     <p-column header="{{i18n.keyID['sds_block_volume_operation']}}" [style]="{'width': '8%'}">
                         <ng-template pTemplate="body" let-storage="rowData" let-i="rowIndex">
-                            <p-dropmenu label="{{i18n.keyID['sds_block_volume_more']}}" [model]="storage['disabled'] ? menuDeleDisableItems: menuItems" (click)="returnSelectedStorage(storage)"></p-dropmenu>
+                            <p-dropmenu label="{{i18n.keyID['sds_block_volume_more']}}" [model]="storage['disabled'] ? menuDeleDisableItems: menuItems" (click)="onClickOperationMenu(storage)"></p-dropmenu>
                         </ng-template>
                     </p-column>
                     <ng-template let-storage pTemplate="rowexpansion">
@@ -399,7 +399,7 @@
                                 </div>
                             </div>
                         </div>
-                </ng-template>
+                    </ng-template>
                 </p-dataTable>
             </p-card>
         </div>
@@ -447,41 +447,104 @@
     <p-confirmDialog></p-confirmDialog>
 </div>
 <p-dialog styleClass="register-alert-source-dialog"  header="Register Alert Source" [(visible)]="showRegisterAlertSourceForm" [width]="900" modal="modal" [height]="700">
-    <form [formGroup]="registerAlertSourceForm" [grid]="{label: 'ui-g-3', content:'ui-g-20'}" [errorMessage]="errorMessage">
-        <form-item label="{{alertSourceFormlabel.version}}" [required]="true">
-            <p-dropdown [style]="{'min-width':'150px','width':'220px'}" placeholder="Please select" [options]="versionOptions" (onChange)="setFormByVersion(selectedVersion)" name='selectedVersion' [(ngModel)]='selectedVersion' formControlName="version"></p-dropdown>
-        </form-item>
-        <form-item *ngIf="v2cFields" label="{{alertSourceFormlabel.community_string}}">
-            <input formControlName="community_string" type="text" size="30" pInputText> 
-        </form-item>
-        <form-item *ngIf="v3Fields" label="{{alertSourceFormlabel.username}}">
-            <input formControlName="username" type="text" size="30" pInputText> 
-        </form-item>
-        <form-item *ngIf="v3Fields" label="{{alertSourceFormlabel.engine_id}}">
-            <input formControlName="engine_id" type="text" size="30" pInputText> 
-        </form-item>
-        <form-item *ngIf="v3Fields" label="{{alertSourceFormlabel.security_level}}">
-            <p-dropdown [style]="{'min-width':'150px','width':'220px'}" placeholder="Please select" [options]="securityLeveloptions" name='selectedSecurityLevel' [(ngModel)]='selectedSecurityLevel' formControlName="security_level"></p-dropdown>
-        </form-item>
-        <form-item *ngIf="v3Fields && (selectedSecurityLevel=='AuthNoPriv' || selectedSecurityLevel=='AuthPriv')" label="{{alertSourceFormlabel.auth_protocol}}">
-            <p-dropdown [style]="{'min-width':'150px','width':'220px'}" placeholder="Please select" [options]="authProtocolOptions" name='selectedAuthProtocol' [(ngModel)]='selectedAuthProtocol' formControlName="auth_protocol"></p-dropdown>
-        </form-item>
-        <form-item *ngIf="v3Fields && (selectedSecurityLevel=='AuthNoPriv' || selectedSecurityLevel=='AuthPriv')" label="{{alertSourceFormlabel.auth_key}}">
-            <input formControlName="auth_key" type="text" size="30" pInputText> 
-        </form-item>
-        <form-item *ngIf="v3Fields && selectedSecurityLevel=='AuthPriv'" label="{{alertSourceFormlabel.privacy_protocol}}">
-            <p-dropdown [style]="{'min-width':'150px','width':'220px'}" placeholder="Please select" [options]="privacyProtocolOptions" name='selectedPrivacyProtocol' [(ngModel)]='selectedPrivacyProtocol' formControlName="privacy_protocol"></p-dropdown>
-        </form-item>
-        <form-item *ngIf="v3Fields && selectedSecurityLevel=='AuthPriv'" label="{{alertSourceFormlabel.privacy_key}}">
-            <input formControlName="privacy_key" type="text" size="30" pInputText> 
-        </form-item>
-        <form-item [required]="true" label="{{alertSourceFormlabel.host}}">
-            <input formControlName="host" type="text" size="30" pInputText> 
-        </form-item>
+    <form *ngIf="showRegisterAlertSourceForm" [formGroup]="registerAlertSourceForm" [grid]="{label: 'ui-g-5', content:'ui-g-7'}" [errorMessage]="errorMessage">
+       
+        <div class="ui-g">
+            <div class="ui-g-6">
+                <form-item label="{{alertSourceFormlabel.version}}" [required]="true">
+                    <p-dropdown [style]="{'min-width':'150px','width':'220px'}" placeholder="Please select" [options]="versionOptions" (onChange)="setFormByVersion()" name='selectedVersion' [(ngModel)]='selectedVersion' formControlName="version"></p-dropdown>
+                </form-item>
+            </div>
+            <div class="ui-g-6">
+                <form-item [required]="true" label="{{alertSourceFormlabel.host}}">
+                    <input formControlName="host" type="text" size="30" pInputText> 
+                </form-item>
+            </div>
+        </div>
+       
+        
+       
+        <div class="ui-g">
+            <div class="ui-g-6">
+                <form-item *ngIf="v2cFields" [required]="true" label="{{alertSourceFormlabel.community_string}}">
+                    <input formControlName="community_string" type="text" size="30" pInputText> 
+                </form-item>
+            </div>
+            <div class="ui-g-6">
+                
+            </div>
+        </div>
+        <div class="ui-g">
+            <div class="ui-g-6">
+                <form-item *ngIf="v3Fields" [required]="true" label="{{alertSourceFormlabel.username}}">
+                    <input formControlName="username" type="text" size="30" pInputText> 
+                </form-item>
+                <form-item *ngIf="v3Fields" [required]="true" label="{{alertSourceFormlabel.engine_id}}">
+                    <input formControlName="engine_id" type="text" size="30" pInputText> 
+                </form-item>
+                <form-item *ngIf="v3Fields" [required]="true" label="{{alertSourceFormlabel.security_level}}">
+                    <p-dropdown [style]="{'min-width':'150px','width':'220px'}" placeholder="Please select" (click)="onSelectSecuritylevel()" [options]="securityLeveloptions" name='selectedSecurityLevel' [(ngModel)]='selectedSecurityLevel' formControlName="security_level"></p-dropdown>
+                </form-item>
+            </div>
+            <div class="ui-g-6">
+                
+            </div>
+        </div>
+        <div class="ui-g">
+            <div class="ui-g-6">
+                <form-item *ngIf="v3Fields && (selectedSecurityLevel=='authPriv' || selectedSecurityLevel=='authNoPriv')" [required]="true" label="{{alertSourceFormlabel.auth_protocol}}">
+                    <p-dropdown [style]="{'min-width':'150px','width':'220px'}" placeholder="Please select" [options]="authProtocolOptions" name='selectedAuthProtocol' [(ngModel)]='selectedAuthProtocol' formControlName="auth_protocol"></p-dropdown>
+                </form-item>
+            </div>
+            <div class="ui-g-6">
+                <form-item *ngIf="v3Fields && (selectedSecurityLevel=='authPriv' || selectedSecurityLevel=='authNoPriv')" [required]="true" label="{{alertSourceFormlabel.auth_key}}">
+                    <input formControlName="auth_key" type="password" size="30" pInputText> 
+                </form-item>
+            </div>
+        </div>
+        <div class="ui-g">
+            <div class="ui-g-6">
+                <form-item *ngIf="v3Fields && (selectedSecurityLevel=='authPriv')" [required]="true" label="{{alertSourceFormlabel.privacy_protocol}}">
+                    <p-dropdown [style]="{'min-width':'150px','width':'220px'}" placeholder="Please select" [options]="privacyProtocolOptions" name='selectedPrivacyProtocol' [(ngModel)]='selectedPrivacyProtocol' formControlName="privacy_protocol"></p-dropdown>
+                </form-item>
+            </div>
+            <div class="ui-g-6">
+                <form-item *ngIf="v3Fields && selectedSecurityLevel=='authPriv'" [required]="true" label="{{alertSourceFormlabel.privacy_key}}">
+                    <input formControlName="privacy_key" type="password" size="30" pInputText> 
+                </form-item>
+            </div>
+        </div>
+        <div class="ui-g">
+            <div class="ui-g-6">
+                <form-item label="{{alertSourceFormlabel.port}}">
+                    <input formControlName="port" value="161" type="number" size="30" pInputText> 
+                </form-item>
+            </div>
+            <div class="ui-g-6">
+                <form-item label="{{alertSourceFormlabel.retry_num}}">
+                    <input formControlName="retry_num" value="1" type="number" size="30" pInputText> 
+                </form-item>
+            </div>
+        </div>
+        <div class="ui-g">
+            <div class="ui-g-6">
+                <form-item label="{{alertSourceFormlabel.context_name}}">
+                    <input formControlName="context_name" type="text" size="30" pInputText> 
+                </form-item>
+               
+            </div>
+            <div class="ui-g-6">
+                <form-item label="{{alertSourceFormlabel.expiration}}">
+                    <input formControlName="expiration" value="2" type="number" size="30" pInputText> 
+                </form-item>
+                
+            </div>
+        </div>
+        
     </form>
     <p-footer>
-        <button type="submit" class="ui-button-secondary" pButton (click)="registerAlertSource(registerAlertSourceForm.value)"  label="{{i18n.keyID['ok']}}"></button>
-        <button type="button" pButton (click)="showRegisterAlertSourceForm=false"  label="{{i18n.keyID['cancel']}}"></button>
+        <button type="submit" class="ui-button-secondary" pButton [disabled]="registerAlertSourceForm.invalid" (click)="registerAlertSource(registerAlertSourceForm.value)"  label="{{i18n.keyID['ok']}}"></button>
+        <button type="button" pButton (click)="closeAlertSourceDialog()"  label="{{i18n.keyID['cancel']}}"></button>
     </p-footer>
 
 </p-dialog>
