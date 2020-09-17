@@ -28,6 +28,7 @@ export class StoragesComponent implements OnInit {
     selectStorage;
     showListView: boolean = false;
     menuItems: MenuItem[];
+    contextMenuItems: MenuItem[];
     capacityData: any;
     chartOptions: any;
     vendorOptions;
@@ -315,13 +316,19 @@ export class StoragesComponent implements OnInit {
                 element['storagePools'] = [];
                 let vols = [];
                 let pools = [];
-                this.ds.getAllVolumes().subscribe((res)=>{
-                    this.allVolumes = res.json().volumes;
-                    this.allVolumes.forEach(volElement => {
-                        if(volElement['storage_id'] == element['id']){
-                            vols.push(volElement);
-                        }
-                    });
+
+                // Get all the Storage pools associated with the Storage device
+                this.ds.getAllStoragePools(element['id']).subscribe((res)=>{
+                    pools = res.json().storage_pools;
+                    element['storagePools'] = pools;
+                }, (error)=>{
+                    console.log("Something went wrong. Could not fetch Storage Pools.", element['id'], error)
+                });
+
+                // Get all the volumes associated with the Storage device
+                this.ds.getAllVolumes(element['id']).subscribe((res)=>{
+                    vols = res.json().volumes;
+                    element['volumes'] = vols;
                 }, (error)=>{
                     console.log("Something went wrong. Could not fetch Volumes.", element['id'], error)
                 });
@@ -344,7 +351,7 @@ export class StoragesComponent implements OnInit {
 
                 let opt = {
                     legend:{
-                        position: 'right'
+                        position: 'bottom'
                     }
                 }
                 element['capacityData'] = capData;
@@ -442,6 +449,45 @@ export class StoragesComponent implements OnInit {
                             modelGroupNode.details.totalUsagePercent = Math.ceil((storageDevice['used_capacity']/storageDevice['total_capacity']) * 100);
                             modelGroupNode.details.totalSystemUsedCapacity = Math.ceil((storageDevice['raw_capacity'] - storageDevice['total_capacity']));
                             
+                            // Create the Volume parent Node
+                            console.log("storageDevice", storageDevice);
+                            let parentVolNode = {};
+                            if(storageDevice['volumes'] ){
+                                parentVolNode = {
+                                    label : "Volumes",
+                                    collapsedIcon: 'fa-database',
+                                    expandedIcon: 'fa-database',
+                                    type: 'volParent',
+                                    children: []
+                                }
+                                modelTreeNode['children'].push(parentVolNode);
+                            }
+                            let volChildNode ={};
+                            if(storageDevice['volumes'].length){
+                                _.each(storageDevice['volumes'], function(volItem){
+                                    volChildNode = {
+                                        label : volItem['name'],
+                                        collapsedIcon: 'fa-database',
+                                        expandedIcon: 'fa-database',
+                                        type: 'volNode',
+                                        details: volItem
+                                    }
+                                })
+                                
+                            }
+                            // Create the Storage Pool parent Node
+                            let parentPoolNode = {};
+                            if(storageDevice['storagePools']){
+                                parentPoolNode = {
+                                    label : "Storage Pools",
+                                    collapsedIcon: 'fa-cubes',
+                                    expandedIcon: 'fa-cubes',
+                                    type: 'poolParent',
+                                    children: []
+                                }
+                                modelTreeNode['children'].push(parentPoolNode);
+                            }
+
                             // Push each storage device as a child of the model node
                             modelGroupNode['children'].push(modelTreeNode);
                         });
@@ -458,11 +504,56 @@ export class StoragesComponent implements OnInit {
                 });
             }
             
+            // Push each Vendor as a node in the Tree
             treeData.push(vendorTreeNode);
         })
         this.arrayTreeData = treeData;
         
     }
+    public deviceNodeMenu(event, node, overlaypanel: OverlayPanel) {
+       overlaypanel.hide();
+        if(node['type']='device'){
+            this.contextMenuItems = [
+                {
+                    "label": "Register Alert Source",
+                    command: () => {
+                        this.showAlertSourceDialog(node['details']);
+                    },
+                    disabled:false
+                },
+                
+                {
+                    "label": "Remove Alert Source",
+                    command: () => {
+                        
+                        console.log("Alert Source removed");
+                    	//TODO: Add remove alert source
+                    },
+                    disabled:false
+                },
+                {
+                    "label": "Sync Storage Device",
+                    command: () => {
+                        this.syncStorage(node['details'].id);
+                    },
+                    disabled:false
+                },
+                {
+                    "label": this.i18n.keyID['sds_block_volume_delete'],
+                    command: () => {
+                        this.batchDeleteStorages(node['details']);
+                    },
+                    disabled:false
+                }
+            ];
+        } else{
+            this.contextMenuItems = [];
+        }
+        
+        return false;
+    }
+
+
 
     showChart(){
         
@@ -501,43 +592,7 @@ export class StoragesComponent implements OnInit {
             console.log("Something went wrong. Could not initiate the sync.", error);
         });
     }
-    getVolumesByStorage(storageId){
-        this.ds.getAllVolumes().subscribe((res)=>{
-            this.allVolumes = res.json().volumes;
-            this.allVolumes.forEach(element => {
-                if(element['storage_id'] == storageId){
-                    this.volumesArr.push(element);
-                }
-            });
-            this.totalRecords = this.dataSource.length;
-            this.volumesArr = this.dataSource.slice(0, 10);
-            
-            return this.volumesArr;
-        }, (error)=>{
-            console.log("Something went wrong. Could not fetch Volumes.", error)
-            this.volumesArr = [];
-            return this.volumesArr;
-        });
-    }
-
-    getPoolsByStorage(storageId){
-        this.ds.getAllStoragePools().subscribe((res)=>{
-            this.allPools  = res.json().storage_pools;
-            this.allPools.forEach(element => {
-                if(element['storage_id'] == storageId){
-                    this.poolsArr.push(element);
-                }
-            });
-            this.totalRecords = this.dataSource.length;
-            this.poolsArr = this.dataSource.slice(0, 10);
-            
-            return this.poolsArr;
-        }, (error)=>{
-            console.log("Something went wrong. Could not fetch pools.", error)
-            this.poolsArr = [];
-            return this.poolsArr;
-        });
-    }
+    
 
     
 

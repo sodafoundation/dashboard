@@ -52,8 +52,34 @@ export class DelfinService {
     }
 
     //get all Volumes
-    getAllVolumes(): Observable<any> {
-        return this.http.get(this.delfinVolumesUrl);
+    getAllVolumes(storageId?, nativeVolumeId?, nativeStoragePoolId?, name?, status?, limit?, offset?, sort?): Observable<any> {
+        let query = "";
+        if(storageId){
+            query += "?storage_id=" + storageId;
+        }
+        if(nativeVolumeId){
+            query += "?native_volume_id=" + nativeVolumeId;
+        }
+        if(nativeStoragePoolId){
+            query += "?native_storage_pool_id=" + nativeStoragePoolId;
+        }
+        if(name){
+            query += "?name=" + name;
+        }
+        if(status){
+            query += "?status=" + status;
+        }
+        if(limit){
+            query += "?limit=" + limit;
+        }
+        if(offset){
+            query += "?offset=" + offset;
+        }
+        if(sort){
+            query += "?sort=" + sort;
+        }
+        let url =this.delfinVolumesUrl + query;
+        return this.http.get(url);
     }
 
     //get Volume Details
@@ -62,8 +88,34 @@ export class DelfinService {
     }
 
     //get all Storage pools
-    getAllStoragePools(): Observable<any> {
-        return this.http.get(this.delfinStoragePoolsUrl);
+    getAllStoragePools(storageId?, storagePoolId?, nativeStoragePoolId?, name?, status?, limit?, offset?, sort?): Observable<any> {
+        let query = "";
+        if(storageId){
+            query += "?storage_id=" + storageId;
+        }
+        if(storagePoolId){
+            query += "?id=" + storagePoolId;
+        }
+        if(nativeStoragePoolId){
+            query += "?native_storage_pool_id=" + nativeStoragePoolId;
+        }
+        if(name){
+            query += "?name=" + name;
+        }
+        if(status){
+            query += "?status=" + status;
+        }
+        if(limit){
+            query += "?limit=" + limit;
+        }
+        if(offset){
+            query += "?offset=" + offset;
+        }
+        if(sort){
+            query += "?sort=" + sort;
+        }
+        let url =this.delfinStoragePoolsUrl + query;
+        return this.http.get(url);
     }
 
     //get Storage Pool details
@@ -84,6 +136,16 @@ export class DelfinService {
     //delete alert source
     deleteAlertSource(id): Observable<any>{
         return this.http.delete(this.delfinStoragesUrl + '/' + id + '/alert-source')
+    }
+
+    //Get All alerts
+    getAllAlerts(): Observable<any>{
+        return this.http.get(this.delfinStoragesUrl + '/alerts');
+    }
+
+    //Get Alerts by Storage ID
+    getAlertsByStorageId(storageId): Observable<any>{
+        return this.http.get(this.delfinStoragesUrl + '/' + storageId + '/alerts/');
     }
 
     //delete alerts

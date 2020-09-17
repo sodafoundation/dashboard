@@ -1,5 +1,5 @@
 import {ValidatorFn, AbstractControl } from '@angular/forms';
-import { Consts } from '../../shared/api';
+import { Consts } from './consts';
 export class Utils {
 
     static capacityUnit = {
