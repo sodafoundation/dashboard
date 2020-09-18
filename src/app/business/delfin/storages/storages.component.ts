@@ -171,7 +171,15 @@ export class StoragesComponent implements OnInit {
         
         this.menuItems = [
             {
+                "label": "Update Access Info",
+                command: () => {
+                    this.updateAccessInfo(this.selectStorage);
+                },
+                disabled:false
+            },
+            {
                 "label": "Configure Alert Source",
+
                 command: () => {
                     this.showAlertSourceDialog(this.selectStorage);
                 },
@@ -330,7 +338,9 @@ export class StoragesComponent implements OnInit {
         this.registerAlertSourceForm = this.fb.group({});
            
     }
-
+    updateAccessInfo(storage){
+        this.router.navigate(['/modifyStorage', storage['id']]);
+    }
     getAllActiveAlerts(){
         this.ds.getAllAlerts().subscribe((res)=>{
             this.allActiveAlerts = res.json().alerts;
@@ -583,6 +593,13 @@ export class StoragesComponent implements OnInit {
        this.getAlertSourcebyStorage(node['details'].id);
         if(node['type']='device'){
             this.contextMenuItems = [
+                {
+                    "label": "Update Access Info",
+                    command: () => {
+                        this.updateAccessInfo(node['details']);
+                    },
+                    disabled:false
+                },
                 {
                     "label": "Configure Alert Source",
                     command: () => {
