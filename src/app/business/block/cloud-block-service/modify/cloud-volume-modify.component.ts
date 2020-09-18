@@ -53,21 +53,6 @@ export class CloudVolumeModifyComponent implements OnInit{
         tags: "Tags",
     };
     errorMessage = {
-        "name": { 
-            required: "Name is required",
-            minlength: "The volume name should have minimum 3 characters.",
-            maxlength: "The volume name should have maximum 64 characters.",
-            pattern: "Must start with a character. Can contain alphabets, numbers and underscore. No special characters allowed."
-        },
-        "backend_type" : {
-            required: "Backend type is required"
-        },
-        "backend" : {
-            required: "Backend is required"
-        },
-        "availabilityZone" : {
-            required: "Availability Zone is required"
-        },
         "size" : {
             required: "Size is required",
             min: "Min: 1 GiB",
