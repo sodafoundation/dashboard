@@ -22,6 +22,11 @@
                 {{volume.displaySize}}
             </ng-template>
         </p-column>
+        <p-column field="iops" header="IOPS">
+            <ng-template pTemplate="body" let-volume="rowData">
+                {{volume.iops ? volume.iops : '--'}}
+            </ng-template>
+        </p-column>
         <p-column field="type" header="Type">
             <ng-template pTemplate="body" let-volume="rowData">
                 {{volume.volType}}
