@@ -34,7 +34,7 @@
         </p-column>
         <p-column field="status" header="Status">
             <ng-template pTemplate="body" let-volume="rowData">
-                <span> {{volume.status}} </span> <i *ngIf="volume.status=='creating'" title="Volume is creating" class="fa fa-spinner fa-spin fa-3x fa-fw"></i>
+                <span> {{volume.status}} </span> <i *ngIf="volume.status=='creating' || volume.status=='updating'" class="fa fa-spinner fa-spin fa-3x fa-fw"></i>
             </ng-template>
         </p-column>
         <p-column field="createdAt" header="Created At">
@@ -61,7 +61,7 @@
                         </div>
                         <div class="ui-grid-col-2 volume-basic-item-value-color">
                             <span>{{volume.status? volume.status : '--'}} </span>
-                            <i *ngIf="volume.status=='creating'" title="Volume is creating" class="fa fa-spinner fa-spin fa-3x fa-fw"></i>
+                            <i *ngIf="volume.status=='creating'  || volume.status=='updating'" class="fa fa-spinner fa-spin fa-3x fa-fw"></i>
                         </div>
                         <div class="ui-grid-col-2">
                             {{label.createdAt}}:

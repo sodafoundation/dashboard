@@ -109,8 +109,8 @@ export class CloudVolumeCreateComponent implements OnInit{
             "backend_type":["",{validators:[Validators.required], updateOn:'change'}],
             "availabilityZone": ['',{validators: [Validators.required]}],
             "size": ['', { validators: [Validators.required, Validators.min(4), Validators.max(16384), Validators.pattern(this.validRule.size)], updateOn: 'change' }],
-            "type": ['',],
-            "iops": ['', { validators: [Validators.required, Validators.min(100), Validators.max(64000)], updateOn: 'change' }],
+            "type": [''],
+            "iops": ['', { validators: [Validators.min(100), Validators.max(64000)], updateOn: 'change' }],
         });
         
         this.createVolumeForm.addControl('encrypted', this.fb.control(false, Validators.required));
@@ -360,11 +360,6 @@ export class CloudVolumeCreateComponent implements OnInit{
             this.msgs = [];
             this.msgs.push({severity: 'error', summary: "Error", detail: 'Cloud Volume could not be created.'});
         })
-    }
-    
-    returnSelectedVolume(selectedVolume){
-        this.selectedVolume = selectedVolume;
-    }
-
-    
+    } 
+   
 }
