@@ -154,6 +154,9 @@ export class CloudVolumeCreateComponent implements OnInit{
             this.createVolumeForm.controls['size'].updateValueAndValidity();
         }
         if(this.selectedVolType=='io1'){
+            if(!this.createVolumeForm.controls['iops']){
+                this.createVolumeForm.addControl('iops', this.fb.control(3000, Validators.required));
+            }
             this.createVolumeForm.controls['size'].setValidators([Validators.required, Validators.min(4), Validators.max(16384)]);
             this.createVolumeForm.controls['size'].setValue(500);
             this.errorMessage.size.min = "Min: 4 GiB"
