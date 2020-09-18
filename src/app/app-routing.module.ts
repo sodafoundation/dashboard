@@ -9,6 +9,7 @@ const routes: Routes = [
     {path: 'help', loadChildren: './business/help/help.module#HelpModule'},
     {path: 'block', loadChildren: './business/block/block.module#BlockModule'},
     {path: 'createVolume', loadChildren: './business/block/create-volume/create-volume.module#CreateVolumeModule'},
+    {path: 'modifyCloudVolume/:volumeId', loadChildren: './business/block/cloud-block-service/modify/cloud-volume-modify.module#CloudVolumeModifyModule'},
     {path: 'volumeDetails/:volumeId', loadChildren: './business/block/volume-detail/volume-detail.module#VolumeDetailModule'},
     {path: 'createHost', loadChildren: './business/block/create-host/create-host.module#CreateHostModule'},
     {path: 'modifyHost/:hostId', loadChildren: './business/block/modify-host/modify-host.module#ModifyHostModule',
