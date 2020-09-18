@@ -134,10 +134,6 @@ export class ModifyStorageComponent implements OnInit {
             {
                 label: "HPE",
                 value: 'hpe'
-            },
-            {
-                label: "Fake Storage",
-                value: 'fake_storage'
             }
         ];
 
@@ -172,17 +168,6 @@ export class ModifyStorageComponent implements OnInit {
                         rest: true,
                         ssh: true,
                         extra: false
-                    }
-                }
-            ],
-            'fake_storage' : [
-                {
-                    label: "Fake Driver",
-                    value: {
-                        name: 'fake_driver',
-                        rest: true,
-                        ssh: true,
-                        extra: true
                     }
                 }
             ]
