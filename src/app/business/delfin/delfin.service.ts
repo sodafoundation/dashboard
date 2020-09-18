@@ -124,7 +124,7 @@ export class DelfinService {
     }
 
     //get all alert sources
-    getAllAlertSources(id): Observable<any>{
+    getAlertSource(id): Observable<any>{
         return this.http.get(this.delfinStoragesUrl + '/' + id + '/alert-source')
     }
 
@@ -145,7 +145,7 @@ export class DelfinService {
 
     //Get Alerts by Storage ID
     getAlertsByStorageId(storageId): Observable<any>{
-        return this.http.get(this.delfinStoragesUrl + '/' + storageId + '/alerts/');
+        return this.http.get(this.delfinStoragesUrl + '/' + storageId + '/alerts');
     }
 
     //delete alerts
