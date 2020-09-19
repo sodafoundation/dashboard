@@ -34,7 +34,7 @@ export const Consts = {
     BYTES_PER_CHUNK : 1024 * 1024 * 5,
     TIMEOUT: 30 * 60 * 1000,
 
-    CLOUD_TYPE:['aws-s3', 'aws-file', 'aws-block', 'azure-blob', 'azure-file','hw-obs','fusionstorage-object','ceph-s3','ibm-cos','gcp-s3', 'gcp-file', 'yig', 'alibaba-oss'],
+    CLOUD_TYPE:['aws-s3', 'aws-file', 'aws-block', 'azure-blob', 'azure-file','hw-obs','fusionstorage-object','ceph-s3','ibm-cos','gcp-s3', 'yig', 'alibaba-oss'],
 
     TYPE_SVG:{
         "aws-s3":'aws.svg',
