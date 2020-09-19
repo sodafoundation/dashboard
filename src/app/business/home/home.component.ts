@@ -58,6 +58,15 @@ export class HomeComponent implements OnInit {
             arr:['aws-s3','azure-blob','hw-obs','fusionstorage-object', 'gcp-s3','ibm-cos', 'alibaba-oss', 'aws-file', 'aws-block', 'azure-file']
         },
         {
+            label: 'Project',
+            required: 'true',
+            id: 'project',
+            type: 'text',
+            name: 'project',
+            formControlName: 'region',
+            arr:['gcp-file']
+        },
+        {
             label: 'Endpoint',
             required: 'true',
             id: 'endpoint',
