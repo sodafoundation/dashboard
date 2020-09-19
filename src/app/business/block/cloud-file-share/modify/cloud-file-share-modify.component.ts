@@ -101,7 +101,7 @@ export class CloudFileShareModifyComponent implements OnInit{
                 this.allTypes = [];
                 this.BucketService.getTypes().subscribe((res) => {
                     res.json().types.forEach(element => {
-                    if( element.name=='aws-file' || element.name == 'azure-file' ){
+                    if( element.name=='aws-file' || element.name == 'azure-file' || element.name == 'gcp-file'){
                         this.allTypes.push({
                             label: Consts.CLOUD_TYPE_NAME[element.name],
                             value: element.name
@@ -131,7 +131,7 @@ export class CloudFileShareModifyComponent implements OnInit{
                 this.cloudFileShareModifyForm = this.fb.group({
                     'description': new FormControl(this.selectedFileShare['description'] ? this.selectedFileShare['description'] : '', {validators:[Validators.maxLength(250),Validators.pattern(this.validRule.description)]}),
                 });
-                if(this.selectedFileShare['size'] && this.selectedFileShare['backend_type'] == 'azure-file'){
+                if(this.selectedFileShare['size'] && (this.selectedFileShare['backend_type'] == 'azure-file' || this.selectedFileShare['backend_type'] == 'gcp-file')){
                     self.cloudFileShareModifyForm.addControl('size', this.fb.control(this.selectedFileShare['size'], Validators.required));
                 }
                 if(this.selectedFileShare['tags'] && this.selectedFileShare['tags'].length){
@@ -225,7 +225,7 @@ export class CloudFileShareModifyComponent implements OnInit{
         this.allTypes = [];
         this.BucketService.getTypes().subscribe((res) => {
             res.json().types.forEach(element => {
-            if( element.name=='aws-file' || element.name == 'azure-file' ){
+            if( element.name=='aws-file' || element.name == 'azure-file' || element.name == 'gcp-file'){
                 this.allTypes.push({
                     label: Consts.CLOUD_TYPE_NAME[element.name],
                     value: element.name

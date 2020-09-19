@@ -34,7 +34,7 @@ export const Consts = {
     BYTES_PER_CHUNK : 1024 * 1024 * 5,
     TIMEOUT: 30 * 60 * 1000,
 
-    CLOUD_TYPE:['aws-s3', 'aws-file','azure-blob', 'azure-file','hw-obs','fusionstorage-object','ceph-s3','ibm-cos','gcp-s3', 'yig', 'alibaba-oss'],
+    CLOUD_TYPE:['aws-s3', 'aws-file', 'aws-block', 'azure-blob', 'azure-file','hw-obs','fusionstorage-object','ceph-s3','ibm-cos','gcp-s3', 'gcp-file', 'yig', 'alibaba-oss'],
 
     TYPE_SVG:{
         "aws-s3":'aws.svg',
@@ -47,7 +47,9 @@ export const Consts = {
         "yig": "yig.png",
         'alibaba-oss': 'alibaba.svg',
         "aws-file" : 'aws.svg',
-        "azure-file" : 'azure.svg'
+        "azure-file" : 'azure.svg',
+        "aws-block" : 'aws.svg',
+        "gcp-file" : 'google.svg'
 
     },
     CLOUD_TYPE_NAME: {
@@ -56,12 +58,14 @@ export const Consts = {
         'hw-obs': "Huawei OBS",
         'fusionstorage-object': "FusionStorage Object",
         'ceph-s3': "Ceph S3",
-        'gcp-s3': "GCP Storage",
+        'gcp-s3': "GCP Object Storage",
         'ibm-cos': "IBM COS",
         'yig': "YIG Ceph",
         'alibaba-oss' : "Alibaba Object Storage",
-        'aws-file' : 'AWS File Service',
-        'azure-file' : 'Azure File Service'
+        'aws-file' : 'AWS File Storage',
+        'azure-file' : 'Azure File Storage',
+        'aws-block' : 'AWS Block Storage',
+        'gcp-file' : 'GCP File Storage'
     },
     S3_HOST_IP: '',
     S3_HOST_PORT: '',

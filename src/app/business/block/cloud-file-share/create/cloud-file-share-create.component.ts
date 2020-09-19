@@ -36,8 +36,8 @@ export class CloudFileShareCreateComponent implements OnInit{
     errorMessage = {
         "name": { 
             required: "Name is required",
-            minLength: "Minimum 2 characters",
-            maxLength: "Maximum 128 characters",
+            minlength: "The file share name should have minimum 2 characters.",
+            maxlength: "The file share name should have maximum 128 characters.",
             pattern: "Must start with a character. Can contain alphabets, numbers and underscore. No special characters allowed."
         },
         "backend_type" : {
@@ -97,7 +97,7 @@ export class CloudFileShareCreateComponent implements OnInit{
         this.allTypes = [];
         this.BucketService.getTypes().subscribe((res) => {
             res.json().types.forEach(element => {
-            if( element.name=='aws-file' || element.name == 'azure-file' ){
+            if( element.name=='aws-file' || element.name == 'azure-file' || element.name == 'gcp-file'){
                 this.allTypes.push({
                     label: Consts.CLOUD_TYPE_NAME[element.name],
                     value: element.name
@@ -136,7 +136,7 @@ export class CloudFileShareCreateComponent implements OnInit{
     }
 
     prepareCreateForm(type){
-        if(type == 'azure-file') {
+        if(type == 'azure-file'  || type== 'gcp-file' ) {
             this.cloudFileShareCreateForm.addControl('size', this.fb.control(''))
             this.cloudFileShareCreateForm.addControl('metadata', this.fb.array([this.createMetadata()]));
             this.cloudFileShareCreateForm.removeControl('tags');
@@ -190,6 +190,7 @@ export class CloudFileShareCreateComponent implements OnInit{
         const encSettingsControl = this.cloudFileShareCreateForm.get('encryptionSettings');
         let encGrp:any =  this.cloudFileShareCreateForm.controls['encryptionSettings']['controls'];
         if(visible){
+            
             encGrp.forEach(item => {
                 item.controls['key'].setValidators(Validators.required);
                 item.controls['value'].setValidators(Validators.required);
