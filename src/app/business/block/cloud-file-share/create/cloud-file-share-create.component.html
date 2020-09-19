@@ -16,6 +16,9 @@
     <form-item label="{{label.description}}">
         <textarea [rows]="5" [cols]="30" pInputTextarea formControlName="description" [maxlength]="250"></textarea>
     </form-item>
+    <form-item *ngIf="cloudFileShareCreateForm.controls['availabilityZone']" label="{{label.az}}">
+        <input formControlName="availabilityZone" type="text" size="30" pInputText> 
+    </form-item>
     <form-item *ngIf="cloudFileShareCreateForm.controls['encrypted']" label="Enable Encryption?" >
         <p-inputSwitch formControlName="encrypted" onLabel="Yes" offLabel="No" (onChange)="encryptionControl()"></p-inputSwitch>
     </form-item>
@@ -89,7 +92,7 @@
                 </div>
                 <div class="ui-g-12 ui-md-2 ui-md-offset-1">
                     <div class="ui-inputgroup">
-                        <a *ngIf="(key != 'PerformanceMode') || (key != 'ThroughputMode') || (key != 'ProvisionedThroughputInMibps')" 
+                        <a *ngIf="(key != 'PerformanceMode') || (key != 'ThroughputMode') || (key != 'ProvisionedThroughputInMibps') || (key != 'Tier')" 
                             disabled="cloudFileShareCreateForm.get('metadata')['length'] > 1" 
                             class="remove-metadata" 
                             (click)="removeMetadataLink(i)">
