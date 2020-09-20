@@ -160,8 +160,7 @@ export class CloudVolumeModifyComponent implements OnInit{
             this.modifyVolumeForm.controls['size'].setValidators([Validators.required, Validators.min(1), Validators.max(16384)]);
             this.modifyVolumeForm.controls['size'].updateValueAndValidity();
             if(this.modifyVolumeForm.controls['iops']){
-                this.modifyVolumeForm.controls['iops'].clearValidators();
-                this.modifyVolumeForm.controls['iops'].updateValueAndValidity();
+                this.modifyVolumeForm.removeControl('iops');
             }
         }
         if(this.selectedVolType=='io1'){
