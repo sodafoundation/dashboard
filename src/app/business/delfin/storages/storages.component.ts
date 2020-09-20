@@ -220,10 +220,6 @@ export class StoragesComponent implements OnInit {
             {
                 label: "HPE",
                 value: 'hpe'
-            },
-            {
-                label: "Fake Storage",
-                value: 'fake_storage'
             }
         ];
 
@@ -244,12 +240,6 @@ export class StoragesComponent implements OnInit {
                 {
                     label: "3PAR",
                     value: '3par'
-                }
-            ],
-            'fake_storage' : [
-                {
-                    label: "Fake Driver",
-                    value: 'fake_driver'
                 }
             ]
         };
