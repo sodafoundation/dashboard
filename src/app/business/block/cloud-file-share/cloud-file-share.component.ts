@@ -101,7 +101,7 @@ export class CloudFileShareComponent implements OnInit{
         this.http.get('v1/{project_id}/backends').subscribe((res)=>{
             this.allBackends = res.json().backends ? res.json().backends :[];
             this.allBackends.forEach(element => {
-                if(element.type == 'aws-file' || element.type == 'azure-file'){
+                if(element.type == 'aws-file' || element.type == 'azure-file' || element.type == 'gcp-file'){
                     this.selectedBackends.push(element);
                 }
             });

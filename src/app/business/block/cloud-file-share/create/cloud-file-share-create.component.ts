@@ -36,8 +36,8 @@ export class CloudFileShareCreateComponent implements OnInit{
     errorMessage = {
         "name": { 
             required: "Name is required",
-            minLength: "Minimum 2 characters",
-            maxLength: "Maximum 128 characters",
+            minlength: "The file share name should have minimum 2 characters.",
+            maxlength: "The file share name should have maximum 128 characters.",
             pattern: "Must start with a character. Can contain alphabets, numbers and underscore. No special characters allowed."
         },
         "backend_type" : {
@@ -64,7 +64,8 @@ export class CloudFileShareCreateComponent implements OnInit{
         tags: "Tags",
         metadata: "Metadata",
         backend_type: "Type",
-        backend: "Backend"
+        backend: "Backend",
+        az: "Availability Zone"
     };
     msgs: Message[];
 
@@ -88,6 +89,7 @@ export class CloudFileShareCreateComponent implements OnInit{
             'backend':["",{validators:[Validators.required], updateOn:'change'}],
             'name': new FormControl('', {validators:[Validators.required, Validators.minLength(2), Validators.maxLength(128), Validators.pattern(this.validRule.name),Utils.isExisted(this.allNamesForCheck)]}),
             'description': new FormControl('', {validators:[Validators.maxLength(250),Validators.pattern(this.validRule.description)]}),
+            'type' : new FormControl('cloudFS')
         });
         this.getTypes();
         this.getBackends();
@@ -96,8 +98,10 @@ export class CloudFileShareCreateComponent implements OnInit{
     getTypes() {
         this.allTypes = [];
         this.BucketService.getTypes().subscribe((res) => {
-            res.json().types.forEach(element => {
-            if( element.name=='aws-file' || element.name == 'azure-file' ){
+           
+            let types = res.json().types;
+            types.forEach(element => {
+            if( element.name=='aws-file' || element.name == 'azure-file' || element.name == 'gcp-file'){
                 this.allTypes.push({
                     label: Consts.CLOUD_TYPE_NAME[element.name],
                     value: element.name
@@ -126,7 +130,8 @@ export class CloudFileShareCreateComponent implements OnInit{
     getBackends() {
         this.allBackends = [];
         this.BucketService.getBckends().subscribe((res) => {
-            res.json().forEach(element => {
+            let backends = res.json().backends;
+            backends.forEach(element => {
                 this.allBackends.push({
                     label: element.name,
                     value: element.name
@@ -136,40 +141,44 @@ export class CloudFileShareCreateComponent implements OnInit{
     }
 
     prepareCreateForm(type){
-        if(type == 'azure-file') {
-            this.cloudFileShareCreateForm.addControl('size', this.fb.control(''))
-            this.cloudFileShareCreateForm.addControl('metadata', this.fb.array([this.createMetadata()]));
+        if(type == 'azure-file' ) {
+            this.cloudFileShareCreateForm.addControl('size', this.fb.control(''));
+            this.cloudFileShareCreateForm.removeControl('availabilityZone');
+            if(this.cloudFileShareCreateForm.get('metadata')){
+                this.cloudFileShareCreateForm.removeControl('metadata');
+                this.cloudFileShareCreateForm.addControl('metadata', this.fb.array([this.createMetadata()]));
+            }
             this.cloudFileShareCreateForm.removeControl('tags');
             this.cloudFileShareCreateForm.removeControl('encrypted');
             this.cloudFileShareCreateForm.removeControl('encryptionSettings');
-        } else{
-            this.cloudFileShareCreateForm.removeControl('size');
-            this.cloudFileShareCreateForm.removeControl('metadata');
-        }
+        } 
+        if(type == 'gcp-file'){
+            this.cloudFileShareCreateForm.addControl('size', this.fb.control(''));
+            this.cloudFileShareCreateForm.addControl('availabilityZone', this.fb.control(''));
+            this.cloudFileShareCreateForm.removeControl('encrypted');
+            this.cloudFileShareCreateForm.removeControl('encryptionSettings');
+            this.cloudFileShareCreateForm.addControl('tags', this.fb.array([this.createTags('creator','')]));
+            if(this.cloudFileShareCreateForm.get('metadata')){
+                this.cloudFileShareCreateForm.removeControl('metadata');
+                this.cloudFileShareCreateForm.addControl('metadata', this.fb.array([this.createMetadata('Tier', 'STANDARD')]));
+            }
+        } 
         if(type == 'aws-file') {
             if(this.cloudFileShareCreateForm.controls['size']){
                 this.cloudFileShareCreateForm.removeControl('size');
             }
-            
+            this.cloudFileShareCreateForm.removeControl('availabilityZone');
             this.cloudFileShareCreateForm.addControl('encrypted', this.fb.control(false, [Validators.required]));
             if(this.cloudFileShareCreateForm.controls['encrypted']){
                 this.cloudFileShareCreateForm.addControl('encryptionSettings', this.fb.array([this.createEncryptionSettings('KmsKeyId', '')]));
             }
+            this.cloudFileShareCreateForm.removeControl('tags');
             this.cloudFileShareCreateForm.addControl('tags', this.fb.array([this.createTags('Name','')]));
-            if(!this.cloudFileShareCreateForm.controls['metadata']){
-                this.cloudFileShareCreateForm.addControl('metadata', this.fb.array([this.createMetadata('PerformanceMode', 'generalPurpose')]));
-                this.addNextMetadata('ThroughputMode', 'bursting');
-                this.addNextMetadata('ProvisionedThroughputInMibps', '');
-            }
-            
-        } else{
-            let self =this;
-            if(this.cloudFileShareCreateForm.get('metadata')['length']>1){
-                this.cloudFileShareCreateForm.removeControl('metadata');
-                this.cloudFileShareCreateForm.addControl('metadata', this.fb.array([this.createMetadata()]));
-            }
-        }
-        
+            this.cloudFileShareCreateForm.removeControl('metadata');
+            this.cloudFileShareCreateForm.addControl('metadata', this.fb.array([this.createMetadata('PerformanceMode', 'generalPurpose')]));
+            this.addNextMetadata('ThroughputMode', 'bursting');
+            this.addNextMetadata('ProvisionedThroughputInMibps', '');
+        } 
     }
 
     updateFormAndRegion(){
@@ -190,6 +199,7 @@ export class CloudFileShareCreateComponent implements OnInit{
         const encSettingsControl = this.cloudFileShareCreateForm.get('encryptionSettings');
         let encGrp:any =  this.cloudFileShareCreateForm.controls['encryptionSettings']['controls'];
         if(visible){
+            
             encGrp.forEach(item => {
                 item.controls['key'].setValidators(Validators.required);
                 item.controls['value'].setValidators(Validators.required);
@@ -262,7 +272,8 @@ export class CloudFileShareCreateComponent implements OnInit{
             name: value['name'],
             description: value['description'],
             backendId: this.selectedBackend['id'],
-            metadata: meta
+            metadata: meta,
+            type: value['type']
         }
         dataArr['encrypted'] = value['encrypted'] ? value['encrypted'] : false;
         let enc = {};
@@ -275,6 +286,9 @@ export class CloudFileShareCreateComponent implements OnInit{
             }
         }
         
+        if(value['availabilityZone']){
+            dataArr['availabilityZone'] = value['availabilityZone'];
+        }
         if(value['size']){
             dataArr['size'] = parseInt(value['size']);
         }

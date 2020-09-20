@@ -66,7 +66,8 @@ export class CloudFileShareModifyComponent implements OnInit{
         tags: "Tags",
         metadata: "Metadata",
         backend_type: "Type",
-        backend: "Backend"
+        backend: "Backend",
+        az: "Availability Zone"
     };
     msgs: Message[];
 
@@ -101,7 +102,7 @@ export class CloudFileShareModifyComponent implements OnInit{
                 this.allTypes = [];
                 this.BucketService.getTypes().subscribe((res) => {
                     res.json().types.forEach(element => {
-                    if( element.name=='aws-file' || element.name == 'azure-file' ){
+                    if( element.name=='aws-file' || element.name == 'azure-file' || element.name == 'gcp-file'){
                         this.allTypes.push({
                             label: Consts.CLOUD_TYPE_NAME[element.name],
                             value: element.name
@@ -130,9 +131,13 @@ export class CloudFileShareModifyComponent implements OnInit{
                 this.showModifyForm = true;
                 this.cloudFileShareModifyForm = this.fb.group({
                     'description': new FormControl(this.selectedFileShare['description'] ? this.selectedFileShare['description'] : '', {validators:[Validators.maxLength(250),Validators.pattern(this.validRule.description)]}),
+                    'type': new FormControl('cloudFS')
                 });
-                if(this.selectedFileShare['size'] && this.selectedFileShare['backend_type'] == 'azure-file'){
+                if(this.selectedFileShare['size'] && (this.selectedFileShare['backend_type'] == 'azure-file' || this.selectedFileShare['backend_type'] == 'gcp-file')){
                     self.cloudFileShareModifyForm.addControl('size', this.fb.control(this.selectedFileShare['size'], Validators.required));
+                }
+                if(this.selectedFileShare['availabilityZone'] && this.selectedFileShare['backend_type'] == 'gcp-file'){
+                    self.cloudFileShareModifyForm.addControl('availabilityZone', this.fb.control(this.selectedFileShare['availabilityZone']));
                 }
                 if(this.selectedFileShare['tags'] && this.selectedFileShare['tags'].length){
                     _.each(this.selectedFileShare['tags'], function(item){
@@ -195,6 +200,23 @@ export class CloudFileShareModifyComponent implements OnInit{
                             }
                             self.selectedFileShare['metadataArr'].push(metaitem);
                         } 
+                        if(key=="Tier"){
+                            if(value['Kind'].hasOwnProperty('StringValue')){
+                                metaitem = {
+                                    key : "Tier", 
+                                    value : value['Kind']['StringValue'],
+                                    type : 'string'
+                                }
+                            }
+                            if(value['Kind'].hasOwnProperty('NumberValue')){
+                                metaitem = {
+                                    key: "Tier", 
+                                    value : value['Kind']['NumberValue'],
+                                    type : 'number'
+                                }
+                            }
+                            self.selectedFileShare['metadataArr'].push(metaitem);
+                        }
                         
                     })
                 }
@@ -225,7 +247,7 @@ export class CloudFileShareModifyComponent implements OnInit{
         this.allTypes = [];
         this.BucketService.getTypes().subscribe((res) => {
             res.json().types.forEach(element => {
-            if( element.name=='aws-file' || element.name == 'azure-file' ){
+            if( element.name=='aws-file' || element.name == 'azure-file' || element.name == 'gcp-file'){
                 this.allTypes.push({
                     label: Consts.CLOUD_TYPE_NAME[element.name],
                     value: element.name
@@ -326,7 +348,8 @@ export class CloudFileShareModifyComponent implements OnInit{
     getFileShareDataArray(value){
         let meta = {};
         let dataArr = {
-            description: value['description'] ? value['description'] : ''
+            description: value['description'] ? value['description'] : '',
+            type: value['type']
         }
         if(value['metadata']){
             value['metadata'].forEach(element => {
@@ -339,7 +362,9 @@ export class CloudFileShareModifyComponent implements OnInit{
             });
             dataArr['metadata'] = meta;
         }
-        
+        if(value['availabilityZone']){
+            dataArr['availabilityZone'] = value['availabilityZone'];
+        }
         if(value['size']){
             dataArr['size'] = parseInt(value['size']);
         }
