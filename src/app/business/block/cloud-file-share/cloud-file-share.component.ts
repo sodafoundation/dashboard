@@ -37,7 +37,8 @@ export class CloudFileShareComponent implements OnInit{
         status: "Status",
         availabilityZone: "Availability Zone",
         tags: "Tags",
-        metadata: "Metadata"
+        metadata: "Metadata",
+        size: "Size"
     };
 
     constructor(private cloudFS: CloudFileShareService,
@@ -119,7 +120,10 @@ export class CloudFileShareComponent implements OnInit{
                     if(!element['tags']){
                         element['tags'] = [];
                     }
-
+                    if(element['size']){
+                        let display = Utils.formatBytes(element['size']);
+                        element['displaySize'] = display;
+                    }
                     let metadataArr = [];
                     if(element['metadata']){
                         let meta = element['metadata']['fields'];
@@ -176,6 +180,23 @@ export class CloudFileShareComponent implements OnInit{
                                 }
                                 metadataArr.push(metaitem);
                             } 
+                            if(key=="Tier"){
+                                if(value['Kind'].hasOwnProperty('StringValue')){
+                                    metaitem = {
+                                        key : "Tier", 
+                                        value : value['Kind']['StringValue'],
+                                        type : 'string'
+                                    }
+                                }
+                                if(value['Kind'].hasOwnProperty('NumberValue')){
+                                    metaitem = {
+                                        key: "Tier", 
+                                        value : value['Kind']['NumberValue'],
+                                        type : 'number'
+                                    }
+                                }
+                                metadataArr.push(metaitem);
+                            }
                             
                         })
                         element['metadataArr'] = metadataArr;

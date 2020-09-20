@@ -70,10 +70,10 @@
                             {{fileshare.description}}
                         </div>
                         <div class="ui-grid-col-2">
-                            {{label.backend}}:
+                            {{label.size}}:
                         </div>
                         <div class="ui-grid-col-2 volume-basic-item-value-color">
-                            {{fileshare.backend}}
+                            {{fileshare.displaySize ? fileshare.displaySize : '--'}}
                         </div>
                         <div class="ui-grid-col-2">
                             {{label.updatedAt}}:
@@ -85,16 +85,16 @@
                     </div>
                     <div class="ui-grid-row volume-basic-item-class">
                             <div class="ui-grid-col-2">
-                                
+                                {{label.region}}:
                             </div>
                             <div class="ui-grid-col-2 volume-basic-item-value-color">
-                                
+                                {{fileshare.region ? fileshare.region : '--'}}
                             </div>
                             <div class="ui-grid-col-2">
-                                
+                                {{label.availabilityZone}}:
                             </div>
                             <div class="ui-grid-col-2 volume-basic-item-value-color">
-                                
+                                {{fileshare.availabilityZone ? fileshare.availabilityZone : '--'}}
                             </div>
                             
                             <div class="ui-grid-col-2">
