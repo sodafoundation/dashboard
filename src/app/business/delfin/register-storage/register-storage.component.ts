@@ -127,10 +127,6 @@ export class RegisterStorageComponent implements OnInit {
             {
                 label: "HPE",
                 value: 'hpe'
-            },
-            {
-                label: "Fake Storage",
-                value: 'fake_storage'
             }
         ];
 
