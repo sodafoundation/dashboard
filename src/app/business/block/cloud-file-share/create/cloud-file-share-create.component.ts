@@ -52,7 +52,7 @@ export class CloudFileShareCreateComponent implements OnInit{
         }
     };
     validRule= {
-        'name':'^[a-zA-Z]{1}([a-zA-Z0-9]|[-_]){0,127}$',
+        'name':'^[a-zA-Z]{1}([a-zA-Z0-9]|[_]){0,127}$',
         'description':'^[a-zA-Z ]{1}([a-zA-Z0-9 ]){0,249}$'
     };
     label = {
@@ -153,6 +153,9 @@ export class CloudFileShareCreateComponent implements OnInit{
             this.cloudFileShareCreateForm.removeControl('encryptionSettings');
         } 
         if(type == 'gcp-file'){
+            this.cloudFileShareCreateForm.controls['name'].setValidators([Validators.required, Validators.minLength(2), Validators.maxLength(16), Validators.pattern(this.validRule.name),Utils.isExisted(this.allNamesForCheck)]);
+            this.errorMessage.name.maxlength = "The file share name should have maximum 16 characters."
+            this.cloudFileShareCreateForm.controls['name'].updateValueAndValidity();
             this.cloudFileShareCreateForm.addControl('size', this.fb.control(''));
             this.cloudFileShareCreateForm.addControl('availabilityZone', this.fb.control(''));
             this.cloudFileShareCreateForm.removeControl('encrypted');
@@ -161,8 +164,15 @@ export class CloudFileShareCreateComponent implements OnInit{
             if(this.cloudFileShareCreateForm.get('metadata')){
                 this.cloudFileShareCreateForm.removeControl('metadata');
                 this.cloudFileShareCreateForm.addControl('metadata', this.fb.array([this.createMetadata('Tier', 'STANDARD')]));
+            } else{
+                this.cloudFileShareCreateForm.addControl('metadata', this.fb.array([this.createMetadata('Tier', 'STANDARD')]));
             }
         } 
+        else{
+            this.cloudFileShareCreateForm.controls['name'].setValidators([Validators.required, Validators.minLength(2), Validators.maxLength(128), Validators.pattern(this.validRule.name),Utils.isExisted(this.allNamesForCheck)]);
+            this.errorMessage.name.maxlength = "The file share name should have maximum 128 characters." 
+            this.cloudFileShareCreateForm.controls['name'].updateValueAndValidity();
+        }
         if(type == 'aws-file') {
             if(this.cloudFileShareCreateForm.controls['size']){
                 this.cloudFileShareCreateForm.removeControl('size');
