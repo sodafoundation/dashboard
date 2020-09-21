@@ -2371,5 +2371,22 @@ dl.storage-capacity-list dd{
     font-size: 1.25em;
     font-weight: 600;
 }
+.severity-icon{
+    float: left;
+    min-width: 30px;
+
+    .major{
+        color: #ff7f00;
+    }
+    .critical{
+        color: #db4437;
+    }
+    .fatal{
+        color: #ff0000;
+    }
+    .informational{
+        color: #4285f3;
+    }
+}
 /* Delfin Styles end */
 
