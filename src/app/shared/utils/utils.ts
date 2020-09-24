@@ -128,13 +128,14 @@ export class Utils {
     static formatBytes(bytes, decimals = 2) {
         if (bytes === 0) return '0 Bytes';
     
-        const k = Consts.GiB_CONVERTER;
+        const k = Consts.TO_GiB_CONVERTER;
         const dm = decimals < 0 ? 0 : decimals;
-        const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
-    
+        const sizesGiB = ['Bytes', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB', 'EiB', 'ZiB', 'YiB'];
+        const sizesGB = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+        
         const i = Math.floor(Math.log(bytes) / Math.log(k));
-    
-        return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizesGiB[i];
     }
 
     /**
