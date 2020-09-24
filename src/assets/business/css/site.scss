@@ -1906,6 +1906,25 @@ a {
 .register-backend-dialog .ui-dialog-content{
     min-height: 400px;
 }
+.home-sidebar-panel.ui-sidebar-lg{
+    background-color: #2C3F61;
+}
+.right-sidebar-content-wrapper{
+    margin: 2em;
+    h1 {
+        color: #cdd3dd;
+    }
+    .right-sidebar-header{
+        margin-bottom: 30px;
+    }
+    .ui-dropdown-items-wrapper{
+        max-height: 325px !important;
+    }
+
+    label {
+        font-weight: 700;
+    }
+}
 /* custom breadcrumb end */
 .uploading-title, .downloading-title{
     color: #333333;
