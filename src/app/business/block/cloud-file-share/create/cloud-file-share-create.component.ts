@@ -261,8 +261,8 @@ export class CloudFileShareCreateComponent implements OnInit{
 
     createMetadata(key?, value?){
         return this.fb.group({
-            key: new FormControl(key ? key : '', Validators.required),
-            value: new FormControl(value ? value : '', Validators.required)
+            key: new FormControl(key ? key : ''),
+            value: new FormControl(value ? value : '')
         })
     }
 
