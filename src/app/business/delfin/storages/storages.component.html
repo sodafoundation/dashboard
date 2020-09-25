@@ -152,8 +152,8 @@
                                         </span>
                                     </div>
                                 </div>
-                                <div *ngIf="device.capacity && device.capacity.usage" class="storage-usage-bar" style="padding: 5px 25px 5px 5px;">
-                                    <p-progressBar [ngClass]="{'capacity-usage-normal': device.capacity.usage < 75, 
+                                <div *ngIf="device.capacity && device.capacity.usage!=null" class="storage-usage-bar" style="padding: 5px 25px 5px 5px;">
+                                    <p-progressBar [ngClass]="{'capacity-usage-zero': device.capacity.usage ==0, 'capacity-usage-normal': device.capacity.usage > 0 && device.capacity.usage < 75, 
                                         'capacity-usage-warning': device.capacity.usage > 75 && device.capacity.usage < 95, 
                                         'capacity-usage-full' : device.capacity.usage > 95 }" [value]="device.capacity.usage" unit="% used"></p-progressBar>
                                 </div>
@@ -739,7 +739,7 @@
                 </tbody>
             </table>
             <div class="storage-usage-bar" >
-                <p-progressBar [ngClass]="{'capacity-usage-normal': storageOverview.capacity.usage < 75, 
+                <p-progressBar [ngClass]="{'capacity-usage-zero': storageOverview.capacity.usage == 0, 'capacity-usage-normal': storageOverview.capacity.usage > 0 && storageOverview.capacity.usage < 75, 
                     'capacity-usage-warning': storageOverview.capacity.usage > 75 && storageOverview.capacity.usage < 95, 
                     'capacity-usage-full' : storageOverview.capacity.usage > 95 }" [value]="storageOverview.capacity.usage" unit="% used"></p-progressBar>
             </div>
@@ -820,7 +820,7 @@
                 </tbody>
             </table>
             <div class="storage-usage-bar" >
-                <p-progressBar [ngClass]="{'capacity-usage-normal': modelOverview.details.totalUsagePercent < 75, 
+                <p-progressBar [ngClass]="{'capacity-usage-zero': modelOverview.capacity.totalUsagePercent == 0, 'capacity-usage-normal': modelOverview.capacity.totalUsagePercent > 0 && modelOverview.capacity.totalUsagePercent < 75, 
                     'capacity-usage-warning': modelOverview.details.totalUsagePercent > 75 && modelOverview.details.totalUsagePercent < 95, 
                     'capacity-usage-full' : modelOverview.details.totalUsagePercent > 95 }" [value]="modelOverview.details.totalUsagePercent" unit="% used"></p-progressBar>
             </div>
@@ -867,7 +867,7 @@
                 </tbody>
             </table>
             <div class="storage-usage-bar" >
-                <p-progressBar [ngClass]="{'capacity-usage-normal': parentOverview.details.totalUsagePercent < 75, 
+                <p-progressBar [ngClass]="{'capacity-usage-zero': parentOverview.capacity.totalUsagePercent == 0, 'capacity-usage-normal': parentOverview.capacity.totalUsagePercent > 0 && parentOverview.capacity.totalUsagePercent < 75, 
                     'capacity-usage-warning': parentOverview.details.totalUsagePercent > 75 && parentOverview.details.totalUsagePercent < 95, 
                     'capacity-usage-full' : parentOverview.details.totalUsagePercent > 95 }" [value]="parentOverview.details.totalUsagePercent" unit="% used"></p-progressBar>
             </div>
@@ -924,7 +924,7 @@
                 </tbody>
             </table>
             <div class="storage-usage-bar" >
-                <p-progressBar [ngClass]="{'capacity-usage-normal': volumeOverview.details.capacity.usage < 75, 
+                <p-progressBar [ngClass]="{'capacity-usage-zero': volumeOverview.capacity.usage == 0, 'capacity-usage-normal': volumeOverview.capacity.usage > 0 && volumeOverview.capacity.usage < 75, 
                     'capacity-usage-warning': volumeOverview.details.capacity.usage > 75 && volumeOverview.details.capacity.usage < 95, 
                     'capacity-usage-full' : volumeOverview.details.capacity.usage > 95 }" [value]="volumeOverview.details.capacity.usage" unit="% used"></p-progressBar>
             </div>
@@ -967,7 +967,7 @@
                 </tbody>
             </table>
             <div class="storage-usage-bar" >
-                <p-progressBar [ngClass]="{'capacity-usage-normal': poolOverview.details.capacity.usage < 75, 
+                <p-progressBar [ngClass]="{'capacity-usage-zero': poolOverview.capacity.usage == 0, 'capacity-usage-normal': poolOverview.capacity.usage > 0 && poolOverview.capacity.usage < 75, 
                     'capacity-usage-warning': poolOverview.details.capacity.usage > 75 && poolOverview.details.capacity.usage < 95, 
                     'capacity-usage-full' : poolOverview.details.capacity.usage > 95 }" [value]="poolOverview.details.capacity.usage" unit="% used"></p-progressBar>
             </div>
