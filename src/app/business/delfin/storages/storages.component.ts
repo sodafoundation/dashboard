@@ -470,6 +470,7 @@ export class StoragesComponent implements OnInit {
                 label: key,
                 collapsedIcon: 'fa-folder',
                 expandedIcon: 'fa-folder-open',
+                styleClass: 'vendor-node',
                 type: 'array',
                 expanded: true
             }
@@ -482,6 +483,7 @@ export class StoragesComponent implements OnInit {
                         label: modelKey,
                         collapsedIcon: 'fa-folder',
                         expandedIcon: 'fa-folder-open',
+                        styleClass: 'model-node',
                         type: 'modelGroup',
                         expanded: true,
                         children: [],
@@ -507,6 +509,7 @@ export class StoragesComponent implements OnInit {
                                 label: storageDevice['name'],
                                 collapsedIcon: 'fa-hdd-o',
                                 expandedIcon: 'fa-hdd-o',
+                                styleClass: 'device-node',
                                 children: [],
                                 type: 'device',
                                 details: storageDevice
@@ -529,6 +532,7 @@ export class StoragesComponent implements OnInit {
                                     collapsedIcon: 'fa-database',
                                     expandedIcon: 'fa-database',
                                     type: 'volParent',
+                                    styleClass: 'volume-parent-node',
                                     leaf: false,
                                     details: {
                                         totalUsableCapacity: 0,
@@ -555,6 +559,7 @@ export class StoragesComponent implements OnInit {
                                     label : "Storage Pools",
                                     collapsedIcon: 'fa-cubes',
                                     expandedIcon: 'fa-cubes',
+                                    styleClass: 'pool-parent-node',
                                     type: 'poolParent',
                                     leaf: false,
                                     details: {
@@ -637,6 +642,7 @@ export class StoragesComponent implements OnInit {
                                 label : volItem['name'],
                                 collapsedIcon: 'fa-database',
                                 expandedIcon: 'fa-database',
+                                styleClass: 'volume-node',
                                 type: 'volNode',
                                 details: volItem,
                             }
@@ -676,6 +682,7 @@ export class StoragesComponent implements OnInit {
                                 label : poolItem['name'],
                                 collapsedIcon: 'fa-cubes',
                                 expandedIcon: 'fa-cubes',
+                                styleClass: 'pool-node',
                                 type: 'poolNode',
                                 details: poolItem,
                             }

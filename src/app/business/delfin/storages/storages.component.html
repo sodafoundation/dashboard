@@ -39,7 +39,6 @@
                         <p-scrollPanel [style]="{height: '300px'}" styleClass="storage-summary-panel-2">
                             <p-tree [value]="arrayTreeData" [loading]="loading" [contextMenu]="cm" (onNodeExpand)="loadNode($event)" emptyMessage="No records found." styleClass="storage-array-tree-view" >
                                 <ng-template #modelTreeItem let-model pTemplate="modelGroup">
-                                    
                                     <a (mouseenter)="showOverview($event, model, modelOverviewPanel)" (mouseleave)="showOverview($event, model, modelOverviewPanel)">{{model.label}}</a>
                                 </ng-template>
                                 <ng-template #deviceTreeItem let-node pTemplate="device">

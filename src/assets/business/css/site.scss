@@ -2175,22 +2175,15 @@ td.ui-datatable-emptymessage{
         padding-top: 1.5rem;
     }
 }
+.volume-parent-node ul.ui-treenode-children, .pool-parent-node ul.ui-treenode-children{
+    height: 100px;
+    overflow-y: scroll;
+    width: 50%;
+}
 .delfin-storage-list-page .ui-dataview-layout-options.ui-selectbutton .ui-togglebutton.ui-button.ui-state-default, .ui-selectbutton .ui-button.ui-state-default{
 padding: 0 0.15rem;
 }
-dl.storage-capacity-list dt{
-    float: left;
-    clear: left;
-    width: 9.5em;
-    font-weight: bold;
-    padding: 1em 1.5em;
-    font-size: 1.2em;
-}
-dl.storage-capacity-list dd{
-    float: left;
-    padding: 1em 3em;
-    font-size: 1.2em;
-}
+
 .storage-summary-panel-2{
     height: 400px;
     min-height: 350px;
