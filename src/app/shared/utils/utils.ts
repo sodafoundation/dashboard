@@ -121,9 +121,12 @@ export class Utils {
         return ret + " " + unit;
     }
     /***
-     * Returns the capacity value in appropriate display units
+     * formatBytes(bytes, decimals) Returns the capacity value in appropriate display units
      * @param bytes (byte)
      * @param decimals (number) //defaults to 2
+     * 
+     * As per https://stackoverflow.com/a/18650828/6303009
+     * by Aliceljm (https://stackoverflow.com/users/1596799/aliceljm)
      */
     static formatBytes(bytes, decimals = 2) {
         if (bytes === 0) return '0 Bytes';
