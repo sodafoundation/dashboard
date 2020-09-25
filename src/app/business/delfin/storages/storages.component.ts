@@ -648,7 +648,7 @@ export class StoragesComponent implements OnInit {
                         devChild['details'].displayTotal = Utils.formatBytes(devChild['details'].totalUsableCapacity);
                         devChild['details'].displayFree = Utils.formatBytes(devChild['details'].totalFreeCapacity);
                         devChild['details'].displayUsed = Utils.formatBytes(devChild['details'].totalUsedCapacity);
-                        
+                        devChild['label'] = "Volumes " + "(" + devChild['children'].length + ")";
                     }
                 } else if(devChild['type']=='poolParent'){
                     devChild['children'] = [];
@@ -687,7 +687,7 @@ export class StoragesComponent implements OnInit {
                         devChild['details'].displayTotal = Utils.formatBytes(devChild['details'].totalUsableCapacity);
                         devChild['details'].displayFree = Utils.formatBytes(devChild['details'].totalFreeCapacity);
                         devChild['details'].displayUsed = Utils.formatBytes(devChild['details'].totalUsedCapacity);
-                        
+                        devChild['label'] = "Storage Pools " + "(" + devChild['children'].length + ")";
                     }
                 }
             })
