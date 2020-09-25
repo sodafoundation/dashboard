@@ -2217,6 +2217,12 @@ padding: 0 0.15rem;
         height: 1.6em;
     }
     
+    .capacity-usage-zero .ui-progressbar-label{
+        color: #000;
+        padding-top: 2px;
+        display: block !important;
+    }
+
     .capacity-usage-normal .ui-progressbar-value{
         background: #26988f;
     }
