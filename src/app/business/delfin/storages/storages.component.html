@@ -36,15 +36,26 @@
                         </div>
                     </p-header>
                     <div>
-                        <p-scrollPanel [style]="{width: '100%', height: '300px'}" styleClass="storage-summary-panel-2">
+                        <p-scrollPanel [style]="{height: '300px'}" styleClass="storage-summary-panel-2">
                             <p-tree [value]="arrayTreeData" [loading]="loading" [contextMenu]="cm" (onNodeExpand)="loadNode($event)" emptyMessage="No records found." styleClass="storage-array-tree-view" >
                                 <ng-template #modelTreeItem let-model pTemplate="modelGroup">
-                                    
                                     <a (mouseenter)="showOverview($event, model, modelOverviewPanel)" (mouseleave)="showOverview($event, model, modelOverviewPanel)">{{model.label}}</a>
                                 </ng-template>
                                 <ng-template #deviceTreeItem let-node pTemplate="device">
                                     <a [routerLink]="['/storageDetails/' + node.details.id]" (contextmenu)="deviceNodeMenu($event, node, deviceOverviewPanel)"  (mouseenter)="showOverview($event, node, deviceOverviewPanel)" (mouseleave)="deviceOverviewPanel.hide()">{{node.label}}</a>
                                     <i *ngIf="node.details.sync_status=='SYNCING'" title="Device is syncing" class="fa fa-spinner fa-spin fa-3x fa-fw"></i>
+                                </ng-template>
+                                <ng-template #volumeParentTreeItem let-node pTemplate="volParent">
+                                    <a (mouseenter)="showOverview($event, node, parentOverviewPanel)" (mouseleave)="parentOverviewPanel.hide()">{{node.label}}</a>
+                                </ng-template>
+                                <ng-template #poolParentTreeItem let-node pTemplate="poolParent">
+                                    <a (mouseenter)="showOverview($event, node, parentOverviewPanel)" (mouseleave)="parentOverviewPanel.hide()">{{node.label}}</a>
+                                </ng-template>
+                                <ng-template #volumeTreeItem let-node pTemplate="volNode">
+                                    <a (mouseenter)="showOverview($event, node, volumeOverviewPanel)" (mouseleave)="volumeOverviewPanel.hide()">{{node.label}}</a>
+                                </ng-template>
+                                <ng-template #poolTreeItem let-node pTemplate="poolNode">
+                                    <a (mouseenter)="showOverview($event, node, poolOverviewPanel)" (mouseleave)="poolOverviewPanel.hide()">{{node.label}}</a>
                                 </ng-template>
                             </p-tree>
                             <p-contextMenu #cm appendTo="body" [model]="contextMenuItems"></p-contextMenu>
@@ -141,8 +152,8 @@
                                         </span>
                                     </div>
                                 </div>
-                                <div *ngIf="device.capacity && device.capacity.usage" class="storage-usage-bar" style="padding: 5px 25px 5px 5px;">
-                                    <p-progressBar [ngClass]="{'capacity-usage-normal': device.capacity.usage < 75, 
+                                <div *ngIf="device.capacity && device.capacity.usage!=null" class="storage-usage-bar" style="padding: 5px 25px 5px 5px;">
+                                    <p-progressBar [ngClass]="{'capacity-usage-zero': device.capacity.usage ==0, 'capacity-usage-normal': device.capacity.usage > 0 && device.capacity.usage < 75, 
                                         'capacity-usage-warning': device.capacity.usage > 75 && device.capacity.usage < 95, 
                                         'capacity-usage-full' : device.capacity.usage > 95 }" [value]="device.capacity.usage" unit="% used"></p-progressBar>
                                 </div>
@@ -728,7 +739,7 @@
                 </tbody>
             </table>
             <div class="storage-usage-bar" >
-                <p-progressBar [ngClass]="{'capacity-usage-normal': storageOverview.capacity.usage < 75, 
+                <p-progressBar [ngClass]="{'capacity-usage-zero': storageOverview.capacity.usage == 0, 'capacity-usage-normal': storageOverview.capacity.usage > 0 && storageOverview.capacity.usage < 75, 
                     'capacity-usage-warning': storageOverview.capacity.usage > 75 && storageOverview.capacity.usage < 95, 
                     'capacity-usage-full' : storageOverview.capacity.usage > 95 }" [value]="storageOverview.capacity.usage" unit="% used"></p-progressBar>
             </div>
@@ -809,9 +820,156 @@
                 </tbody>
             </table>
             <div class="storage-usage-bar" >
-                <p-progressBar [ngClass]="{'capacity-usage-normal': modelOverview.details.totalUsagePercent < 75, 
+                <p-progressBar [ngClass]="{'capacity-usage-zero': modelOverview.details.totalUsagePercent == 0, 'capacity-usage-normal': modelOverview.details.totalUsagePercent > 0 && modelOverview.details.totalUsagePercent < 75, 
                     'capacity-usage-warning': modelOverview.details.totalUsagePercent > 75 && modelOverview.details.totalUsagePercent < 95, 
                     'capacity-usage-full' : modelOverview.details.totalUsagePercent > 95 }" [value]="modelOverview.details.totalUsagePercent" unit="% used"></p-progressBar>
+            </div>
+        </div>
+    </div>
+</p-overlayPanel>
+
+<p-overlayPanel styleClass="overview-panel" #parentOverviewPanel>
+    <div class="ui-g overview-title">
+        <h4>{{parentOverview && parentOverview.parent.label}} {{parentOverview && parentOverview.label}}</h4>
+    </div>
+    <div class="ui-g overview-item">
+        <div class="ui-g-6">
+            <span class="overview-item-label">
+                Number of {{parentOverview && parentOverview.type=='volParent' ? 'Volumes' : 'Pools'}} 
+            </span>
+        </div>
+        <div class="ui-g-4 ui-g-offset-2">
+            <span>
+                {{parentOverview && parentOverview.children.length}}
+            </span>
+        </div>
+    </div>
+    <hr />
+   
+    <div class="ui-g overview-item">
+        <div class="ui-g-12">
+            <span class="overview-item-label">Usable Capacity Summary</span>
+        </div>
+        
+    </div>
+    <div class="ui-g overview-item">
+        <div *ngIf="parentOverview && parentOverview.details" class="capacity-stats-bar">
+            <table class="capacity-table" *ngIf="parentOverview && parentOverview.details">
+                <thead>
+                    <th class="capacity-header">Free</th>
+                    <th class="capacity-header">Used</th>
+                    <th class="capacity-header">Total</th>
+                </thead>
+                <tbody>
+                    <td class="capacity-field"><span class="free-storage">{{parentOverview.details && parentOverview.details.displayFree ? parentOverview.details.displayFree : '-'}} </span> </td>
+                    <td class="capacity-field"><span class="used-storage">{{parentOverview.details && parentOverview.details.displayUsed ? parentOverview.details.displayUsed : '-'}} </span> </td>
+                    <td class="capacity-field"><span class="total-storage">{{parentOverview.details && parentOverview.details.displayTotal ? parentOverview.details.displayTotal : '-'}} </span></td>
+                </tbody>
+            </table>
+            <div class="storage-usage-bar" >
+                <p-progressBar [ngClass]="{'capacity-usage-zero': parentOverview.details.totalUsagePercent == 0, 'capacity-usage-normal': parentOverview.details.totalUsagePercent > 0 && parentOverview.details.totalUsagePercent < 75, 
+                    'capacity-usage-warning': parentOverview.details.totalUsagePercent > 75 && parentOverview.details.totalUsagePercent < 95, 
+                    'capacity-usage-full' : parentOverview.details.totalUsagePercent > 95 }" [value]="parentOverview.details.totalUsagePercent" unit="% used"></p-progressBar>
+            </div>
+        </div>
+    </div>
+</p-overlayPanel>
+
+
+<p-overlayPanel styleClass="overview-panel" #volumeOverviewPanel>
+    <div class="ui-g overview-title">
+        <h4>{{volumeOverview && volumeOverview.details.name}}</h4>
+    </div>
+    <div class="ui-g ui-g-nopad overview-item" >
+        <div class="ui-g-6">
+            <span class="overview-item-label">Status: </span>
+        </div>
+        <div class="ui-g-6">
+            <span class="storage-status-icon" [ngClass]="{normal:  volumeOverview && volumeOverview.details.status =='normal', abnormal: volumeOverview && volumeOverview.details.status =='abnormal'}"><i class="fa fa-circle"></i></span>
+            <span *ngIf="volumeOverview && volumeOverview.details.status=='normal'">Normal</span>
+            <span *ngIf=" volumeOverview && volumeOverview.details.status=='abnormal'">Abnormal</span>
+            <span *ngIf=" volumeOverview && volumeOverview.details.status=='offline'">Offline</span>
+        </div>
+    </div>
+    <div class="ui-g overview-item">
+        <div class="ui-g-6">
+            <span class="overview-item-label">
+              WWN
+            </span>
+        </div>
+        <div class="ui-g-6">
+            <span>
+                {{ volumeOverview && volumeOverview.details.wwn}}
+            </span>
+        </div>
+    </div>
+    <hr />
+    <div class="ui-g overview-item">
+        <div class="ui-g-12">
+            <span class="overview-item-label">Usable Capacity Summary</span>
+        </div>
+    </div>
+    <div class="ui-g overview-item">
+        <div *ngIf="volumeOverview && volumeOverview.details.capacity" class="capacity-stats-bar">
+            <table class="capacity-table" *ngIf="volumeOverview && volumeOverview.details.capacity">
+                <thead>
+                    <th class="capacity-header">Free</th>
+                    <th class="capacity-header">Used</th>
+                    <th class="capacity-header">Total</th>
+                </thead>
+                <tbody>
+                    <td class="capacity-field"><span class="free-storage">{{volumeOverview.details.capacity && volumeOverview.details.capacity.free ? volumeOverview.details.capacity.free : '-'}} </span></td>
+                    <td class="capacity-field"><span class="used-storage">{{volumeOverview.details.capacity && volumeOverview.details.capacity.used ? volumeOverview.details.capacity.used : '-'}} </span></td>
+                    <td class="capacity-field"><span class="total-storage">{{volumeOverview.details.capacity && volumeOverview.details.capacity.total ? volumeOverview.details.capacity.total : '-'}} </span></td>
+                </tbody>
+            </table>
+            <div class="storage-usage-bar" >
+                <p-progressBar [ngClass]="{'capacity-usage-zero': volumeOverview.details.capacity.usage == 0, 'capacity-usage-normal': volumeOverview.details.capacity.usage > 0 && volumeOverview.details.capacity.usage < 75, 
+                    'capacity-usage-warning': volumeOverview.details.capacity.usage > 75 && volumeOverview.details.capacity.usage < 95, 
+                    'capacity-usage-full' : volumeOverview.details.capacity.usage > 95 }" [value]="volumeOverview.details.capacity.usage" unit="% used"></p-progressBar>
+            </div>
+        </div>
+    </div>
+</p-overlayPanel>
+<p-overlayPanel styleClass="overview-panel" #poolOverviewPanel>
+    <div class="ui-g overview-title">
+        <h4>{{poolOverview && poolOverview.details.name}}</h4>
+    </div>
+    <div class="ui-g ui-g-nopad overview-item" >
+        <div class="ui-g-6">
+            <span class="overview-item-label">Status: </span>
+        </div>
+        <div class="ui-g-6">
+            <span class="storage-status-icon" [ngClass]="{normal:  poolOverview && poolOverview.details.status =='normal', abnormal: poolOverview && poolOverview.details.status =='abnormal'}"><i class="fa fa-circle"></i></span>
+            <span *ngIf="poolOverview && poolOverview.details.status=='normal'">Normal</span>
+            <span *ngIf=" poolOverview && poolOverview.details.status=='abnormal'">Abnormal</span>
+            <span *ngIf=" poolOverview && poolOverview.details.status=='offline'">Offline</span>
+        </div>
+    </div>
+    <hr />
+    <div class="ui-g overview-item">
+        <div class="ui-g-12">
+            <span class="overview-item-label">Usable Capacity Summary</span>
+        </div>
+    </div>
+    <div class="ui-g overview-item">
+        <div *ngIf="poolOverview && poolOverview.details.capacity" class="capacity-stats-bar">
+            <table class="capacity-table" *ngIf="poolOverview && poolOverview.details.capacity">
+                <thead>
+                    <th class="capacity-header">Free</th>
+                    <th class="capacity-header">Used</th>
+                    <th class="capacity-header">Total</th>
+                </thead>
+                <tbody>
+                    <td class="capacity-field"><span class="free-storage">{{poolOverview.details.capacity && poolOverview.details.capacity.free ? poolOverview.details.capacity.free : '-'}} </span></td>
+                    <td class="capacity-field"><span class="used-storage">{{poolOverview.details.capacity && poolOverview.details.capacity.used ? poolOverview.details.capacity.used : '-'}} </span></td>
+                    <td class="capacity-field"><span class="total-storage">{{poolOverview.details.capacity && poolOverview.details.capacity.total ? poolOverview.details.capacity.total : '-'}} </span></td>
+                </tbody>
+            </table>
+            <div class="storage-usage-bar" >
+                <p-progressBar [ngClass]="{'capacity-usage-zero': poolOverview.details.capacity.usage == 0, 'capacity-usage-normal': poolOverview.details.capacity.usage > 0 && poolOverview.details.capacity.usage < 75, 
+                    'capacity-usage-warning': poolOverview.details.capacity.usage > 75 && poolOverview.details.capacity.usage < 95, 
+                    'capacity-usage-full' : poolOverview.details.capacity.usage > 95 }" [value]="poolOverview.details.capacity.usage" unit="% used"></p-progressBar>
             </div>
         </div>
     </div>

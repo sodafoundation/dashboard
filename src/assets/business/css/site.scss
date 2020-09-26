@@ -2185,32 +2185,25 @@ td.ui-datatable-emptymessage{
     text-align: center;
 }
 .storage-array-tree-view {
-    width: 100%;
-    height: 100%; 
+    width: 97%;
+    height: 98%; 
     overflow: auto;
-
+    border: none;
     .ui-tree-empty-message {
         padding: .25em;
         text-align: center;
         padding-top: 1.5rem;
     }
 }
+.volume-parent-node ul.ui-treenode-children, .pool-parent-node ul.ui-treenode-children{
+    height: 100px;
+    overflow-y: scroll;
+    width: 50%;
+}
 .delfin-storage-list-page .ui-dataview-layout-options.ui-selectbutton .ui-togglebutton.ui-button.ui-state-default, .ui-selectbutton .ui-button.ui-state-default{
 padding: 0 0.15rem;
 }
-dl.storage-capacity-list dt{
-    float: left;
-    clear: left;
-    width: 9.5em;
-    font-weight: bold;
-    padding: 1em 1.5em;
-    font-size: 1.2em;
-}
-dl.storage-capacity-list dd{
-    float: left;
-    padding: 1em 3em;
-    font-size: 1.2em;
-}
+
 .storage-summary-panel-2{
     height: 400px;
     min-height: 350px;
@@ -2244,6 +2237,12 @@ dl.storage-capacity-list dd{
         height: 1.6em;
     }
     
+    .capacity-usage-zero .ui-progressbar-label{
+        color: #000;
+        padding-top: 2px;
+        display: block !important;
+    }
+
     .capacity-usage-normal .ui-progressbar-value{
         background: #26988f;
     }
