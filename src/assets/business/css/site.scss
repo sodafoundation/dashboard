@@ -2186,9 +2186,9 @@ td.ui-datatable-emptymessage{
 }
 .storage-array-tree-view {
     width: 97%;
-    height: 100%; 
+    height: 98%; 
     overflow: auto;
-
+    border: none;
     .ui-tree-empty-message {
         padding: .25em;
         text-align: center;
