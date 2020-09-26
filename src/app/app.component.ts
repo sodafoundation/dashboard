@@ -89,7 +89,7 @@ export class AppComponent implements OnInit, AfterViewInit {
             "text" : "A profile is a set of configurations on service capabilities (including resource tuning, QoS) of storage resources. A profile must be specified when volume or fileshare is created."
         },
         {
-            "title": "Resource",
+            "title": "Resource Manager",
             "description": "Volumes / Buckets / File Share / Hosts",
             "routerLink": "/block",
             "joyrideStep" : "menuResource",
@@ -127,7 +127,7 @@ export class AppComponent implements OnInit, AfterViewInit {
             "text" : "A profile is a set of configurations on service capabilities (including resource tuning, QoS) of storage resources. A profile must be specified when volume is created."
         },
         {
-            "title": "Resource",
+            "title": "Resource Manager",
             "description": "Volumes / Buckets / File Share / Hosts",
             "routerLink": "/block",
             "joyrideStep" : "menuResource",
@@ -164,7 +164,7 @@ export class AppComponent implements OnInit, AfterViewInit {
             "text" : "Data flow through buckets by migration / replication."
         },
         {
-            "title": "Monitor",
+            "title": "Resource Monitor",
             "description": "SODA Storage Infrastructure Manager",
             "routerLink": "/monitor",
             "joyrideStep" : "menuDelfin",
