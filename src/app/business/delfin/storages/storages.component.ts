@@ -168,7 +168,7 @@ export class StoragesComponent implements OnInit {
     ngOnInit() {
         this.loading = true;
         this.getAllStorages();
-        
+        this.getAllActiveAlerts();
         
         this.menuItems = [
             {
