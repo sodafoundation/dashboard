@@ -173,10 +173,10 @@ export class AppComponent implements OnInit, AfterViewInit {
         },
         {
             "title": "Resource Manager",
-            "description": "SODA Infrastructure Manager",
+            "description": "SODA Storage Infrastructure Manager",
             "routerLink": "/delfin",
             "joyrideStep" : "menuDelfin",
-            "text" : "This is the SODA Infrastructre Manager.",
+            "text" : "delfin is the SODA Infrastructure Manager project which provides unified, intelligent and scalable resource management, alert and performance monitoring",
             "group" : true,
             "children" : [
                 {
@@ -749,11 +749,11 @@ export class AppComponent implements OnInit, AfterViewInit {
     stepDone() {
         setTimeout(() => {
             this.title = 'Tour Finished!';
-            console.log('Step done!');
+            
         }, 3000);
     }
     onPrev() {
-        console.log('Prev Clicked');
+        
     }
     startTour() {
         const options = {
@@ -776,7 +776,7 @@ export class AppComponent implements OnInit, AfterViewInit {
             },
             () => {
                 this.stepDone();
-                console.log('Tour finished');
+                
             }
         );
     }

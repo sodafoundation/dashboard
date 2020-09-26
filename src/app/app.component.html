@@ -63,7 +63,11 @@
                     <h1>{{menuItem.title}}</h1>
                     <p>{{menuItem.description}}</p>
                 </a> 
-                <p-panel styleClass="menuGroup" [header]="menuItem.title" *ngIf="menuItem.group" [joyrideStep]="menuItem.joyrideStep" [text]="menuItem.text" stepPosition="right" [toggleable]="true" [collapsed]="true" expandIcon="fa-chevron-down" collapseIcon="fa-chevron-up">
+                <p-panel styleClass="menuGroup" *ngIf="menuItem.group" [joyrideStep]="menuItem.joyrideStep" [text]="menuItem.text" stepPosition="right" [toggleable]="true" [collapsed]="true" expandIcon="fa-chevron-down" collapseIcon="fa-chevron-up">
+                    <p-header>
+                        <h1>{{menuItem.title}}</h1>
+                        <p>{{menuItem.description}}</p>
+                    </p-header>
                     <ul class="menuGroup-list">
                         <li class="menuGroup-child" *ngFor="let child of menuItem.children">
                             <a href="#" [routerLink]="[child.routerLink]" [ngClass]="{'active-item':child==activeItem}" (click)="menuItemClick($event, child)">
