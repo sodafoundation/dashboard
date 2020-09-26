@@ -11,6 +11,8 @@ import { ProfileService } from '../../../profile/profile.service';
 import { CloudFileShareService } from '../cloud-file-share.service';
 import { BucketService} from '../../buckets.service';
 
+let _ = require("underscore");
+
 @Component({
     selector: 'app-create-cloud-file-share',
     templateUrl: './cloud-file-share-create.component.html',
@@ -40,6 +42,9 @@ export class CloudFileShareCreateComponent implements OnInit{
             maxlength: "The file share name should have maximum 128 characters.",
             pattern: "Must start with a character. Can contain alphabets, numbers and underscore. No special characters allowed."
         },
+        "size" : {
+            required: "Size is required"
+        },
         "backend_type" : {
             required: "Backend type is required"
         },
@@ -60,7 +65,7 @@ export class CloudFileShareCreateComponent implements OnInit{
         description: this.i18n.keyID["sds_block_volume_descri"],
         encrypted: "Enable Encryption",
         encryptionSettings: "Encryption Settings",
-        size: "Size",
+        size: "Size (GiB)",
         tags: "Tags",
         metadata: "Metadata",
         backend_type: "Type",
@@ -147,6 +152,8 @@ export class CloudFileShareCreateComponent implements OnInit{
             if(this.cloudFileShareCreateForm.get('metadata')){
                 this.cloudFileShareCreateForm.removeControl('metadata');
                 this.cloudFileShareCreateForm.addControl('metadata', this.fb.array([this.createMetadata()]));
+            } else{
+                this.cloudFileShareCreateForm.addControl('metadata', this.fb.array([this.createMetadata()]));
             }
             this.cloudFileShareCreateForm.removeControl('tags');
             this.cloudFileShareCreateForm.removeControl('encrypted');
@@ -156,7 +163,7 @@ export class CloudFileShareCreateComponent implements OnInit{
             this.cloudFileShareCreateForm.controls['name'].setValidators([Validators.required, Validators.minLength(2), Validators.maxLength(16), Validators.pattern(this.validRule.name),Utils.isExisted(this.allNamesForCheck)]);
             this.errorMessage.name.maxlength = "The file share name should have maximum 16 characters."
             this.cloudFileShareCreateForm.controls['name'].updateValueAndValidity();
-            this.cloudFileShareCreateForm.addControl('size', this.fb.control(''));
+            this.cloudFileShareCreateForm.addControl('size', this.fb.control('1024', [Validators.required]));
             this.cloudFileShareCreateForm.addControl('availabilityZone', this.fb.control(''));
             this.cloudFileShareCreateForm.removeControl('encrypted');
             this.cloudFileShareCreateForm.removeControl('encryptionSettings');
@@ -239,8 +246,8 @@ export class CloudFileShareCreateComponent implements OnInit{
 
     createTags(key?, value?){
         return this.fb.group({
-            key: new FormControl(key ? key : '', Validators.required),
-            value: new FormControl(value ? value : '', Validators.required)
+            key: new FormControl(key ? key : ''),
+            value: new FormControl(value ? value : '')
         })
     }
     addNextTag(key?, value?) {
@@ -254,8 +261,8 @@ export class CloudFileShareCreateComponent implements OnInit{
 
     createMetadata(key?, value?){
         return this.fb.group({
-            key: new FormControl(key ? key : '', Validators.required),
-            value: new FormControl(value ? value : '', Validators.required)
+            key: new FormControl(key ? key : ''),
+            value: new FormControl(value ? value : '')
         })
     }
 
@@ -269,21 +276,27 @@ export class CloudFileShareCreateComponent implements OnInit{
     }
 
     getFileShareDataArray(value){
-        let meta = {};
-        value['metadata'].forEach(element => {
-            if(element['key']=="ProvisionedThroughputInMibps"){
-                meta[element['key']] = parseInt(element['value']);
-            } else{
-                meta[element['key']] = element['value'];
-            }
-            
-        });
         let dataArr = {
             name: value['name'],
             description: value['description'],
             backendId: this.selectedBackend['id'],
-            metadata: meta,
             type: value['type']
+        }
+        if(value['metadata']){
+            let meta = {};
+            dataArr['metadata'] = [];
+            value['metadata'].forEach(element => {
+                if(element['key']=="ProvisionedThroughputInMibps"){
+                    meta[element['key']] = parseInt(element['value']);
+                } else if(element['key']){
+                    meta[element['key']] = element['value'];
+                }
+                if(!_.isEmpty(meta)){
+                    dataArr['metadata'] = meta;
+                } else{
+                    delete dataArr['metadata'];
+                }
+            });
         }
         dataArr['encrypted'] = value['encrypted'] ? value['encrypted'] : false;
         let enc = {};
@@ -300,7 +313,7 @@ export class CloudFileShareCreateComponent implements OnInit{
             dataArr['availabilityZone'] = value['availabilityZone'];
         }
         if(value['size']){
-            dataArr['size'] = parseInt(value['size']);
+            dataArr['size'] = parseInt(value['size']) * Consts.FROM_GiB_CONVERTER;
         }
         if(value['tags']){
             dataArr['tags'] = value['tags'];
