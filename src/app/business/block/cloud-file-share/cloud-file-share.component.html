@@ -18,6 +18,11 @@
         <p-column selectionMode="multiple" [style]="{'width': '30px'}"></p-column>
         <p-column field="name" header="Name"></p-column>
         <p-column field="backend" header="Backend"></p-column>
+        <p-column field="size" header="Size">
+            <ng-template pTemplate="body" let-fileshare="rowData">
+                {{fileshare.displaySize ? fileshare.displaySize : '--'}}
+            </ng-template>
+        </p-column>
         <p-column field="status" header="Status">
             <ng-template pTemplate="body" let-fileshare="rowData">
                 <span>{{fileshare.status}}</span> <i *ngIf="fileshare.status=='creating'  || fileshare.status=='updating'" class="fa fa-spinner fa-spin fa-3x fa-fw"></i>
