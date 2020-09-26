@@ -156,7 +156,7 @@ export class CloudVolumeModifyComponent implements OnInit{
 
     onChangeVolType(){
         if(this.selectedVolType=='gp2'){
-            this.modifyVolumeForm.controls['size'].setValue(this.selectedVolume && this.selectedVolume['size'] ? this.selectedVolume['size'] : 100);
+            this.modifyVolumeForm.controls['size'].setValue(this.selectedVolume && this.selectedVolume['size'] ? (this.selectedVolume['size'] / Math.pow(Consts.TO_GiB_CONVERTER, 3)) : 100);
             this.modifyVolumeForm.controls['size'].setValidators([Validators.required, Validators.min(1), Validators.max(16384)]);
             this.modifyVolumeForm.controls['size'].updateValueAndValidity();
             if(this.modifyVolumeForm.controls['iops']){
@@ -169,7 +169,7 @@ export class CloudVolumeModifyComponent implements OnInit{
             }
             this.errorMessage.size.min = "Min: 4 GiB";
             this.modifyVolumeForm.controls['size'].setValidators([Validators.required, Validators.min(4), Validators.max(16384)]);
-            this.modifyVolumeForm.controls['size'].setValue(this.selectedVolume && this.selectedVolume['size'] ? this.selectedVolume['size'] : 500);
+            this.modifyVolumeForm.controls['size'].setValue(this.selectedVolume && this.selectedVolume['size'] ? (this.selectedVolume['size'] / Math.pow(Consts.TO_GiB_CONVERTER, 3)) : 500);
             this.modifyVolumeForm.controls['iops'].setValue(this.selectedVolume && this.selectedVolume['iops'] ? this.selectedVolume['iops'] : 3000);
             this.modifyVolumeForm.controls['iops'].setValidators([Validators.required, Validators.min(100), Validators.max(64000)]);
             this.modifyVolumeForm.controls['size'].updateValueAndValidity();
@@ -180,7 +180,7 @@ export class CloudVolumeModifyComponent implements OnInit{
                 this.modifyVolumeForm.removeControl('iops');
             }
             this.errorMessage.size.min = "Min: 500 GiB";
-            this.modifyVolumeForm.controls['size'].setValue(this.selectedVolume && this.selectedVolume['size'] && this.selectedVolume['size'] >= 500 ? this.selectedVolume['size'] : 500);
+            this.modifyVolumeForm.controls['size'].setValue(this.selectedVolume && this.selectedVolume['size'] && this.selectedVolume['size'] >= 500 ? (this.selectedVolume['size'] / Math.pow(Consts.TO_GiB_CONVERTER, 3)) : 500);
             this.modifyVolumeForm.controls['size'].setValidators([Validators.required, Validators.min(500), Validators.max(16384)]);
             this.modifyVolumeForm.controls['size'].updateValueAndValidity();
         }
@@ -191,7 +191,7 @@ export class CloudVolumeModifyComponent implements OnInit{
             }
             this.errorMessage.size.min = "Min: 1 GiB";
             this.errorMessage.size.max = "Min: 1024 GiB";
-            this.modifyVolumeForm.controls['size'].setValue(this.selectedVolume && this.selectedVolume['size'] ? this.selectedVolume['size'] : 500);
+            this.modifyVolumeForm.controls['size'].setValue(this.selectedVolume && this.selectedVolume['size'] ? (this.selectedVolume['size'] / Math.pow(Consts.TO_GiB_CONVERTER, 3)) : 500);
             this.modifyVolumeForm.controls['size'].setValidators([Validators.required, Validators.min(1), Validators.max(1024)]);
             this.modifyVolumeForm.controls['size'].updateValueAndValidity();
         }
@@ -239,7 +239,7 @@ export class CloudVolumeModifyComponent implements OnInit{
     getVolumeDataArray(value){
        
         let dataArr = {
-            size: parseInt(value.size),
+            size: parseInt(value.size) * Consts.FROM_GiB_CONVERTER,
             type: value.type
         };
         if(value.iops){

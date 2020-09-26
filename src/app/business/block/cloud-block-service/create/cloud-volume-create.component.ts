@@ -310,7 +310,7 @@ export class CloudVolumeCreateComponent implements OnInit{
         let dataArr = {
             name:value.name,
             availabilityZone: value.availabilityZone,
-            size: parseInt(value.size),
+            size: parseInt(value.size) * Consts.FROM_GiB_CONVERTER,
             type: value.type,
             backendId:value.backendId,
         };
