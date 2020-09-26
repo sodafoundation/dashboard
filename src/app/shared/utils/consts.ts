@@ -3,8 +3,9 @@ export const Consts = {
     /**
      * Constants to be used for conversion of capacity value in appropriate display values.
      */
-    GiB_CONVERTER : 1024,
-    GB_CONVERTER : 1000,
+    FROM_GiB_CONVERTER: 1073741824,
+    TO_GiB_CONVERTER : 1024,
+    TO_GB_CONVERTER : 1000,
     
     /** Unknown placeholder **/
     UNKNOW_PLACEHOLDER: "--",
