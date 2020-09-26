@@ -83,7 +83,7 @@ export class StorageDetailsComponent implements OnInit {
         this.items = [
             { 
                 label: "Storages", 
-                url: '/delfin' 
+                url: '/monitor' 
             },
             { 
                 label: "Storage Details", 

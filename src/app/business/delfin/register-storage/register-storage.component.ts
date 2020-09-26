@@ -108,7 +108,7 @@ export class RegisterStorageComponent implements OnInit {
         this.items = [
             { 
                 label: "Storage Summary", 
-                url: '/delfin' 
+                url: '/monitor' 
             },
             { 
                 label: "Register Storage", 
@@ -386,7 +386,7 @@ export class RegisterStorageComponent implements OnInit {
             let queryParams = {
                 "message": JSON.stringify({severity: 'success', summary: 'Success', detail: 'Storage device registered successfully.'})
             };
-            this.router.navigate(['/delfin'], {queryParams: queryParams});
+            this.router.navigate(['/monitor'], {queryParams: queryParams});
         }, (error) =>{
             this.msgs = [];
             this.msgs.push({severity: 'error', summary: "Error", detail:"Something went wrong. Storage device could not be registered."});

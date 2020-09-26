@@ -65,7 +65,6 @@ export class AppComponent implements OnInit, AfterViewInit {
     userId;
     SignatureKey = {};
     akSkRouterLink = "/akSkManagement";
-    monitorConfigLink = "/monitor/config";
     Signature = "";
     kDate = "";
     stringToSign = "";
@@ -102,13 +101,6 @@ export class AppComponent implements OnInit, AfterViewInit {
             "routerLink": "/dataflow",
             "joyrideStep" : "menuDataflow",
             "text" : "Data flow through buckets by migration / replication."
-        },
-        {
-            "title": "Monitor",
-            "description": "Telemetry information.",
-            "routerLink": "/monitor",
-            "joyrideStep" : "menuMonitor",
-            "text" : "Links to Telemetry services"
         },
         {
             "title": "Services",
@@ -172,25 +164,18 @@ export class AppComponent implements OnInit, AfterViewInit {
             "text" : "Data flow through buckets by migration / replication."
         },
         {
-            "title": "Resource Manager",
+            "title": "Monitor",
             "description": "SODA Storage Infrastructure Manager",
-            "routerLink": "/delfin",
+            "routerLink": "/monitor",
             "joyrideStep" : "menuDelfin",
             "text" : "delfin is the SODA Infrastructure Manager project which provides unified, intelligent and scalable resource management, alert and performance monitoring",
             "group" : true,
             "children" : [
                 {
                     "title" : "Storage Summary",
-                    "routerLink": "/delfin"
+                    "routerLink": "/monitor"
                 },
             ]
-        },
-        {
-            "title": "Monitor",
-            "description": "Telemetry information.",
-            "routerLink": "/monitor",
-            "joyrideStep" : "menuMonitor",
-            "text" : "Links to Telemetry services"
         },
 	    {
             "title": "Services",
@@ -223,7 +208,6 @@ export class AppComponent implements OnInit, AfterViewInit {
         'menuResource',
         'menuDataflow',
         'menuDelfin',
-        'menuMonitor',
         'menuServices',
         'menuInfrastructure',
         'menuIdentity',
@@ -245,7 +229,6 @@ export class AppComponent implements OnInit, AfterViewInit {
         'menuProfile',
         'menuResource',
         'menuDataflow',
-        'menuMonitor',
         'menuServices',
         'homeResourceCard@/home',
         'homeDataflowCard@/home',
@@ -987,13 +970,6 @@ export class AppComponent implements OnInit, AfterViewInit {
                         },{
                             label: "AK/SK Management",
                             routerLink: this.akSkRouterLink,
-                            command: ()=>{
-                                this.isHomePage = false;
-                            }
-                        },
-                        {
-                            label: "Monitor Configuration",
-                            routerLink: this.monitorConfigLink,
                             command: ()=>{
                                 this.isHomePage = false;
                             }

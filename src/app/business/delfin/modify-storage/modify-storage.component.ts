@@ -114,7 +114,7 @@ export class ModifyStorageComponent implements OnInit {
         this.items = [
             { 
                 label: "Storage Summary", 
-                url: '/delfin' 
+                url: '/monitor' 
             },
             { 
                 label: "Modify Storage", 
@@ -423,7 +423,7 @@ export class ModifyStorageComponent implements OnInit {
             let queryParams = {
                 "message": JSON.stringify({severity: 'success', summary: 'Success', detail: 'Storage device access info updated successfully.'})
             };
-            this.router.navigate(['/delfin'], {queryParams: queryParams});
+            this.router.navigate(['/monitor'], {queryParams: queryParams});
         }, (error) =>{
             this.msgs = [];
             this.msgs.push({severity: 'error', summary: "Error", detail:"Something went wrong. Storage device access info could not be modified."});
