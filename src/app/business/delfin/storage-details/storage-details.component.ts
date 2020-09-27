@@ -172,9 +172,9 @@ export class StorageDetailsComponent implements OnInit {
             'total_capacity' : 0,
             'used_capacity' : 0,
             'free_capacity' : 0,
-            'displayTotal' : '',
-            'displayUsed' : '',
-            'displayFree' : ''
+            'displayTotal' : null,
+            'displayUsed' : null,
+            'displayFree' : null
         };
         // Get all the volumes associated with the Storage device
         this.ds.getAllVolumes(id).subscribe((res)=>{
@@ -201,9 +201,9 @@ export class StorageDetailsComponent implements OnInit {
             'total_capacity' : 0,
             'used_capacity' : 0,
             'free_capacity' : 0,
-            'displayTotal' : '',
-            'displayUsed' : '',
-            'displayFree' : ''
+            'displayTotal' : null,
+            'displayUsed' : null,
+            'displayFree' : null
         };
         this.ds.getAllStoragePools(id).subscribe((res)=>{
             let pools = res.json().storage_pools;

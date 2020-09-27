@@ -59,6 +59,7 @@ export class StoragesComponent implements OnInit {
     modelOverview;
     volumeOverview;
     poolOverview;
+    parentOverview;
     groupedByVendor;
     totalArrayRawCapacity: any;
     totalArrayUsableCapacity: any;
@@ -167,7 +168,7 @@ export class StoragesComponent implements OnInit {
     ngOnInit() {
         this.loading = true;
         this.getAllStorages();
-        
+        this.getAllActiveAlerts();
         
         this.menuItems = [
             {
@@ -469,7 +470,9 @@ export class StoragesComponent implements OnInit {
                 label: key,
                 collapsedIcon: 'fa-folder',
                 expandedIcon: 'fa-folder-open',
-                type: 'array'
+                styleClass: 'vendor-node',
+                type: 'array',
+                expanded: true
             }
 
             // Populate the vendor tree node with children grouped by models.
@@ -480,7 +483,9 @@ export class StoragesComponent implements OnInit {
                         label: modelKey,
                         collapsedIcon: 'fa-folder',
                         expandedIcon: 'fa-folder-open',
+                        styleClass: 'model-node',
                         type: 'modelGroup',
+                        expanded: true,
                         children: [],
                         details: {
                             totalUsableCapacity: 0,
@@ -490,12 +495,12 @@ export class StoragesComponent implements OnInit {
                             totalRawCapacity: 0,
                             totalSubscribedCapacity: 0,
                             totalSystemUsedCapacity: 0,
-                            displayTotal: "",
-                            displayFree: "",
-                            displayUsed: "",
-                            displayRaw: "",
-                            displaySubscribed: "",
-                            displaySystemUsed: ""
+                            displayTotal: null,
+                            displayFree: null,
+                            displayUsed: null,
+                            displayRaw: null,
+                            displaySubscribed: null,
+                            displaySystemUsed: null
                         }
                     }
                     if(isArray(modelValue) && modelValue.length){
@@ -504,6 +509,7 @@ export class StoragesComponent implements OnInit {
                                 label: storageDevice['name'],
                                 collapsedIcon: 'fa-hdd-o',
                                 expandedIcon: 'fa-hdd-o',
+                                styleClass: 'device-node',
                                 children: [],
                                 type: 'device',
                                 details: storageDevice
@@ -514,7 +520,7 @@ export class StoragesComponent implements OnInit {
                             modelGroupNode.details.totalFreeCapacity+=storageDevice['free_capacity'];
                             modelGroupNode.details.totalRawCapacity+=storageDevice['raw_capacity'];
                             modelGroupNode.details.totalSubscribedCapacity+=storageDevice['subscribed_capacity'];
-                            modelGroupNode.details.totalUsagePercent = Math.ceil((storageDevice['used_capacity']/storageDevice['total_capacity']) * 100);
+                            
                             modelGroupNode.details.totalSystemUsedCapacity = Math.ceil((storageDevice['raw_capacity'] - storageDevice['total_capacity']));
                             
                             // Create the Volume parent Node
@@ -526,22 +532,25 @@ export class StoragesComponent implements OnInit {
                                     collapsedIcon: 'fa-database',
                                     expandedIcon: 'fa-database',
                                     type: 'volParent',
-                                    children: []
+                                    styleClass: 'volume-parent-node',
+                                    leaf: false,
+                                    details: {
+                                        totalUsableCapacity: 0,
+                                        totalFreeCapacity: 0,
+                                        totalUsedCapacity: 0,
+                                        totalUsagePercent: 0,
+                                        totalRawCapacity: 0,
+                                        totalSubscribedCapacity: 0,
+                                        totalSystemUsedCapacity: 0,
+                                        displayTotal: null,
+                                        displayFree: null,
+                                        displayUsed: null,
+                                        displayRaw: null,
+                                        displaySubscribed: null,
+                                        displaySystemUsed: null
+                                    }
                                 }
                                 modelTreeNode['children'].push(parentVolNode);
-                            }
-                            let volChildNode ={};
-                            if(storageDevice['volumes'].length){
-                                _.each(storageDevice['volumes'], function(volItem){
-                                    volChildNode = {
-                                        label : volItem['name'],
-                                        collapsedIcon: 'fa-database',
-                                        expandedIcon: 'fa-database',
-                                        type: 'volNode',
-                                        details: volItem
-                                    }
-                                })
-                                
                             }
                             // Create the Storage Pool parent Node
                             let parentPoolNode = {};
@@ -550,8 +559,24 @@ export class StoragesComponent implements OnInit {
                                     label : "Storage Pools",
                                     collapsedIcon: 'fa-cubes',
                                     expandedIcon: 'fa-cubes',
+                                    styleClass: 'pool-parent-node',
                                     type: 'poolParent',
-                                    children: []
+                                    leaf: false,
+                                    details: {
+                                        totalUsableCapacity: 0,
+                                        totalFreeCapacity: 0,
+                                        totalUsedCapacity: 0,
+                                        totalUsagePercent: 0,
+                                        totalRawCapacity: 0,
+                                        totalSubscribedCapacity: 0,
+                                        totalSystemUsedCapacity: 0,
+                                        displayTotal: null,
+                                        displayFree: null,
+                                        displayUsed: null,
+                                        displayRaw: null,
+                                        displaySubscribed: null,
+                                        displaySystemUsed: null
+                                    }
                                 }
                                 modelTreeNode['children'].push(parentPoolNode);
                             }
@@ -560,7 +585,7 @@ export class StoragesComponent implements OnInit {
                             modelGroupNode['children'].push(modelTreeNode);
                         });
                     }
-                    
+                    modelGroupNode.details.totalUsagePercent = Math.ceil((modelGroupNode.details.totalUsedCapacity/modelGroupNode.details.totalUsableCapacity) * 100);
                     modelGroupNode.details.displayTotal = Utils.formatBytes(modelGroupNode.details.totalUsableCapacity);
                     modelGroupNode.details.displayFree = Utils.formatBytes(modelGroupNode.details.totalFreeCapacity);
                     modelGroupNode.details.displayUsed = Utils.formatBytes(modelGroupNode.details.totalUsedCapacity);
@@ -578,6 +603,104 @@ export class StoragesComponent implements OnInit {
         this.arrayTreeData = treeData;
         
     }
+
+    // Invoked on expanding a parent node in the tree above
+    
+    loadNode(event){
+        let self =this;
+        //Check if the expanded node is a device
+
+        if(event.node.type == 'device'){
+            let device = event.node;
+
+            //check each child if it is a Volume parent or Pool Parent
+            _.each(device['children'], function(devChild){
+                if(devChild['type']=='volParent'){
+                    devChild['children'] = [];
+
+                    // If Volume parent then iterate through all volumes and calculate the capacities and stats for 
+                    // each volume parent and volume node
+
+                    if(device['details'].volumes && device['details'].volumes.length){
+                        let volChildNode ={};
+                        _.each(device['details'].volumes, function(volItem){
+                            //Calculate the capacities for the Volume
+                            volItem['capacity'] = {};
+                            let percentUsage = Math.ceil((volItem['used_capacity']/volItem['total_capacity']) * 100);
+                            volItem['capacity'].used = Utils.formatBytes(volItem['used_capacity']);
+                            volItem['capacity'].free = Utils.formatBytes(volItem['free_capacity']);
+                            volItem['capacity'].total = Utils.formatBytes(volItem['total_capacity']);
+                            volItem['capacity'].system_used = Utils.formatBytes(volItem['system_used_capacity']) ;
+                            volItem['capacity'].usage = percentUsage;
+
+                            //Create the capacity stats for each volume group by summing together the capacity of each device
+                            devChild['details'].totalUsableCapacity+=volItem['total_capacity'];
+                            devChild['details'].totalUsedCapacity+=volItem['used_capacity'];
+                            devChild['details'].totalFreeCapacity+=volItem['free_capacity'];
+                            
+                            volChildNode = {
+                                label : volItem['name'],
+                                collapsedIcon: 'fa-database',
+                                expandedIcon: 'fa-database',
+                                styleClass: 'volume-node',
+                                type: 'volNode',
+                                details: volItem,
+                            }
+                            devChild['children'].push(volChildNode);
+                        })
+
+                        //Populate the display values
+                        devChild['details'].totalUsagePercent = Math.ceil((devChild['details'].totalUsedCapacity/devChild['details'].totalUsableCapacity) * 100);
+                        devChild['details'].displayTotal = Utils.formatBytes(devChild['details'].totalUsableCapacity);
+                        devChild['details'].displayFree = Utils.formatBytes(devChild['details'].totalFreeCapacity);
+                        devChild['details'].displayUsed = Utils.formatBytes(devChild['details'].totalUsedCapacity);
+                        devChild['label'] = "Volumes " + "(" + devChild['children'].length + ")";
+                    }
+                } else if(devChild['type']=='poolParent'){
+                    devChild['children'] = [];
+
+                    // If Volume parent then iterate through all volumes and calculate the capacities and stats for 
+                    // each volume parent and volume node
+
+                    if(device['details'].storagePools && device['details'].storagePools.length){
+                        let poolChildNode ={};
+                        _.each(device['details'].storagePools, function(poolItem){
+                            //Calculate the capacities for the Volume
+                            poolItem['capacity'] = {};
+                            let percentUsage = Math.ceil((poolItem['used_capacity']/poolItem['total_capacity']) * 100);
+                            poolItem['capacity'].used = Utils.formatBytes(poolItem['used_capacity']);
+                            poolItem['capacity'].free = Utils.formatBytes(poolItem['free_capacity']);
+                            poolItem['capacity'].total = Utils.formatBytes(poolItem['total_capacity']);
+                            poolItem['capacity'].usage = percentUsage;
+
+                            //Create the capacity stats for each pool group by summing together the capacity of each device
+                            devChild['details'].totalUsableCapacity+=poolItem['total_capacity'];
+                            devChild['details'].totalUsedCapacity+=poolItem['used_capacity'];
+                            devChild['details'].totalFreeCapacity+=poolItem['free_capacity'];
+                            
+                            poolChildNode = {
+                                label : poolItem['name'],
+                                collapsedIcon: 'fa-cubes',
+                                expandedIcon: 'fa-cubes',
+                                styleClass: 'pool-node',
+                                type: 'poolNode',
+                                details: poolItem,
+                            }
+                            devChild['children'].push(poolChildNode);
+                        })
+                        
+                        //Populate the display values
+                        devChild['details'].totalUsagePercent = Math.ceil((devChild['details'].totalUsedCapacity/devChild['details'].totalUsableCapacity) * 100);
+                        devChild['details'].displayTotal = Utils.formatBytes(devChild['details'].totalUsableCapacity);
+                        devChild['details'].displayFree = Utils.formatBytes(devChild['details'].totalFreeCapacity);
+                        devChild['details'].displayUsed = Utils.formatBytes(devChild['details'].totalUsedCapacity);
+                        devChild['label'] = "Storage Pools " + "(" + devChild['children'].length + ")";
+                    }
+                }
+            })
+        }
+    }
+    
     public deviceNodeMenu(event, node, overlaypanel: OverlayPanel) {
        overlaypanel.hide();
        this.getAlertSourcebyStorage(node['details'].id);
@@ -688,7 +811,7 @@ export class StoragesComponent implements OnInit {
 
     //Show the overview panel when hovering on device in the tree.
     showOverview(event, node, overlaypanel: OverlayPanel){
-        let deviceOverlaypanel, modelOverlayPanel;
+        let deviceOverlaypanel, modelOverlayPanel, volumeParentOverlayPanel, poolParentOverlayPanel, volumeOverlayPanel, poolOverlayPanel;
         switch (node.type) {
             case "device":
                 this.storageOverview = node.details;
@@ -700,6 +823,27 @@ export class StoragesComponent implements OnInit {
                     this.modelOverview = node;
                     modelOverlayPanel = overlaypanel;
                     modelOverlayPanel.toggle(event);
+                break;
+            
+            case "volParent":
+                    this.parentOverview = node;
+                    volumeParentOverlayPanel = overlaypanel;
+                    volumeParentOverlayPanel.toggle(event);
+                break;
+            case "poolParent":
+                    this.parentOverview = node;
+                    poolParentOverlayPanel = overlaypanel;
+                    poolParentOverlayPanel.toggle(event);
+                break;
+            case "volNode":
+                    this.volumeOverview = node;
+                    volumeOverlayPanel = overlaypanel;
+                    volumeOverlayPanel.toggle(event);
+                break;
+            case "poolNode":
+                    this.poolOverview = node;
+                    poolOverlayPanel = overlaypanel;
+                    poolOverlayPanel.toggle(event);
                 break;
         
             default:
