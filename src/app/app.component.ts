@@ -590,7 +590,7 @@ export class AppComponent implements OnInit, AfterViewInit {
                     window['akskWarning']=true;
                     
                 }
-                if(window['akskWarning'] && this.router.url != 'akSkManagement'){
+                if(window['akskWarning'] && (this.router.url == '/block' || this.router.url == '/dataflow')){
                     let msg = "SODA Dashboard requires AK/SK authentication for all multi-cloud operations. The current system does not have an AK/SK. Click below to go to AK/SK management and add one."
                     let header = "AK/SK Not Found!";
                     let acceptLabel = "Add AK/SK";
