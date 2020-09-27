@@ -32,13 +32,13 @@ const routes: Routes = [
     {path: 'bucketDetail/:bucketId', loadChildren: './business/block/bucket-detail/bucket-detail.module#BucketDetailModule'},
     {path: 'objectAcl/:bucketId/:key', loadChildren: './business/block/bucket-detail/object-acl/object-acl.module#ObjectAclModule'},
     {path: 'akSkManagement', loadChildren: './business/ak-sk/ak-sk.module#AkSkModule'},
-    {path: 'monitor', loadChildren: './business/monitor/monitor.module#MonitorModule'},
+    
     {path: 'createFileShare', loadChildren: './business/block/create-file-share/create-file-share.module#CreateFileShareModule'},
     {path: 'createCloudFileShare', loadChildren: './business/block/cloud-file-share/create/cloud-file-share-create.module#CloudFileShareCreateModule'},
     {path: 'modifyCloudFileShare/:fileShareId', loadChildren: './business/block/cloud-file-share/modify/cloud-file-share-modify.module#CloudFileShareModifyModule'},
     {path: 'fileShareDetail/:fileShareId', loadChildren: './business/block/file-share-detail/file-share-detail.module#FileShareDetailModule'},
     {path: 'services', loadChildren: './business/services/services.module#ServicesModule'},
-    {path: 'delfin', loadChildren: './business/delfin/delfin.module#DelfinModule'},
+    {path: 'monitor', loadChildren: './business/delfin/delfin.module#DelfinModule'},
     {path: 'registerStorage', loadChildren: './business/delfin/register-storage/register-storage.module#RegisterStorageModule'},
     {path: 'storageDetails/:storageId', loadChildren: './business/delfin/storage-details/storage-details.module#StorageDetailsModule'},
     {path: 'modifyStorage/:storageId', loadChildren: './business/delfin/modify-storage/modify-storage.module#ModifyStorageModule'}

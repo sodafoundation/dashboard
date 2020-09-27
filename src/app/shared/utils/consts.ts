@@ -73,9 +73,9 @@ export const Consts = {
     API: {
         
         DELFIN : {
-            'storages' : 'delfin/storages',
-            'storagePools' : 'delfin/storage-pools',
-            'volumes' : 'delfin/volumes'
+            'storages' : 'resource-monitor/storages',
+            'storagePools' : 'resource-monitor/storage-pools',
+            'volumes' : 'resource-monitor/volumes'
         }
     }
 }
