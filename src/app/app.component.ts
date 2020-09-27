@@ -166,14 +166,14 @@ export class AppComponent implements OnInit, AfterViewInit {
         {
             "title": "Resource Monitor",
             "description": "SODA Storage Infrastructure Manager",
-            "routerLink": "/monitor",
+            "routerLink": "/resource-monitor",
             "joyrideStep" : "menuDelfin",
             "text" : "delfin is the SODA Infrastructure Manager project which provides unified, intelligent and scalable resource management, alert and performance monitoring",
             "group" : true,
             "children" : [
                 {
                     "title" : "Storage Summary",
-                    "routerLink": "/monitor"
+                    "routerLink": "/resource-monitor"
                 },
             ]
         },
