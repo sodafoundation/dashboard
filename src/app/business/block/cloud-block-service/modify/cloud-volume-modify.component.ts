@@ -190,7 +190,7 @@ export class CloudVolumeModifyComponent implements OnInit{
                 this.modifyVolumeForm.removeControl('iops');
             }
             this.errorMessage.size.min = "Min: 1 GiB";
-            this.errorMessage.size.max = "Min: 1024 GiB";
+            this.errorMessage.size.max = "Max: 1024 GiB";
             this.modifyVolumeForm.controls['size'].setValue(this.selectedVolume && this.selectedVolume['size'] ? (this.selectedVolume['size'] / Math.pow(Consts.TO_GiB_CONVERTER, 3)) : 500);
             this.modifyVolumeForm.controls['size'].setValidators([Validators.required, Validators.min(1), Validators.max(1024)]);
             this.modifyVolumeForm.controls['size'].updateValueAndValidity();
@@ -265,9 +265,9 @@ export class CloudVolumeModifyComponent implements OnInit{
         let param = this.getVolumeDataArray(value);
         this.cloudBS.updateVolume(this.selectedVolumeId, param).subscribe((res)=>{
             this.msgs = [];
-            this.msgs.push({severity: 'success', summary: 'Success', detail: 'Cloud Volume has been created successfully.'});
+            this.msgs.push({severity: 'success', summary: 'Success', detail: 'Cloud Volume has been modified successfully.'});
             let queryParams = {
-                "message": JSON.stringify({severity: 'success', summary: 'Success', detail: 'Cloud Volume has been created successfully.'})
+                "message": JSON.stringify({severity: 'success', summary: 'Success', detail: 'Cloud Volume has been modified successfully.'})
             };
             this.selectedBackends = [];
             this.selectType = "";
@@ -275,7 +275,7 @@ export class CloudVolumeModifyComponent implements OnInit{
             this.router.navigate(['/block',"fromCloudVolume"], {queryParams: queryParams});
         }, (error)=>{
             this.msgs = [];
-            this.msgs.push({severity: 'error', summary: "Error", detail: 'Cloud Volume could not be created.'});
+            this.msgs.push({severity: 'error', summary: "Error", detail: 'Cloud Volume could not be modified.'});
         })
     }
 }

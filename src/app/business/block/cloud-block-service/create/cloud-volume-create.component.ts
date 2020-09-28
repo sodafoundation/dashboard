@@ -177,7 +177,7 @@ export class CloudVolumeCreateComponent implements OnInit{
             this.createVolumeForm.removeControl('iops');
             this.createVolumeForm.controls['size'].setValue(500);
             this.errorMessage.size.min = "Min: 1 GiB"
-            this.errorMessage.size.max = "Min: 1024 GiB"
+            this.errorMessage.size.max = "Max: 1024 GiB"
             this.createVolumeForm.controls['size'].setValidators([Validators.required, Validators.min(1), Validators.max(1024)]);
             this.createVolumeForm.controls['size'].updateValueAndValidity();
         }
