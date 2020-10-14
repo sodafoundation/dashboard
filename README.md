@@ -5,6 +5,20 @@
 
 <img src="https://sodafoundation.io/wp-content/uploads/2020/01/SODA_logo_outline_color_800x800.png" width="200" height="200">
 
+## Table of Contents  
+
+* [Introduction](#introduction)  
+* [Documentation](#documentation)  
+* [Quick Start - For Users](#quick-start---to-useexperience)
+* [Quick Start - For Developers](#quick-start---to-develop)
+* [Latest Releases](#latest-releases)  
+* [Support and Issues](#support-and-issues)  
+* [Project Community](#project-community)
+* [How to Contribute to this Project](#how-to-contribute-to-this-project)
+* [Project Roadmap](#project-roadmap)  
+* [Join SODA Foundation](#join-soda-foundation)  
+
+
 ## Introduction
 
 SODA Dashboard provides a GUI interface through which the users can experience various features and capabilities added to each SODA Release. It provides an easy user setup and experience of all the key features integrated.
