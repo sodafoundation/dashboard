@@ -1,11 +1,19 @@
-<div>
+<div class="ui-g">
     <div class="ui-g-12 ui-md-7">
         <div class="font-primary">
-            <h2>{{data.name}}</h2>
+            <h2>{{ data.name ? (data.name | slice:0:20) : '--' }} 
+                <span *ngIf="data.name && data.name.length > 20" pTooltip="{{data.name}}" tooltipPosition="top" tooltipStyleClass="profile-name-tooltip">
+                    ...
+                </span>
+            </h2>
         </div>
         <div class="padding-class">
             <div style="float:left;margin-right:2px" class="label-class">{{I18N.keyID['sds_block_volume_descri']}}:</div>
-            <div style="overflow: hidden; text-overflow:ellipsis; white-space: nowrap;" title="{{data && data.description ?data.description :'--'}}">{{data && data.description ?data.description :"--"}}</div>
+            <div title="{{data && data.description ?data.description :'--'}}">{{ data.description ? (data.description | slice:0:40) : '--' }} 
+                <span  *ngIf="data.description && data.description.length > 20" pTooltip="{{data.description}}" tooltipPosition="top" tooltipStyleClass="profile-desc-tooltip">
+                    ...
+                </span>
+            </div>
         </div>
         <div class="padding-class"style="clear:both;">
             <span class="label-class">Storage Type:</span>
