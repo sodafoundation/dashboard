@@ -37,7 +37,8 @@ export class CloudFileShareComponent implements OnInit{
         status: "Status",
         availabilityZone: "Availability Zone",
         tags: "Tags",
-        metadata: "Metadata"
+        metadata: "Metadata",
+        size: "Size"
     };
 
     constructor(private cloudFS: CloudFileShareService,
@@ -101,7 +102,7 @@ export class CloudFileShareComponent implements OnInit{
         this.http.get('v1/{project_id}/backends').subscribe((res)=>{
             this.allBackends = res.json().backends ? res.json().backends :[];
             this.allBackends.forEach(element => {
-                if(element.type == 'aws-file' || element.type == 'azure-file'){
+                if(element.type == 'aws-file' || element.type == 'azure-file' || element.type == 'gcp-file'){
                     this.selectedBackends.push(element);
                 }
             });
@@ -119,63 +120,25 @@ export class CloudFileShareComponent implements OnInit{
                     if(!element['tags']){
                         element['tags'] = [];
                     }
-
+                    if(element['size']){
+                        let display = Utils.formatBytes(element['size']);
+                        element['displaySize'] = display;
+                    }
                     let metadataArr = [];
                     if(element['metadata']){
                         let meta = element['metadata']['fields'];
                         _.each(meta, function(value, key){
                             let metaitem = {};
-                            if(key=="PerformanceMode"){
-                                if(value['Kind'].hasOwnProperty('StringValue')){
-                                    metaitem = {
-                                        key: "PerformanceMode",
-                                        value : value['Kind']['StringValue'],
-                                        type : 'string'
-                                    }
-                                }
-                                if(value['Kind'].hasOwnProperty('NumberValue')){
-                                    metaitem = {
-                                        key: "PerformanceMode", 
-                                        value : value['Kind']['NumberValue'],
-                                        type : 'number'
-                                    }
-                                }
-                                metadataArr.push(metaitem);
+                            metaitem['key'] = key;
+                            if(value['Kind'].hasOwnProperty('StringValue')){
+                                metaitem['value'] = value['Kind']['StringValue'];
+                                metaitem['type'] = 'string';
+                            } else if(value['Kind'].hasOwnProperty('NumberValue')){
+                                metaitem['value'] = value['Kind']['NumberValue'];
+                                metaitem['type'] = 'number';
                             }
-                            if(key=="ThroughputMode"){
-                                if(value['Kind'].hasOwnProperty('StringValue')){
-                                    metaitem = {
-                                        key : "ThroughputMode", 
-                                        value : value['Kind']['StringValue'],
-                                        type : 'string'
-                                    }
-                                }
-                                if(value['Kind'].hasOwnProperty('NumberValue')){
-                                    metaitem = {
-                                        key: "ThroughputMode", 
-                                        value : value['Kind']['NumberValue'],
-                                        type : 'number'
-                                    }
-                                }
-                                metadataArr.push(metaitem);
-                            }
-                            if(key=="ProvisionedThroughputInMibps"){
-                                if(value['Kind'].hasOwnProperty('StringValue')){
-                                    metaitem = {
-                                        key : "ProvisionedThroughputInMibps", 
-                                        value : value['Kind']['StringValue'],
-                                        type : 'string'
-                                    }
-                                }
-                                if(value['Kind'].hasOwnProperty('NumberValue')){
-                                    metaitem = {
-                                        key: "ProvisionedThroughputInMibps", 
-                                        value : value['Kind']['NumberValue'],
-                                        type : 'number'
-                                    }
-                                }
-                                metadataArr.push(metaitem);
-                            } 
+                            
+                            metadataArr.push(metaitem);
                             
                         })
                         element['metadataArr'] = metadataArr;

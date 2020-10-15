@@ -115,50 +115,72 @@
             </p-card>
         </div>
     </div>
-    <p-dialog styleClass="modify-backend-dialog" header="Modify" [(visible)]="modifyBackendshow" [width]="600" modal="modal">
-        <form [grid]="{label: 'ui-g-3', content:'ui-g-20'}" [formGroup]="modifyBackendForm" [errorMessage]="errorMessage">
-            <form-item label="Access Key" [required]="true">
-                <input type="text" pInputText formControlName="ak" />
-            </form-item>
-            <form-item label="Secret Key" [required]="true">
-                <input type="text" pInputText formControlName="sk" />
-            </form-item>
-        </form>
-        <p-footer>
-            <button type="button" pButton (click)="modifyBackend()"  label="{{I18N.keyID['ok']}}"></button>
-            <button type="button" pButton (click)="modifyBackendshow = false"  label="{{I18N.keyID['cancel']}}"></button>
-        </p-footer>
-    </p-dialog>
+    
 </div>
 
-
-<p-home-dialog  styleClass="register-backend-dialog" header="Register Storage Backend" [(visible)]="showRegisterFlag" [width]="510" [height]="790" modal="modal" [style]="{'opacity':'0.95','right':'46px','top':'80px','background':'rgb(44,63,97)'}" >
-        <form [grid]="{label: 'ui-g-5', content:'ui-g-20'}" [formGroup]="backendForm" [errorMessage]="errorMessage">
-            <form-item label="Name" [required]="true">
-                <input id="name" type="text" name="name" formControlName="name"  pInputText />
-            </form-item>
-            <form-item label="Type" [required]="true">
-                <p-dropdown [style]="{'min-width':'220px'}" (onChange)="selectOption()" placeholder="Please select" formControlName="type" [options]="allTypes"  ></p-dropdown>
-            </form-item>
-            <form-item *ngFor="let item of formItemCopy" [label]="item.label" [required]="item.required">
-                <input [id]="item.id" [type]="item.type" [name]="item.name"  [formControlName]="item.formControlName"  pInputText />
-            </form-item>
-        </form>
-        <div style="margin-top:100px;">
-            <button type="button" class="ui-button-secondary" pButton (click)="createBackend()" label="{{I18N.keyID['ok']}}" ></button>
-        </div>
-</p-home-dialog>
-<p-home-dialog styleClass="show-all-backend-dialog" header="Storage Backends" [(visible)]="showBackends" [width]="710" [height]="790" modal="modal" [style]="{'opacity':'0.8','right':'46px','top':'80px','background':'rgb(44,63,97)'}" >
-    <p-dataTable id="home-backend-detail" [value]="typeDetail" [rows]="10">
-        <p-column field="name" header="{{I18N.keyID['sds_block_volume_name']}}" ></p-column>
-        <p-column field="typeName" header="Type" ></p-column>
-        <p-column field="bucketName" header="Bucket"></p-column>
-        <p-column header="{{I18N.keyID['sds_block_volume_operation']}}" [style]="{'width':'140px'}">
-            <ng-template pTemplate="body" let-backend="rowData" let-i="rowIndex">
-                <a (click)="configModify(backend)" style="margin-right:10px;" >Modify</a>
-                <a (click)="deleteBackend(backend)">Delete</a>
-            </ng-template>
-        </p-column>
-    </p-dataTable>
-</p-home-dialog>
+<p-dialog styleClass="modify-backend-dialog" header="Modify" [(visible)]="modifyBackendshow" [width]="600" modal="modal" [closeOnEscape]="false" [closable]="false"> 
+    <form [grid]="{label: 'ui-g-3', content:'ui-g-20'}" [formGroup]="modifyBackendForm" [errorMessage]="errorMessage">
+        <form-item label="Access Key" [required]="true">
+            <input type="text" pInputText formControlName="ak" />
+        </form-item>
+        <form-item label="Secret Key" [required]="true">
+            <input type="password" pInputText formControlName="sk" />
+        </form-item>
+    </form>
+    <p-footer>
+        <button type="button" pButton (click)="modifyBackend()"  label="{{I18N.keyID['ok']}}"></button>
+        <button type="button" pButton (click)="closeModify()"  label="{{I18N.keyID['cancel']}}"></button>
+    </p-footer>
+</p-dialog>
 <p-confirmDialog></p-confirmDialog>
+<p-sidebar [(visible)]="showRightSidebar" (onHide)="closeSidebar()" position="right" styleClass="home-sidebar-panel ui-sidebar-lg" [baseZIndex]="10000">
+    <div *ngIf="showRegisterFlag" class="right-sidebar-content-wrapper">
+        <div class="right-sidebar-header">
+            <h1 style="font-weight:normal">Register Backend</h1>
+        </div>
+        <div class="right-sidebar-body">
+            <form [grid]="{label: 'ui-g-5', content:'ui-g-20'}" [formGroup]="backendForm" [errorMessage]="errorMessage">
+                <form-item label="Name" [required]="true">
+                    <input id="name" type="text" name="name" formControlName="name"  pInputText />
+                </form-item>
+                <form-item label="Type" [required]="true">
+                    <p-dropdown [style]="{'min-width':'220px'}" (onChange)="selectOption()" placeholder="Please select" formControlName="type" [options]="allTypes"  ></p-dropdown>
+                </form-item>
+                <form-item *ngFor="let item of formItemCopy" [label]="item.label" [required]="item.required">
+                    <input [id]="item.id" [type]="item.type" [name]="item.name"  [formControlName]="item.formControlName"  pInputText />
+                </form-item>
+            </form>
+        </div>
+        <div class="right-sidebar-footer">
+            <div style="margin-top:100px;">
+                <button type="button" class="ui-button-secondary" pButton (click)="createBackend()" label="{{I18N.keyID['ok']}}" ></button>
+                <button pButton type="button" (click)="closeSidebar()" label="Cancel" class="ui-button-default"></button>
+            </div>
+        </div>
+    </div>
+
+    <div *ngIf="showBackends"  class="right-sidebar-content-wrapper">
+        <div class="right-sidebar-header">
+            <h1 style="font-weight:normal">Storage Backends</h1>
+        </div>
+        <div class="right-sidebar-body">
+            <p-dataTable id="home-backend-detail" [value]="typeDetail" [rows]="10">
+                <p-column field="name" header="{{I18N.keyID['sds_block_volume_name']}}" ></p-column>
+                <p-column field="typeName" header="Type" ></p-column>
+                <p-column field="bucketName" header="Bucket"></p-column>
+                <p-column header="{{I18N.keyID['sds_block_volume_operation']}}" [style]="{'width':'140px'}">
+                    <ng-template pTemplate="body" let-backend="rowData" let-i="rowIndex">
+                        <a (click)="configModify(backend)" style="margin-right:10px;" >Modify</a>
+                        <a (click)="deleteBackend(backend)">Delete</a>
+                    </ng-template>
+                </p-column>
+            </p-dataTable>
+        </div>
+        <div class="right-sidebar-footer">
+            <div style="margin-top:100px;">
+                <button pButton type="button" (click)="closeSidebar()" label="Cancel" class="ui-button-default"></button>
+            </div>
+        </div>
+    </div>
+    
+</p-sidebar>
