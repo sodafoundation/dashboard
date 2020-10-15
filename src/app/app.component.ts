@@ -4,7 +4,7 @@ import { Router } from '@angular/router';
 import { I18NService, Consts, ParamStorService, MsgBoxService, Utils, HttpService } from 'app/shared/api';
 import { Button } from 'app/components/button/button';
 import { I18nPluralPipe } from '@angular/common';
-import { MenuItem, SelectItem} from './components/common/api';
+import { MenuItem, ConfirmationService, SelectItem} from './components/common/api';
 import { akSkService } from './business/ak-sk/ak-sk.service';
 import { BucketService } from './business/block/buckets.service';
 import * as aws4 from "ngx-aws4";
@@ -18,7 +18,7 @@ let _ = require("underscore");
 @Component({
     selector: 'app-root',
     templateUrl: './app.component.html',
-    providers: [MsgBoxService, akSkService],
+    providers: [MsgBoxService, akSkService, ConfirmationService],
     styleUrls: []
 })
 export class AppComponent implements OnInit, AfterViewInit {
@@ -65,7 +65,6 @@ export class AppComponent implements OnInit, AfterViewInit {
     userId;
     SignatureKey = {};
     akSkRouterLink = "/akSkManagement";
-    monitorConfigLink = "/monitor/config";
     Signature = "";
     kDate = "";
     stringToSign = "";
@@ -90,7 +89,7 @@ export class AppComponent implements OnInit, AfterViewInit {
             "text" : "A profile is a set of configurations on service capabilities (including resource tuning, QoS) of storage resources. A profile must be specified when volume or fileshare is created."
         },
         {
-            "title": "Resource",
+            "title": "Resource Manager",
             "description": "Volumes / Buckets / File Share / Hosts",
             "routerLink": "/block",
             "joyrideStep" : "menuResource",
@@ -102,13 +101,6 @@ export class AppComponent implements OnInit, AfterViewInit {
             "routerLink": "/dataflow",
             "joyrideStep" : "menuDataflow",
             "text" : "Data flow through buckets by migration / replication."
-        },
-        {
-            "title": "Monitor",
-            "description": "Telemetry information.",
-            "routerLink": "/monitor",
-            "joyrideStep" : "menuMonitor",
-            "text" : "Links to Telemetry services"
         },
         {
             "title": "Services",
@@ -135,11 +127,34 @@ export class AppComponent implements OnInit, AfterViewInit {
             "text" : "A profile is a set of configurations on service capabilities (including resource tuning, QoS) of storage resources. A profile must be specified when volume is created."
         },
         {
-            "title": "Resource",
+            "title": "Resource Manager",
             "description": "Volumes / Buckets / File Share / Hosts",
             "routerLink": "/block",
             "joyrideStep" : "menuResource",
-            "text" : "View and manage Buckets, Volumes, Volume Groups, File shares and Hosts that have been manually created or applied for through service templates."
+            "text" : "View and manage Buckets, Volumes, Volume Groups, File shares and Hosts that have been manually created or applied for through service templates.",
+            "group" : true,
+            "children" : [
+                {
+                    "title" : "Buckets",
+                    "routerLink": "/block"
+                },
+                {
+                    "title" : "Volumes",
+                    "routerLink": "/block/fromVolume"
+                },
+                {
+                    "title" : "Volume Group",
+                    "routerLink": "/block/fromGroup"
+                },
+                {
+                    "title" : "File Share",
+                    "routerLink": "/block/fromFileShare"
+                },
+                {
+                    "title" : "Hosts",
+                    "routerLink": "/block/fromHosts"
+                },
+            ]
         },
         {
             "title": "Dataflow",
@@ -149,11 +164,18 @@ export class AppComponent implements OnInit, AfterViewInit {
             "text" : "Data flow through buckets by migration / replication."
         },
         {
-            "title": "Monitor",
-            "description": "Telemetry information.",
-            "routerLink": "/monitor",
-            "joyrideStep" : "menuMonitor",
-            "text" : "Links to Telemetry services"
+            "title": "Resource Monitor",
+            "description": "SODA Storage Infrastructure Manager",
+            "routerLink": "/resource-monitor",
+            "joyrideStep" : "menuDelfin",
+            "text" : "delfin is the SODA Infrastructure Manager project which provides unified, intelligent and scalable resource management, alert and performance monitoring",
+            "group" : true,
+            "children" : [
+                {
+                    "title" : "Storage Summary",
+                    "routerLink": "/resource-monitor"
+                },
+            ]
         },
 	    {
             "title": "Services",
@@ -185,7 +207,7 @@ export class AppComponent implements OnInit, AfterViewInit {
         'menuProfile',
         'menuResource',
         'menuDataflow',
-        'menuMonitor',
+        'menuDelfin',
         'menuServices',
         'menuInfrastructure',
         'menuIdentity',
@@ -207,7 +229,6 @@ export class AppComponent implements OnInit, AfterViewInit {
         'menuProfile',
         'menuResource',
         'menuDataflow',
-        'menuMonitor',
         'menuServices',
         'homeResourceCard@/home',
         'homeDataflowCard@/home',
@@ -233,10 +254,13 @@ export class AppComponent implements OnInit, AfterViewInit {
         private paramStor: ParamStorService,
         private msg: MsgBoxService,
         private akSkService: akSkService,
+        private confirmationService: ConfirmationService,
         public I18N: I18NService,
         private BucketService: BucketService,
         private readonly joyrideService: JoyrideService
-    ) { }
+    ) { 
+        window['akskWarning'] = false;
+    }
 
     // Wave params
     svg_height = 150;
@@ -559,8 +583,20 @@ export class AppComponent implements OnInit, AfterViewInit {
                     'X-Auth-Token': localStorage['auth-token']
                 } 
             }
+            
             this.akSkService.getAkSkList(request,options).subscribe(res=>{
                 let response = res.json();
+                if(!response.credentials.length){
+                    window['akskWarning']=true;
+                    
+                }
+                if(window['akskWarning'] && (this.router.url == '/block' || this.router.url == '/dataflow')){
+                    let msg = "SODA Dashboard requires AK/SK authentication for all multi-cloud operations. The current system does not have an AK/SK. Click below to go to AK/SK management and add one."
+                    let header = "AK/SK Not Found!";
+                    let acceptLabel = "Add AK/SK";
+                    let warning=true;
+                    this.confirmDialog([msg,header,acceptLabel,warning]);
+                }
                 let detailArr = [];
                 response.credentials.forEach(item=>{
                     if(item.user_id == window['userId']){
@@ -571,6 +607,7 @@ export class AppComponent implements OnInit, AfterViewInit {
                 this.SignatureKey = [];
                 if(detailArr.length > 0){
                     window['getParameters'](detailArr); 
+                    window['akskWarning'] = false;
                 }
                 if (cb) {
                     cb();
@@ -671,6 +708,21 @@ export class AppComponent implements OnInit, AfterViewInit {
             return requestOptions;
     	}
     }
+    confirmDialog([msg,header,acceptLabel,warning]){
+        this.confirmationService.confirm({
+            message: msg,
+            header: header,
+            acceptLabel: acceptLabel,
+            isWarning: warning,
+            key: 'akskWarningPrompt',
+            accept: ()=>{
+                this.isHomePage = false;
+                window['akskWarning'] = false;
+                this.router.navigateByUrl('/akSkManagement');
+            },
+            reject:()=>{}
+        })
+    }
     /* Joyride */
     stepVisible: any;
     title: any;
@@ -680,11 +732,11 @@ export class AppComponent implements OnInit, AfterViewInit {
     stepDone() {
         setTimeout(() => {
             this.title = 'Tour Finished!';
-            console.log('Step done!');
+            
         }, 3000);
     }
     onPrev() {
-        console.log('Prev Clicked');
+        
     }
     startTour() {
         const options = {
@@ -707,7 +759,7 @@ export class AppComponent implements OnInit, AfterViewInit {
             },
             () => {
                 this.stepDone();
-                console.log('Tour finished');
+                
             }
         );
     }
@@ -918,13 +970,6 @@ export class AppComponent implements OnInit, AfterViewInit {
                         },{
                             label: "AK/SK Management",
                             routerLink: this.akSkRouterLink,
-                            command: ()=>{
-                                this.isHomePage = false;
-                            }
-                        },
-                        {
-                            label: "Monitor Configuration",
-                            routerLink: this.monitorConfigLink,
                             command: ()=>{
                                 this.isHomePage = false;
                             }
