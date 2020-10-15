@@ -83,6 +83,7 @@ export class BucketsComponent implements OnInit{
     isSSEKMS: boolean = false;
     isSSEC: boolean = false;
     msgs: Message[];
+    showAKSKWarning: boolean;
 
     constructor(
         public I18N: I18NService,
@@ -95,6 +96,7 @@ export class BucketsComponent implements OnInit{
         private http:Http,
         private msg: MsgBoxService
     ){
+        this.showAKSKWarning = window['akskWarning'];
         this.errorMessage = {
             "name": { 
                 required: "Name is required.", 

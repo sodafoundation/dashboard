@@ -11,10 +11,13 @@
         <p-dropdown [style]="{'min-width':'150px','width':'220px'}" placeholder="Please select" [options]="backendsOption" (onChange)="updateFormAndRegion()" formControlName="backend"></p-dropdown>
     </form-item>
     <form-item [required]="true" label="{{label.name}}">
-        <input formControlName="name" type="text" size="30" pInputText [maxlength]="128" [minlength]="2"> 
+        <input formControlName="name" type="text" size="30" pInputText> 
     </form-item>
     <form-item label="{{label.description}}">
         <textarea [rows]="5" [cols]="30" pInputTextarea formControlName="description" [maxlength]="250"></textarea>
+    </form-item>
+    <form-item *ngIf="cloudFileShareCreateForm.controls['availabilityZone']" label="{{label.az}}">
+        <input formControlName="availabilityZone" type="text" size="30" pInputText> 
     </form-item>
     <form-item *ngIf="cloudFileShareCreateForm.controls['encrypted']" label="Enable Encryption?" >
         <p-inputSwitch formControlName="encrypted" onLabel="Yes" offLabel="No" (onChange)="encryptionControl()"></p-inputSwitch>
@@ -89,7 +92,7 @@
                 </div>
                 <div class="ui-g-12 ui-md-2 ui-md-offset-1">
                     <div class="ui-inputgroup">
-                        <a *ngIf="(key != 'PerformanceMode') || (key != 'ThroughputMode') || (key != 'ProvisionedThroughputInMibps')" 
+                        <a *ngIf="(key != 'PerformanceMode') || (key != 'ThroughputMode') || (key != 'ProvisionedThroughputInMibps') || (key != 'Tier')" 
                             disabled="cloudFileShareCreateForm.get('metadata')['length'] > 1" 
                             class="remove-metadata" 
                             (click)="removeMetadataLink(i)">

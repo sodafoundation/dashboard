@@ -18,9 +18,14 @@
         <p-column selectionMode="multiple" [style]="{'width': '30px'}"></p-column>
         <p-column field="name" header="Name"></p-column>
         <p-column field="backend" header="Backend"></p-column>
+        <p-column field="size" header="Size">
+            <ng-template pTemplate="body" let-fileshare="rowData">
+                {{fileshare.displaySize ? fileshare.displaySize : '--'}}
+            </ng-template>
+        </p-column>
         <p-column field="status" header="Status">
             <ng-template pTemplate="body" let-fileshare="rowData">
-                {{fileshare.status}}
+                <span>{{fileshare.status}}</span> <i *ngIf="fileshare.status=='creating'  || fileshare.status=='updating'" class="fa fa-spinner fa-spin fa-3x fa-fw"></i>
             </ng-template>
         </p-column>
         <p-column field="createdAt" header="Created At">
@@ -52,6 +57,7 @@
                         </div>
                         <div class="ui-grid-col-2 volume-basic-item-value-color">
                             {{fileshare.status? fileshare.status : '--'}}
+                            <i *ngIf="fileshare.status=='creating'  || fileshare.status=='updating'" class="fa fa-spinner fa-spin fa-3x fa-fw"></i>
                         </div>
                         <div class="ui-grid-col-2">
                             {{label.createdAt}}:
@@ -69,10 +75,10 @@
                             {{fileshare.description}}
                         </div>
                         <div class="ui-grid-col-2">
-                            {{label.backend}}:
+                            {{label.size}}:
                         </div>
                         <div class="ui-grid-col-2 volume-basic-item-value-color">
-                            {{fileshare.backend}}
+                            {{fileshare.displaySize ? fileshare.displaySize : '--'}}
                         </div>
                         <div class="ui-grid-col-2">
                             {{label.updatedAt}}:
@@ -84,16 +90,16 @@
                     </div>
                     <div class="ui-grid-row volume-basic-item-class">
                             <div class="ui-grid-col-2">
-                                
+                                {{label.region}}:
                             </div>
                             <div class="ui-grid-col-2 volume-basic-item-value-color">
-                                
+                                {{fileshare.region ? fileshare.region : '--'}}
                             </div>
                             <div class="ui-grid-col-2">
-                                
+                                {{label.availabilityZone}}:
                             </div>
                             <div class="ui-grid-col-2 volume-basic-item-value-color">
-                                
+                                {{fileshare.availabilityZone ? fileshare.availabilityZone : '--'}}
                             </div>
                             
                             <div class="ui-grid-col-2">
