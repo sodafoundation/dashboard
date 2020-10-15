@@ -159,7 +159,7 @@ export class VolumeListComponent implements OnInit {
                     this.fromVolume = true;
                     this.tabIndex = 0;
                 }
-                if(params.fromRoute === "fromCloudFileShare"){
+                if(params.fromRoute === "fromCloudVolume"){
                     this.fromCloudVolume = true;
                     this.tabIndex = 1;
                 }

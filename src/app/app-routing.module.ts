@@ -9,6 +9,8 @@ const routes: Routes = [
     {path: 'help', loadChildren: './business/help/help.module#HelpModule'},
     {path: 'block', loadChildren: './business/block/block.module#BlockModule'},
     {path: 'createVolume', loadChildren: './business/block/create-volume/create-volume.module#CreateVolumeModule'},
+    {path: 'createCloudVolume', loadChildren: './business/block/cloud-block-service/create/cloud-volume-create.module#CloudVolumeCreateModule'},
+    {path: 'modifyCloudVolume/:volumeId', loadChildren: './business/block/cloud-block-service/modify/cloud-volume-modify.module#CloudVolumeModifyModule'},
     {path: 'volumeDetails/:volumeId', loadChildren: './business/block/volume-detail/volume-detail.module#VolumeDetailModule'},
     {path: 'createHost', loadChildren: './business/block/create-host/create-host.module#CreateHostModule'},
     {path: 'modifyHost/:hostId', loadChildren: './business/block/modify-host/modify-host.module#ModifyHostModule',
@@ -30,12 +32,16 @@ const routes: Routes = [
     {path: 'bucketDetail/:bucketId', loadChildren: './business/block/bucket-detail/bucket-detail.module#BucketDetailModule'},
     {path: 'objectAcl/:bucketId/:key', loadChildren: './business/block/bucket-detail/object-acl/object-acl.module#ObjectAclModule'},
     {path: 'akSkManagement', loadChildren: './business/ak-sk/ak-sk.module#AkSkModule'},
-    {path: 'monitor', loadChildren: './business/monitor/monitor.module#MonitorModule'},
+    
     {path: 'createFileShare', loadChildren: './business/block/create-file-share/create-file-share.module#CreateFileShareModule'},
     {path: 'createCloudFileShare', loadChildren: './business/block/cloud-file-share/create/cloud-file-share-create.module#CloudFileShareCreateModule'},
     {path: 'modifyCloudFileShare/:fileShareId', loadChildren: './business/block/cloud-file-share/modify/cloud-file-share-modify.module#CloudFileShareModifyModule'},
     {path: 'fileShareDetail/:fileShareId', loadChildren: './business/block/file-share-detail/file-share-detail.module#FileShareDetailModule'},
-    {path: 'services', loadChildren: './business/services/services.module#ServicesModule'}
+    {path: 'services', loadChildren: './business/services/services.module#ServicesModule'},
+    {path: 'resource-monitor', loadChildren: './business/delfin/delfin.module#DelfinModule'},
+    {path: 'registerStorage', loadChildren: './business/delfin/register-storage/register-storage.module#RegisterStorageModule'},
+    {path: 'storageDetails/:storageId', loadChildren: './business/delfin/storage-details/storage-details.module#StorageDetailsModule'},
+    {path: 'modifyStorage/:storageId', loadChildren: './business/delfin/modify-storage/modify-storage.module#ModifyStorageModule'}
 ];
 
 @NgModule({

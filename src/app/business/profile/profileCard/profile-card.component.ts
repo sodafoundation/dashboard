@@ -80,6 +80,9 @@ export class ProfileCardComponent implements OnInit {
             }else{
                 this.storageAclFlag = false;
             }
+            if(data['customProperties']){
+                this.policys.push("Customization");
+            }
         }
         
         this.map["Qos"] = "50px";
