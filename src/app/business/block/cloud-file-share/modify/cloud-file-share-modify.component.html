@@ -8,10 +8,13 @@
         <span>{{selectType}}</span>
     </form-item>
     <form-item label="{{label.backend}}" [required]="true">
-        <span>{{selectBackend}}</span>
+        <span>{{selectedFileShare['backend']}}</span>
     </form-item>
     <form-item [required]="true" label="{{label.name}}">
         <span>{{selectedFileShare['name']}}</span>
+    </form-item>
+    <form-item *ngIf="selectedFileShare && selectedFileShare['availabilityZone']" label="{{label.az}}">
+        <span>{{selectedFileShare['availabilityZone']}}</span>
     </form-item>
     <form-item label="{{label.description}}">
         <textarea [rows]="5" [cols]="30" pInputTextarea formControlName="description" [maxlength]="250"></textarea>
@@ -64,7 +67,7 @@
                 </div>
                 <div class="ui-g-12 ui-md-2 ui-md-offset-1">
                     <div class="ui-inputgroup">
-                        <a *ngIf="(key != 'PerformanceMode') || (key != 'ThroughputMode') || (key != 'ProvisionedThroughputInMibps')" 
+                        <a *ngIf="(key != 'PerformanceMode') || (key != 'ThroughputMode') || (key != 'ProvisionedThroughputInMibps') || (key != 'Tier')" 
                             disabled="cloudFileShareModifyForm.get('metadata')['length'] > 1" 
                             class="remove-metadata" 
                             (click)="removeMetadataLink(i)">

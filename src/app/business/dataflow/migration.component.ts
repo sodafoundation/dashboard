@@ -47,6 +47,7 @@ export class MigrationListComponent implements OnInit {
     plan: any;
     errorMessage:Object;
     allMigrationForCheck=[];
+    showAKSKWarning: boolean;
     constructor(
         public I18N: I18NService,
         private router: Router,
@@ -57,6 +58,7 @@ export class MigrationListComponent implements OnInit {
         private BucketService:BucketService,
         private http: Http
     ) {
+        this.showAKSKWarning = window['akskWarning'];
         this.errorMessage = {
             "name": { required: "Name is required.",isExisted:"Name is existing" },
             "srcBucket": { required: "Source Bucket is required." },
