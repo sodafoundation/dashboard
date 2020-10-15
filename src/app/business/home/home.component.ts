@@ -17,6 +17,7 @@ declare let X2JS:any;
     ]
 })
 export class HomeComponent implements OnInit {
+    showRightSidebar: boolean = false;
     lineData ={};
     lineOption = {};
     showRegisterFlag = false;
@@ -55,7 +56,16 @@ export class HomeComponent implements OnInit {
             type: 'text',
             name: 'region',
             formControlName: 'region',
-            arr:['aws-s3','azure-blob','hw-obs','fusionstorage-object', 'gcp-s3','ibm-cos', 'alibaba-oss', 'aws-file', 'azure-file']
+            arr:['aws-s3','azure-blob','hw-obs','fusionstorage-object', 'gcp-s3','ibm-cos', 'alibaba-oss', 'aws-file', 'aws-block', 'azure-file']
+        },
+        {
+            label: 'Project',
+            required: 'true',
+            id: 'project',
+            type: 'text',
+            name: 'project',
+            formControlName: 'region',
+            arr:['gcp-file']
         },
         {
             label: 'Endpoint',
@@ -82,7 +92,7 @@ export class HomeComponent implements OnInit {
             type: 'text',
             name: 'accessKey',
             formControlName: 'ak',
-            arr:['aws-s3','azure-blob','hw-obs','fusionstorage-object','ceph-s3','gcp-s3','ibm-cos', 'alibaba-oss', 'aws-file', 'azure-file']
+            arr:['aws-s3','azure-blob','hw-obs','fusionstorage-object','ceph-s3','gcp-s3','ibm-cos', 'alibaba-oss', 'aws-file', 'aws-block', 'azure-file', 'gcp-file']
         },
         {
             label: 'Secret Key',
@@ -91,8 +101,9 @@ export class HomeComponent implements OnInit {
             type: 'password',
             name: 'secretKey',
             formControlName: 'sk',
-            arr:['aws-s3','azure-blob','hw-obs','fusionstorage-object','ceph-s3','gcp-s3','ibm-cos','alibaba-oss', 'aws-file', 'azure-file']
+            arr:['aws-s3','azure-blob','hw-obs','fusionstorage-object','ceph-s3','gcp-s3','ibm-cos','alibaba-oss', 'aws-file', 'aws-block', 'azure-file', 'gcp-file']
         },
+        
     ]
 
 
@@ -244,6 +255,8 @@ export class HomeComponent implements OnInit {
                 let allBuckets = [];
                 this.getBuckend(allBuckets);
             }
+        }, (error)=>{
+            console.log("Could not fetch AK/SK", error);
         }) 
     }
     getBuckend(allBuckets){
@@ -308,8 +321,14 @@ export class HomeComponent implements OnInit {
         if( this.Allbackends['aws-file']){
             this.allBackends_count.localBKD += this.Allbackends['aws-file'].length;
         }
+        if( this.Allbackends['aws-block']){
+            this.allBackends_count.localBKD += this.Allbackends['aws-block'].length;
+        }
         if( this.Allbackends['azure-file']){
             this.allBackends_count.localBKD += this.Allbackends['azure-file'].length;
+        }
+        if( this.Allbackends['gcp-file']){
+            this.allBackends_count.localBKD += this.Allbackends['gcp-file'].length;
         }
 
         this.allBackends_count.ibmcos = this.Allbackends['ibm-cos'] ? this.Allbackends['ibm-cos'].length :0;
@@ -330,7 +349,17 @@ export class HomeComponent implements OnInit {
             });
         });
     }
+
+    closeSidebar(){
+        this.showRightSidebar = false;
+        
+        this.showRegisterFlag = false;
+        this.showBackends = false;
+        
+    }
+
     configModify(backend){
+        this.showRightSidebar = false;
         this.modifyBackendshow = true;
         this.selectedBackend = backend;
         this.modifyBackendForm.reset(
@@ -340,7 +369,13 @@ export class HomeComponent implements OnInit {
             }
         );
     }
+    closeModify(){
+        this.modifyBackendshow = false;
+        this.showRightSidebar = true;
+        this.showBackends = true;
+    }
     modifyBackend(){
+        
         if(!this.modifyBackendForm.valid){
             for(let i in this.modifyBackendForm.controls){
                 this.modifyBackendForm.controls[i].markAsTouched();
@@ -353,10 +388,15 @@ export class HomeComponent implements OnInit {
         }
         this.http.put(`v1/{project_id}/backends/${this.selectedBackend.id}`,param).subscribe((res)=>{
             this.modifyBackendshow = false;
+            this.showRightSidebar = true;
+            this.showBackends = true;
+        }, (error)=>{
+            console.log("Something went wrong. Could not modify the AK/SK.")
         });
     }
 
     showBackendsDetail(type?){
+        this.showRightSidebar = true;
         this.showBackends = true;
         
         if(type){
@@ -368,12 +408,15 @@ export class HomeComponent implements OnInit {
             let ceph_arr = this.Allbackends['ceph-s3'] ? this.Allbackends['ceph-s3'] : [];
             let yig_arr = this.Allbackends['yig'] ? this.Allbackends['yig'] : [];
             let aws_fs_arr = this.Allbackends['aws-file'] ? this.Allbackends['aws-file'] : [];
+            let aws_bs_arr = this.Allbackends['aws-block'] ? this.Allbackends['aws-block'] : [];
             let azure_fs_arr = this.Allbackends['azure-file'] ? this.Allbackends['azure-file'] : [];
-            this.typeDetail = fs_arr.concat(ceph_arr,yig_arr,aws_fs_arr,azure_fs_arr);
+            let gcp_fs_arr = this.Allbackends['gcp-file'] ? this.Allbackends['gcp-file'] : [];
+            this.typeDetail = fs_arr.concat(ceph_arr,yig_arr,aws_fs_arr,aws_bs_arr,azure_fs_arr, gcp_fs_arr);
         }
     }
 
     deleteBackend(backend){
+        this.showRightSidebar = false;
         if(backend.canDelete){
             this.msg.info("The backend cannot be deleted because buckets have already been created");
         }else{
@@ -394,6 +437,7 @@ export class HomeComponent implements OnInit {
             accept: ()=>{
                 try {
                     if(backend == "close"){
+                        this.showRightSidebar = true;
                         return;
                     }else{
                         let url = 'v1/{project_id}/backends/'+backend.id;
@@ -413,7 +457,10 @@ export class HomeComponent implements OnInit {
                     
                 }
             },
-            reject:()=>{}
+            reject:()=>{
+                this.showRightSidebar = true;
+                this.showBackends = true;
+            }
         })
     }
                             
@@ -449,16 +496,23 @@ export class HomeComponent implements OnInit {
         };
         this.http.post("v1/{project_id}/backends", param,options).subscribe((res) => {
             this.showRegisterFlag = false;
+            this.showRightSidebar = false;
             this.http.get('v1/{project_id}/backends').subscribe((res)=>{
                 let backends = res.json().backends ? res.json().backends :[];
                 this.initBackendsAndNum(backends);
                 this.formItemCopy = []
             });
+            
+        },(error)=>{
+            console.log("Something went wrong. Could not register the backend.")
         });
     }
     showRegister(){
         this.formItemCopy = []
+        this.showRightSidebar = true;
         this.showRegisterFlag = true;
+        
+        
         this.backendForm.reset();
         this.backendForm.controls['name'].setValidators([Validators.required,Utils.isExisted(this.allBackendNameForCheck)]);
     }

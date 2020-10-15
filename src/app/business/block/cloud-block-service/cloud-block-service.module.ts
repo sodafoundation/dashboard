@@ -4,6 +4,7 @@ import { RouterModule } from '@angular/router';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 
 import { ButtonModule, DataTableModule, DropMenuModule, DialogModule, FormModule, InputTextModule, InputTextareaModule, InputSwitchModule, DropdownModule , ConfirmationService,ConfirmDialogModule, MultiSelectModule, GrowlModule } from '../../../components/common/api';
+import { TooltipModule } from '../../../components/tooltip/tooltip';
 import { HttpService } from '../../../shared/service/Http.service';
 
 import { CloudBlockServiceComponent } from './cloud-block-service.component';
@@ -30,7 +31,8 @@ import { CloudBlockServiceService} from './cloud-block-service.service';
     ConfirmDialogModule,
     RouterModule,
     MultiSelectModule,
-    GrowlModule
+    GrowlModule,
+    TooltipModule
   ],
   exports: [ CloudBlockServiceComponent],
   providers: [

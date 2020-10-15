@@ -1,0 +1,453 @@
+<p-growl [value]="msgs" [sticky]="false" [life]="6000"></p-growl>
+<div>
+    <div class="custom-breadcrumb">
+        <span *ngFor="let item of items; index as i">
+          <a [ngClass]="{'font-color-class': i===0}" [routerLink]="[item.url]">{{item.label}}</a>
+          <span *ngIf="(i+1) !== items.length">></span>
+        </span>
+    </div>
+    <div class="table-toolbar">
+        <div class="left">
+            
+        </div>
+        <div class="right">
+            <button pButton type="button" (click)="syncStorage(selectedStorageId)" icon="fa-exchange" label="Sync Storage"></button>
+            <button class="" title="Refresh" label="Refresh" pButton type="button" (click)="getStorageById(selectedStorageId)" icon="fa-refresh"></button>
+        </div>
+    </div>
+    <div>
+        <p-tabView styleClass="ui-tabview-large" (onChange)="changeDetailsTab($event)" [activeIndex]="detailsTabIndex">
+            <p-tabPanel header="Configuration">
+                    <div class="details-basic-info">
+                        <div class="ui-grid ui-grid-responsive ui-grid-pad ui-fluid">
+                            <div class="ui-grid-col-12">
+                                <div class="ui-grid-row details-basic-item-class">
+                                    <div class="ui-grid-col-2">
+                                        {{label.name}}:
+                                    </div>
+                                    <div class="ui-grid-col-2 details-basic-item-value-color" *ngIf="selectedStorage">
+                                        {{selectedStorage.name}}
+                                    </div>
+                                    <div class="ui-grid-col-2">
+                                        {{label.status}}:
+                                    </div>
+                                    <div class="ui-grid-col-2 details-basic-item-value-color" *ngIf="selectedStorage">
+                                        <span class="storage-status-icon" [ngClass]="{normal: selectedStorage.status=='normal', abnormal: selectedStorage.status=='abnormal' || selectedStorage.status=='offline'}"><i class="fa fa-circle"></i></span>
+                                        <span *ngIf="selectedStorage.status=='normal'">Normal</span>
+                                        <span *ngIf="selectedStorage.status=='abnormal'">Abnormal</span>
+                                        <span *ngIf="selectedStorage.status=='offline'">Offline</span>
+                                    </div>
+                                    <div class="ui-grid-col-2">
+                                        {{label.sync_status}}
+                                    </div>
+                                    <div class="ui-grid-col-3 details-basic-item-value-color" *ngIf="selectedStorage">
+                                        <span>{{selectedStorage.sync_status ? selectedStorage.sync_status : '--'}}</span>
+                                        <span *ngIf="selectedStorage.sync_status=='SYNCING'" ><i class="fa fa-spinner fa-pulse"></i></span>
+                                    </div>
+                                
+                                </div>
+                                <div class="ui-grid-row details-basic-item-class">
+                                    <div class="ui-grid-col-2">
+                                        {{label.id}}:
+                                    </div>
+                                    <div class="ui-grid-col-2 details-basic-item-value-color" *ngIf="selectedStorage">
+                                        {{selectedStorage.id | slice:0:20}}
+                                        <a *ngIf="selectedStorage.id.length > 20" pTooltip="{{selectedStorage.id}}" tooltipPosition="top">
+                                            ...
+                                        </a>
+                                    </div>
+                                    <div class="ui-grid-col-2">
+                                        {{label.firmware_version}}:
+                                    </div>
+                                    <div class="ui-grid-col-2 details-basic-item-value-color" *ngIf="selectedStorage">
+                                        {{selectedStorage.firmware_version}}
+                                    </div>
+                                    <div class="ui-grid-col-2">
+                                        {{label.created_at}}:
+                                    </div>
+                                    <div class="ui-grid-col-3 details-basic-item-value-color" *ngIf="selectedStorage">
+                                        {{selectedStorage.created_at ? (selectedStorage.created_at | date:'long') : '--'}}
+                                    </div>
+                                    
+                                </div>
+                                <div class="ui-grid-row details-basic-item-class">
+                                        <div class="ui-grid-col-2">
+                                            {{label.vendor}} / {{label.model}}:
+                                        </div>
+                                        <div class="ui-grid-col-2 details-basic-item-value-color" *ngIf="selectedStorage">
+                                            {{selectedStorage.vendor}} / {{selectedStorage.model}}
+                                        </div>
+                                        <div class="ui-grid-col-2">
+                                            {{label.serial_number}}:
+                                        </div>
+                                        <div class="ui-grid-col-2 details-basic-item-value-color" *ngIf="selectedStorage">
+                                            {{ selectedStorage.serial_number | slice:0:20 }}
+                                            <a *ngIf="selectedStorage.serial_number.length > 20" pTooltip="{{selectedStorage.serial_number}}" tooltipPosition="top">
+                                                ...
+                                            </a>
+                                        </div>
+                                        
+                                        <div class="ui-grid-col-2">
+                                            {{label.updated_at}}:
+                                        </div>
+                                        <div class="ui-grid-col-3 details-basic-item-value-color" *ngIf="selectedStorage">
+                                            {{selectedStorage.updated_at ? (selectedStorage.updated_at | date:'long') : '--'}}
+                                        </div>
+                                </div>
+                                <div class="ui-grid-row details-basic-item-class">
+                                    <div class="ui-grid-col-2">
+                                        {{label.description}}:
+                                    </div>
+                                    <div class="ui-grid-col-2 details-basic-item-value-color" *ngIf="selectedStorage">
+                                        {{ selectedStorage.description | slice:0:20 }}
+                                        <a *ngIf="selectedStorage.description.length > 20" pTooltip="{{selectedStorage.description}}" tooltipPosition="top">
+                                            ...
+                                        </a>
+                                    </div>
+                                    <div class="ui-grid-col-2">
+                                        {{label.location}}:
+                                    </div>
+                                    <div class="ui-grid-col-2 details-basic-item-value-color" *ngIf="selectedStorage">
+                                        {{selectedStorage.location ? selectedStorage.location : '--'}}
+                                    </div>
+                                    <div class="ui-grid-col-2">
+                                    </div>
+                                    <div class="ui-grid-col-3 details-basic-item-value-color" *ngIf="selectedStorage">
+                                    </div>
+                                </div>
+                                <div class="ui-grid-row details-basic-item-class">
+                                    <div class="ui-grid-col-12">
+                                        <span>Capacity Summary</span>
+                                    </div>
+                                </div>
+                                <div class="ui-grid-row details-basic-item-class">
+                                    <div class="ui-grid-col-2">
+                                        {{label.raw_capacity}}:
+                                    </div>
+                                    <div class="ui-grid-col-2 details-basic-item-value-color" *ngIf="selectedStorage">
+                                        {{ selectedStorage.capacity.raw}}
+                                    </div>
+                                    <div class="ui-grid-col-2">
+                                        {{label.subscribed_capacity}}:
+                                    </div>
+                                    <div class="ui-grid-col-2 details-basic-item-value-color" *ngIf="selectedStorage">
+                                        {{ selectedStorage.capacity.subscribed}}
+                                    </div>
+                                    <div class="ui-grid-col-2">
+                                        {{label.system_used}}:
+                                    </div>
+                                    <div class="ui-grid-col-3 details-basic-item-value-color" *ngIf="selectedStorage">
+                                        {{ selectedStorage.capacity.system_used}}
+                                    </div>
+                                </div>
+                                <div class="ui-grid-row details-basic-item-class">
+                                    <div class="ui-grid-col-2">
+                                        {{label.free_capacity}}:
+                                    </div>
+                                    <div class="ui-grid-col-2 details-basic-item-value-color" *ngIf="selectedStorage">
+                                        {{ selectedStorage.capacity.free}}
+                                    </div>
+                                    <div class="ui-grid-col-2">
+                                        {{label.used_capacity}}:
+                                    </div>
+                                    <div class="ui-grid-col-2 details-basic-item-value-color" *ngIf="selectedStorage">
+                                        {{ selectedStorage.capacity.used}}
+                                    </div>
+                                    <div class="ui-grid-col-2">
+                                        {{label.total_capacity}}:
+                                    </div>
+                                    <div class="ui-grid-col-3 details-basic-item-value-color" *ngIf="selectedStorage">
+                                        {{ selectedStorage.capacity.total}}
+                                    </div>
+                                </div>
+                                
+                            </div>
+                        </div>
+                    </div>
+                <div class="configuration-tabs">
+                    <p-tabView styleClass="ui-tabview-large" (onChange)="changeConfigTab($event)" [activeIndex]="configTabIndex"> 
+                        <p-tabPanel header="Volumes">
+                            <ng-template pTemplate="content">
+                                <app-delfin-volumes [selectedStorage]="selectedStorageId"></app-delfin-volumes>
+                            </ng-template>
+                        </p-tabPanel>
+                        <p-tabPanel header="Storage pools">
+                            <app-delfin-storage-pools [selectedStorage]="selectedStorageId"></app-delfin-storage-pools>
+                        </p-tabPanel>
+                        
+                    </p-tabView>
+                </div>
+            </p-tabPanel>
+            <p-tabPanel header="Capacity">
+                <ng-template pTemplate="content">
+                    <div class="ui-grid-row">
+                        <div class="ui-g-4 capacity-overview-container total">
+                            <div class="ui-g-6 capacity-overview-label-tile">
+                                {{label.total_capacity}}:
+                            </div>
+                            <div class="ui-g-6 capacity-overview-value-tile">
+                                {{ selectedStorage.capacity.total}}
+                            </div>
+                        </div>
+                        <div class="ui-g-4 capacity-overview-container free">
+                            <div class="ui-g-6 capacity-overview-label-tile">
+                                {{label.free_capacity}}:
+                            </div>
+                            <div class="ui-g-6 capacity-overview-value-tile">
+                                {{ selectedStorage.capacity.free}}
+                            </div>
+                        </div>
+                        <div class="ui-g-4 capacity-overview-container used">
+                            <div class="ui-g-6 capacity-overview-label-tile">
+                                {{label.used_capacity}}:
+                            </div>
+                            <div class="ui-g-6 capacity-overview-value-tile">
+                                {{ selectedStorage.capacity.used}}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ui-grid-row">
+                        <div class="ui-g-4 capacity-overview-container raw">
+                            <div class="ui-g-6 capacity-overview-label-tile">
+                                {{label.raw_capacity}}:
+                            </div>
+                            <div class="ui-g-6 capacity-overview-value-tile">
+                                {{ selectedStorage.capacity.raw}}
+                            </div>
+                        </div>
+                        <div class="ui-g-4 capacity-overview-container system-used">
+                            <div class="ui-g-6 capacity-overview-label-tile">
+                                {{label.system_used}}:
+                            </div>
+                            <div class="ui-g-6 capacity-overview-value-tile">
+                                {{ selectedStorage.capacity.system_used}}
+                            </div>
+                        </div>
+                        <div class="ui-g-4 capacity-overview-container subscribed">
+                            <div class="ui-g-6 capacity-overview-label-tile">
+                                {{label.subscribed_capacity}}:
+                            </div>
+                            <div class="ui-g-6 capacity-overview-value-tile">
+                                {{ selectedStorage.capacity.subscribed}}
+                            </div>
+                        </div>
+                    </div>
+                   
+                    <div class="ui-grid-row">
+                        <div class="ui-g-6">
+                            <p-card styleClass="ui-card-shadow">
+                                <p-header style="padding: 0.15rem 0.2rem 0 0.2rem;">
+                                    <div class="ui-g-row summary-card-header-container" >
+                                        <div class="ui-g-6 left-items" style="padding-left: 0.2rem;">
+                                            <div class="ui-card-title">Array Usable Capacity</div>
+                                            <div class="ui-card-subtitle">Total Usable Capacity: {{selectedStorage && selectedStorage.capacity.total}}</div>
+                                        </div>
+                                        <div class="ui-g-offset-4 ui-g-2">
+                                            
+                                        </div>
+                                    </div>
+                                </p-header>
+                                <div>
+                                    <p-chart type="doughnut" [data]="usableCapacityChartData" [options]="usableCapacityChartOptions" [responsive]="true"></p-chart>        
+                                </div>
+                                <p-footer>
+                                </p-footer>
+                            </p-card>
+                            
+                        </div>
+                        <div class="ui-g-6">
+                            <p-card styleClass="ui-card-shadow">
+                                <p-header style="padding: 0.15rem 0.2rem 0 0.2rem;">
+                                    <div class="ui-g-row summary-card-header-container" >
+                                        <div class="ui-g-6 left-items" style="padding-left: 0.2rem;">
+                                            <div class="ui-card-title">Array Raw Capacity</div>
+                                            <div class="ui-card-subtitle">Total Raw Capacity: {{selectedStorage && selectedStorage.capacity.raw}}</div>
+                                        </div>
+                                        <div class="ui-g-offset-4 ui-g-2">
+                                            
+                                        </div>
+                                    </div>
+                                </p-header>
+                                <div>
+                                    <p-chart type="doughnut" [data]="rawCapacityChartData" [options]="rawCapacityChartOptions" [responsive]="true"></p-chart>
+                                </div>
+                                <p-footer>
+                                </p-footer>
+                            </p-card>
+                            
+                        </div>
+                    </div>
+                    <div class="ui-grid-row">
+                        <div class="ui-g-6">
+                            <p-card styleClass="ui-card-shadow">
+                                <p-header style="padding: 0.15rem 0.2rem 0 0.2rem;">
+                                    <div class="ui-g-row summary-card-header-container" >
+                                        <div class="ui-g-10 left-items" style="padding-left: 0.2rem;">
+                                            <div class="ui-card-title">Volumes Overview</div>
+                                            <div class="ui-card-subtitle">
+                                                <span>Total Number of Volumes: {{allVolumesCountAndCapacity.total }}</span> <br /> 
+                                                <span>Total Volumes Capacity: {{allVolumesCountAndCapacity && allVolumesCountAndCapacity.displayTotal}}</span>
+                                            </div>
+                                        </div>
+                                        
+                                    </div>
+                                </p-header>
+                                <div>
+                                    <p-chart type="doughnut" [data]="volumesCapacityChartData" [options]="volumesCapacityChartOptions" [responsive]="true"></p-chart>
+                                </div>
+                                
+                                <p-footer>
+                                </p-footer>
+                            </p-card>
+                        </div>
+                        <div class="ui-g-6">
+                            <p-card styleClass="ui-card-shadow">
+                                <p-header style="padding: 0.15rem 0.2rem 0 0.2rem;">
+                                    <div class="ui-g-row summary-card-header-container" >
+                                        <div class="ui-g-10 left-items" style="padding-left: 0.2rem;">
+                                            <div class="ui-card-title">Storage Pools Overview</div>
+                                            <div class="ui-card-subtitle">
+                                                <span>Total Number of Pools: {{allPoolsCountAndCapacity.total }}</span> <br />
+                                                <span>Total Storage Pools Capacity: {{allPoolsCountAndCapacity && allPoolsCountAndCapacity.displayTotal}}</span>
+                                            </div>
+                                        </div>
+                                        
+                                    </div>
+                                </p-header>
+                                <div>
+                                    <p-chart type="doughnut" [data]="poolsCapacityChartData" [options]="poolsCapacityChartOptions" [responsive]="true"></p-chart>
+                                </div>
+                                <p-footer>
+                                </p-footer>
+                            </p-card>
+                        </div>
+                    </div>
+                </ng-template>
+            </p-tabPanel>
+            <p-tabPanel header="Alerts">
+                <ng-template pTemplate="content">
+                    <div class="ui-grid-row">
+                        <div class="table-toolbar">
+                            <div class="left">
+
+                            </div>
+                            <div class="right">
+                                <div class="ui-inputsearch">
+                                    <input type="text" #searchAll pInputText placeholder="{{i18n.keyID['sds_block_volume_search']}}">
+                                    <button pButton type="button" icon="fa-search"></button>
+                                </div>
+                                
+                                <button class="" title="Refresh list" pButton type="button" (click)="getAllActiveAlerts(selectedStorageId)" icon="fa-refresh"></button>
+                            </div>
+                        </div>
+                        <p-dataTable [value]="allActiveAlerts" [globalFilter]="searchAll" [rows]="10" [expandableRows]="true" [paginator]="true" [pageLinks]="3" [rowsPerPageOptions]="[10,20,50,100]" [totalRecords]="totalRecords" #at>
+                            <p-column expander="true" styleClass="col-icon" [style]="{'width': '3%'}"></p-column>
+                            <p-column field="alert_name" header="Name" #alertName>
+                                <ng-template pTemplate="body" let-alert="rowData">
+                                    {{alert.alert_name}}
+                                </ng-template>
+                            </p-column>    
+                            <p-column field="severity" header="Severity">
+                                <ng-template pTemplate="body" let-alert="rowData">
+                                    <div class="severity-icon">
+                                        <i *ngIf="alert.severity=='Major'" class="fa fa-exclamation major"></i>
+                                        <i *ngIf="alert.severity=='Critical'" class="fa fa-exclamation-triangle critical"></i>
+                                        <i *ngIf="alert.severity=='Fatal'" class="fa fa-times-circle fatal"></i>
+                                        <i *ngIf="alert.severity=='Informational'" class="fa fa-info-circle informational"></i>
+                                    </div>
+                                    <div class="severity-label">
+                                        {{alert.severity}}
+                                    </div>
+                                </ng-template>
+                            </p-column> 
+                            <p-column field="description" header="Description" [sortable]="true" [style]="{'width': '40%'}"></p-column>
+                            <p-column field="occur_time" header="Occured At">
+                                <ng-template pTemplate="body" let-alert="rowData">
+                                    <span>{{alert.created_at ? (alert.created_at | date:'long') : '--'}}</span>
+                                </ng-template>
+                            </p-column>
+                            <ng-template let-alert pTemplate="rowexpansion">
+                                <div class="details-basic-info">
+                                    <div class="ui-grid ui-grid-responsive ui-grid-pad ui-fluid">
+                                        <div class="ui-grid-col-12">
+                                            <div class="ui-grid-row details-basic-item-class">
+                                                <div class="ui-grid-col-2">
+                                                    Alert Name: 
+                                                </div>
+                                                <div class="ui-grid-col-2 details-basic-item-value-color" *ngIf="alert">
+                                                    {{alert.alert_name}}
+                                                </div>
+                                                <div class="ui-grid-col-2">
+                                                    Sequence Number
+                                                </div>
+                                                <div class="ui-grid-col-2 details-basic-item-value-color" *ngIf="alert">
+                                                    {{alert.sequence_number}}
+                                                </div>
+                                                <div class="ui-grid-col-2">
+                                                    Occurred at:
+                                                </div>
+                                                <div class="ui-grid-col-3 details-basic-item-value-color" *ngIf="alert">
+                                                    {{alert.occur_time ? (alert.occur_time | date:'long') : '--'}}
+                                                </div>
+                                            
+                                            </div>
+                                            <div class="ui-grid-row details-basic-item-class">
+                                                <div class="ui-grid-col-2">
+                                                    Category:
+                                                </div>
+                                                <div class="ui-grid-col-2 details-basic-item-value-color" *ngIf="alert">
+                                                    {{alert.category}}
+                                                </div>
+                                                <div class="ui-grid-col-2">
+                                                    Severity: 
+                                                </div>
+                                                <div class="ui-grid-col-2 details-basic-item-value-color" *ngIf="alert">
+                                                    <div class="severity-icon">
+                                                        <i *ngIf="alert.severity=='Major'" class="fa fa-exclamation major"></i>
+                                                        <i *ngIf="alert.severity=='Critical'" class="fa fa-exclamation-triangle critical"></i>
+                                                        <i *ngIf="alert.severity=='Fatal'" class="fa fa-times-circle fatal"></i>
+                                                        <i *ngIf="alert.severity=='Informational'" class="fa fa-info-circle informational"></i>
+                                                    </div>
+                                                    <div class="severity-label">
+                                                        {{alert.severity}}
+                                                    </div>
+                                                </div>
+                                                <div class="ui-grid-col-2">
+                                                    Location: 
+                                                </div>
+                                                <div class="ui-grid-col-3 details-basic-item-value-color" *ngIf="alert">
+                                                    {{alert.location}}
+                                                </div>
+                                                
+                                            </div>
+                                            <div class="ui-grid-row details-basic-item-class">
+                                                <div class="ui-grid-col-2">
+                                                    Description:
+                                                </div>
+                                                <div class="ui-grid-col-10 details-basic-item-value-color" *ngIf="alert">
+                                                    {{alert.description}}
+                                                </div>
+                                            </div>
+                                            <div class="ui-grid-row details-basic-item-class">
+                                                <div class="ui-grid-col-2">
+                                                    <span>Recovery Advice:</span>
+                                                </div>
+                                                <div class="ui-grid-col-10 details-basic-item-value-color" *ngIf="alert">
+                                                    <span> {{ alert.recovery_advice}}</span>
+                                                </div>
+                                            </div>
+                                            
+                                        </div>
+                                    </div>
+                                </div>
+                            </ng-template>   
+                        </p-dataTable>
+                    </div>
+                </ng-template>
+            </p-tabPanel>
+        </p-tabView>
+    </div>
+    
+    
+</div>
+

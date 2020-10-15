@@ -1,5 +1,7 @@
 import { Component, OnInit, Input } from '@angular/core';
 
+let _ = require("underscore");
+
 @Component({
   selector: 'app-suspension-frame',
   templateUrl: './suspension-frame.component.html',
@@ -14,7 +16,18 @@ export class SuspensionFrameComponent implements OnInit {
     set policy(policy: any) {
         let extra = policy[1];
         this.policyName = policy[0];
-        if(this.policyName === "QoS" && extra["provisioningProperties"].ioConnectivity.maxIOPS){
+        if(this.policyName === "Customization" && extra["customProperties"]){
+          let self = this;
+          let customProp = {};
+          _.each(extra['customProperties'], function(value, key){
+            customProp = {
+                  'key' : key,
+                  'value' : value
+            }
+            self.data.push(customProp);
+            
+          })
+        }else if(this.policyName === "QoS" && extra["provisioningProperties"].ioConnectivity.maxIOPS){
             let maxIpos ="MaxIOPS = " + extra["provisioningProperties"].ioConnectivity.maxIOPS + " IOPS/TB";
             this.data.push(maxIpos);
             let maxBWS = "MaxBWS = " + extra["provisioningProperties"].ioConnectivity.maxBWS + " MBPS/TB";
