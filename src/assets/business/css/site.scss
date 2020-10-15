@@ -168,9 +168,11 @@ body{
     box-shadow: 0px 6px 25px rgba(33, 33, 33, 0.36);
     
 }
+.sidebar-toggle-button .fa{
+    color: #fff;
+    font-size: 0.3rem;
+}
 #layout-sidebar {
-    // background-color: #242e43;
-    // background-image: url('./assets/business/images/menu-bg.png');
     background-position: 0 bottom;
     background-repeat: no-repeat;
     box-sizing: border-box;
@@ -260,16 +262,57 @@ body{
 #layout-topbar .user-info p span i {
     margin-right: 0.05rem;
 }
-
+.left-sidebar{
+    background-color: #1b2539 !important;
+    width: 26em;
+}
+.left-sidebar .ui-sidebar-close .fa{
+    font-size: 0.25rem;
+    color: #fff;
+}
+.left-sidebar .ui-sidebar-close a:hover{
+    
+    color: #1b2539;
+}
 .sidebar-menu {
     display: inline-block;
     list-style-type: none;
-    margin: 0.75rem 0 0;
-    padding: 0 0.3rem 0 0.4rem;
     height: 100%;
-    overflow-y: auto;
+    //overflow-y: auto;
     
 }
+.sidebar-menu .menuGroup .menuGroup-list .menuGroup-child a h1{
+    font-size: 0.20rem;
+    padding: 0.3em 0;
+} 
+.sidebar-menu .menuGroup .ui-panel-titlebar-toggler{
+    background: none;
+    border: none;
+    color: #ffffff;
+    margin-top: -3em !important;
+}
+.sidebar-menu-container.ui-widget-content, .sidebar-menu .menuGroup.ui-widget-content{
+    background: none;
+    border: none;
+    color: #ffffff;
+}
+.sidebar-menu .menuGroup .ui-panel-titlebar{
+    background: none;
+    border: none;
+    color: #ffffff;
+    padding: 0.10rem 0 ;
+}
+.sidebar-menu .menuGroup .ui-panel-title{
+    font-size: 0.24rem;
+    color: #cdd3dd;
+}
+.sidebar-menu .menuGroup .menuGroup-child a{
+    padding: 0 !important;
+}
+/*
+.sidebar-menu .menuGroup .menuGroup-child a:hover{
+    color: #fff;
+} */
 /* width */
 ::-webkit-scrollbar {
     width:10px;
@@ -296,9 +339,10 @@ body{
 
 .sidebar-menu>li {
     border-bottom: 1px solid #323d54;
+    padding: 0 0.20rem;
 }
 
-.sidebar-menu>li>a {
+.sidebar-menu>li>a, .sidebar-menu .menuGroup .menuGroup-list .menuGroup-child a {
     padding: 0.18rem 0;
     text-decoration: none;
     transition: color .3s;
@@ -1039,25 +1083,25 @@ a {
     background-color: rgba(243, 246, 247, 1);
 }
 
-.volume-basic-info {
+.volume-basic-info, .details-basic-info {
     background: #f3f6f7;
     margin-bottom: .3rem;
     padding: .2rem;
     border-radius: 12px;
 }
 
-.volume-basic-info h3 {
+.volume-basic-info h3, .details-basic-info h3 {
     padding: 0 .08rem .2rem;
 }
-.volume-basic-info p {
+.volume-basic-info p, .details-basic-info p {
     padding: 0 .08rem .1rem;
 }
 
-.volume-basic-item-class {
+.volume-basic-item-class, .details-basic-item-class {
     padding: 0.5em 0;
 }
 
-.volume-basic-item-value-color {
+.volume-basic-item-value-color, .details-basic-item-value-color {
     color: #2E3039 !important;
 }
 
@@ -1863,6 +1907,25 @@ a {
 .register-backend-dialog .ui-dialog-content{
     min-height: 400px;
 }
+.home-sidebar-panel.ui-sidebar-lg{
+    background-color: #2C3F61;
+}
+.right-sidebar-content-wrapper{
+    margin: 2em;
+    h1 {
+        color: #cdd3dd;
+    }
+    .right-sidebar-header{
+        margin-bottom: 30px;
+    }
+    .ui-dropdown-items-wrapper{
+        max-height: 325px !important;
+    }
+
+    label {
+        font-weight: 700;
+    }
+}
 /* custom breadcrumb end */
 .uploading-title, .downloading-title{
     color: #333333;
@@ -1878,6 +1941,15 @@ a {
     .ui-dialog-content{
         height: 550px;
         padding-bottom: 0.6rem !important;
+    }
+}
+.register-alert-source-dialog{
+    .ui-dialog-content{
+        height: 550px;
+        padding-bottom: 0.6rem !important;
+    }
+    input {
+        width: 180px;
     }
 }
 .create-cloud-volume-dialog{
@@ -2062,16 +2134,16 @@ span.encryption-type {
     font-size: 14px;
     padding: 10px;
 }
-/* Create Host page */
-.initiator-array, .tag-array, .metadata-array{
+/* Create Host page, Create Cloud File Share, Register Storage device */
+.initiator-array, .tag-array, .metadata-array, .extra-attribute-array{
     width: 600px;
     padding: 0 0 5px 0;
 }
-a.add-initiator, a.add-tag, a.add-metadata{
+a.add-initiator, a.add-tag, a.add-metadata, a.add-extra-attribute{
     color: #00b12e;
 }
 
-a.remove-initiator, a.remove-tag, a.remove-metadata{
+a.remove-initiator, a.remove-tag, a.remove-metadata, a.remove-extra-attribute{
     color: #ff0000;
     padding: 8px 0 0 0;
 }
@@ -2108,3 +2180,232 @@ a.remove-initiator, a.remove-tag, a.remove-metadata{
     margin: 10px 0;
 }
 /* Help Section Ends */
+/* Delfin Styles start */
+td.ui-datatable-emptymessage{
+    text-align: center;
+}
+.storage-array-tree-view {
+    width: 97%;
+    height: 98%; 
+    overflow: auto;
+    border: none;
+    .ui-tree-empty-message {
+        padding: .25em;
+        text-align: center;
+        padding-top: 1.5rem;
+    }
+}
+.volume-parent-node ul.ui-treenode-children, .pool-parent-node ul.ui-treenode-children{
+    height: 100px;
+    overflow-y: scroll;
+    width: 50%;
+}
+.delfin-storage-list-page .ui-dataview-layout-options.ui-selectbutton .ui-togglebutton.ui-button.ui-state-default, .ui-selectbutton .ui-button.ui-state-default{
+padding: 0 0.15rem;
+}
+
+.storage-summary-panel-2{
+    height: 400px;
+    min-height: 350px;
+    .ui-scrollpanel-content{
+        height: calc(100%);
+    }
+    .no-records-found {
+        text-align: center;
+        padding-top: 2rem;
+    }
+}
+.storage-status-icon i{
+    font-size: 0.12rem;
+}
+.storage-status-icon.normal i{
+    color: #4CAF50;
+}
+.storage-status-icon.abnormal i{
+    color: #F44336;
+}
+
+.register-storage-param-group{
+    margin: 0.2rem;
+}
+.modify-storage-param-group{
+    margin: 0.2rem;
+}
+
+.storage-usage-bar{
+    .ui-progressbar{
+        height: 1.6em;
+    }
+    
+    .capacity-usage-zero .ui-progressbar-label{
+        color: #000;
+        padding-top: 2px;
+        display: block !important;
+    }
+
+    .capacity-usage-normal .ui-progressbar-value{
+        background: #26988f;
+    }
+    .capacity-usage-normal .ui-progressbar-label{
+        color: #000;
+        padding-top: 2px;
+    }
+}
+
+.storage-usage-bar {
+    .capacity-usage-warning .ui-progressbar-value{
+        background: #e8b701;
+    }
+    .capacity-usage-warning .ui-progressbar-label{
+        color: #fff;
+        padding-top: 2px;
+    }
+}
+.storage-usage-bar {
+    .capacity-usage-full .ui-progressbar-value{
+        background: #ff4747;
+    }
+    .capacity-usage-full .ui-progressbar-label{
+        color: #fff;
+        padding-top: 2px;
+    }
+}
+
+.capacity-stats-bar{
+    padding: 10px 0 0 0;
+    text-align: right;
+    font-size: 12px;
+}
+.free-storage{
+    color: #444;
+    font-weight: 600;
+}
+.used-storage{
+    color: #444;
+    font-weight: 600;
+}
+.total-storage{
+    color: #444 ;
+    font-weight: 600;
+}
+.stat-separator{
+    color: #000;
+}
+
+.overview-panel{
+    width: 300px;
+    min-height: 300px;
+    .capacity-stats-bar{
+        width: 100%;
+        text-align: left;
+        padding: 0 0 5px 5px;
+        font-size: 0.9em;
+    }
+    .storage-usage-bar{
+        padding-top: 10px;
+    }
+    .overview-title{
+        border-bottom: 1px solid #444;
+        padding: 0 0 5px 5px;
+        h4{
+            font-weight: 700;
+        }   
+    }
+    .capacity-table{
+        width: 100%;
+        .capacity-header{
+            text-align: left;
+        }
+        .capacity-field{
+            text-align: left;
+        }
+    }
+}
+
+.capacity-usage-warning.ui-progressbar-value{
+    background-color: #ff0000;
+}
+.array-usable-capacity-widget{
+    height: 400px;
+    .storage-summary-panel-2{
+        min-height: 350px;
+    }
+    
+}
+.array-raw-capacity-widget{
+    .ui-scrollpanel-content{
+        height: 100%;
+        padding-bottom: 10px;
+    }
+    .storage-usage-bar #raw-capacity-bar{
+        width: 100%;
+        height: 20px;
+        background-color: #26988f;
+        .usable-capacity{
+            width: 75%;
+            background-color: #444;
+            height: 20px;
+            text-align: center;
+            .label{
+                color: #fff;
+            }
+        }
+        .system-used{
+            text-align: center;
+            .label{
+                color: #fff;
+            }
+        }
+    }
+}
+
+.ui-grid-row .capacity-overview-container {
+    box-shadow: 5px 5px 25px rgba(51, 59, 69, 0.14902);
+    -webkit-box-shadow: 10px 5px 25px rgba(51, 59, 69, 0.14902);
+    -moz-box-shadow: 5px 5px 25px rgba(51, 59, 69, 0.14902);
+    border: 1px solid #D5D5D5;
+    background-color: #1D7CEC;
+    color: #657D95;
+    border: 25px solid #fff;
+}
+.capacity-overview-container.free{
+    background-color: #67B214;
+}
+.capacity-overview-container.used{
+    background-color: #db4437;
+}
+.capacity-overview-container.raw{
+    background-color: #48917b;
+}
+.capacity-overview-container.system-used{
+    background-color: #444;
+}
+.capacity-overview-container.subscribed{
+    background-color: #134d8e;
+}
+.capacity-overview-label-tile, .capacity-overview-value-tile {
+    color: #fff;
+    text-align: center;
+    padding: 20px 5px;
+    font-size: 1.25em;
+    font-weight: 600;
+}
+.severity-icon{
+    float: left;
+    min-width: 30px;
+
+    .major{
+        color: #ff7f00;
+    }
+    .critical{
+        color: #db4437;
+    }
+    .fatal{
+        color: #ff0000;
+    }
+    .informational{
+        color: #4285f3;
+    }
+}
+/* Delfin Styles end */
+
