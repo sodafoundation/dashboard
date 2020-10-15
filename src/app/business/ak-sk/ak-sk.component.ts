@@ -84,8 +84,8 @@ export class AkSkComponent implements OnInit{
     }
     addKey(){
         //Gets a safe random number
-        let accessKey = this.getRandomstring(20);
-        let secretKey = this.getRandomstring(40);
+        let accessKey = this.getRandomstring(16);
+        let secretKey = this.getRandomstring(32);
         let blob = "{\"access\":\"" + accessKey + "\",\"secret\":\"" + secretKey +"\"}";
         let request: any = {};
         request = {

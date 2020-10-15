@@ -1,4 +1,5 @@
 import {ValidatorFn, AbstractControl } from '@angular/forms';
+import { Consts } from './consts';
 export class Utils {
 
     static capacityUnit = {
@@ -118,6 +119,26 @@ export class Utils {
 
         ret = this.numberFormat(ret, decimals);
         return ret + " " + unit;
+    }
+    /***
+     * formatBytes(bytes, decimals) Returns the capacity value in appropriate display units
+     * @param bytes (byte)
+     * @param decimals (number) //defaults to 2
+     * 
+     * As per https://stackoverflow.com/a/18650828/6303009
+     * by Aliceljm (https://stackoverflow.com/users/1596799/aliceljm)
+     */
+    static formatBytes(bytes, decimals = 2) {
+        if (bytes === 0) return '0 Bytes';
+    
+        const k = Consts.TO_GiB_CONVERTER;
+        const dm = decimals < 0 ? 0 : decimals;
+        const sizesGiB = ['Bytes', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB', 'EiB', 'ZiB', 'YiB'];
+        const sizesGB = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+        
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizesGiB[i];
     }
 
     /**
