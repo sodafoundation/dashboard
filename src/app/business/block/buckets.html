@@ -2,7 +2,7 @@
 <div class="content-header">
     <div class="table-toolbar">
         <div class="left">
-            <button class="ui-button-secondary" [disabled] = "showCreateBucket" pButton type="button" (click)="showCreateForm()" label="{{I18N.keyID['sds_block_volume_create']}}" ></button>
+            <button class="ui-button-secondary" [disabled] = "showAKSKWarning" pButton type="button" (click)="showCreateForm()" label="{{I18N.keyID['sds_block_volume_create']}}" ></button>
         </div>
         <div class="right">
             <div class="ui-inputsearch">
@@ -12,7 +12,7 @@
             <button class="" pButton type="button" (click)="getBuckets()"  icon="fa-refresh"></button>
         </div>
     </div>
-    <div style="padding-bottom: 0.1rem;color:red;" *ngIf="showCreateBucket">
+    <div style="padding-bottom: 0.1rem;color:red;" *ngIf="showAKSKWarning">
         The operation of the buckets requires AK/SK authentication. The current system does not have AK/SK. Please go to
         <b>
             <a href="#" [routerLink] = "[akSkRouterLink]">add AK/SK</a> 
