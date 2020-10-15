@@ -1,6 +1,6 @@
 <div class="table-toolbar">
     <div class="left">
-        <button class="ui-button-secondary" pButton type="button" label="{{I18N.keyID['sds_block_volume_create']}}" (click)="configCreateMigration()" ></button>
+        <button class="ui-button-secondary" [disabled] = "showAKSKWarning" pButton type="button" label="{{I18N.keyID['sds_block_volume_create']}}" (click)="configCreateMigration()" ></button>
     </div>
     <div class="right">
         <div class="ui-inputsearch">
@@ -9,6 +9,13 @@
         </div>
         <button class="" pButton type="button" (click)="getMigrations()" icon="fa-refresh"></button>
     </div>
+</div>
+<div style="padding-bottom: 0.1rem;color:red;" *ngIf="showAKSKWarning">
+    The migration operation requires AK/SK authentication. The current system does not have AK/SK. Please go to
+    <b>
+        <a href="#" [routerLink] = "[akSkRouterLink]">add AK/SK</a> 
+    </b> 
+     
 </div>
 <p-dataTable [value]="allMigrations" [globalFilter]="searchByName" [(selection)]="selectedMigrations"  [showHeaderCheckbox]="true" resizableColumns="true" expandableRows="true" rowExpandMode="single" [rows]="10" [paginator]="true" [pageLinks]="3" (onRowExpand)="onRowExpand($event)" [rowsPerPageOptions]="[10,20,50,100]">
     <p-column expander="true" styleClass="table-col-expander"></p-column>

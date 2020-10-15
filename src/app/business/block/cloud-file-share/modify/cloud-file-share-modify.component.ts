@@ -40,6 +40,9 @@ export class CloudFileShareModifyComponent implements OnInit{
             maxLength: "Maximum 128 characters",
             pattern: "Must start with a character. Can contain alphabets, numbers and underscore. No special characters allowed."
         },
+        "size" : {
+            required: "Size is required"
+        },
         "backend_type" : {
             required: "Backend type is required"
         },
@@ -62,11 +65,12 @@ export class CloudFileShareModifyComponent implements OnInit{
         region: 'Region',
         encrypted: "Enable Encryption",
         encryptionSettings: "Encryption Settings",
-        size: "Size",
+        size: "Size (GiB)",
         tags: "Tags",
         metadata: "Metadata",
         backend_type: "Type",
-        backend: "Backend"
+        backend: "Backend",
+        az: "Availability Zone"
     };
     msgs: Message[];
 
@@ -101,7 +105,7 @@ export class CloudFileShareModifyComponent implements OnInit{
                 this.allTypes = [];
                 this.BucketService.getTypes().subscribe((res) => {
                     res.json().types.forEach(element => {
-                    if( element.name=='aws-file' || element.name == 'azure-file' ){
+                    if( element.name=='aws-file' || element.name == 'azure-file' || element.name == 'gcp-file'){
                         this.allTypes.push({
                             label: Consts.CLOUD_TYPE_NAME[element.name],
                             value: element.name
@@ -112,27 +116,27 @@ export class CloudFileShareModifyComponent implements OnInit{
                     }
                     });
                     
-                    this.backendsOption = [];
-                    this.BucketService.getBackendsByTypeId(this.selectType).subscribe((res) => {
-                        let backends = res.json().backends ? res.json().backends :[];
-                        this.listedBackends = backends;
-                        backends.forEach(element => {
-                            this.backendsOption.push({
-                                label: element.name,
-                                value: element.name
-                            })
-                        });
-                        this.selectBackend = this.selectedFileShare['backend'];
-                    });
                 });
                 this.enableEncryption = this.selectedFileShare['encrypted'] ? this.selectedFileShare['encrypted'] : false;
                 
                 this.showModifyForm = true;
                 this.cloudFileShareModifyForm = this.fb.group({
                     'description': new FormControl(this.selectedFileShare['description'] ? this.selectedFileShare['description'] : '', {validators:[Validators.maxLength(250),Validators.pattern(this.validRule.description)]}),
+                    'type': new FormControl('cloudFS')
                 });
+                if(this.selectedFileShare['backend_type'] == 'gcp-file'){
+                    if(this.selectedFileShare['size']){
+                        self.cloudFileShareModifyForm.addControl('size', this.fb.control((this.selectedFileShare['size'] / Math.pow(Consts.TO_GiB_CONVERTER, 3)), [Validators.required, Validators.min(1024)]));
+                        self.cloudFileShareModifyForm.controls['size'].setValidators([Validators.required, Validators.min(1), Validators.max(16384)]);
+                        self.cloudFileShareModifyForm.controls['size'].updateValueAndValidity();
+                    }
+                }
+               
                 if(this.selectedFileShare['size'] && this.selectedFileShare['backend_type'] == 'azure-file'){
-                    self.cloudFileShareModifyForm.addControl('size', this.fb.control(this.selectedFileShare['size'], Validators.required));
+                    self.cloudFileShareModifyForm.addControl('size', this.fb.control((this.selectedFileShare['size'] / Math.pow(Consts.TO_GiB_CONVERTER, 3)), Validators.required));
+                }
+                if(this.selectedFileShare['availabilityZone'] && this.selectedFileShare['backend_type'] == 'gcp-file'){
+                    self.cloudFileShareModifyForm.addControl('availabilityZone', this.fb.control(this.selectedFileShare['availabilityZone']));
                 }
                 if(this.selectedFileShare['tags'] && this.selectedFileShare['tags'].length){
                     _.each(this.selectedFileShare['tags'], function(item){
@@ -195,6 +199,23 @@ export class CloudFileShareModifyComponent implements OnInit{
                             }
                             self.selectedFileShare['metadataArr'].push(metaitem);
                         } 
+                        if(key=="Tier"){
+                            if(value['Kind'].hasOwnProperty('StringValue')){
+                                metaitem = {
+                                    key : "Tier", 
+                                    value : value['Kind']['StringValue'],
+                                    type : 'string'
+                                }
+                            }
+                            if(value['Kind'].hasOwnProperty('NumberValue')){
+                                metaitem = {
+                                    key: "Tier", 
+                                    value : value['Kind']['NumberValue'],
+                                    type : 'number'
+                                }
+                            }
+                            self.selectedFileShare['metadataArr'].push(metaitem);
+                        }
                         
                     })
                 }
@@ -204,6 +225,8 @@ export class CloudFileShareModifyComponent implements OnInit{
                    this.selectedFileShare['metadataArr'].slice(1).forEach(element => {
                         (this.cloudFileShareModifyForm.controls['metadata'] as FormArray).push(self.createMetadata('','',element));
                    });
+                } else if(this.selectedFileShare['backend_type'] == 'azure-file' || this.selectedFileShare['backend_type'] == 'gcp-file'){
+                    this.cloudFileShareModifyForm.addControl('metadata', this.fb.array([this.createMetadata()]));
                 }
             });
             
@@ -225,7 +248,7 @@ export class CloudFileShareModifyComponent implements OnInit{
         this.allTypes = [];
         this.BucketService.getTypes().subscribe((res) => {
             res.json().types.forEach(element => {
-            if( element.name=='aws-file' || element.name == 'azure-file' ){
+            if( element.name=='aws-file' || element.name == 'azure-file' || element.name == 'gcp-file'){
                 this.allTypes.push({
                     label: Consts.CLOUD_TYPE_NAME[element.name],
                     value: element.name
@@ -236,56 +259,17 @@ export class CloudFileShareModifyComponent implements OnInit{
         
     }
 
-    getBackendsByTypeId() {
-        this.backendsOption = [];
-        this.BucketService.getBackendsByTypeId(this.selectType).subscribe((res) => {
-            let backends = res.json().backends ? res.json().backends :[];
-            this.listedBackends = backends;
-            backends.forEach(element => {
-                this.backendsOption.push({
-                    label: element.name,
-                    value: element.name
-                })
-            });
-        });
-    }
-
-    getBackends() {
-        this.allBackends = [];
-        this.BucketService.getBckends().subscribe((res) => {
-            this.allBackends = res.json().backends;
-            this.allBackends.forEach(element => {
-                if(element['id'] == this.selectedFileShare['backendId']){
-                    this.selectedFileShare['backend_type'] = element['type'];
-                }
-            });
-        });
-    }
-   
-    
-
-    updateFormAndRegion(){
-        let selected = this.cloudFileShareModifyForm.value.backend;
-        this.listedBackends.forEach( element =>{
-            if(element.name == selected){
-                this.selectedBackend = element;
-            }
-        })
-        
-       
-    }
-
     createTags(key?, value?, tagObj?){
         if(tagObj){
             
            return this.fb.group({
-            key: new FormControl(tagObj.key, Validators.required),
-            value: new FormControl(tagObj.value, Validators.required),
+            key: new FormControl(tagObj.key),
+            value: new FormControl(tagObj.value),
           })
         } else{
             return this.fb.group({
-                key: new FormControl(key ? key : '', Validators.required),
-                value: new FormControl(value ? value : '', Validators.required)
+                key: new FormControl(key ? key : ''),
+                value: new FormControl(value ? value : '')
             })
         }
         
@@ -302,13 +286,13 @@ export class CloudFileShareModifyComponent implements OnInit{
     createMetadata(key?, value?, metaObj?){
         if(metaObj){
             return this.fb.group({
-                key: new FormControl(metaObj.key, Validators.required),
-                value: new FormControl(metaObj.value, Validators.required),
+                key: new FormControl(metaObj.key),
+                value: new FormControl(metaObj.value),
               })
         } else{
             return this.fb.group({
-                key: new FormControl(key ? key : '', Validators.required),
-                value: new FormControl(value ? value : '', Validators.required)
+                key: new FormControl(key ? key : ''),
+                value: new FormControl(value ? value : '')
             })
         }
         
@@ -324,24 +308,32 @@ export class CloudFileShareModifyComponent implements OnInit{
     }
 
     getFileShareDataArray(value){
-        let meta = {};
+        
         let dataArr = {
-            description: value['description'] ? value['description'] : ''
+            description: value['description'] ? value['description'] : '',
+            type: value['type']
         }
         if(value['metadata']){
+            let meta = {};
+            dataArr['metadata'] = [];
             value['metadata'].forEach(element => {
                 if(element['key']=="ProvisionedThroughputInMibps"){
                     meta[element['key']] = parseInt(element['value']);
-                } else{
+                } else if(element['key']){
                     meta[element['key']] = element['value'];
                 }
-                
+                if(!_.isEmpty(meta)){
+                    dataArr['metadata'] = meta;
+                } else{
+                    delete dataArr['metadata'];
+                }
             });
-            dataArr['metadata'] = meta;
         }
-        
+        if(value['availabilityZone']){
+            dataArr['availabilityZone'] = value['availabilityZone'];
+        }
         if(value['size']){
-            dataArr['size'] = parseInt(value['size']);
+            dataArr['size'] = parseInt(value['size']) * Consts.FROM_GiB_CONVERTER;
         }
         if(value['tags']){
             dataArr['tags'] = value['tags'];

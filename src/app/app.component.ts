@@ -65,7 +65,6 @@ export class AppComponent implements OnInit, AfterViewInit {
     userId;
     SignatureKey = {};
     akSkRouterLink = "/akSkManagement";
-    monitorConfigLink = "/monitor/config";
     Signature = "";
     kDate = "";
     stringToSign = "";
@@ -90,7 +89,7 @@ export class AppComponent implements OnInit, AfterViewInit {
             "text" : "A profile is a set of configurations on service capabilities (including resource tuning, QoS) of storage resources. A profile must be specified when volume or fileshare is created."
         },
         {
-            "title": "Resource",
+            "title": "Resource Manager",
             "description": "Volumes / Buckets / File Share / Hosts",
             "routerLink": "/block",
             "joyrideStep" : "menuResource",
@@ -102,13 +101,6 @@ export class AppComponent implements OnInit, AfterViewInit {
             "routerLink": "/dataflow",
             "joyrideStep" : "menuDataflow",
             "text" : "Data flow through buckets by migration / replication."
-        },
-        {
-            "title": "Monitor",
-            "description": "Telemetry information.",
-            "routerLink": "/monitor",
-            "joyrideStep" : "menuMonitor",
-            "text" : "Links to Telemetry services"
         },
         {
             "title": "Services",
@@ -135,11 +127,34 @@ export class AppComponent implements OnInit, AfterViewInit {
             "text" : "A profile is a set of configurations on service capabilities (including resource tuning, QoS) of storage resources. A profile must be specified when volume is created."
         },
         {
-            "title": "Resource",
+            "title": "Resource Manager",
             "description": "Volumes / Buckets / File Share / Hosts",
             "routerLink": "/block",
             "joyrideStep" : "menuResource",
-            "text" : "View and manage Buckets, Volumes, Volume Groups, File shares and Hosts that have been manually created or applied for through service templates."
+            "text" : "View and manage Buckets, Volumes, Volume Groups, File shares and Hosts that have been manually created or applied for through service templates.",
+            "group" : true,
+            "children" : [
+                {
+                    "title" : "Buckets",
+                    "routerLink": "/block"
+                },
+                {
+                    "title" : "Volumes",
+                    "routerLink": "/block/fromVolume"
+                },
+                {
+                    "title" : "Volume Group",
+                    "routerLink": "/block/fromGroup"
+                },
+                {
+                    "title" : "File Share",
+                    "routerLink": "/block/fromFileShare"
+                },
+                {
+                    "title" : "Hosts",
+                    "routerLink": "/block/fromHosts"
+                },
+            ]
         },
         {
             "title": "Dataflow",
@@ -149,11 +164,18 @@ export class AppComponent implements OnInit, AfterViewInit {
             "text" : "Data flow through buckets by migration / replication."
         },
         {
-            "title": "Monitor",
-            "description": "Telemetry information.",
-            "routerLink": "/monitor",
-            "joyrideStep" : "menuMonitor",
-            "text" : "Links to Telemetry services"
+            "title": "Resource Monitor",
+            "description": "SODA Storage Infrastructure Manager",
+            "routerLink": "/resource-monitor",
+            "joyrideStep" : "menuDelfin",
+            "text" : "delfin is the SODA Infrastructure Manager project which provides unified, intelligent and scalable resource management, alert and performance monitoring",
+            "group" : true,
+            "children" : [
+                {
+                    "title" : "Storage Summary",
+                    "routerLink": "/resource-monitor"
+                },
+            ]
         },
 	    {
             "title": "Services",
@@ -185,7 +207,7 @@ export class AppComponent implements OnInit, AfterViewInit {
         'menuProfile',
         'menuResource',
         'menuDataflow',
-        'menuMonitor',
+        'menuDelfin',
         'menuServices',
         'menuInfrastructure',
         'menuIdentity',
@@ -207,7 +229,6 @@ export class AppComponent implements OnInit, AfterViewInit {
         'menuProfile',
         'menuResource',
         'menuDataflow',
-        'menuMonitor',
         'menuServices',
         'homeResourceCard@/home',
         'homeDataflowCard@/home',
@@ -569,7 +590,7 @@ export class AppComponent implements OnInit, AfterViewInit {
                     window['akskWarning']=true;
                     
                 }
-                if(window['akskWarning'] && this.router.url != 'akSkManagement'){
+                if(window['akskWarning'] && (this.router.url == '/block' || this.router.url == '/dataflow')){
                     let msg = "SODA Dashboard requires AK/SK authentication for all multi-cloud operations. The current system does not have an AK/SK. Click below to go to AK/SK management and add one."
                     let header = "AK/SK Not Found!";
                     let acceptLabel = "Add AK/SK";
@@ -711,11 +732,11 @@ export class AppComponent implements OnInit, AfterViewInit {
     stepDone() {
         setTimeout(() => {
             this.title = 'Tour Finished!';
-            console.log('Step done!');
+            
         }, 3000);
     }
     onPrev() {
-        console.log('Prev Clicked');
+        
     }
     startTour() {
         const options = {
@@ -738,7 +759,7 @@ export class AppComponent implements OnInit, AfterViewInit {
             },
             () => {
                 this.stepDone();
-                console.log('Tour finished');
+                
             }
         );
     }
@@ -949,13 +970,6 @@ export class AppComponent implements OnInit, AfterViewInit {
                         },{
                             label: "AK/SK Management",
                             routerLink: this.akSkRouterLink,
-                            command: ()=>{
-                                this.isHomePage = false;
-                            }
-                        },
-                        {
-                            label: "Monitor Configuration",
-                            routerLink: this.monitorConfigLink,
                             command: ()=>{
                                 this.isHomePage = false;
                             }
