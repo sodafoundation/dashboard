@@ -5,9 +5,11 @@ import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { CloudFileShareCreateComponent } from './cloud-file-share-create.component';
 
 import { RouterModule } from '@angular/router';
-import {DataTableModule, DropMenuModule, DialogModule, FormModule, InputTextModule, InputTextareaModule, 
-  DropdownModule ,ConfirmationService,ConfirmDialogModule,CalendarModule,CheckboxModule, InputSwitchModule, 
-  TableModule,TabViewModule, ButtonModule, SpinnerModule, GrowlModule } from '../../../../components/common/api';
+import {
+    DataTableModule, DropMenuModule, DialogModule, FormModule, InputTextModule, InputTextareaModule,
+    DropdownModule, ConfirmationService, ConfirmDialogModule, CalendarModule, CheckboxModule, InputSwitchModule,
+    TableModule, TabViewModule, ButtonModule, SpinnerModule, GrowlModule, RadioButtonModule
+} from '../../../../components/common/api';
 import { HttpService } from '../../../../shared/service/Http.service';
 import { AvailabilityZonesService } from '../../../resource/resource.service';
 import { ProfileService } from '../../../profile/profile.service';
@@ -45,7 +47,8 @@ let routers = [{
     InputSwitchModule,
     TableModule,
     SpinnerModule,
-    GrowlModule
+    GrowlModule,
+    RadioButtonModule
   ],
   exports: [ CloudFileShareCreateComponent ],
   providers: [
