@@ -1,0 +1,64 @@
+<div>
+    <p-accordion styleClass="accordion-help" [multiple]="true">
+        <p-accordionTab header="How do I create a Volume?">
+            <ol>
+                <li>Create a profile and select Block storage type.</li>
+                <li>Click on Resource -&gt; Volume Tab -&gt; Create</li>
+                <li>Select the Availability Zone, Profile and capacity(GB or TB)</li>
+                <li>Enter a valid name.</li>
+                <li>Optionally you can "Configure Replication" by checking the check-box.</li>
+                <li>If you checked the checkbox then select the profile to use and enter the period for replication.</li>
+                <li>Click Ok. You should see the Volume listed in the table.</li>
+            </ol>
+            <img src="assets/business/images/help/how-to-create-a-volume.gif" width="80%" height="auto"/>
+        </p-accordionTab>
+        <p-accordionTab header="How do I create a Bucket?">
+            <ol>
+                <li>Add a backend from the Home Screen.</li>
+                <li>Go to Resource -&gt; Bucket tab. Click on Create.</li>
+                <li>In the dialog window that opens enter a valid name, select the backend type and choose the backend where the bucket should be created. All objects uploaded to this bucket will be saved to this backend by default.</li>
+                <li>SODA supports server side encryption(SSE) on buckets. To enable SSE change the "Enable Encryption?" switch to yes. Select SSE from the list.</li>
+                <li>Click on Ok. Hooray! your bucket has been created. Now lets upload some objects!</li>
+           </ol>
+           <h3>Here is a short demo:</h3>
+            <img src="assets/business/images/help/how-to-create-a-bucket.gif" width="80%" height="auto"/>
+        </p-accordionTab>
+        <p-accordionTab header="How do I migrate a Bucket?">
+            <ol>
+                <li>Add two backends from the Home Screen. One for the source and one for the destination buckets.</li>
+                <li>Go to Resource -&gt; Bucket tab and click on the "Migrate" link under operation.</li>
+                <li>Enter a plan name. Use a name that will tell you what the migration does. It will help in the future to run the job again.</li>
+                <li>The source bucket is automatically selected. Select the destination bucket.</li>
+                <li>By default the migration is scheduled to run immediately. To schedule the migration at a different date and time, uncheck the "Immediately" checkbox and select the data and time.</li>
+                <li>Optionally you can decide if you want to retain the object at the source or not. If you want to move the object then select the "Delete source objects..." checkbox.</li>
+                <li>Click on Ok. Depending on the number of objects and the size of objects, the Migration will be started at scheduled time (or immediately).</li>
+                <li>You can check the migration details under the Dataflow page. In the table, expand to view the details of the migration task.</li>
+                <li>You can see the source, the destination, the total size of the objects to be migrated, the size of objects currently migrated and the progress of the migration.</li>
+            </ol>
+            <h3>Here is a short demo:</h3>
+            <img src="assets/business/images/help/how-to-migrate-a-bucket.gif" width="80%" height="auto"/>
+        </p-accordionTab>
+        <p-accordionTab header="How do I upload an object?">
+            <h3>Here is a short demo:</h3>
+            <img src="assets/business/images/help/how-to-upload-object.gif" width="80%" height="auto"/>
+        </p-accordionTab>
+        <p-accordionTab header="What is the maximum size of object that I can upload?">
+            
+        </p-accordionTab>
+        <p-accordionTab header="How do I set a Lifecycle rule on a bucket?">
+            
+        </p-accordionTab>
+        <p-accordionTab header="How do I set ACL on bucket?">
+            
+        </p-accordionTab>
+        <p-accordionTab header="Can I copy an object from one bucket / backend to another?">
+            
+        </p-accordionTab>
+        <p-accordionTab header="How do I create an encrypted bucket?">
+            
+        </p-accordionTab>
+        <p-accordionTab header="FAQs">
+            
+        </p-accordionTab>
+    </p-accordion>
+</div>

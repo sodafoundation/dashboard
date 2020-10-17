@@ -2,7 +2,7 @@
 <div class="content-header">
     <div class="table-toolbar">
         <div class="left">
-            <button class="ui-button-secondary" [disabled] = "showCreateBucket" pButton type="button" (click)="showCreateForm()" label="{{I18N.keyID['sds_block_volume_create']}}" ></button>
+            <button class="ui-button-secondary" [disabled] = "showAKSKWarning" pButton type="button" (click)="showCreateForm()" label="{{I18N.keyID['sds_block_volume_create']}}" ></button>
         </div>
         <div class="right">
             <div class="ui-inputsearch">
@@ -12,7 +12,7 @@
             <button class="" pButton type="button" (click)="getBuckets()"  icon="fa-refresh"></button>
         </div>
     </div>
-    <div style="padding-bottom: 0.1rem;color:red;" *ngIf="showCreateBucket">
+    <div style="padding-bottom: 0.1rem;color:red;" *ngIf="showAKSKWarning">
         The operation of the buckets requires AK/SK authentication. The current system does not have AK/SK. Please go to
         <b>
             <a href="#" [routerLink] = "[akSkRouterLink]">add AK/SK</a> 
@@ -26,7 +26,11 @@
             </ng-template>
         </p-column>
         <p-column field="LocationConstraint" header="Default Backend" ></p-column>
-        <p-column field="CreateTime" header="Created At"></p-column>
+        <p-column field="CreationDate" header="Created At">
+            <ng-template pTemplate="body" let-obj="rowData" let-i="rowIndex">
+                {{obj.CreationDate ? (obj.CreationDate | date:'long') : '--'}}
+            </ng-template>
+        </p-column>
         <p-column field="encryptionEnabled" header="Encryption Enabled">
             <ng-template pTemplate="body" let-bucket="rowData">
                 <p *ngIf="bucket.encryptionEnabled==true"><i class="fa fa-lock"></i> <span class="encryption-text">Yes</span><span class="encryption-type">AES256</span></p>
@@ -52,7 +56,7 @@
                 <p-dropdown [style]="{'min-width':'150px','width':'220px'}" placeholder="Please select" [options]="allTypes" (onChange)="getBackendsByTypeId()" name='selectType' [(ngModel)]='selectType' formControlName="backend_type"></p-dropdown>
             </form-item>
             <form-item label="Backend" [required]="true">
-                <p-dropdown [style]="{'min-width':'150px','width':'220px'}" placeholder="Please select" [options]="backendsOption" formControlName="backend"></p-dropdown>
+                <p-dropdown [style]="{'min-width':'150px','width':'220px'}" placeholder="Please select" [options]="backendsOption" (onChange)="setRegion()" formControlName="backend"></p-dropdown>
             </form-item>
            
             <form-item label="Enable Encryption?" >

@@ -1,0 +1,138 @@
+<p-growl [value]="msgs" [sticky]="false" [life]="6000"></p-growl>
+<div>
+    <div class="table-toolbar">
+        <div class="left">
+            <button class="ui-button-secondary" pButton type="button" label="{{I18N.keyID['sds_cloud_file_share_create']}}" [routerLink]="['/createCloudFileShare']"></button>
+            <button pButton type="button" label="{{I18N.keyID['sds_cloud_file_share_delete']}}" (click)="batchDelete(selectedFileShares)" [disabled]="selectedFileShares.length == 0"></button>
+        </div>
+        <div class="right">
+            <div class="ui-inputsearch">
+                <input type="text" #searchByName pInputText placeholder="{{I18N.keyID['sds_commmon_search']}}">
+                <button pButton type="button" icon="fa-search"></button>
+            </div> 
+            <button class="" pButton type="button" (click)="getFileShares()" icon="fa-refresh"></button>
+        </div>
+    </div>
+    <p-dataTable [value]="allFileShares" [globalFilter]="searchByName" [(selection)]="selectedFileShares" [expandableRows]="true" [showHeaderCheckbox]="true" resizableColumns="true" [rows]="10" [paginator]="true" [pageLinks]="3" [rowsPerPageOptions]="[10,20,50,100]">
+        <p-column expander="true" styleClass="col-icon" [style]="{'width': '30px'}"></p-column>
+        <p-column selectionMode="multiple" [style]="{'width': '30px'}"></p-column>
+        <p-column field="name" header="Name"></p-column>
+        <p-column field="backend" header="Backend"></p-column>
+        <p-column field="size" header="Size">
+            <ng-template pTemplate="body" let-fileshare="rowData">
+                {{fileshare.displaySize ? fileshare.displaySize : '--'}}
+            </ng-template>
+        </p-column>
+        <p-column field="status" header="Status">
+            <ng-template pTemplate="body" let-fileshare="rowData">
+                <span>{{fileshare.status}}</span> <i *ngIf="fileshare.status=='creating'  || fileshare.status=='updating'" class="fa fa-spinner fa-spin fa-3x fa-fw"></i>
+            </ng-template>
+        </p-column>
+        <p-column field="createdAt" header="Created At">
+            <ng-template pTemplate="body" let-fileshare="rowData">
+                <span>{{fileshare.createdAt ? (fileshare.createdAt | date:'long') : '--'}}</span>
+            </ng-template>
+        </p-column>
+        <p-column field="updatedAt" header="Updated At">
+            <ng-template pTemplate="body" let-fileshare="rowData">
+                <span>{{fileshare.updatedAt ? (fileshare.updatedAt | date:'long') : '--'}}</span>
+            </ng-template>
+        </p-column>
+        <p-column header="{{I18N.keyID['sds_block_volume_operation']}}" [style]="{'width': '335px'}">
+            <ng-template pTemplate="body" let-fileShare="rowData" let-i="rowIndex">
+                <p-dropmenu label="{{I18N.keyID['sds_block_volume_more']}}" [model]="fileShare['disabled'] ? menuDeleDisableItems: menuItems" (click)="returnSelectedFileShare(fileShare)"></p-dropmenu>
+            </ng-template>
+        </p-column>
+        <ng-template let-fileshare pTemplate="rowexpansion">
+            <div class="ui-grid ui-grid-responsive ui-grid-pad ui-fluid">
+                <div class="ui-grid-row volume-basic-item-class">
+                        <div class="ui-grid-col-2">
+                            {{label.name}}:
+                        </div>
+                        <div class="ui-grid-col-2 volume-basic-item-value-color">
+                            {{fileshare.name}}
+                        </div>
+                        <div class="ui-grid-col-2">
+                            {{label.status}}:
+                        </div>
+                        <div class="ui-grid-col-2 volume-basic-item-value-color">
+                            {{fileshare.status? fileshare.status : '--'}}
+                            <i *ngIf="fileshare.status=='creating'  || fileshare.status=='updating'" class="fa fa-spinner fa-spin fa-3x fa-fw"></i>
+                        </div>
+                        <div class="ui-grid-col-2">
+                            {{label.createdAt}}:
+                        </div>
+                        <div class="ui-grid-col-3 volume-basic-item-value-color">
+                            {{fileshare.createdAt ? (fileshare.createdAt | date:'long') : '--'}}
+                        </div>
+                        
+                    </div>
+                    <div class="ui-grid-row volume-basic-item-class">
+                        <div class="ui-grid-col-2">
+                            {{label.description}}:
+                        </div>
+                        <div class="ui-grid-col-2 volume-basic-item-value-color">
+                            {{fileshare.description}}
+                        </div>
+                        <div class="ui-grid-col-2">
+                            {{label.size}}:
+                        </div>
+                        <div class="ui-grid-col-2 volume-basic-item-value-color">
+                            {{fileshare.displaySize ? fileshare.displaySize : '--'}}
+                        </div>
+                        <div class="ui-grid-col-2">
+                            {{label.updatedAt}}:
+                        </div>
+                        <div class="ui-grid-col-3 volume-basic-item-value-color">
+                            {{fileshare.updatedAt ? (fileshare.updatedAt | date:'long') : '--'}}
+                        </div>
+                        
+                    </div>
+                    <div class="ui-grid-row volume-basic-item-class">
+                            <div class="ui-grid-col-2">
+                                {{label.region}}:
+                            </div>
+                            <div class="ui-grid-col-2 volume-basic-item-value-color">
+                                {{fileshare.region ? fileshare.region : '--'}}
+                            </div>
+                            <div class="ui-grid-col-2">
+                                {{label.availabilityZone}}:
+                            </div>
+                            <div class="ui-grid-col-2 volume-basic-item-value-color">
+                                {{fileshare.availabilityZone ? fileshare.availabilityZone : '--'}}
+                            </div>
+                            
+                            <div class="ui-grid-col-2">
+                                
+                            </div>
+                            <div class="ui-grid-col-3 volume-basic-item-value-color">
+                                
+                            </div>
+                        </div>
+                <div class="ui-grid-row volume-basic-item-class">
+                    <div class="ui-grid-col-12">
+                        {{label.tags}}:
+                    </div>
+                </div>
+                <div class="ui-grid-row volume-basic-item-class">
+                    <p-dataTable [value]="fileshare.tags">
+                        <p-column field="key" header="Key"></p-column>
+                        <p-column field="value" header="Value"></p-column>
+                    </p-dataTable>
+                </div>
+                <div class="ui-grid-row volume-basic-item-class">
+                    <div class="ui-grid-col-12">
+                        {{label.metadata}}:
+                    </div>
+                </div>
+                <div class="ui-grid-row volume-basic-item-class">
+                    <p-dataTable [value]="fileshare.metadataArr">
+                        <p-column field="key" header="Key"></p-column>
+                        <p-column field="value" header="Value"></p-column>
+                    </p-dataTable>
+                </div>
+            </div>
+    </ng-template>
+    </p-dataTable>
+    <p-confirmDialog></p-confirmDialog>
+</div>

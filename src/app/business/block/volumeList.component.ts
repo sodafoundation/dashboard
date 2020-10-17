@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewContainerRef, ViewChild, Directive, ElementRef, HostBinding, HostListener } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { I18NService, Utils } from 'app/shared/api';
 import { FormControl, FormGroup, FormBuilder, Validators, ValidatorFn, AbstractControl } from '@angular/forms';
 import { AppService } from 'app/app.service';
@@ -94,10 +94,14 @@ export class VolumeListComponent implements OnInit {
     attachedHostOptions = [];
     hostOptions = [];
     msgs: Message[];
+    fromVolume: any;
+    fromCloudVolume: any;
+    tabIndex: number = 0;
 
     constructor(
         public I18N: I18NService,
         private router: Router,
+        private ActivatedRoute: ActivatedRoute,
         private VolumeService: VolumeService,
         private SnapshotService: SnapshotService,
         private ProfileService: ProfileService,
@@ -148,6 +152,19 @@ export class VolumeListComponent implements OnInit {
     }
 
     ngOnInit() {
+        this.ActivatedRoute.params.subscribe(
+            (params) => {
+                
+                if(params.fromRoute === "fromVolume"){
+                    this.fromVolume = true;
+                    this.tabIndex = 0;
+                }
+                if(params.fromRoute === "fromCloudVolume"){
+                    this.fromCloudVolume = true;
+                    this.tabIndex = 1;
+                }
+            }
+          );
         this.menuItems = [
             {
                 "label": this.I18N.keyID['sds_block_volume_modify'],

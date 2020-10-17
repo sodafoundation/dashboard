@@ -10,7 +10,8 @@ import { RouterModule } from '@angular/router';
 import { ButtonModule, ChartModule,CardModule } from '../../components/common/api';
 import { DataTableModule, DropMenuModule,HomeDialogModule, DialogModule, FormModule, InputTextModule, InputTextareaModule,
    DropdownModule ,ConfirmationService,ConfirmDialogModule} from '../../components/common/api';
-
+   import { SidebarModule } from '../../components/sidebar/sidebar';
+   import { JoyrideModule } from 'ngx-joyride';
 let routers = [{
   path: '',
   component: HomeComponent
@@ -35,7 +36,9 @@ let routers = [{
     DropdownModule,
     DataTableModule,
     ConfirmDialogModule,
-    DialogModule
+    DialogModule,
+    SidebarModule,
+    JoyrideModule.forChild()
   ],
   providers: [HttpService, ProfileService,ConfirmationService,BucketService]
 })

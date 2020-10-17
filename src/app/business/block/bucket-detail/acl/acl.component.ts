@@ -2,11 +2,12 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { Component, OnInit, ViewContainerRef, ViewChild, Directive, ElementRef, HostBinding, HostListener, Input } from '@angular/core';
 import { I18NService, MsgBoxService, HttpService, Utils } from 'app/shared/api';
 import { BucketService } from '../../buckets.service';
-import { ConfirmationService, ConfirmDialogModule } from '../../../../components/common/api';
+import { ConfirmationService, ConfirmDialogModule, Message } from '../../../../components/common/api';
 import { trigger, state, style, transition, animate } from '@angular/animations';
 import { I18nPluralPipe } from '@angular/common';
 import { FormGroup, Validators, FormBuilder, FormControl } from '@angular/forms';
 import { DomSanitizer } from '@angular/platform-browser';
+import { Http, Headers } from '@angular/http';
 
 declare let X2JS: any;
 let _ = require("underscore");
@@ -25,6 +26,7 @@ export class AclComponent implements OnInit {
     Signature;
     key;
     kDate;
+    msgs: Message[];
 
     constructor(
         private BucketService: BucketService,
@@ -37,29 +39,36 @@ export class AclComponent implements OnInit {
     //query acl list
     getAclList() {
         window['getAkSkList'](()=> {
+            
             let requestMethod = "GET";
-            let url = this.BucketService.url + '/' + this.bucketId+'/?acl';
-            window['canonicalString'](requestMethod, url, () => {
-                let options: any = {};
-                let key = "/?acl"
-                this.getSignature(options);
-                let name = this.bucketId + key
-                this.BucketService.getAcl(name,options).subscribe((res) => {
-                    let str = res['_body'];
-                    let x2js = new X2JS();
-                    let jsonObj = x2js.xml_str2json(str);
-                    let chooseObj = jsonObj.AccessControlPolicy && jsonObj.AccessControlPolicy.AccessControlList.Grant
-                    this.checkBoxArr = []
-                    Array.isArray(chooseObj) && chooseObj.forEach((item) => {
-                        if(item.Permission =="WRITE"){
-                            this.checkBoxArr.push('write','read')
-                            return
-                        }else if(item.Permission == "READ"){
-                            this.checkBoxArr.push('read')
+            let url = "/"+this.bucketId+"/?acl";
+            let requestOptions: any;
+            let options: any = {};
+            requestOptions = window['getSignatureKey'](requestMethod, url) ;
+            options['headers'] = new Headers();
+            options = this.BucketService.getSignatureOptions(requestOptions, options);
+            this.BucketService.getAcl(this.bucketId,options).subscribe((res) => {
+                let str = res['_body'];
+                let x2js = new X2JS();
+                let jsonObj = x2js.xml_str2json(str);
+                let publicGroup = jsonObj.AccessControlPolicy && jsonObj.AccessControlPolicy.AccessControlList.Grant ? jsonObj.AccessControlPolicy.AccessControlList.Grant : [];
+                this.checkBoxArr = []
+                if(publicGroup && publicGroup.length){
+                    publicGroup.forEach(element => {
+                        if(element['Grantee']['_xsi:type']=="Group"){
+                            if(element['Permission'] =="WRITE"){
+                                this.checkBoxArr.push('write','read');
+                            }else if(element['Permission'] == "READ"){
+                                this.checkBoxArr.push('read');
+                            }
                         }
                     });
-                    
-                })
+                }
+                
+            }, (error) => {
+                this.msgs = [];
+                this.msgs.push({severity: 'error', summary: "Error", detail: "Could not fetch ACL."});
+                console.log("Could not fetch ACL list.Something went wrong.", error);
             })
         })
     }
@@ -82,29 +91,30 @@ export class AclComponent implements OnInit {
     }
     creatAclSubmit(param,user) {
         window['getAkSkList'](()=> {
+            
             let requestMethod = "PUT";
-            let url = this.BucketService.url + '/' + this.bucketId + "/?acl";
-            window['canonicalString'](requestMethod,url,() => {
-                let options: any = {}; 
-                this.getSignature(options);
-                options['Content-Length'] = param.length;
-                options.headers.set('Content-Type', 'application/xml');
-                options.headers.set('x-amz-acl', user);
-                let name = this.bucketId + "/?acl"
-                this.BucketService.creatAcl(name, param, options).subscribe((res)=> {
-                    this.getAclList()
-                })
+            let url = '/' + this.bucketId + "/?acl";
+            let requestOptions: any;
+            let options: any = {};
+            let contentHeaders = {
+                'x-amz-acl' : user
+            };
+            let body = '';
+            requestOptions = window['getSignatureKey'](requestMethod, url, '', '', '', body, '', '', contentHeaders) ;
+            options['headers'] = new Headers();
+            options = this.BucketService.getSignatureOptions(requestOptions, options);
+            
+            options.headers.set('x-amz-acl', user);
+            this.BucketService.creatAcl(this.bucketId, body, options).subscribe((res)=> {
+                this.msgs = [];
+                this.msgs.push({severity: 'success', summary: 'Success', detail: 'ACL updated successfully.'});
+                this.getAclList()
+            }, (error) => {
+                this.msgs = [];
+                this.msgs.push({severity: 'error', summary: "Error", detail: error.json()});
+                console.log("Could not create ACL. Something went wrong.", error);
             })
         })
     }
 
-    // Rquest header with AK/SK authentication added
-    getSignature(options) {
-        let SignatureObjectwindow = window['getSignatureKey']();
-        let requestObject = this.BucketService.getSignatureOptions(SignatureObjectwindow, options);
-        options = requestObject['options'];
-        this.Signature = requestObject['Signature'];
-        this.kDate = requestObject['kDate'];
-        return options;
-    }
 }

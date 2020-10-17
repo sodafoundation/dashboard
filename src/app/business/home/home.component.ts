@@ -17,6 +17,7 @@ declare let X2JS:any;
     ]
 })
 export class HomeComponent implements OnInit {
+    showRightSidebar: boolean = false;
     lineData ={};
     lineOption = {};
     showRegisterFlag = false;
@@ -24,11 +25,12 @@ export class HomeComponent implements OnInit {
     showBackends = false;
     allBackends_count={
         aws:0,
-        huaweipri:0,
+        azureblob:0,
         huaweipub:0,
         localBKD:0,
         ibmcos:0,
-        gcp:0
+        gcp:0,
+        alibaba:0
     }
     counts= {
         volumesCount:0,
@@ -54,7 +56,16 @@ export class HomeComponent implements OnInit {
             type: 'text',
             name: 'region',
             formControlName: 'region',
-            arr:['aws-s3','azure-blob','hw-obs','fusionstorage-object','ceph-s3','gcp-s3','ibm-cos']
+            arr:['aws-s3','azure-blob','hw-obs','fusionstorage-object', 'gcp-s3','ibm-cos', 'alibaba-oss', 'aws-file', 'aws-block', 'azure-file']
+        },
+        {
+            label: 'Project',
+            required: 'true',
+            id: 'project',
+            type: 'text',
+            name: 'project',
+            formControlName: 'region',
+            arr:['gcp-file']
         },
         {
             label: 'Endpoint',
@@ -63,7 +74,7 @@ export class HomeComponent implements OnInit {
             type: 'text',
             name: 'endpoint',
             formControlName: 'endpoint',
-            arr:['aws-s3','azure-blob','hw-obs','fusionstorage-object','ceph-s3','gcp-s3','ibm-cos','yig']
+            arr:['aws-s3','azure-blob','hw-obs','fusionstorage-object','ceph-s3','gcp-s3','ibm-cos','yig', 'alibaba-oss']
         },
         {
             label: 'Bucket',
@@ -72,7 +83,7 @@ export class HomeComponent implements OnInit {
             type: 'text',
             name: 'bucket',
             formControlName: 'bucket',
-            arr:['aws-s3','azure-blob','hw-obs','fusionstorage-object','ceph-s3','gcp-s3','ibm-cos']
+            arr:['aws-s3','azure-blob','hw-obs','fusionstorage-object','ceph-s3','gcp-s3','ibm-cos', 'alibaba-oss']
         },
         {
             label: 'Access Key',
@@ -81,7 +92,7 @@ export class HomeComponent implements OnInit {
             type: 'text',
             name: 'accessKey',
             formControlName: 'ak',
-            arr:['aws-s3','azure-blob','hw-obs','fusionstorage-object','ceph-s3','gcp-s3','ibm-cos']
+            arr:['aws-s3','azure-blob','hw-obs','fusionstorage-object','ceph-s3','gcp-s3','ibm-cos', 'alibaba-oss', 'aws-file', 'aws-block', 'azure-file', 'gcp-file']
         },
         {
             label: 'Secret Key',
@@ -90,8 +101,9 @@ export class HomeComponent implements OnInit {
             type: 'password',
             name: 'secretKey',
             formControlName: 'sk',
-            arr:['aws-s3','azure-blob','hw-obs','fusionstorage-object','ceph-s3','gcp-s3','ibm-cos']
+            arr:['aws-s3','azure-blob','hw-obs','fusionstorage-object','ceph-s3','gcp-s3','ibm-cos','alibaba-oss', 'aws-file', 'aws-block', 'azure-file', 'gcp-file']
         },
+        
     ]
 
 
@@ -102,6 +114,7 @@ export class HomeComponent implements OnInit {
     @ViewChild("cloud_hw_p") c_HWP: ElementRef;
     @ViewChild("svgCon") svgCon: ElementRef;
     @ViewChild("cloud_gcp") c_GCP: ElementRef;
+    @ViewChild("cloud_alibaba") c_AOS: ElementRef;
     
     scaleX = 1;
     scaleY = 1;
@@ -184,7 +197,7 @@ export class HomeComponent implements OnInit {
             that.scaleX = svgConW/240; 
             that.scaleY = 5;
 
-            let clouds = [that.c_GCP.nativeElement, that.c_HWP.nativeElement, that.c_IBMCOS.nativeElement, that.c_HW.nativeElement, that.c_AWS.nativeElement];
+            let clouds = [that.c_GCP.nativeElement, that.c_HWP.nativeElement, that.c_IBMCOS.nativeElement, that.c_AOS.nativeElement, that.c_HW.nativeElement, that.c_AWS.nativeElement];
             clouds.forEach((item, index) => {
                 let totalLength = that.path.nativeElement.getTotalLength();
                 let point = totalLength/clouds.length * (index+1) + moveX + initPos;
@@ -218,29 +231,32 @@ export class HomeComponent implements OnInit {
         window['getAkSkList'](()=>{
             let requestMethod = "GET";
             let url = this.BucketService.url;
-            window['canonicalString'](requestMethod, url, ()=>{
-                let options: any = {};
-                this.getSignature(options);
-                if(Object.keys(options).length > 0 ){
-                    this.BucketService.getBuckets(options).subscribe((res)=>{
-                        let str = res['_body'];
-                        let x2js = new X2JS();
-                        let jsonObj = x2js.xml_str2json(str);
-                        let buckets = (jsonObj ? jsonObj.ListAllMyBucketsResult.Buckets:[]);
-                        let allBuckets = [];
-                        if(Object.prototype.toString.call(buckets) === "[object Array]"){
-                            allBuckets = buckets;
-                        }else if(Object.prototype.toString.call(buckets) === "[object Object]"){
-                            allBuckets = [buckets];
-                        }
-                        this.getBuckend(allBuckets);
-                    }); 
-                }else{
+            let requestOptions: any;
+            let options: any = {};
+            requestOptions = window['getSignatureKey'](requestMethod, url);
+
+            options['headers'] = new Headers();
+            options = this.BucketService.getSignatureOptions(requestOptions, options);
+            if(Object.keys(options).length > 0 ){
+                this.BucketService.getBuckets(options).subscribe((res)=>{
+                    let str = res['_body'];
+                    let x2js = new X2JS();
+                    let jsonObj = x2js.xml_str2json(str);
+                    let buckets = (jsonObj ? jsonObj.ListAllMyBucketsResult.Buckets.Bucket:[]);
                     let allBuckets = [];
+                    if(Object.prototype.toString.call(buckets) === "[object Array]"){
+                        allBuckets = buckets;
+                    }else if(Object.prototype.toString.call(buckets) === "[object Object]"){
+                        allBuckets = [buckets];
+                    }
                     this.getBuckend(allBuckets);
-                }
-                 
-            });
+                }); 
+            }else{
+                let allBuckets = [];
+                this.getBuckend(allBuckets);
+            }
+        }, (error)=>{
+            console.log("Could not fetch AK/SK", error);
         }) 
     }
     getBuckend(allBuckets){
@@ -288,22 +304,37 @@ export class HomeComponent implements OnInit {
         },[]);
         this.Allbackends = result;
         this.allBackends_count.localBKD = 0;
-        this.allBackends_count.aws = this.Allbackends[this.cloud_type[0]] ? this.Allbackends[Consts.CLOUD_TYPE[0]].length :0;
-        this.allBackends_count.huaweipri = this.Allbackends[this.cloud_type[1]] ? this.Allbackends[Consts.CLOUD_TYPE[1]].length :0;
-        this.allBackends_count.huaweipub = this.Allbackends[this.cloud_type[2]] ? this.Allbackends[Consts.CLOUD_TYPE[2]].length :0;
-        if( this.Allbackends[this.cloud_type[3]]){
-            this.allBackends_count.localBKD += this.Allbackends[this.cloud_type[3]].length;
+
+        this.allBackends_count.aws = this.Allbackends['aws-s3'] ? this.Allbackends['aws-s3'].length :0;
+        this.allBackends_count.azureblob = this.Allbackends['azure-blob'] ? this.Allbackends['azure-blob'].length :0;
+        this.allBackends_count.huaweipub = this.Allbackends['hw-obs'] ? this.Allbackends['hw-obs'].length :0;
+
+        if( this.Allbackends['ceph-s3']){
+            this.allBackends_count.localBKD += this.Allbackends['ceph-s3'].length;
         }
-        if( this.Allbackends[this.cloud_type[4]]){
-            this.allBackends_count.localBKD += this.Allbackends[this.cloud_type[4]].length;
+        if( this.Allbackends['yig']){
+            this.allBackends_count.localBKD += this.Allbackends['yig'].length;
         }
-        if( this.Allbackends[this.cloud_type[7]]){
-            this.allBackends_count.localBKD += this.Allbackends[this.cloud_type[7]].length;
+        if( this.Allbackends['fusionstorage-object']){
+            this.allBackends_count.localBKD += this.Allbackends['fusionstorage-object'].length;
+        }
+        if( this.Allbackends['aws-file']){
+            this.allBackends_count.localBKD += this.Allbackends['aws-file'].length;
+        }
+        if( this.Allbackends['aws-block']){
+            this.allBackends_count.localBKD += this.Allbackends['aws-block'].length;
+        }
+        if( this.Allbackends['azure-file']){
+            this.allBackends_count.localBKD += this.Allbackends['azure-file'].length;
+        }
+        if( this.Allbackends['gcp-file']){
+            this.allBackends_count.localBKD += this.Allbackends['gcp-file'].length;
         }
 
+        this.allBackends_count.ibmcos = this.Allbackends['ibm-cos'] ? this.Allbackends['ibm-cos'].length :0;
+        this.allBackends_count.gcp = this.Allbackends['gcp-s3'] ? this.Allbackends['gcp-s3'].length :0;
+        this.allBackends_count.alibaba = this.Allbackends['alibaba-oss'] ? this.Allbackends['alibaba-oss'].length :0;
 
-        this.allBackends_count.ibmcos = this.Allbackends[this.cloud_type[5]] ? this.Allbackends[Consts.CLOUD_TYPE[5]].length :0;
-        this.allBackends_count.gcp = this.Allbackends[this.cloud_type[6]] ? this.Allbackends[Consts.CLOUD_TYPE[6]].length :0;
     }
 
     getType(){
@@ -318,7 +349,17 @@ export class HomeComponent implements OnInit {
             });
         });
     }
+
+    closeSidebar(){
+        this.showRightSidebar = false;
+        
+        this.showRegisterFlag = false;
+        this.showBackends = false;
+        
+    }
+
     configModify(backend){
+        this.showRightSidebar = false;
         this.modifyBackendshow = true;
         this.selectedBackend = backend;
         this.modifyBackendForm.reset(
@@ -328,7 +369,13 @@ export class HomeComponent implements OnInit {
             }
         );
     }
+    closeModify(){
+        this.modifyBackendshow = false;
+        this.showRightSidebar = true;
+        this.showBackends = true;
+    }
     modifyBackend(){
+        
         if(!this.modifyBackendForm.valid){
             for(let i in this.modifyBackendForm.controls){
                 this.modifyBackendForm.controls[i].markAsTouched();
@@ -341,10 +388,15 @@ export class HomeComponent implements OnInit {
         }
         this.http.put(`v1/{project_id}/backends/${this.selectedBackend.id}`,param).subscribe((res)=>{
             this.modifyBackendshow = false;
+            this.showRightSidebar = true;
+            this.showBackends = true;
+        }, (error)=>{
+            console.log("Something went wrong. Could not modify the AK/SK.")
         });
     }
 
     showBackendsDetail(type?){
+        this.showRightSidebar = true;
         this.showBackends = true;
         
         if(type){
@@ -355,11 +407,16 @@ export class HomeComponent implements OnInit {
             let fs_arr = this.Allbackends['fusionstorage-object'] ? this.Allbackends['fusionstorage-object'] : [];
             let ceph_arr = this.Allbackends['ceph-s3'] ? this.Allbackends['ceph-s3'] : [];
             let yig_arr = this.Allbackends['yig'] ? this.Allbackends['yig'] : [];
-            this.typeDetail = fs_arr.concat(ceph_arr,yig_arr);
+            let aws_fs_arr = this.Allbackends['aws-file'] ? this.Allbackends['aws-file'] : [];
+            let aws_bs_arr = this.Allbackends['aws-block'] ? this.Allbackends['aws-block'] : [];
+            let azure_fs_arr = this.Allbackends['azure-file'] ? this.Allbackends['azure-file'] : [];
+            let gcp_fs_arr = this.Allbackends['gcp-file'] ? this.Allbackends['gcp-file'] : [];
+            this.typeDetail = fs_arr.concat(ceph_arr,yig_arr,aws_fs_arr,aws_bs_arr,azure_fs_arr, gcp_fs_arr);
         }
     }
 
     deleteBackend(backend){
+        this.showRightSidebar = false;
         if(backend.canDelete){
             this.msg.info("The backend cannot be deleted because buckets have already been created");
         }else{
@@ -380,6 +437,7 @@ export class HomeComponent implements OnInit {
             accept: ()=>{
                 try {
                     if(backend == "close"){
+                        this.showRightSidebar = true;
                         return;
                     }else{
                         let url = 'v1/{project_id}/backends/'+backend.id;
@@ -399,7 +457,10 @@ export class HomeComponent implements OnInit {
                     
                 }
             },
-            reject:()=>{}
+            reject:()=>{
+                this.showRightSidebar = true;
+                this.showBackends = true;
+            }
         })
     }
                             
@@ -435,16 +496,23 @@ export class HomeComponent implements OnInit {
         };
         this.http.post("v1/{project_id}/backends", param,options).subscribe((res) => {
             this.showRegisterFlag = false;
+            this.showRightSidebar = false;
             this.http.get('v1/{project_id}/backends').subscribe((res)=>{
                 let backends = res.json().backends ? res.json().backends :[];
                 this.initBackendsAndNum(backends);
                 this.formItemCopy = []
             });
+            
+        },(error)=>{
+            console.log("Something went wrong. Could not register the backend.")
         });
     }
     showRegister(){
         this.formItemCopy = []
+        this.showRightSidebar = true;
         this.showRegisterFlag = true;
+        
+        
         this.backendForm.reset();
         this.backendForm.controls['name'].setValidators([Validators.required,Utils.isExisted(this.allBackendNameForCheck)]);
     }

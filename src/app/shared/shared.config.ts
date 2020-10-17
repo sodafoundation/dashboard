@@ -11,8 +11,19 @@ export class SharedConfig{
         return () => new Promise((resolve, reject) => {
             Promise.all([
                 SharedConfig.I18NConfig(I18NService, httpService),
-                // SharedConfig.AutoDeploy(httpService),
+                SharedConfig.getEnvHostDetails(httpService),
             ]).then(() => resolve()).catch(reason => console.log(reason));
+        })
+    }
+
+    // Discover S3 Host IP and Port and populate the config file.
+    static getEnvHostDetails(httpService) {
+        return new Promise((resolve, reject) => {
+            httpService.get("../../assets/data/runtime.json").subscribe((r) => {
+                Consts.S3_HOST_IP = r.json().hostIP;
+                Consts.S3_HOST_PORT = r.json().hostPort;
+                resolve();
+            })
         })
     }
 

@@ -13,12 +13,12 @@
 # limitations under the License.
 
 # Docker build usage:
-# 	docker build . -t opensdsio/dashboard:latest
+# 	docker build . -t sodafoundation/dashboard:latest
 # Docker run usage:
-# 	docker run -d -p 8088:8088 opensdsio/dashboard:latest
+# 	docker run -d -p 8088:8088 sodafoundation/dashboard:latest
 
 FROM nginx:alpine
-MAINTAINER Leon Wang <wanghui71leon@gmail.com>
+
 # Current directory is always /opt/dashboard.
 WORKDIR /opt/dashboard
 

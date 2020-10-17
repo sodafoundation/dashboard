@@ -1,0 +1,87 @@
+<p-growl [value]="msgs" [sticky]="false" [life]="6000"></p-growl>
+<div class="content-header">
+    <h1>{{i18n.keyID['sds_modifyFileShare']}}</h1>
+</div>
+
+<form *ngIf="showModifyForm" [formGroup] ="cloudFileShareModifyForm" [grid]="{label: 'ui-g-3', content:'ui-g-20'}" (ngSubmit)="onSubmit(cloudFileShareModifyForm.value)" [errorMessage]="errorMessage">
+    <form-item label="{{label.backend_type}}" [required]="true">
+        <span>{{selectType}}</span>
+    </form-item>
+    <form-item label="{{label.backend}}" [required]="true">
+        <span>{{selectedFileShare['backend']}}</span>
+    </form-item>
+    <form-item [required]="true" label="{{label.name}}">
+        <span>{{selectedFileShare['name']}}</span>
+    </form-item>
+    <form-item *ngIf="selectedFileShare && selectedFileShare['availabilityZone']" label="{{label.az}}">
+        <span>{{selectedFileShare['availabilityZone']}}</span>
+    </form-item>
+    <form-item label="{{label.description}}">
+        <textarea [rows]="5" [cols]="30" pInputTextarea formControlName="description" [maxlength]="250"></textarea>
+    </form-item>
+    <form-item *ngIf="enableEncryption" label="Encrypted?" >
+        <span>Yes</span>
+    </form-item>
+    <form-item *ngIf="cloudFileShareModifyForm.controls['size']" label="{{label.size}}">
+        <input formControlName="size" type="text" size="30" pInputText> 
+    </form-item>
+    <form-item *ngIf="cloudFileShareModifyForm.controls['tags']" [required]="true" label="{{label.tags}}">
+        <a class="add-tag" (click)="addNextTag()"><i class="fa fa-plus-circle" ></i></a>
+        <div class="tag-array" formArrayName="tags"
+            *ngFor="let item of cloudFileShareModifyForm.get('tags')['controls']; let i = index">
+            <div class="ui-g ui-fluid" [formGroupName]="i">
+                <div class="ui-g-12 ui-md-4">
+                    <div class="ui-inputgroup">
+                        <input type="text" pInputText formControlName='key' placeholder="Key">
+                    </div>
+                </div>
+                <div class="ui-g-12 ui-md-4 ui-md-offset-1">
+                    <div class="ui-inputgroup">
+                        <input type="text" pInputText formControlName='value' placeholder="Value">
+                    </div>
+                </div>
+                <div class="ui-g-12 ui-md-2 ui-md-offset-1">
+                    <div class="ui-inputgroup">
+                        <a disabled="cloudFileShareModifyForm.get('tags')['length'] > 1" class="remove-tag" (click)="removeTagLink(i)"><i class="fa fa-minus-circle"></i></a>     
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+    </form-item>
+
+    <form-item *ngIf="cloudFileShareModifyForm.controls['metadata']" [required]="true" label="{{label.metadata}}">
+        <a class="add-metadata" (click)="addNextMetadata()"><i class="fa fa-plus-circle" ></i></a>
+        <div class="metadata-array" formArrayName="metadata"
+            *ngFor="let item of cloudFileShareModifyForm.get('metadata')['controls']; let i = index">
+            <div class="ui-g ui-fluid" [formGroupName]="i">
+                <div class="ui-g-12 ui-md-4">
+                    <div class="ui-inputgroup">
+                        <input type="text" pInputText formControlName='key' placeholder="Key">
+                    </div>
+                </div>
+                <div class="ui-g-12 ui-md-4 ui-md-offset-1">
+                    <div class="ui-inputgroup">
+                        <input type="text" pInputText formControlName='value' placeholder="Value">
+                    </div>
+                </div>
+                <div class="ui-g-12 ui-md-2 ui-md-offset-1">
+                    <div class="ui-inputgroup">
+                        <a *ngIf="(key != 'PerformanceMode') || (key != 'ThroughputMode') || (key != 'ProvisionedThroughputInMibps') || (key != 'Tier')" 
+                            disabled="cloudFileShareModifyForm.get('metadata')['length'] > 1" 
+                            class="remove-metadata" 
+                            (click)="removeMetadataLink(i)">
+                            <i class="fa fa-minus-circle"></i>
+                        </a>     
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+    </form-item>
+
+    <div class="bottom-button-margin">
+        <button pButton type="submit" class="ui-button-secondary" label="{{i18n.keyID['ok']}}" [disabled]="cloudFileShareModifyForm.invalid"></button>
+        <button pButton type="button" label="{{i18n.keyID['cancel']}}" [routerLink]="['/block','fromCloudFileShare']"></button>
+    </div>
+</form>

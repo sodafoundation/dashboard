@@ -10,6 +10,7 @@ import { BaseRequestOptionsArgs } from 'app/shared/service/api';
 
 declare let X2JS:any;
 let lodash = require('lodash');
+let _ = require("underscore");
 
 @Component({
   selector: 'bucket-detail',
@@ -71,6 +72,9 @@ export class BucketDetailComponent implements OnInit {
   uploadForm :FormGroup;
   files;
   allFolderNameForCheck = [];
+
+  progressValue: number = 0;
+
   constructor(
     private ActivatedRoute: ActivatedRoute,
     public I18N:I18NService,
@@ -149,11 +153,24 @@ export class BucketDetailComponent implements OnInit {
       item.source + '/' + item.Key;
       let sourceBucket = item.source;
       window['getAkSkList'](() => {
-        let requestMethod = "PUT";
-        let url = this.BucketService.url + "/" + this.bucketId + '/' + key;
-        window['canonicalString'](requestMethod, url, () => {
+          let requestMethod = "PUT";
+          let url = "/" + this.bucketId + '/' + key;
+          let requestOptions: any;
           let options: any = {};
-          this.getSignature(options);
+          let contentHeaders = {
+            'x-amz-copy-source' : copySource,
+            'X-Amz-Metadata-Directive' : ''
+          }
+          if(sourceBucket != this.bucketId){
+            //Copy between different buckets
+            contentHeaders['X-Amz-Metadata-Directive'] = 'COPY';
+          }else{
+            //Copy in the same bucket
+            contentHeaders['X-Amz-Metadata-Directive'] = 'REPLACE';
+          }
+          requestOptions = window['getSignatureKey'](requestMethod, url, '', '', '', '', '', '', contentHeaders) ;
+          options['headers'] = new Headers();
+          options = this.BucketService.getSignatureOptions(requestOptions, options);
           options.headers.set('Content-Type', 'application/xml');
           //The source data
           options.headers.set('x-amz-copy-source', copySource);
@@ -164,8 +181,8 @@ export class BucketDetailComponent implements OnInit {
             //Copy in the same bucket
             options.headers.set('X-Amz-Metadata-Directive', 'REPLACE');
           }
-          let param = {};
-          this.BucketService.copyObject(this.bucketId + '/' + key, param, options).subscribe((res) => {
+          
+          this.BucketService.copyObject(this.bucketId + '/' + key, '', options).subscribe((res) => {
             this.isReadyPast = true;
             window.sessionStorage['searchIndex'] = "";
             this.getAlldir();
@@ -173,7 +190,6 @@ export class BucketDetailComponent implements OnInit {
           }, (error)=>{
             window.sessionStorage['searchIndex'] = "";
           });
-        })
       })
     })
   }
@@ -217,11 +233,15 @@ export class BucketDetailComponent implements OnInit {
     }
     this.selectedDir = [];
     window['getAkSkList'](()=>{
-      let requestMethod = "GET";
-      let url = this.BucketService.url + '/' + this.bucketId;
-      window['canonicalString'](requestMethod, url,()=>{
+      
+
+        let requestMethod = "GET";
+        let url = '/' + this.bucketId;
+        let requestOptions: any;
         let options: any = {};
-        this.getSignature(options);
+        requestOptions = window['getSignatureKey'](requestMethod, url);
+        options['headers'] = new Headers();
+        options = this.BucketService.getSignatureOptions(requestOptions, options);
         this.BucketService.getBucketById(this.bucketId,options).subscribe((res) => {
           let str = res._body;
           let x2js = new X2JS();
@@ -236,7 +256,7 @@ export class BucketDetailComponent implements OnInit {
           let backupAllDir = JSON.parse( JSON.stringify( this.allDir ) );
           this.resolveObject();
           //Data in folder
-          if(this.folderId !=""){
+          if(this.folderId && this.folderId !=""){
             if(!this.folderId.endsWith(this.colon)){
               this.folderId = this.folderId + this.colon;
             }
@@ -313,7 +333,7 @@ export class BucketDetailComponent implements OnInit {
             }
           })
         });
-        })
+
     })
     window.sessionStorage['folderId'] = ""
     window.sessionStorage['headerTag'] = ""
@@ -339,15 +359,7 @@ export class BucketDetailComponent implements OnInit {
       this.allDir.push(defaultObject);
     })
   }
-  //Request header with AK/SK authentication added
-  getSignature(options) {
-    let SignatureObjectwindow = window['getSignatureKey']();
-    let requestObject = this.BucketService.getSignatureOptions(SignatureObjectwindow,options);
-    options = requestObject['options'];
-    this.Signature = requestObject['Signature'];
-    this.kDate = requestObject['kDate'];
-    return options;
-  }
+  
   getTypes() {
     this.allTypes = [];
     this.BucketService.getTypes().subscribe((res) => {
@@ -446,32 +458,49 @@ export class BucketDetailComponent implements OnInit {
 
   downloadFile(file) {
     let fileObjectKey;
+    let fileString: any;
+    let fileContent: any;
     if(this.folderId !=""){
       fileObjectKey = this.folderId + file.Key;
     }else{
       fileObjectKey = file.Key;
     }
-    let downloadUrl = `${this.BucketService.url}/${this.bucketId}/${fileObjectKey}`;
+    let downloadUrl = this.BucketService.url + `${this.bucketId}/${fileObjectKey}`;
     window['getAkSkList'](()=>{
-      let requestMethod = "GET";
-      let url = downloadUrl;
-      window['canonicalString'](requestMethod, url,()=>{
+      
+        let requestMethod = "GET";
+        let url = '/' + this.bucketId + '/' + fileObjectKey;
+        let requestOptions: any;
         let options: any = {};
-        this.getSignature(options);
+        requestOptions = window['getSignatureKey'](requestMethod, url);
+        options['headers'] = new Headers();
+        options = this.BucketService.getSignatureOptions(requestOptions, options);
         window['load'](file.Key,file.ETag)
         var xhr = new XMLHttpRequest();
-        xhr.open('GET', url, true);    
+        xhr.withCredentials = true;
+        xhr.open('GET', downloadUrl, true);    
         xhr.responseType = "arraybuffer";
-        xhr.setRequestHeader('Authorization', this.Signature)
-        xhr.setRequestHeader('X-Auth-Date', this.kDate)
+        xhr.setRequestHeader('Content-Type', requestOptions.headers['Content-Type']);
+        xhr.setRequestHeader('X-Auth-Token', requestOptions.headers['X-Auth-Token']);
+        xhr.setRequestHeader('X-Amz-Content-Sha256', requestOptions.headers['X-Amz-Content-Sha256']);
+        xhr.setRequestHeader('X-Amz-Date', requestOptions.headers['X-Amz-Date']);
+        xhr.setRequestHeader('Authorization', requestOptions.headers['Authorization']);
         let msgs = this.msg
         xhr.onload = function () {
           if ((this as any).status === 200) {
             let res = (this as any).response;
             let blob = new Blob([res]);
             var reader = new FileReader();
-            reader.readAsDataURL(blob);
+            reader.readAsArrayBuffer(blob);
             reader.onload = ()=>{
+              let binary: any = "";
+              fileContent = reader.result;
+              let bytes = new Uint8Array(fileContent);
+              let length = bytes.byteLength;
+              for (var i = 0; i < length; i++) {
+                  binary += String.fromCharCode(bytes[i]);
+              }
+              fileString = binary;
               if (typeof window.navigator.msSaveBlob !== 'undefined') {  
               window.navigator.msSaveBlob(blob, file.Key);
             } else {
@@ -504,7 +533,12 @@ export class BucketDetailComponent implements OnInit {
         xhr.onloadend=()=>{
           window['disload'](file.Key)
         }
-      })
+        xhr.onprogress = (event) => {
+          let done = event.loaded;
+          let total =  event.total;
+          let progress = Math.floor(done/total*100)
+          window['downloadProgress'](progress);
+      }
     });
   }
   //Gets the name of the folder
@@ -528,17 +562,18 @@ export class BucketDetailComponent implements OnInit {
       folderName = this.createFolderForm.value.name + this.colon;
     }
     window['getAkSkList'](()=>{
-      let requestMethod = "PUT";
-      let url = this.BucketService.url + "/" + this.bucketId+ '/' +folderName;
-      window['canonicalString'](requestMethod, url,()=>{
+        let requestMethod = "PUT";
+        let url = "/" + this.bucketId+ '/' +folderName;
+        let requestOptions: any;
         let options: any = {};
-        this.getSignature(options);
+        requestOptions = window['getSignatureKey'](requestMethod, url);
+        options['headers'] = new Headers();
+        options = this.BucketService.getSignatureOptions(requestOptions, options);
         options.headers.set('Content-Type','application/xml');
         this.BucketService.uploadFile(this.bucketId+ '/' +folderName,"",options).subscribe((res) => {
           this.showCreateFolder = false;
           this.getAlldir();
         });
-      })
     })
   }
   deleteMultiDir(){
@@ -578,15 +613,17 @@ export class BucketDetailComponent implements OnInit {
                       objectKey = this.folderId + objectKey;
                     }
                     window['getAkSkList'](()=>{
-                      let requestMethod = "DELETE";
-                      let url = this.BucketService.url + `/${this.bucketId}/${objectKey}`;
-                      window['canonicalString'](requestMethod, url,()=>{
+                      
+                        let requestMethod = "DELETE";
+                        let url = '/' + `${this.bucketId}/${objectKey}`;
+                        let requestOptions: any;
                         let options: any = {};
-                        this.getSignature(options);
-                        this.BucketService.deleteFile(`/${this.bucketId}/${objectKey}`,options).subscribe((res) => {
+                        requestOptions = window['getSignatureKey'](requestMethod, url);
+                        options['headers'] = new Headers();
+                        options = this.BucketService.getSignatureOptions(requestOptions, options);
+                        this.BucketService.deleteFile(`${this.bucketId}/${objectKey}`,options).subscribe((res) => {
                           this.getAlldir();
                         });
-                      })
                     })
                     
                     break;
@@ -598,15 +635,17 @@ export class BucketDetailComponent implements OnInit {
                         objectKey = this.folderId + objectKey;
                       }
                       window['getAkSkList'](()=>{
+                        
                         let requestMethod = "DELETE";
-                        let url = this.BucketService.url + `/${this.bucketId}/${objectKey}`;
-                        window['canonicalString'](requestMethod, url,()=>{
-                          let options: any = {};
-                          this.getSignature(options);
-                          this.BucketService.deleteFile(`/${this.bucketId}/${objectKey}`,options).subscribe((res) => {
+                        let url = '/' + `${this.bucketId}/${objectKey}`;
+                        let requestOptions: any;
+                        let options: any = {};
+                        requestOptions = window['getSignatureKey'](requestMethod, url);
+                        options['headers'] = new Headers();
+                        options = this.BucketService.getSignatureOptions(requestOptions, options);
+                          this.BucketService.deleteFile(`${this.bucketId}/${objectKey}`,options).subscribe((res) => {
                             this.getAlldir();
                           });
-                        }) 
                       })
                    });
                     break;

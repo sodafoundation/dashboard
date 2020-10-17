@@ -20,28 +20,68 @@
 
 
 <div class="layout-wrapper" (mousemove)="refreshLastTime()" *ngIf="isLogin">
-    <div id="layout-topbar">
-        <div class="user-info">
-            <div>
-                <h1>{{ username }}</h1>
-                <p-dropmenu icon="fa-chevron-circle-down" [model]="dropMenuItems" styleClass="ui-dropmenu-large"></p-dropmenu>
+    <div id="layout-topbar" style="z-index: 1001;">
+        <div class="ui-g">
+            <div class="ui-g-12 menu-bar">
+                <div class="ui-g-2">
+                    <div joyrideStep="homeWelcome" stepPosition="bottom" [title]="'Welcome to SODA Foundation'" [stepContent]="homeWelcomeContent" [text]="'Welcome to the SODA Foundation dashboard. This dashboard gives you a UI to check out the various features and APIs from various SODA Foundation projects.'" class="logo">
+                        <a href="#" [routerLink]="['/home']"></a>
+                    </div>
+                </div>
+
+                <div class="ui-g-4">
+
+
+                </div>
+                <div class="ui-g-3">
+                    <button type="button" class="user-guide-btn ui-button" pButton label="Need Help?" icon="fa-question-circle" (click)="openUserGuide()"></button>
+                    <button type="button" pButton class="start-tour-button ui-button" (click)="startTour()" label="Start Tour"></button>
+                </div>
+                <div class="ui-g-1">
+                    <a class="soda-foundation-website-logo" title="Click here to visit the SODA Foundation website." href="https://sodafoundation.io" target="_blank"><img src="/assets/business/images/soda-foundation-header-logo.png" height="48px"></a>
+
+                </div>
+                <div class="ui-g-2">
+                    <div class="user-info">
+                        <div>
+                            <h1>Welcome {{ username }}</h1>
+                            <p-dropmenu joyrideStep="homeUserProfile" stepPosition="bottom" [title]="'User menu'" [text]="'You can switch region, navigate to Key Management System (AK/SK), Monitor Configuration and Logout'" icon="fa-chevron-circle-down" [model]="dropMenuItems" styleClass="ui-dropmenu-large"></p-dropmenu>
+                        </div>
+                        <p><span><i class="fa fa-map-marker"></i>default_region</span><span *ngIf=" username!='admin' "><i class="fa fa-users"></i>{{ currentTenant }}</span></p>
+                        <a href="#" [routerLink]="[akSkRouterLink]"></a>
+                    </div>
+                </div>
             </div>
-            <p><span><i class="fa fa-map-marker"></i>default_region</span><span *ngIf=" username!='admin' "><i class="fa fa-users"></i>{{ currentTenant }}</span></p>
-            <a href="#" [routerLink]="[akSkRouterLink]"></a>
         </div>
+    </div>
+    <div id="layout-sidebar">
+        <p-scrollPanel [style]="{width: '100%', height: '900px'}" styleClass="sidebar-menu-container">
         
-        <ul class="topbar-menu">
+        <ul class="sidebar-menu">
             <li *ngFor="let menuItem of menuItems">
-                <a href="#" [routerLink]="[menuItem.routerLink]" [ngClass]="{'active-item':menuItem==activeItem}" (click)="menuItemClick($event, menuItem)">
+                <a *ngIf="!menuItem.group" href="#" [joyrideStep]="menuItem.joyrideStep" [text]="menuItem.text" stepPosition="right" [routerLink]="[menuItem.routerLink]" [ngClass]="{'active-item':menuItem==activeItem}" (click)="menuItemClick($event, menuItem)">
                     <h1>{{menuItem.title}}</h1>
                     <p>{{menuItem.description}}</p>
                 </a> 
+                <p-panel styleClass="menuGroup" *ngIf="menuItem.group" [joyrideStep]="menuItem.joyrideStep" [text]="menuItem.text" stepPosition="right" [toggleable]="true" [collapsed]="true" expandIcon="fa-chevron-down" collapseIcon="fa-chevron-up">
+                    <p-header>
+                        <h1>{{menuItem.title}}</h1>
+                        <p>{{menuItem.description}}</p>
+                    </p-header>
+                    <ul class="menuGroup-list">
+                        <li class="menuGroup-child" *ngFor="let child of menuItem.children">
+                            <a href="#" [routerLink]="[child.routerLink]" [ngClass]="{'active-item':child==activeItem}" (click)="menuItemClick($event, child)">
+                                <h1>
+                                    {{child.title}}
+                                </h1>
+                            </a>
+                        </li>
+                    </ul>
+                </p-panel>
             </li>
         </ul>
 
-        <div class="logo">
-            <a href="#" [routerLink]="['/']"></a>
-        </div>
+    </p-scrollPanel>
     </div>
 
     <div id="layout-content">
@@ -50,6 +90,13 @@
         </div>
     </div>
 </div>
+<ng-template #homeWelcomeContent>
+    <div class="tour-content">
+        SODA Dashboard provides a unified interface to the underlying capabilities from the SODA Framework components. This dashboard is built mainly to illustrate/showcase various use cases that could run on SODA ecosystem projects.
+
+        It is a direct client to SODA API and other projects which are getting integrated to SODA Ecosystem.
+    </div>
+</ng-template>
 
 <div style="position: fixed; left: 0; bottom: -10px; right:0; z-index: -1;">
     <svg width="100%" height="150">
@@ -59,11 +106,21 @@
 </div>
 
 <div *ngIf="showPrompt" style="padding:15px 20px; z-index: 99999; line-height:18px;position: fixed;bottom: 10px;left:10px;background:rgba(255,255,255,0.75); border-radius: 5px; box-shadow:0 0 10px rgba(0,0,0,0.3);">
-    <span>Uploading file [ {{fileName}} ]</span>
+    <span class="uploading-title">Uploading file [ {{fileName}} ]</span>
+    <div class="ui-g">
+        <div class="ui-g-12">
+            <p-progressBar [value]="progressValue"></p-progressBar>
+        </div>
+    </div>
 </div> 
 <ul style=" z-index: 99999; line-height:18px;position: fixed;bottom: 10px;left:10px;">
     <li *ngFor="let downfile of downLoadArr;index as i" style="display: inline-block;  padding:15px; background:rgba(255,255,255,0.75); border-radius: 5px; box-shadow:0 0 10px rgba(0,0,0,0.3);">
-        <span *ngIf="i==0">downloading file</span>
-        <span>[ {{downfile.name}} ]</span>
+        <span class="downloading-title" *ngIf="i==0">downloading file [ {{downfile.name}} ]</span>
+        <div class="ui-g">
+            <div class="ui-g-12">
+                <p-progressBar [value]="downloadProgressValue"></p-progressBar>
+            </div>
+        </div>
     </li>
 </ul>
+<p-confirmDialog key="akskWarningPrompt" [closable]='false' [rejectVisible]='true'></p-confirmDialog>

@@ -7,11 +7,11 @@
                     <path #path d="m10.5,31.5c0,-14.91713 49.00276,-27 109.49999,-27c60.49723,0 109.49999,12.08287 109.49999,27c0,14.91713 -49.00276,27 -109.49999,27c-60.49723,0 -109.49999,-12.08287 -109.49999,-27z" stroke-opacity="null" stroke-linecap="null" stroke-linejoin="null" stroke-width="null" fill-opacity="null" fill="none"/>
                 </g>
             </svg>
-            <div (click)="showRegister()" class="ui-home-backend-add">+</div>
-            <div (click)="showBackendsDetail()" class="cloud-center" >
+            <div joyrideStep="homeAddBackendBtn" stepPosition="bottom" text="Click here to add backends spanning different cloud vendors and even on premise clusters." (click)="showRegister()" class="ui-home-backend-add">+</div>
+            <div joyrideStep="homeAllBackends" stepPosition="bottom" text="Click here to view all Other Backends (YIG, CEPH, and other File Storage)" (click)="showBackendsDetail()" class="cloud-center" >
                 <div class="ui-home-backend-count">{{allBackends_count.localBKD}}</div>
             </div>
-            <div #cloud_aws class="cloud" (click)="showBackendsDetail(cloud_type[0])">
+            <div joyrideStep="homeAWSBackends" stepPosition="left" text="Click here to view all AWS S3 Backends" #cloud_aws class="cloud" (click)="showBackendsDetail('aws-s3')">
                 <div class="ui-home-backend-count">{{allBackends_count.aws}}</div>
                 <div class="ui-home-backend-logo">
                     <img src="assets/business/images/common/aws.svg" width="64px"/>
@@ -20,8 +20,8 @@
                     <span>Amazon S3</span>
                 </div>
             </div>
-            <div #cloud_hw class="cloud" (click)="showBackendsDetail(cloud_type[1])">
-                <div class="ui-home-backend-count">{{allBackends_count.huaweipri}}</div>
+            <div joyrideStep="homeAzureBackends" stepPosition="left" text="Click here to view all Azure Backends" #cloud_hw class="cloud" (click)="showBackendsDetail('azure-blob')">
+                <div class="ui-home-backend-count">{{allBackends_count.azureblob}}</div>
                 <div class="ui-home-backend-logo">
                     <img src="assets/business/images/common/azure.svg"  width="64px"/>
                 </div>
@@ -29,7 +29,8 @@
                     <span>Azure Storage</span>
                 </div>
             </div>            
-            <div #cloud_hw_p class="cloud" (click)="showBackendsDetail(cloud_type[2])">
+
+            <div joyrideStep="homeHuaweiBackends" stepPosition="left" text="Click here to view all Huawei Backends" #cloud_hw_p class="cloud" (click)="showBackendsDetail('hw-obs')">
                 <div class="ui-home-backend-count">{{allBackends_count.huaweipub}}</div>
                 <div class="ui-home-backend-logo">
                     <img src="assets/business/images/common/huawei.svg"  width="64px"/>
@@ -38,7 +39,7 @@
                     <span>Huawei</span>
                 </div>
             </div>
-            <div #cloud_ibmcos class="cloud" (click)="showBackendsDetail(cloud_type[5])">
+            <div joyrideStep="homeIBMBackends" stepPosition="left" text="Click here to view all IBM Backends" #cloud_ibmcos class="cloud" (click)="showBackendsDetail('imb-cos')">
                 <div class="ui-home-backend-count">{{allBackends_count.ibmcos}}</div>
                 <div class="ui-home-backend-logo">
                     <img src="assets/business/images/common/ibm.svg"  width="64px"/>
@@ -47,13 +48,23 @@
                     <span>IBM COS</span>
                 </div>
             </div>
-            <div #cloud_gcp class="cloud" (click)="showBackendsDetail(cloud_type[6])">
+
+            <div joyrideStep="homeGCPBackends" stepPosition="left" text="Click here to view all GCP Backends" #cloud_gcp class="cloud" (click)="showBackendsDetail('gcp-s3')">
                 <div class="ui-home-backend-count">{{allBackends_count.gcp}}</div>
                 <div class="ui-home-backend-logo">
                     <img src="assets/business/images/common/google.svg"  width="64px"/>
                 </div>
                 <div class="ui-home-backend-name">
                     <span>GCP</span>
+                </div>
+            </div>
+            <div joyrideStep="homeAlibabaBackends" stepPosition="left" text="Click here to view all Alibaba Backends" #cloud_alibaba class="cloud" (click)="showBackendsDetail('alibaba-oss')">
+                <div class="ui-home-backend-count">{{allBackends_count.alibaba}}</div>
+                <div class="ui-home-backend-logo">
+                    <img src="assets/business/images/common/alibaba-cloud.png"  width="64px"/>
+                </div>
+                <div class="ui-home-backend-name">
+                    <span>Alibaba Object Storage</span>
                 </div>
             </div>
         </div>
@@ -63,8 +74,8 @@
             </svg>
         </div>
     </div>
-    <div style="display:flex;">
-        <div style="flex:1;padding:20px;">
+    <div style="display:flex;" >
+        <div joyrideStep="homeResourceCard" stepPosition="top" text="You can see the number of volumes provisioned, buckets created and Fileshares created."  style="flex:1;padding:20px;">
             <p-card styleClass="ui-card-shadow">
                 <div class="ui-card-title">Resource</div>
                 <div class="ui-home-card">
@@ -86,8 +97,8 @@
                 </div>
             </p-card>
         </div>
-        <div style="flex:1;padding:20px;">
-            <p-card styleClass="ui-card-shadow">
+        <div joyrideStep="homeDataflowCard" stepPosition="top" text="You can see the number of migrations and replications here." style="flex:1;padding:20px;" >
+            <p-card  styleClass="ui-card-shadow">
                     <div class="ui-card-title">Dataflow Quantity</div>
                 <div class="ui-home-card">
                     <div class="ui-home-card-count">
@@ -104,50 +115,72 @@
             </p-card>
         </div>
     </div>
-    <p-dialog  header="Modify" [(visible)]="modifyBackendshow" [width]="600" modal="modal">
-        <form [grid]="{label: 'ui-g-3', content:'ui-g-20'}" [formGroup]="modifyBackendForm" [errorMessage]="errorMessage">
-            <form-item label="Access Key" [required]="true">
-                <input type="text" pInputText formControlName="ak" />
-            </form-item>
-            <form-item label="Secret Key" [required]="true">
-                <input type="text" pInputText formControlName="sk" />
-            </form-item>
-        </form>
-        <p-footer>
-            <button type="button" pButton (click)="modifyBackend()"  label="{{I18N.keyID['ok']}}"></button>
-            <button type="button" pButton (click)="modifyBackendshow = false"  label="{{I18N.keyID['cancel']}}"></button>
-        </p-footer>
-    </p-dialog>
+    
 </div>
 
-
-<p-home-dialog header="Register Storage Backend" [(visible)]="showRegisterFlag" [width]="510" [height]="790" modal="modal" [style]="{'opacity':'0.95','right':'46px','top':'80px','background':'rgb(44,63,97)'}" >
-        <form [grid]="{label: 'ui-g-5', content:'ui-g-20'}" [formGroup]="backendForm" [errorMessage]="errorMessage">
-            <form-item label="Name" [required]="true">
-                <input id="name" type="text" name="name" formControlName="name"  pInputText />
-            </form-item>
-            <form-item label="Type" [required]="true">
-                <p-dropdown [style]="{'min-width':'220px'}" (onChange)="selectOption()" placeholder="Please select" formControlName="type" [options]="allTypes"  ></p-dropdown>
-            </form-item>
-            <form-item *ngFor="let item of formItemCopy" [label]="item.label" [required]="item.required">
-                <input [id]="item.id" [type]="item.type" [name]="item.name"  [formControlName]="item.formControlName"  pInputText />
-            </form-item>
-        </form>
-        <div style="margin-top:100px;">
-            <button type="button" class="ui-button-secondary" pButton (click)="createBackend()" label="{{I18N.keyID['ok']}}" ></button>
-        </div>
-</p-home-dialog>
-<p-home-dialog header="Storage Backends" [(visible)]="showBackends" [width]="710" [height]="790" modal="modal" [style]="{'opacity':'0.8','right':'46px','top':'80px','background':'rgb(44,63,97)'}" >
-    <p-dataTable id="home-backend-detail" [value]="typeDetail" [rows]="10">
-        <p-column field="name" header="{{I18N.keyID['sds_block_volume_name']}}" ></p-column>
-        <p-column field="typeName" header="Type" ></p-column>
-        <p-column field="bucketName" header="Bucket"></p-column>
-        <p-column header="{{I18N.keyID['sds_block_volume_operation']}}" [style]="{'width':'140px'}">
-            <ng-template pTemplate="body" let-backend="rowData" let-i="rowIndex">
-                <a (click)="configModify(backend)" style="margin-right:10px;" >Modify</a>
-                <a (click)="deleteBackend(backend)">Delete</a>
-            </ng-template>
-        </p-column>
-    </p-dataTable>
-</p-home-dialog>
+<p-dialog styleClass="modify-backend-dialog" header="Modify" [(visible)]="modifyBackendshow" [width]="600" modal="modal" [closeOnEscape]="false" [closable]="false"> 
+    <form [grid]="{label: 'ui-g-3', content:'ui-g-20'}" [formGroup]="modifyBackendForm" [errorMessage]="errorMessage">
+        <form-item label="Access Key" [required]="true">
+            <input type="text" pInputText formControlName="ak" />
+        </form-item>
+        <form-item label="Secret Key" [required]="true">
+            <input type="password" pInputText formControlName="sk" />
+        </form-item>
+    </form>
+    <p-footer>
+        <button type="button" pButton (click)="modifyBackend()"  label="{{I18N.keyID['ok']}}"></button>
+        <button type="button" pButton (click)="closeModify()"  label="{{I18N.keyID['cancel']}}"></button>
+    </p-footer>
+</p-dialog>
 <p-confirmDialog></p-confirmDialog>
+<p-sidebar [(visible)]="showRightSidebar" (onHide)="closeSidebar()" position="right" styleClass="home-sidebar-panel ui-sidebar-lg" [baseZIndex]="10000">
+    <div *ngIf="showRegisterFlag" class="right-sidebar-content-wrapper">
+        <div class="right-sidebar-header">
+            <h1 style="font-weight:normal">Register Backend</h1>
+        </div>
+        <div class="right-sidebar-body">
+            <form [grid]="{label: 'ui-g-5', content:'ui-g-20'}" [formGroup]="backendForm" [errorMessage]="errorMessage">
+                <form-item label="Name" [required]="true">
+                    <input id="name" type="text" name="name" formControlName="name"  pInputText />
+                </form-item>
+                <form-item label="Type" [required]="true">
+                    <p-dropdown [style]="{'min-width':'220px'}" (onChange)="selectOption()" placeholder="Please select" formControlName="type" [options]="allTypes"  ></p-dropdown>
+                </form-item>
+                <form-item *ngFor="let item of formItemCopy" [label]="item.label" [required]="item.required">
+                    <input [id]="item.id" [type]="item.type" [name]="item.name"  [formControlName]="item.formControlName"  pInputText />
+                </form-item>
+            </form>
+        </div>
+        <div class="right-sidebar-footer">
+            <div style="margin-top:100px;">
+                <button type="button" class="ui-button-secondary" pButton (click)="createBackend()" label="{{I18N.keyID['ok']}}" ></button>
+                <button pButton type="button" (click)="closeSidebar()" label="Cancel" class="ui-button-default"></button>
+            </div>
+        </div>
+    </div>
+
+    <div *ngIf="showBackends"  class="right-sidebar-content-wrapper">
+        <div class="right-sidebar-header">
+            <h1 style="font-weight:normal">Storage Backends</h1>
+        </div>
+        <div class="right-sidebar-body">
+            <p-dataTable id="home-backend-detail" [value]="typeDetail" [rows]="10">
+                <p-column field="name" header="{{I18N.keyID['sds_block_volume_name']}}" ></p-column>
+                <p-column field="typeName" header="Type" ></p-column>
+                <p-column field="bucketName" header="Bucket"></p-column>
+                <p-column header="{{I18N.keyID['sds_block_volume_operation']}}" [style]="{'width':'140px'}">
+                    <ng-template pTemplate="body" let-backend="rowData" let-i="rowIndex">
+                        <a (click)="configModify(backend)" style="margin-right:10px;" >Modify</a>
+                        <a (click)="deleteBackend(backend)">Delete</a>
+                    </ng-template>
+                </p-column>
+            </p-dataTable>
+        </div>
+        <div class="right-sidebar-footer">
+            <div style="margin-top:100px;">
+                <button pButton type="button" (click)="closeSidebar()" label="Cancel" class="ui-button-default"></button>
+            </div>
+        </div>
+    </div>
+    
+</p-sidebar>

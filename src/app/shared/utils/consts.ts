@@ -1,11 +1,19 @@
 export const Consts = {
-    /** 不显示的语言 **/
+    
+    /**
+     * Constants to be used for conversion of capacity value in appropriate display values.
+     */
+    FROM_GiB_CONVERTER: 1073741824,
+    TO_GiB_CONVERTER : 1024,
+    TO_GB_CONVERTER : 1000,
+    
+    /** Unknown placeholder **/
     UNKNOW_PLACEHOLDER: "--",
 
-    /** 百分比显示小数位数 **/
+    /** Display Decimal places **/
     PRECISION_PERCENT: 2,
 
-    /** 常用日期时间格式 **/
+    /** Common Date and Time Formats **/
     DATE_FORMAT: "yyyy-MM-dd",
     TIME_FORMAT: "hh:mm:ss",
     DATETIME_FORMAT: "yyyy-MM-dd hh:mm:ss",
@@ -19,13 +27,6 @@ export const Consts = {
     WSearch: 180,
 
 
-    /** 百分比显示小数位数 **/
-
-    /** 百分比显示小数位数 **/
-
-    /** 百分比显示小数位数 **/
-
-    /** 百分比显示小数位数 **/
     /**
      * only for bucket to backend and to type
      */
@@ -33,7 +34,9 @@ export const Consts = {
     BUCKET_TYPE:new Map<string,string>(),
     BYTES_PER_CHUNK : 1024 * 1024 * 5,
     TIMEOUT: 30 * 60 * 1000,
-    CLOUD_TYPE:['aws-s3','azure-blob','hw-obs','fusionstorage-object','ceph-s3','ibm-cos','gcp-s3', 'yig'],
+
+    CLOUD_TYPE:['aws-s3', 'aws-file', 'aws-block', 'azure-blob', 'azure-file','hw-obs','fusionstorage-object','ceph-s3','ibm-cos','gcp-s3', 'gcp-file', 'yig', 'alibaba-oss'],
+
     TYPE_SVG:{
         "aws-s3":'aws.svg',
         "hw-obs":"huawei.svg",
@@ -42,7 +45,13 @@ export const Consts = {
         "ceph-s3": "ceph.svg",
         "ibm-cos": "ibm.svg",
         "gcp-s3": "google.svg",
-        "yig": "yig.png"
+        "yig": "yig.png",
+        'alibaba-oss': 'alibaba.svg',
+        "aws-file" : 'aws.svg',
+        "azure-file" : 'azure.svg',
+        "aws-block" : 'aws.svg',
+        "gcp-file" : 'google.svg'
+
     },
     CLOUD_TYPE_NAME: {
         'aws-s3': 'AWS S3',
@@ -50,8 +59,23 @@ export const Consts = {
         'hw-obs': "Huawei OBS",
         'fusionstorage-object': "FusionStorage Object",
         'ceph-s3': "Ceph S3",
-        'gcp-s3': "GCP Storage",
+        'gcp-s3': "GCP Object Storage",
         'ibm-cos': "IBM COS",
-        'yig': "YIG"
+        'yig': "YIG Ceph",
+        'alibaba-oss' : "Alibaba Object Storage",
+        'aws-file' : 'AWS File Storage',
+        'azure-file' : 'Azure File Storage',
+        'aws-block' : 'AWS Block Storage',
+        'gcp-file' : 'GCP File Storage'
+    },
+    S3_HOST_IP: '',
+    S3_HOST_PORT: '',
+    API: {
+        
+        DELFIN : {
+            'storages' : 'resource-monitor/storages',
+            'storagePools' : 'resource-monitor/storage-pools',
+            'volumes' : 'resource-monitor/volumes'
+        }
     }
 }

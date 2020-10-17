@@ -1,24 +1,32 @@
 import { Component, OnInit, ViewContainerRef, ViewChild, Directive, ElementRef, HostBinding, HostListener, AfterViewInit } from '@angular/core';
-import { Http } from '@angular/http';
+import { Http, Headers } from '@angular/http';
 import { Router } from '@angular/router';
-import { I18NService, Consts, ParamStorService, MsgBoxService, Utils } from 'app/shared/api';
+import { I18NService, Consts, ParamStorService, MsgBoxService, Utils, HttpService } from 'app/shared/api';
+import { Button } from 'app/components/button/button';
 import { I18nPluralPipe } from '@angular/common';
-import { MenuItem, SelectItem} from './components/common/api';
+import { MenuItem, ConfirmationService, SelectItem} from './components/common/api';
 import { akSkService } from './business/ak-sk/ak-sk.service';
 import { BucketService } from './business/block/buckets.service';
+import * as aws4 from "ngx-aws4";
+import { JoyrideService } from 'ngx-joyride';
 
 let d3 = window["d3"];
 declare let X2JS: any;
 let CryptoJS = require("crypto-js");
+let _ = require("underscore");
 
 @Component({
     selector: 'app-root',
     templateUrl: './app.component.html',
-    providers: [MsgBoxService, akSkService],
+    providers: [MsgBoxService, akSkService, ConfirmationService],
     styleUrls: []
 })
 export class AppComponent implements OnInit, AfterViewInit {
     selectFileName: string;
+
+    progressValue: number = 0;
+    downloadProgressValue: number = 0;
+
     chromeBrowser: boolean = false;
 
     isLogin: boolean;
@@ -57,44 +65,49 @@ export class AppComponent implements OnInit, AfterViewInit {
     userId;
     SignatureKey = {};
     akSkRouterLink = "/akSkManagement";
-    monitorConfigLink = "/monitor/config";
     Signature = "";
     kDate = "";
     stringToSign = "";
     canonicalString = "";
 
     menuItems = [];
+    tourSteps = [];
 
     menuItems_tenant = [
         {
             "title": "Home",
             "description": "Resource statistics",
-            "routerLink": "/home"
+            "routerLink": "/home",
+            "joyrideStep" : "menuHome",
+            "text" : "This page shows you the overall view of the backends available, volumes provisioned, buckets created and object storage migrations performed."
         },
         {
             "title": "Profile",
             "description": "Profiles",
-            "routerLink": "/profile"
+            "routerLink": "/profile",
+            "joyrideStep" : "menuProfile",
+            "text" : "A profile is a set of configurations on service capabilities (including resource tuning, QoS) of storage resources. A profile must be specified when volume or fileshare is created."
         },
         {
-            "title": "Resource",
+            "title": "Resource Manager",
             "description": "Volumes / Buckets / File Share / Hosts",
-            "routerLink": "/block"
+            "routerLink": "/block",
+            "joyrideStep" : "menuResource",
+            "text" : "View and manage Buckets, Volumes, Volume Groups, File shares and Hosts that have been manually created or applied for through service templates."
         },
         {
             "title": "Dataflow",
             "description": "Through migration / replication capability.",
-            "routerLink": "/dataflow"
-        },
-        {
-            "title": "Monitor",
-            "description": "Telemetry information.",
-            "routerLink": "/monitor"
+            "routerLink": "/dataflow",
+            "joyrideStep" : "menuDataflow",
+            "text" : "Data flow through buckets by migration / replication."
         },
         {
             "title": "Services",
             "description": "Orchestration services.",
-            "routerLink": "/services"
+            "routerLink": "/services",
+            "joyrideStep" : "menuServices",
+            "text" : "This page demonstrates the Orchestration service that allows to Create and Manage Service Instances"
         }
     ]
 
@@ -102,45 +115,132 @@ export class AppComponent implements OnInit, AfterViewInit {
         {
             "title": "Home",
             "description": "Resource statistics",
-            "routerLink": "/home"
+            "routerLink": "/home",
+            "joyrideStep" : "menuHome",
+            "text" : "This page shows you the overall view of the backends available, volumes provisioned, buckets created and object storage migrations performed."
         },
         {
             "title": "Profile",
             "description": "Profiles",
-            "routerLink": "/profile"
+            "routerLink": "/profile",
+            "joyrideStep" : "menuProfile",
+            "text" : "A profile is a set of configurations on service capabilities (including resource tuning, QoS) of storage resources. A profile must be specified when volume is created."
         },
         {
-            "title": "Resource",
+            "title": "Resource Manager",
             "description": "Volumes / Buckets / File Share / Hosts",
-            "routerLink": "/block"
+            "routerLink": "/block",
+            "joyrideStep" : "menuResource",
+            "text" : "View and manage Buckets, Volumes, Volume Groups, File shares and Hosts that have been manually created or applied for through service templates.",
+            "group" : true,
+            "children" : [
+                {
+                    "title" : "Buckets",
+                    "routerLink": "/block"
+                },
+                {
+                    "title" : "Volumes",
+                    "routerLink": "/block/fromVolume"
+                },
+                {
+                    "title" : "Volume Group",
+                    "routerLink": "/block/fromGroup"
+                },
+                {
+                    "title" : "File Share",
+                    "routerLink": "/block/fromFileShare"
+                },
+                {
+                    "title" : "Hosts",
+                    "routerLink": "/block/fromHosts"
+                },
+            ]
         },
         {
             "title": "Dataflow",
             "description": "Through migration / replication capability.",
-            "routerLink": "/dataflow"
+            "routerLink": "/dataflow",
+            "joyrideStep" : "menuDataflow",
+            "text" : "Data flow through buckets by migration / replication."
         },
         {
-            "title": "Monitor",
-            "description": "Telemetry information.",
-            "routerLink": "/monitor"
+            "title": "Resource Monitor",
+            "description": "SODA Storage Infrastructure Manager",
+            "routerLink": "/resource-monitor",
+            "joyrideStep" : "menuDelfin",
+            "text" : "delfin is the SODA Infrastructure Manager project which provides unified, intelligent and scalable resource management, alert and performance monitoring",
+            "group" : true,
+            "children" : [
+                {
+                    "title" : "Storage Summary",
+                    "routerLink": "/resource-monitor"
+                },
+            ]
         },
 	    {
             "title": "Services",
             "description": "Orchestration services.",
-            "routerLink": "/services"
+            "routerLink": "/services",
+            "joyrideStep" : "menuServices",
+            "text" : "This page demonstrates the Orchestration service that allows to Create and Manage Service Instances"
         },
         {
             "title": "Infrastructure",
             "description": "Regions, availability zones and storage",
-            "routerLink": "/resource"
+            "routerLink": "/resource",
+            "joyrideStep" : "menuInfrastructure",
+            "text" : "A quick overview of the block, Object and File infrastructure."
         },
         {
             "title": "Identity",
             "description": "Managing tenants and users",
-            "routerLink": "/identity"
+            "routerLink": "/identity",
+            "joyrideStep" : "menuIdentity",
+            "text" : "Managing Tenants and Users"
         }
     ];
 
+    tourSteps_admin = [
+        'homeWelcome',
+        'homeUserProfile',
+        'menuHome',
+        'menuProfile',
+        'menuResource',
+        'menuDataflow',
+        'menuDelfin',
+        'menuServices',
+        'menuInfrastructure',
+        'menuIdentity',
+        'homeResourceCard@/home',
+        'homeDataflowCard@/home',
+        'homeAddBackendBtn@/home',
+        'homeAWSBackends@/home',
+        'homeGCPBackends@/home',
+        'homeHuaweiBackends@/home',
+        'homeIBMBackends@/home',
+        'homeAlibabaBackends@/home',
+        'homeAzureBackends@/home',
+        'homeAllBackends@/home'
+    ];
+    tourSteps_tenant = [
+        'homeWelcome',
+        'homeUserProfile',
+        'menuHome',
+        'menuProfile',
+        'menuResource',
+        'menuDataflow',
+        'menuServices',
+        'homeResourceCard@/home',
+        'homeDataflowCard@/home',
+        'homeAddBackendBtn@/home',
+        'homeAWSBackends@/home',
+        'homeGCPBackends@/home',
+        'homeHuaweiBackends@/home',
+        'homeIBMBackends@/home',
+        'homeAlibabaBackends@/home',
+        'homeAzureBackends@/home',
+        'homeAllBackends@/home'
+    ];
     activeItem: any;
 
     private msgs: any = [{ severity: 'warn', summary: 'Warn Message', detail: 'There are unsaved changes' }];
@@ -149,13 +249,18 @@ export class AppComponent implements OnInit, AfterViewInit {
         private el: ElementRef,
         private viewContainerRef: ViewContainerRef,
         private http: Http,
+        private httpSvc: HttpService,
         private router: Router,
         private paramStor: ParamStorService,
         private msg: MsgBoxService,
         private akSkService: akSkService,
+        private confirmationService: ConfirmationService,
         public I18N: I18NService,
-        private BucketService: BucketService
-    ) { }
+        private BucketService: BucketService,
+        private readonly joyrideService: JoyrideService
+    ) { 
+        window['akskWarning'] = false;
+    }
 
     // Wave params
     svg_height = 150;
@@ -186,6 +291,10 @@ export class AppComponent implements OnInit, AfterViewInit {
                 return item.id != id
             })
         }
+        this.downloadProgressValue = 0;
+        window['downloadProgress'] = (value) =>{
+            this.downloadProgressValue = value;
+        }
         window['startUpload'] = (selectFile, bucketId, options,folderId, cb) => {
             window['isUpload'] = true;
             this.showPrompt =  true;
@@ -195,78 +304,125 @@ export class AppComponent implements OnInit, AfterViewInit {
                 this.selectFileName = selectFile.name 
             }
             this.fileName = selectFile.name;
-            let uploadUrl = this.BucketService.url + '/'+ bucketId + '/' + this.selectFileName;
+            let uploadUrl = this.BucketService.url + bucketId + '/' + this.selectFileName; 
             if (selectFile['size'] > Consts.BYTES_PER_CHUNK) {
                 //first step get uploadId
                 window['getAkSkList'](()=>{
-                    let requestMethod = "PUT";
-                    let url = uploadUrl + "?uploads";
-                    window['canonicalString'](requestMethod, url,()=>{
-                        this.getSignature();
-                        options.headers.set('Authorization', this.Signature);
-                        options.headers.set('X-Auth-Date', this.kDate);
-                        this.http.put( '/' + uploadUrl + "?uploads", '', options).subscribe((res) => {
-                            let str = res['_body'];
-                            let x2js = new X2JS();
-                            let jsonObj = x2js.xml_str2json(str);
-                            let uploadId = jsonObj.InitiateMultipartUploadResult.UploadId;
-                            // second step part upload
-                            window['uploadPart'](selectFile, uploadId, bucketId, options, cb);
-                        },
-                        (error)=>{
-                            if(uploadNum < 5){
-                                window['startUpload'] (selectFile, bucketId, options,folderId, cb);
-                                uploadNum++;
-                            }else{
-                                uploadNum = 0;
-                                this.showPrompt = false;
-                                window['isUpload'] = false;
-                                this.msg.error("Upload failed. The network may be unstable. Please try again later.");
-                                if (cb) {
-                                    cb();
-                                }
-                            }
-                        });  
-                    })
-                })
-            } else {
-                window['singleUpload'](selectFile, bucketId, options, uploadUrl, cb);
-            }
-        }
-        window['singleUpload'] = (selectFile, bucketId, options, uploadUrl, cb) => {
-            window['getAkSkList'](()=>{
-                let requestMethod = "PUT";
-                let url = uploadUrl;
-                window['canonicalString'](requestMethod, url,()=>{
-                    this.getSignature();
-                    options.headers.set('Authorization', this.Signature);
-                    options.headers.set('X-Auth-Date', this.kDate);
-                    this.http.put("/" + uploadUrl, selectFile, options).subscribe((res) => {
-                        this.showPrompt = false;
-                        window['isUpload'] = false;
-                        this.msg.success("Upload file ["+ selectFile.name +"] successfully.");
-                        if (cb) {
-                            cb();
-                        }
-                        uploadNum = 0;
-                    },
-                    (error)=>{
+                    let requestMethod = "POST";
+                    let url = '/' + bucketId + '/' + this.selectFileName + '?uploads';
+                    let requestOptions: any;
+                    let options: any = {};
+                    let contentHeaders = {
+                        'X-Amz-Content-Sha256': 'UNSIGNED-PAYLOAD'
+                    };
+                    requestOptions = window['getSignatureKey'](requestMethod, url, '', '', '', '', '', '', contentHeaders) ;
+                    options['headers'] = new Headers();
+                    options = this.BucketService.getSignatureOptions(requestOptions, options);
+                    this.httpSvc.post( uploadUrl + '?uploads', '', options).subscribe((res) => {
+                        let str = res['_body'];
+                        let x2js = new X2JS();
+                        let jsonObj = x2js.xml_str2json(str);
+                        let uploadId = jsonObj.InitiateMultipartUploadResult.UploadId;
+                        // second step part upload
+                        window['uploadPart'](selectFile, uploadId, bucketId, options, cb);
+                    },(error)=>{
                         if(uploadNum < 5){
-                            window['singleUpload'](selectFile, bucketId, options, uploadUrl, cb);
+                            window['startUpload'] (selectFile, bucketId, options,folderId, cb);
                             uploadNum++;
-                        }else{
-                            this.showPrompt = false;
+                        } else{
                             uploadNum = 0;
-                            console.log('error');
+                            this.showPrompt = false;
                             window['isUpload'] = false;
                             this.msg.error("Upload failed. The network may be unstable. Please try again later.");
                             if (cb) {
                                 cb();
                             }
                         }
-                        
-                    });
+                    });  
                 })
+            } else {
+                window['singleUpload'](selectFile, bucketId, options, uploadUrl, cb);
+            }
+        }
+        
+        window['singleUpload'] = (selectFile, bucketId, options, uploadUrl, cb) => {
+            let fileString: any;
+            let fileContent: any;
+            window['getAkSkList'](()=>{
+                let requestMethod = "PUT";
+                let url = '/'+ bucketId + '/' + this.selectFileName;
+                let requestOptions: any;
+                let options: any = {};
+                const reader = new FileReader();
+                reader.readAsArrayBuffer(selectFile);
+                reader.onloadend = (e) => {
+                    let self = this;
+                    fileContent = reader.result;
+                    let contentHeaders = {
+                        'Content-Type' : selectFile.type,
+                        'X-Amz-Content-Sha256': 'UNSIGNED-PAYLOAD'
+                    };
+                    requestOptions = window['getSignatureKey'](requestMethod, url, '', '', '', '', '', '', contentHeaders) ;
+                    options['headers'] = new Headers();
+                    options = this.BucketService.getSignatureOptions(requestOptions, options);
+                    /* XHR Send */
+                    var xhr = new XMLHttpRequest();
+                    xhr.withCredentials = true;
+                    xhr.open('PUT', uploadUrl, true);    
+                    //xhr.responseType = "arraybuffer";
+                    xhr.setRequestHeader('Content-Type', requestOptions.headers['Content-Type']);
+                    xhr.setRequestHeader('X-Auth-Token', requestOptions.headers['X-Auth-Token']);
+                    xhr.setRequestHeader('X-Amz-Content-Sha256', requestOptions.headers['X-Amz-Content-Sha256']);
+                    xhr.setRequestHeader('X-Amz-Date', requestOptions.headers['X-Amz-Date']);
+                    xhr.setRequestHeader('Authorization', requestOptions.headers['Authorization']);
+
+                    xhr.onload = function () {
+                        if(xhr.status == 200) {
+                            self.showPrompt = false;
+                            window['isUpload'] = false;
+                            self.msg.success("Upload file ["+ selectFile.name +"] successfully.");
+                            if (cb) {
+                                cb();
+                            }
+                            uploadNum = 0;
+                            self.progressValue = 0;
+                        } else {
+                            self.showPrompt = false;
+                            uploadNum = 0;
+                            self.progressValue = 0;
+                            window['isUpload'] = false;
+                            self.msg.error("Upload failed. The network may be unstable. Please try again later.");
+                        }
+                    };
+                    xhr.upload.onprogress = function(e){
+                        let done = e.loaded;
+                        let total =  e.total;
+                        self.progressValue = Math.floor(done/total*100)
+                    }
+
+                    xhr.onerror = (err)=>{
+                        console.log(err);
+                        if(uploadNum < 5){
+                            window['singleUpload'](selectFile, bucketId, options, uploadUrl, cb);
+                            uploadNum++;
+                        }else{
+                            this.showPrompt = false;
+                            uploadNum = 0;
+                            console.log(err);
+                            window['isUpload'] = false;
+                            this.msg.error("Upload failed. The network may be unstable. Please try again later.");
+                            if (cb) {
+                                cb();
+                            }
+                        }
+                    }
+                    xhr.onloadend=()=>{
+                    }
+                    xhr.send(fileContent);
+                    /* XHR Send ends */
+                };
+
+
             })
         }
         window['uploadPart'] = (selectFile, uploadId, bucketId, options, cb) => {
@@ -291,108 +447,125 @@ export class AppComponent implements OnInit, AfterViewInit {
             window['segmentUpload'](0, proArr, selectFile, uploadId, options, bucketId, cb);
         }
         window['segmentUpload'] = (i, chunks, blob, uploadId, options, bucketId, cb) => {
+            let fileString: any;
             let chunk = blob.slice(chunks[i].start, chunks[i].end);
-            let uploadUrl = this.BucketService.url + '/'+ bucketId + '/' + this.selectFileName;
+            let uploadUrl = this.BucketService.url + bucketId + '/' + this.selectFileName;
             window['getAkSkList'](()=>{
+                
                 let requestMethod = "PUT";
-                let url = uploadUrl + '?partNumber=' + (i + 1) + '&uploadId=' + uploadId;
-                window['canonicalString'](requestMethod, url,()=>{
-                    this.getSignature();
-                    options.headers.set('Authorization', this.Signature);
-                    options.headers.set('X-Auth-Date', this.kDate);
-                    this.http.put("/"+ uploadUrl + '?partNumber=' + (i + 1) + '&uploadId=' + uploadId, chunk, options).subscribe((data) => {
-                        let header = data.headers['_headers']
-                        let headerArr = header.entries()
-                        let headerArr1= Array.from(headerArr)
-                        let ETag 
-                        headerArr1.forEach((item)=>{
-                            if(item[0] == 'etag'){
-                                return ETag = item[1][0].replace(/\"/g,"")
-                            }
-                        })
-                        let obj = {}
-                        obj['PartNumber'] = i+1
-                        obj['ETag'] = ETag && ETag? ETag : ""
-                        window['uploadPartArr'].push(obj);
-                        uploadNum = 0;
-                        if (i < (chunks.length - 1)) {
-                            window['segmentUpload'](i + 1, chunks, blob, uploadId, options, bucketId, cb);
-                        } else {
-                            let marltipart = '<CompleteMultipartUpload>';
-                            window['uploadPartArr'].forEach(item => {
-                                marltipart += `<Part>
-                                <PartNumber>${item.PartNumber}</PartNumber>
-                                <ETag>${item.ETag}</ETag>
-                                </Part>`
-                            });
-                            marltipart += '</CompleteMultipartUpload>';
-                            window['CompleteMultipartUpload'](bucketId, blob, uploadId, marltipart, options, cb);
+                let url = '/'+ bucketId + '/' + this.selectFileName + '?partNumber=' + (i + 1) + '&uploadId=' + uploadId;
+                let requestOptions: any;
+                let options: any = {};
+                const reader = new FileReader();
+                let contentHeaders = {
+                    'X-Amz-Content-Sha256': 'UNSIGNED-PAYLOAD'
+                };
+                requestOptions = window['getSignatureKey'](requestMethod, url, '', '', '', '', '', '', contentHeaders) ;
+                options['headers'] = new Headers();
+                options = this.BucketService.getSignatureOptions(requestOptions, options);
+                this.http.put(uploadUrl + '?partNumber=' + (i + 1) + '&uploadId=' + uploadId, chunk, options).subscribe((data) => {
+                    this.refreshLastTime();
+                    let header = data.headers['_headers']
+                    let headerArr = header.entries()
+                    let headerArr1= Array.from(headerArr)
+                    let ETag 
+                    headerArr1.forEach((item)=>{
+                        if(item[0] == 'etag'){
+                            return ETag = item[1][0].replace(/\"/g,"")
                         }
-                    },
-                    (error)=>{
-                        if(uploadNum < 5){
-                            window['segmentUpload'](i, chunks, blob, uploadId, options, bucketId, cb);
-                            uploadNum++;
-                        }else{
-                            this.showPrompt = false;
-                            uploadNum = 0;
-                            window['isUpload'] = false;
-                            window['getAkSkList'](()=>{
+                    })
+                    let obj = {}
+                    obj['PartNumber'] = i+1
+                    obj['ETag'] = ETag && ETag? ETag : ""
+                    window['uploadPartArr'].push(obj);
+                    uploadNum = 0;
+                    /* upload progress */
+                    let done = i;
+                    let total =  chunks.length;
+                    this.progressValue = Math.floor(done/total*100)
+                    /* Upload progress */
+                    if (i < (chunks.length - 1)) {
+                        window['segmentUpload'](i + 1, chunks, blob, uploadId, options, bucketId, cb);
+                    } else {
+                        let completeMultipartStr = '<CompleteMultipartUpload>';
+                        window['uploadPartArr'].forEach(item => {
+                            completeMultipartStr += `<Part>
+                            <PartNumber>${item.PartNumber}</PartNumber>
+                            <ETag>${item.ETag}</ETag>
+                            </Part>`
+                        });
+                        completeMultipartStr += '</CompleteMultipartUpload>';
+                        window['CompleteMultipartUpload'](bucketId, blob, uploadId, completeMultipartStr, options, cb);
+                    }
+                },
+                (error)=>{
+                    if(uploadNum < 5){
+                        window['segmentUpload'](i, chunks, blob, uploadId, options, bucketId, cb);
+                        uploadNum++;
+                    }else{
+                        this.showPrompt = false;
+                        uploadNum = 0;
+                        window['isUpload'] = false;
+                        window['getAkSkList'](()=>{
+                            
                                 let requestMethod = "DELETE";
-                                let url = uploadUrl + '?uploadId=' + uploadId;
-                                window['canonicalString'](requestMethod, url,()=>{
-                                    this.getSignature();
-                                    options.headers.set('Authorization', this.Signature);
-                                    options.headers.set('X-Auth-Date', this.kDate);
-                                    this.http.delete("/" + uploadUrl + "?uploadId=" + uploadId, options).subscribe((data)=>{});
-                                    this.msg.error("Upload failed. The network may be unstable. Please try again later.");
-                                    if (cb) {
-                                        cb();
-                                    }
-                                })
-                            })
-                        } 
-                    });
-                })
+                                let url = '/'+ bucketId + '/' + this.selectFileName + '?uploadId=' + uploadId;
+                                let requestOptions: any;
+                                let options: any = {};
+                                requestOptions = window['getSignatureKey'](requestMethod, url) ;
+                                options['headers'] = new Headers();
+                                options = this.BucketService.getSignatureOptions(requestOptions, options);
+                                this.http.delete(uploadUrl + "?uploadId=" + uploadId, options).subscribe((data)=>{});
+                                this.msg.error("Upload failed. The network may be unstable. Please try again later.");
+                                if (cb) {
+                                    cb();
+                                }
+                        })
+                    } 
+                });
             })
         }
-        window['CompleteMultipartUpload'] = (bucketId, blob, uploadId, marltipart, options, cb) => {
-            let uploadUrl = this.BucketService.url + '/'+ bucketId + '/' + this.selectFileName;
+        window['CompleteMultipartUpload'] = (bucketId, blob, uploadId, completeMultipartStr, options, cb) => {
+            let uploadUrl = this.BucketService.url + bucketId + '/' + this.selectFileName;
             window['getAkSkList'](()=>{
-                let requestMethod = "PUT";
-                let url = uploadUrl + '?uploadId=' + uploadId;
-                window['canonicalString'](requestMethod, url,()=>{
-                    this.getSignature();
-                    options.headers.set('Authorization', this.Signature);
-                    options.headers.set('X-Auth-Date', this.kDate);
-                    this.http.put("/" + uploadUrl + '?uploadId=' + uploadId, marltipart, options).subscribe((res) => {
+                let fileString: any;
+                let requestMethod = "POST";
+                let url = '/'+ bucketId + '/' + this.selectFileName + '?uploadId=' + uploadId;
+                let requestOptions: any;
+                let options: any = {};
+                
+                requestOptions = window['getSignatureKey'](requestMethod, url, '', '', '', completeMultipartStr) ;
+                options['headers'] = new Headers();
+                options = this.BucketService.getSignatureOptions(requestOptions, options);
+                this.http.post(uploadUrl + '?uploadId=' + uploadId, completeMultipartStr, options).subscribe((res) => {
+                    this.showPrompt = false;
+                    window['isUpload'] = false;
+                    this.msg.success("Upload file ["+ blob.name +"] successfully.");
+                    this.progressValue = 0;
+                    if (cb) {
+                        cb();
+                    }
+                },(error) => {
+                    if(uploadNum < 5){
+                        window['CompleteMultipartUpload'](bucketId, blob, uploadId, completeMultipartStr, options, cb);
+                        uploadNum++;
+                    }else{
                         this.showPrompt = false;
+                        uploadNum = 0;
+                        this.progressValue = 0;
                         window['isUpload'] = false;
-                        this.msg.success("Upload file ["+ blob.name +"] successfully.");
-                        if (cb) {
-                            cb();
-                        }
-                    },
-                    error =>{
-                        if(uploadNum < 5){
-                            window['CompleteMultipartUpload'](bucketId, blob, uploadId, marltipart, options, cb);
-                            uploadNum++;
-                        }else{
-                            this.showPrompt = false;
-                            uploadNum = 0;
-                            window['getAkSkList'](()=>{
-                                let requestMethod = "DELETE";
-                                let url = uploadUrl + '?uploadId=' + uploadId;
-                                window['canonicalString'](requestMethod, url,()=>{
-                                    this.getSignature();
-                                    options.headers.set('Authorization', this.Signature);
-                                    options.headers.set('X-Auth-Date', this.kDate);
-                                    this.http.delete("/" + uploadUrl + "?uploadId=" + uploadId, options).subscribe((data)=>{});
-                                })
-                            })
-                        }
-                    });
-                })
+                        window['getAkSkList'](()=>{
+                            let requestMethod = "DELETE";
+                            let url = '/'+ bucketId + '/' + this.selectFileName + '?uploadId=' + uploadId;
+                            let requestOptions: any;
+                            let options: any = {};
+                            requestOptions = window['getSignatureKey'](requestMethod, url) ;
+                            options['headers'] = new Headers();
+                            options = this.BucketService.getSignatureOptions(requestOptions, options);
+                            this.http.delete(uploadUrl + "?uploadId=" + uploadId, options).subscribe((data)=>{});
+                        })
+                    }
+                });
             })
             
         }
@@ -410,8 +583,20 @@ export class AppComponent implements OnInit, AfterViewInit {
                     'X-Auth-Token': localStorage['auth-token']
                 } 
             }
+            
             this.akSkService.getAkSkList(request,options).subscribe(res=>{
                 let response = res.json();
+                if(!response.credentials.length){
+                    window['akskWarning']=true;
+                    
+                }
+                if(window['akskWarning'] && (this.router.url == '/block' || this.router.url == '/dataflow')){
+                    let msg = "SODA Dashboard requires AK/SK authentication for all multi-cloud operations. The current system does not have an AK/SK. Click below to go to AK/SK management and add one."
+                    let header = "AK/SK Not Found!";
+                    let acceptLabel = "Add AK/SK";
+                    let warning=true;
+                    this.confirmDialog([msg,header,acceptLabel,warning]);
+                }
                 let detailArr = [];
                 response.credentials.forEach(item=>{
                     if(item.user_id == window['userId']){
@@ -422,6 +607,7 @@ export class AppComponent implements OnInit, AfterViewInit {
                 this.SignatureKey = [];
                 if(detailArr.length > 0){
                     window['getParameters'](detailArr); 
+                    window['akskWarning'] = false;
                 }
                 if (cb) {
                     cb();
@@ -471,78 +657,117 @@ export class AppComponent implements OnInit, AfterViewInit {
             this.SignatureKey['AccessKey'] = secretAccessKey.access;
         }
         //Calculation of the signature
-        window['getSignatureKey'] = ()=>{
-            let SignatureObject = {};
-            SignatureObject['kSigning'] = window['getkSigning'](this.SignatureKey['secretAccessKey'],this.SignatureKey['dayDate'],this.SignatureKey['regionName'],this.SignatureKey['serviceName'],this.SignatureKey['dateStamp']);
-            SignatureObject['SignatureKey'] = this.SignatureKey;
-            return SignatureObject;
-        }
-        window['getkSigning'] = (key, dayDate, regionName, serviceName, dateStamp)=>{
-            let kDate = CryptoJS.HmacSHA256(dayDate, "OPENSDS" + key);
-            let kRegion = CryptoJS.HmacSHA256(regionName, kDate);
-            let kService = CryptoJS.HmacSHA256(serviceName, kRegion);
-            let signRequest = CryptoJS.HmacSHA256("sign_request", kService);
-            let kSigning = CryptoJS.HmacSHA256(this.stringToSign, signRequest);
-            return kSigning;
-        }
-        window['buildStringToSign'] = ()=>{
-            let authHeaderPrefix = "OPENSDS-HMAC-SHA256";
-            let requestDateTime = this.SignatureKey['dateStamp'];
-            let credentialString = this.SignatureKey['AccessKey'] + "/" + 
-            this.SignatureKey['dayDate'] + "/" + this.SignatureKey['regionName'] + "/" + this.SignatureKey['serviceName'] + "/" + "sign_request";
-            let canonical = CryptoJS.SHA256(this.canonicalString);
-            this.stringToSign = authHeaderPrefix + "\n" + requestDateTime + "\n" + credentialString + "\n" + canonical;
-        }
-        window['canonicalString'] = (requestMethod, url,cb)=>{
-            let body ="";
-            let canonicalHeaders = "x-auth-date:" + this.SignatureKey['dateStamp'] + "\n";
-            let signedHeaders = "x-auth-date";
-            let hash = CryptoJS.SHA256(body);
-            let rawQuery = "";
-            if(url.indexOf("?") !=-1){
-                let index = url.indexOf("?");
-                let query = url.substring(index+1,url.length);
-                url = url.substring(0,index);
-                rawQuery = window['parameter'](query,rawQuery)
+        window['getSignatureKey'] = (method, canonicalUri, host?, region?, service?, body?, contentType?, queryString?, headers?)=>{
+            
+            if(canonicalUri == 's3/'){
+                canonicalUri = '';
             }
-            url = encodeURI(url);
-            this.canonicalString = requestMethod + "\n" + "/" + url + "" + "\n" + rawQuery + "\n" + canonicalHeaders + "\n" + signedHeaders + "\n" + hash;
-            window['buildStringToSign']();
-            if (cb) {
-                cb();
+            
+            if(body && (headers && headers['X-Amz-Content-Sha256'] == 'UNSIGNED-PAYLOAD')){
+                body = '';
             }
-        }
-        //Canonical url parameter
-        window['parameter'] = (param,rawQuery)=>{
-           if(param.indexOf("&") != -1){
-                let paramArray = param.split("&").sort();
-                paramArray.map((item,index)=>{
-                    if(item.indexOf("=") ==-1){
-                        item += "=";
-                    }
-                    if(index < paramArray.length-1){
-                        item += "&";
-                    }
-                    rawQuery += item;
-                })
-            }else if(param.indexOf("=") != -1){
-                rawQuery = param;
-            }else{
-                rawQuery = param.replace(/\s/g,'%20') + "=";
-            }
-            return rawQuery;
-        }
-    }
+            
+            let requestOptions: any = {
+                host: host ? host : Consts.S3_HOST_IP + ':' + Consts.S3_HOST_PORT,
+                method: method,
+                path: canonicalUri,
+                service: service ? service : 's3',
+                region: region ? region : 'ap-south-1',
+                body: body ? body : '',
+                headers: {
+                    'X-Auth-Token': localStorage['auth-token'],
+                    'Content-Type': headers && headers['Content-Type'] ? headers['Content-Type'] : 'application/xml'
+                }
 
-    //Request header with AK/SK authentication added
-    getSignature(){
-        let SignatureObjectwindow = window['getSignatureKey']();
-        this.Signature = "";
-        if(Object.keys(SignatureObjectwindow.SignatureKey).length > 0){
-            let requestObject = this.BucketService.getSignatureOptions(SignatureObjectwindow);
-            this.Signature = requestObject['Signature'];
-            this.kDate = requestObject['kDate'];
-        } 
+            }
+
+            /****** 
+            ToDo: 
+            Currently we are checking for the known headers in our API requests and adding them to the signature generation. 
+            This will not scale well. We have to iterate through the headers sent to the signature generation method and populate
+            the requestOptions.headers with all the headers.
+            *******/
+            
+            if(headers && headers['x-amz-acl']){
+                requestOptions.headers['x-amz-acl'] = headers['x-amz-acl'];
+            }
+            if(headers && headers['X-Amz-Metadata-Directive']){
+                requestOptions.headers['X-Amz-Metadata-Directive'] = headers['X-Amz-Metadata-Directive'];
+            }
+            if(headers && headers['x-amz-copy-source']){
+                requestOptions.headers['x-amz-copy-source'] = headers['x-amz-copy-source'];
+            }
+            
+            if(headers && headers['X-Amz-Content-Sha256'] == 'UNSIGNED-PAYLOAD'){
+                requestOptions.headers['X-Amz-Content-Sha256'] = 'UNSIGNED-PAYLOAD';
+            }
+            aws4.sign(requestOptions, {
+                secretAccessKey: this.SignatureKey['secretAccessKey'],
+                accessKeyId: this.SignatureKey['AccessKey']
+            })
+            return requestOptions;
+    	}
+    }
+    confirmDialog([msg,header,acceptLabel,warning]){
+        this.confirmationService.confirm({
+            message: msg,
+            header: header,
+            acceptLabel: acceptLabel,
+            isWarning: warning,
+            key: 'akskWarningPrompt',
+            accept: ()=>{
+                this.isHomePage = false;
+                window['akskWarning'] = false;
+                this.router.navigateByUrl('/akSkManagement');
+            },
+            reject:()=>{}
+        })
+    }
+    /* Joyride */
+    stepVisible: any;
+    title: any;
+    toggleAction() {
+        this.stepVisible = true;
+    }
+    stepDone() {
+        setTimeout(() => {
+            this.title = 'Tour Finished!';
+            
+        }, 3000);
+    }
+    onPrev() {
+        
+    }
+    startTour() {
+        const options = {
+            steps: this.tourSteps,
+            // startWith: 'step3@app',
+            // waitingTime: 3000,
+            //stepDefaultPosition: 'top',
+            themeColor: '#243680',
+            showPrevButton: true,
+            logsEnabled: true
+            // customTexts: { prev: of('<<').pipe(delay(2000)), next: '>>'}
+        };
+        this.joyrideService.startTour(options).subscribe(
+            step => {
+                let scrollElm = document.scrollingElement;
+                scrollElm.scrollTop = 0;
+            },
+            e => {
+                console.log('Error', e);
+            },
+            () => {
+                this.stepDone();
+                
+            }
+        );
+    }
+    /* Joyride ends */
+
+    openUserGuide(){
+        this.isHomePage = false;
+        this.router.navigate(['/help']);
     }
     checkTimeOut() {
         this.currentTime = new Date().getTime(); //update current time
@@ -737,6 +962,7 @@ export class AppComponent implements OnInit, AfterViewInit {
 
                 if (this.username == "admin") {
                     this.menuItems = this.menuItems_admin;
+                    this.tourSteps = this.tourSteps_admin;
                     this.dropMenuItems = [
                         {
                             label: "Switch Region",
@@ -749,19 +975,13 @@ export class AppComponent implements OnInit, AfterViewInit {
                             }
                         },
                         {
-                            label: "Monitor Configuration",
-                            routerLink: this.monitorConfigLink,
-                            command: ()=>{
-                                this.isHomePage = false;
-                            }
-                        },
-                        {
                             label: "Logout",
                             command: () => { this.logout() }
                         }
                     ];
                 } else {
                     this.menuItems = this.menuItems_tenant;
+                    this.tourSteps = this.tourSteps_tenant;
                     this.dropMenuItems = [
                         {
                             label: "Switch Region",
@@ -830,6 +1050,8 @@ export class AppComponent implements OnInit, AfterViewInit {
             this.username = "";
             this.password = "";
             this.isLogin = false;
+            this.showPrompt = false;
+            window['isUpload'] = false;
         }, 500);
 
     }
