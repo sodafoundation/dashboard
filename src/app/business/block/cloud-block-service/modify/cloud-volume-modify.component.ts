@@ -91,57 +91,44 @@ export class CloudVolumeModifyComponent implements OnInit{
         }
 
     ngOnInit(){
+        this.getTypes();
+        this.getBackends();
         this.cloudBS.getVolumeById(this.selectedVolumeId).subscribe((res) => {
             let self = this;
             let vol = res.json();
             this.selectedVolume = vol;
-            
-            if(this.selectedVolume && this.selectedVolume['type']){
-                this.selectedVolType = this.selectedVolume['type'];
-            }
-
-            this.modifyVolumeForm = this.fb.group({
-                "description" : [this.selectedVolume && this.selectedVolume['description'] ? this.selectedVolume['description'] : ''],
-                "size": [this.selectedVolume && this.selectedVolume['size'] ? this.selectedVolume['size'] : '', { validators: [Validators.required, Validators.min(4), Validators.max(16384), Validators.pattern(this.validRule.size)], updateOn: 'change' }],
-                "type": [this.selectedVolume && this.selectedVolume['type'] ? this.selectedVolume['type'] : ''],
-                "iops": [this.selectedVolume && this.selectedVolume['iops'] ? this.selectedVolume['iops'] : '', { validators: [Validators.min(100), Validators.max(64000)], updateOn: 'change' }],
+            this.allBackends.forEach(backendItem => {
+                if(this.selectedVolume['backendId'] == backendItem['id']){
+                    this.selectedVolume['backendType'] = backendItem['type'];
+                }
             });
-            
-
-            if(this.selectedVolume['tags'] && this.selectedVolume['tags'].length){
-                _.each(this.selectedVolume['tags'], function(item){
-                   self.modifyVolumeForm.addControl('tags', self.fb.array([self.createTags('','',item)]));
-               });
+            if(this.selectedVolume['backendType'] == "aws-block"){
+                if(this.selectedVolume && this.selectedVolume['type']){
+                    this.selectedVolType = this.selectedVolume['type'];
+                }
+                this.modifyVolumeForm = this.fb.group({
+                    "description" : [this.selectedVolume && this.selectedVolume['description'] ? this.selectedVolume['description'] : ''],
+                    "size": [this.selectedVolume && this.selectedVolume['size'] ? this.selectedVolume['size'] : '', { validators: [Validators.required, Validators.min(4), Validators.max(16384), Validators.pattern(this.validRule.size)], updateOn: 'change' }],
+                    "type": [this.selectedVolume && this.selectedVolume['type'] ? this.selectedVolume['type'] : ''],
+                    "iops": [this.selectedVolume && this.selectedVolume['iops'] ? this.selectedVolume['iops'] : '', { validators: [Validators.min(100), Validators.max(64000)], updateOn: 'change' }],
+                });
+                if(this.selectedVolume['tags'] && this.selectedVolume['tags'].length){
+                    _.each(this.selectedVolume['tags'], function(item){
+                       self.modifyVolumeForm.addControl('tags', self.fb.array([self.createTags('','',item)]));
+                   });
+                }
+                this.volumeTypeOptions = Consts.AWS_VOLUME_TYPES;
+                this.onChangeVolType();
+            } else if(this.selectedVolume['backendType'] == "hw-block"){
+                this.modifyVolumeForm = this.fb.group({
+                    "name" : [this.selectedVolume && this.selectedVolume['name'] ? this.selectedVolume['name'] : ''],
+                });
             }
-            this.onChangeVolType();
+            
         }, (error) => {
             console.log("Something went wrong. Error fetching file shares", error);
         })
         
-      
-        this.volumeTypeOptions = [
-            {
-                label: 'General Purpose',
-                value: 'gp2'
-            },
-            {
-                label: 'Provisioned IOPS',
-                value: 'io1'
-            },
-            {
-                label: 'Cold HDD',
-                value: 'sc1'
-            },
-            {
-                label: 'Throughput Optimized',
-                value: 'st1'
-            },
-            {
-                label: 'Magnetic(Standard)',
-                value: 'standard'
-            }
-        ];
-        this.getTypes();
         
     }
 
@@ -190,7 +177,7 @@ export class CloudVolumeModifyComponent implements OnInit{
                 this.modifyVolumeForm.removeControl('iops');
             }
             this.errorMessage.size.min = "Min: 1 GiB";
-            this.errorMessage.size.max = "Min: 1024 GiB";
+            this.errorMessage.size.max = "Max: 1024 GiB";
             this.modifyVolumeForm.controls['size'].setValue(this.selectedVolume && this.selectedVolume['size'] ? (this.selectedVolume['size'] / Math.pow(Consts.TO_GiB_CONVERTER, 3)) : 500);
             this.modifyVolumeForm.controls['size'].setValidators([Validators.required, Validators.min(1), Validators.max(1024)]);
             this.modifyVolumeForm.controls['size'].updateValueAndValidity();
@@ -201,7 +188,7 @@ export class CloudVolumeModifyComponent implements OnInit{
         this.allTypes = [];
         this.BucketService.getTypes().subscribe((res) => {
             res.json().types.forEach(element => {
-            if( element.name=='aws-block'){
+            if( element.name=='aws-block' || element.name=='hw-block'){
                 this.allTypes.push({
                     label: Consts.CLOUD_TYPE_NAME[element.name],
                     value: element.name
@@ -210,6 +197,12 @@ export class CloudVolumeModifyComponent implements OnInit{
             });
         });
         
+    }
+
+    getBackends() {
+        this.http.get('v1/{project_id}/backends').subscribe((res)=>{
+            this.allBackends = res.json().backends ? res.json().backends :[];
+        });
     }
 
    
@@ -239,17 +232,28 @@ export class CloudVolumeModifyComponent implements OnInit{
     getVolumeDataArray(value){
        
         let dataArr = {
-            size: parseInt(value.size) * Consts.FROM_GiB_CONVERTER,
-            type: value.type
+            
         };
-        if(value.iops){
-            dataArr['iops'] = parseInt(value.iops);
-        }
-        if(value.description){
-            dataArr['description'] = value.description;
-        }
-        if(value['tags']){
-            dataArr['tags'] = value['tags'];
+        if(this.selectedVolume['backendType'] == "aws-block"){
+            if(value.size){
+                dataArr['size'] =  parseInt(value.size) * Consts.FROM_GiB_CONVERTER;
+            }
+            if(value.type){
+                dataArr['type'] = value.type;
+            }
+            if(value.iops){
+                dataArr['iops'] = parseInt(value.iops);
+            }
+            if(value.description){
+                dataArr['description'] = value.description;
+            }
+            if(value['tags']){
+                dataArr['tags'] = value['tags'];
+            }
+        } else if(this.selectedVolume['backendType'] == "hw-block"){
+            if(value.name){
+                dataArr['name'] = value.name;
+            }
         }
 
         return dataArr;
@@ -265,9 +269,9 @@ export class CloudVolumeModifyComponent implements OnInit{
         let param = this.getVolumeDataArray(value);
         this.cloudBS.updateVolume(this.selectedVolumeId, param).subscribe((res)=>{
             this.msgs = [];
-            this.msgs.push({severity: 'success', summary: 'Success', detail: 'Cloud Volume has been created successfully.'});
+            this.msgs.push({severity: 'success', summary: 'Success', detail: 'Cloud Volume has been modified successfully.'});
             let queryParams = {
-                "message": JSON.stringify({severity: 'success', summary: 'Success', detail: 'Cloud Volume has been created successfully.'})
+                "message": JSON.stringify({severity: 'success', summary: 'Success', detail: 'Cloud Volume has been modified successfully.'})
             };
             this.selectedBackends = [];
             this.selectType = "";
@@ -275,7 +279,7 @@ export class CloudVolumeModifyComponent implements OnInit{
             this.router.navigate(['/block',"fromCloudVolume"], {queryParams: queryParams});
         }, (error)=>{
             this.msgs = [];
-            this.msgs.push({severity: 'error', summary: "Error", detail: 'Cloud Volume could not be created.'});
+            this.msgs.push({severity: 'error', summary: "Error", detail: 'Cloud Volume could not be modified.'});
         })
     }
 }
