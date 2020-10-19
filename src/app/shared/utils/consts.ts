@@ -1,12 +1,12 @@
 export const Consts = {
-    
+
     /**
      * Constants to be used for conversion of capacity value in appropriate display values.
      */
     FROM_GiB_CONVERTER: 1073741824,
     TO_GiB_CONVERTER : 1024,
     TO_GB_CONVERTER : 1000,
-    
+
     /** Unknown placeholder **/
     UNKNOW_PLACEHOLDER: "--",
 
@@ -35,7 +35,7 @@ export const Consts = {
     BYTES_PER_CHUNK : 1024 * 1024 * 5,
     TIMEOUT: 30 * 60 * 1000,
 
-    CLOUD_TYPE:['aws-s3', 'aws-file', 'aws-block', 'azure-blob', 'azure-file','hw-obs','fusionstorage-object','ceph-s3','ibm-cos','gcp-s3', 'gcp-file', 'yig', 'alibaba-oss'],
+    CLOUD_TYPE:['aws-s3', 'aws-file', 'aws-block', 'azure-blob', 'azure-file','hw-obs','hw-file','fusionstorage-object','ceph-s3','ibm-cos','gcp-s3', 'gcp-file', 'yig', 'alibaba-oss'],
 
     TYPE_SVG:{
         "aws-s3":'aws.svg',
@@ -50,8 +50,8 @@ export const Consts = {
         "aws-file" : 'aws.svg',
         "azure-file" : 'azure.svg',
         "aws-block" : 'aws.svg',
-        "gcp-file" : 'google.svg'
-
+        "gcp-file" : 'google.svg',
+        "hw-file" : 'huawei.svg'
     },
     CLOUD_TYPE_NAME: {
         'aws-s3': 'AWS S3',
@@ -66,12 +66,13 @@ export const Consts = {
         'aws-file' : 'AWS File Storage',
         'azure-file' : 'Azure File Storage',
         'aws-block' : 'AWS Block Storage',
-        'gcp-file' : 'GCP File Storage'
+        'gcp-file' : 'GCP File Storage',
+        'hw-file' : 'Huawei File Storage'
     },
     S3_HOST_IP: '',
     S3_HOST_PORT: '',
     API: {
-        
+
         DELFIN : {
             'storages' : 'resource-monitor/storages',
             'storagePools' : 'resource-monitor/storage-pools',
