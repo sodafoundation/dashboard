@@ -252,7 +252,9 @@ export class CloudFileShareCreateComponent implements OnInit{
                     }
                 );
             }
-
+            if(this.cloudFileShareCreateForm.controls['size']){
+                this.cloudFileShareCreateForm.removeControl('size');
+            }
             this.cloudFileShareCreateForm.addControl('size', this.fb.control('1', [Validators.required]));
             this.cloudFileShareCreateForm.addControl('availabilityZone', this.fb.control(''));
             this.cloudFileShareCreateForm.addControl('encrypted', this.fb.control(false, [Validators.required]));
