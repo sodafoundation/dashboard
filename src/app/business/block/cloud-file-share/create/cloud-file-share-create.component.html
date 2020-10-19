@@ -57,7 +57,7 @@
     </form-item>
 
     <form-item *ngIf="cloudFileShareCreateForm.controls['protocols']" [required]="true" label="{{label.protocols}}">
-        <input formControlName="protocols" type="text" size="30" pInputText>
+        <p-multiSelect [options]="protocolTypeOptions" formControlName="protocols"  defaultLabel="You can choose multiple"></p-multiSelect>
     </form-item>
 
     <form-item *ngIf="cloudFileShareCreateForm.controls['tags']" [required]="true" label="{{label.tags}}">

@@ -36,6 +36,8 @@ export class CloudFileShareCreateComponent implements OnInit{
     isVisible: boolean = false;
     showField: boolean = true;
     sfsType: string = "SFS";
+    protocolTypeOptions: any;
+    selectedProtocol;
     errorMessage = {
         "name": {
             required: "Name is required",
@@ -99,6 +101,17 @@ export class CloudFileShareCreateComponent implements OnInit{
             'description': new FormControl('', {validators:[Validators.maxLength(250),Validators.pattern(this.validRule.description)]}),
             'type' : new FormControl('cloudFS')
         });
+
+        this.protocolTypeOptions = [
+            {
+                label: 'NFS',
+                value: 'NFS'
+            },
+            {
+                label: 'CIFS',
+                value: 'CIFS'
+            }
+        ];
         this.getTypes();
         this.getBackends();
     }
@@ -156,6 +169,9 @@ export class CloudFileShareCreateComponent implements OnInit{
             if(this.cloudFileShareCreateForm.controls['sfsType']){
                 this.cloudFileShareCreateForm.removeControl('sfsType');
             }
+            if(this.cloudFileShareCreateForm.controls['size']){
+                this.cloudFileShareCreateForm.removeControl('size');
+            }
             this.cloudFileShareCreateForm.addControl('size', this.fb.control(''));
             this.cloudFileShareCreateForm.removeControl('availabilityZone');
             if(this.cloudFileShareCreateForm.get('metadata')){
@@ -178,6 +194,9 @@ export class CloudFileShareCreateComponent implements OnInit{
             this.cloudFileShareCreateForm.controls['name'].setValidators([Validators.required, Validators.minLength(2), Validators.maxLength(16), Validators.pattern(this.validRule.name),Utils.isExisted(this.allNamesForCheck)]);
             this.errorMessage.name.maxlength = "The file share name should have maximum 16 characters."
             this.cloudFileShareCreateForm.controls['name'].updateValueAndValidity();
+            if(this.cloudFileShareCreateForm.controls['size']){
+                this.cloudFileShareCreateForm.removeControl('size');
+            }
             this.cloudFileShareCreateForm.addControl('size', this.fb.control('1024', [Validators.required]));
             this.cloudFileShareCreateForm.addControl('availabilityZone', this.fb.control(''));
             this.cloudFileShareCreateForm.removeControl('encrypted');
@@ -206,9 +225,19 @@ export class CloudFileShareCreateComponent implements OnInit{
                 this.cloudFileShareCreateForm.removeControl('size');
             }
             this.cloudFileShareCreateForm.removeControl('availabilityZone');
+            this.cloudFileShareCreateForm.removeControl('encrypted');
+            this.cloudFileShareCreateForm.removeControl('encryptionSettings');
             this.cloudFileShareCreateForm.addControl('encrypted', this.fb.control(false, [Validators.required]));
-            if(this.cloudFileShareCreateForm.controls['encrypted']){
-                this.cloudFileShareCreateForm.addControl('encryptionSettings', this.fb.array([this.createEncryptionSettings('KmsKeyId', '')]));
+            if(!this.cloudFileShareCreateForm.controls['encryptionSettings']){
+                if(this.cloudFileShareCreateForm.controls['encrypted']){
+                    this.cloudFileShareCreateForm.get("encrypted").valueChanges.subscribe(
+                        (value:string)=>{
+                            if(value){
+                                this.cloudFileShareCreateForm.addControl('encryptionSettings', this.fb.array([this.createEncryptionSettings('KmsKeyId', '')]));
+                            }
+                        }
+                    );
+                }
             }
             this.cloudFileShareCreateForm.removeControl('tags');
             this.cloudFileShareCreateForm.addControl('tags', this.fb.array([this.createTags('Name','')]));
@@ -227,15 +256,30 @@ export class CloudFileShareCreateComponent implements OnInit{
                     }
                 );
             }
-
+            if(this.cloudFileShareCreateForm.controls['size']){
+                this.cloudFileShareCreateForm.removeControl('size');
+            }
             this.cloudFileShareCreateForm.addControl('size', this.fb.control('1', [Validators.required]));
             this.cloudFileShareCreateForm.addControl('availabilityZone', this.fb.control(''));
             this.cloudFileShareCreateForm.addControl('encrypted', this.fb.control(false, [Validators.required]));
-            this.cloudFileShareCreateForm.addControl('protocols', this.fb.control('NFS'));
-            if(this.cloudFileShareCreateForm.controls['encrypted']){
-                this.cloudFileShareCreateForm.addControl('encryptionSettings', this.fb.array([this.createEncryptionSettings('KmsKeyId', '')]));
-                this.addNextEncryptionSettings('KmsKeyName', 'sfs/default');
-                this.addNextEncryptionSettings('DomainId', '');
+            this.cloudFileShareCreateForm.addControl('protocols', this.fb.control(''));
+            this.cloudFileShareCreateForm.removeControl('encrypted');
+            this.cloudFileShareCreateForm.removeControl('encryptionSettings');
+            this.cloudFileShareCreateForm.addControl('encrypted', this.fb.control(false, [Validators.required]));
+            if(!this.cloudFileShareCreateForm.controls['encryptionSettings']){
+                if(this.cloudFileShareCreateForm.controls['encrypted']){
+                    this.cloudFileShareCreateForm.get("encrypted").valueChanges.subscribe(
+                        (value:string)=>{
+                            if(value){
+                                this.cloudFileShareCreateForm.addControl('encryptionSettings', this.fb.array([this.createEncryptionSettings('KmsKeyId', '')]));
+                                this.addNextEncryptionSettings('KmsKeyName', 'sfs/default');
+                                this.addNextEncryptionSettings('DomainId', '');
+                            } else{
+                                this.cloudFileShareCreateForm.removeControl('encryptionSettings');
+                            }
+                        }
+                    );
+                }
             }
             this.cloudFileShareCreateForm.removeControl('tags');
             this.cloudFileShareCreateForm.addControl('tags', this.fb.array([this.createTags('Name','')]));
@@ -376,11 +420,11 @@ export class CloudFileShareCreateComponent implements OnInit{
             dataArr['tags'] = value['tags'];
         }
         if(value['protocols']){
-            var protoArr:string[];
-            protoArr = [value['protocols']]
-            dataArr['protocols'] = protoArr;
+            dataArr['protocols'] = [];
+            value['protocols'].forEach(protoElement => {
+                dataArr['protocols'].push(protoElement);
+            });
         }
-
         return dataArr;
     }
     onSubmit(value){

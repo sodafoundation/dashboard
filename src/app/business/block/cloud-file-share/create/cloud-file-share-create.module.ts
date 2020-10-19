@@ -7,7 +7,7 @@ import { CloudFileShareCreateComponent } from './cloud-file-share-create.compone
 import { RouterModule } from '@angular/router';
 import {
     DataTableModule, DropMenuModule, DialogModule, FormModule, InputTextModule, InputTextareaModule,
-    DropdownModule, ConfirmationService, ConfirmDialogModule, CalendarModule, CheckboxModule, InputSwitchModule,
+    DropdownModule, MultiSelectModule, ConfirmationService, ConfirmDialogModule, CalendarModule, CheckboxModule, InputSwitchModule,
     TableModule, TabViewModule, ButtonModule, SpinnerModule, GrowlModule, RadioButtonModule
 } from '../../../../components/common/api';
 import { HttpService } from '../../../../shared/service/Http.service';
@@ -37,6 +37,7 @@ let routers = [{
     InputTextareaModule,
     DataTableModule,
     DropdownModule,
+    MultiSelectModule,
     DropMenuModule,
     DialogModule,
     FormModule,
