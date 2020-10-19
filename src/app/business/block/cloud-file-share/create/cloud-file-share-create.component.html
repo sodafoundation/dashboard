@@ -11,7 +11,6 @@
         <p-dropdown [style]="{'min-width':'150px','width':'220px'}" placeholder="Please select" [options]="backendsOption" (onChange)="updateFormAndRegion()" formControlName="backend"></p-dropdown>
     </form-item>
     <form-item *ngIf="cloudFileShareCreateForm.controls['sfsType']" label="{{label.sfs_type}}" [required]="true">
-        <span *ngIf = "false"><p-radioButton label="Auto" formControlName="sfsType" name="typeRadioGroup" value="Auto"></p-radioButton></span>
         <span><p-radioButton label="SFS" formControlName="sfsType" name="typeRadioGroup" value="SFS"></p-radioButton></span>
         <span style="margin-left: 30px;"><p-radioButton label="SFS_Turbo" formControlName="sfsType" name="typeRadioGroup" value="SFS_Turbo" disabled="true"></p-radioButton></span>
 
