@@ -106,6 +106,10 @@ export class CloudFileShareCreateComponent implements OnInit{
             {
                 label: 'NFS',
                 value: 'NFS'
+            },
+            {
+                label: 'CIFS',
+                value: 'CIFS'
             }
         ];
         this.getTypes();
