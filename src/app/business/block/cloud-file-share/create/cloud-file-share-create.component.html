@@ -10,21 +10,26 @@
     <form-item label="{{label.backend}}" [required]="true">
         <p-dropdown [style]="{'min-width':'150px','width':'220px'}" placeholder="Please select" [options]="backendsOption" (onChange)="updateFormAndRegion()" formControlName="backend"></p-dropdown>
     </form-item>
+    <form-item *ngIf="cloudFileShareCreateForm.controls['sfsType']" label="{{label.sfs_type}}" [required]="true">
+        <span><p-radioButton label="SFS" formControlName="sfsType" name="typeRadioGroup" value="SFS"></p-radioButton></span>
+        <span style="margin-left: 30px;"><p-radioButton label="SFS_Turbo" formControlName="sfsType" name="typeRadioGroup" value="SFS_Turbo" disabled="true"></p-radioButton></span>
+
+    </form-item>
     <form-item [required]="true" label="{{label.name}}">
-        <input formControlName="name" type="text" size="30" pInputText> 
+        <input formControlName="name" type="text" size="30" pInputText>
     </form-item>
     <form-item label="{{label.description}}">
         <textarea [rows]="5" [cols]="30" pInputTextarea formControlName="description" [maxlength]="250"></textarea>
     </form-item>
     <form-item *ngIf="cloudFileShareCreateForm.controls['availabilityZone']" label="{{label.az}}">
-        <input formControlName="availabilityZone" type="text" size="30" pInputText> 
+        <input formControlName="availabilityZone" type="text" size="30" pInputText>
     </form-item>
     <form-item *ngIf="cloudFileShareCreateForm.controls['encrypted']" label="Enable Encryption?" >
         <p-inputSwitch formControlName="encrypted" onLabel="Yes" offLabel="No" (onChange)="encryptionControl()"></p-inputSwitch>
     </form-item>
-    
+
     <form-item *ngIf="cloudFileShareCreateForm.controls['encryptionSettings'] && isVisible"  label="{{label.encryptionSettings}}">
-        
+
         <div  class="encryption-settings-array" formArrayName="encryptionSettings"
             *ngFor="let item of cloudFileShareCreateForm.get('encryptionSettings')['controls']; let i = index">
             <div class="ui-g ui-fluid" [formGroupName]="i">
@@ -40,16 +45,21 @@
                 </div>
                 <div class="ui-g-12 ui-md-2 ui-md-offset-1">
                     <div class="ui-inputgroup">
-                        
+
                     </div>
                 </div>
             </div>
         </div>
-        
+
     </form-item>
     <form-item *ngIf="cloudFileShareCreateForm.controls['size']" label="{{label.size}}">
-        <input formControlName="size" type="text" size="30" pInputText> 
+        <input formControlName="size" type="text" size="30" pInputText>
     </form-item>
+
+    <form-item *ngIf="cloudFileShareCreateForm.controls['protocols']" [required]="true" label="{{label.protocols}}">
+        <input formControlName="protocols" type="text" size="30" pInputText>
+    </form-item>
+
     <form-item *ngIf="cloudFileShareCreateForm.controls['tags']" [required]="true" label="{{label.tags}}">
         <a class="add-tag" (click)="addNextTag()"><i class="fa fa-plus-circle" ></i></a>
         <div class="tag-array" formArrayName="tags"
@@ -67,12 +77,12 @@
                 </div>
                 <div class="ui-g-12 ui-md-2 ui-md-offset-1">
                     <div class="ui-inputgroup">
-                        <a disabled="cloudFileShareCreateForm.get('tags')['length'] > 1" class="remove-tag" (click)="removeTagLink(i)"><i class="fa fa-minus-circle"></i></a>     
+                        <a disabled="cloudFileShareCreateForm.get('tags')['length'] > 1" class="remove-tag" (click)="removeTagLink(i)"><i class="fa fa-minus-circle"></i></a>
                     </div>
                 </div>
             </div>
         </div>
-        
+
     </form-item>
 
     <form-item *ngIf="cloudFileShareCreateForm.controls['metadata']" [required]="true" label="{{label.metadata}}">
@@ -92,17 +102,17 @@
                 </div>
                 <div class="ui-g-12 ui-md-2 ui-md-offset-1">
                     <div class="ui-inputgroup">
-                        <a *ngIf="(key != 'PerformanceMode') || (key != 'ThroughputMode') || (key != 'ProvisionedThroughputInMibps') || (key != 'Tier')" 
-                            disabled="cloudFileShareCreateForm.get('metadata')['length'] > 1" 
-                            class="remove-metadata" 
+                        <a *ngIf="(key != 'PerformanceMode') || (key != 'ThroughputMode') || (key != 'ProvisionedThroughputInMibps') || (key != 'Tier')"
+                            disabled="cloudFileShareCreateForm.get('metadata')['length'] > 1"
+                            class="remove-metadata"
                             (click)="removeMetadataLink(i)">
                             <i class="fa fa-minus-circle"></i>
-                        </a>     
+                        </a>
                     </div>
                 </div>
             </div>
         </div>
-        
+
     </form-item>
 
     <div class="bottom-button-margin">

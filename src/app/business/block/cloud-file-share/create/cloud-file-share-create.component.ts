@@ -35,8 +35,9 @@ export class CloudFileShareCreateComponent implements OnInit{
     selectedSse;
     isVisible: boolean = false;
     showField: boolean = true;
+    sfsType: string = "SFS";
     errorMessage = {
-        "name": { 
+        "name": {
             required: "Name is required",
             minlength: "The file share name should have minimum 2 characters.",
             maxlength: "The file share name should have maximum 128 characters.",
@@ -70,7 +71,9 @@ export class CloudFileShareCreateComponent implements OnInit{
         metadata: "Metadata",
         backend_type: "Type",
         backend: "Backend",
-        az: "Availability Zone"
+        az: "Availability Zone",
+        protocols: "Protocols",
+        sfs_type: "SFS Type"
     };
     msgs: Message[];
 
@@ -83,7 +86,7 @@ export class CloudFileShareCreateComponent implements OnInit{
         private http: HttpService,
         private fb: FormBuilder,
         private msg: MsgBoxService,
-        private availabilityZonesService:AvailabilityZonesService, 
+        private availabilityZonesService:AvailabilityZonesService,
         private ProfileService: ProfileService,
         private BucketService: BucketService){
 
@@ -103,10 +106,10 @@ export class CloudFileShareCreateComponent implements OnInit{
     getTypes() {
         this.allTypes = [];
         this.BucketService.getTypes().subscribe((res) => {
-           
+
             let types = res.json().types;
             types.forEach(element => {
-            if( element.name=='aws-file' || element.name == 'azure-file' || element.name == 'gcp-file'){
+            if( element.name=='aws-file' || element.name == 'azure-file' || element.name == 'gcp-file' || element.name == 'hw-file'){
                 this.allTypes.push({
                     label: Consts.CLOUD_TYPE_NAME[element.name],
                     value: element.name
@@ -114,7 +117,7 @@ export class CloudFileShareCreateComponent implements OnInit{
             }
             });
         });
-        
+
     }
 
     getBackendsByTypeId() {
@@ -147,6 +150,12 @@ export class CloudFileShareCreateComponent implements OnInit{
 
     prepareCreateForm(type){
         if(type == 'azure-file' ) {
+            if(this.cloudFileShareCreateForm.controls['protocols']){
+                this.cloudFileShareCreateForm.removeControl('protocols');
+            }
+            if(this.cloudFileShareCreateForm.controls['sfsType']){
+                this.cloudFileShareCreateForm.removeControl('sfsType');
+            }
             this.cloudFileShareCreateForm.addControl('size', this.fb.control(''));
             this.cloudFileShareCreateForm.removeControl('availabilityZone');
             if(this.cloudFileShareCreateForm.get('metadata')){
@@ -158,8 +167,14 @@ export class CloudFileShareCreateComponent implements OnInit{
             this.cloudFileShareCreateForm.removeControl('tags');
             this.cloudFileShareCreateForm.removeControl('encrypted');
             this.cloudFileShareCreateForm.removeControl('encryptionSettings');
-        } 
+        }
         if(type == 'gcp-file'){
+            if(this.cloudFileShareCreateForm.controls['protocols']){
+                this.cloudFileShareCreateForm.removeControl('protocols');
+            }
+            if(this.cloudFileShareCreateForm.controls['sfsType']){
+                this.cloudFileShareCreateForm.removeControl('sfsType');
+            }
             this.cloudFileShareCreateForm.controls['name'].setValidators([Validators.required, Validators.minLength(2), Validators.maxLength(16), Validators.pattern(this.validRule.name),Utils.isExisted(this.allNamesForCheck)]);
             this.errorMessage.name.maxlength = "The file share name should have maximum 16 characters."
             this.cloudFileShareCreateForm.controls['name'].updateValueAndValidity();
@@ -174,13 +189,19 @@ export class CloudFileShareCreateComponent implements OnInit{
             } else{
                 this.cloudFileShareCreateForm.addControl('metadata', this.fb.array([this.createMetadata('Tier', 'STANDARD')]));
             }
-        } 
+        }
         else{
             this.cloudFileShareCreateForm.controls['name'].setValidators([Validators.required, Validators.minLength(2), Validators.maxLength(128), Validators.pattern(this.validRule.name),Utils.isExisted(this.allNamesForCheck)]);
-            this.errorMessage.name.maxlength = "The file share name should have maximum 128 characters." 
+            this.errorMessage.name.maxlength = "The file share name should have maximum 128 characters."
             this.cloudFileShareCreateForm.controls['name'].updateValueAndValidity();
         }
         if(type == 'aws-file') {
+            if(this.cloudFileShareCreateForm.controls['protocols']){
+                this.cloudFileShareCreateForm.removeControl('protocols');
+            }
+            if(this.cloudFileShareCreateForm.controls['sfsType']){
+                this.cloudFileShareCreateForm.removeControl('sfsType');
+            }
             if(this.cloudFileShareCreateForm.controls['size']){
                 this.cloudFileShareCreateForm.removeControl('size');
             }
@@ -195,7 +216,32 @@ export class CloudFileShareCreateComponent implements OnInit{
             this.cloudFileShareCreateForm.addControl('metadata', this.fb.array([this.createMetadata('PerformanceMode', 'generalPurpose')]));
             this.addNextMetadata('ThroughputMode', 'bursting');
             this.addNextMetadata('ProvisionedThroughputInMibps', '');
-        } 
+        }
+        if(type == 'hw-file') {
+            this.cloudFileShareCreateForm.addControl('sfsType', new FormControl('SFS'));
+
+            if(this.cloudFileShareCreateForm.controls['sfsType']){
+                this.cloudFileShareCreateForm.get("sfsType").valueChanges.subscribe(
+                    (value:string)=>{
+                        this.sfsType = value
+                    }
+                );
+            }
+
+            this.cloudFileShareCreateForm.addControl('size', this.fb.control('1', [Validators.required]));
+            this.cloudFileShareCreateForm.addControl('availabilityZone', this.fb.control(''));
+            this.cloudFileShareCreateForm.addControl('encrypted', this.fb.control(false, [Validators.required]));
+            this.cloudFileShareCreateForm.addControl('protocols', this.fb.control('NFS'));
+            if(this.cloudFileShareCreateForm.controls['encrypted']){
+                this.cloudFileShareCreateForm.addControl('encryptionSettings', this.fb.array([this.createEncryptionSettings('KmsKeyId', '')]));
+                this.addNextEncryptionSettings('KmsKeyName', 'sfs/default');
+                this.addNextEncryptionSettings('DomainId', '');
+            }
+            this.cloudFileShareCreateForm.removeControl('tags');
+            this.cloudFileShareCreateForm.addControl('tags', this.fb.array([this.createTags('Name','')]));
+            this.cloudFileShareCreateForm.removeControl('metadata');
+            this.cloudFileShareCreateForm.addControl('metadata', this.fb.array([this.createMetadata('VpcID', '')]));
+        }
     }
 
     updateFormAndRegion(){
@@ -209,14 +255,14 @@ export class CloudFileShareCreateComponent implements OnInit{
         this.cloudFileShareCreateForm.patchValue({
             'region' : this.selectedRegion
         })
-       
+
     }
-    
+
     updateEncryptionSettings(visible){
         const encSettingsControl = this.cloudFileShareCreateForm.get('encryptionSettings');
         let encGrp:any =  this.cloudFileShareCreateForm.controls['encryptionSettings']['controls'];
         if(visible){
-            
+
             encGrp.forEach(item => {
                 item.controls['key'].setValidators(Validators.required);
                 item.controls['value'].setValidators(Validators.required);
@@ -242,6 +288,14 @@ export class CloudFileShareCreateComponent implements OnInit{
             key: new FormControl(key ? key : ''),
             value: new FormControl(value ? value : '')
         })
+    }
+    addNextEncryptionSettings(key?, value?) {
+        (this.cloudFileShareCreateForm.controls['encryptionSettings'] as FormArray).push(this.createEncryptionSettings((key ? key : ''), (value ? value : '')))
+    }
+    removeEncryptionSettingsLink(i: number) {
+        if(this.cloudFileShareCreateForm.get('encryptionSettings')['length'] > 1){
+            this.cloudFileShareCreateForm.get('encryptionSettings')['removeAt'](i);
+        }
     }
 
     createTags(key?, value?){
@@ -284,6 +338,9 @@ export class CloudFileShareCreateComponent implements OnInit{
         }
         if(value['metadata']){
             let meta = {};
+            if(this.selectType == 'hw-file'){
+                meta['HwSFSType'] = this.sfsType;
+            }
             dataArr['metadata'] = [];
             value['metadata'].forEach(element => {
                 if(element['key']=="ProvisionedThroughputInMibps"){
@@ -308,7 +365,7 @@ export class CloudFileShareCreateComponent implements OnInit{
                 dataArr['encryptionSettings'] = enc;
             }
         }
-        
+
         if(value['availabilityZone']){
             dataArr['availabilityZone'] = value['availabilityZone'];
         }
@@ -317,6 +374,11 @@ export class CloudFileShareCreateComponent implements OnInit{
         }
         if(value['tags']){
             dataArr['tags'] = value['tags'];
+        }
+        if(value['protocols']){
+            var protoArr:string[];
+            protoArr = [value['protocols']]
+            dataArr['protocols'] = protoArr;
         }
 
         return dataArr;
@@ -343,7 +405,7 @@ export class CloudFileShareCreateComponent implements OnInit{
             console.log("Something went wrong. File share could not be created.", error);
         })
     }
-   
+
     getFileShares(){
         this.cloudFS.getAllFileShares().subscribe((res)=>{
             let fileShares = res.json();
