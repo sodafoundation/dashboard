@@ -34,7 +34,7 @@ export class CloudFileShareModifyComponent implements OnInit{
     selectedBackend: any;
     enableEncryption = false;
     errorMessage = {
-        "name": { 
+        "name": {
             required: "Name is required",
             minLength: "Minimum 2 characters",
             maxLength: "Maximum 128 characters",
@@ -88,8 +88,8 @@ export class CloudFileShareModifyComponent implements OnInit{
         this.ActivatedRoute.params.subscribe((params) => {
             this.fileShareId = params.fileShareId
         });
-        
-        
+
+
     }
     ngOnInit(){
         let self =this;
@@ -115,10 +115,10 @@ export class CloudFileShareModifyComponent implements OnInit{
                         }
                     }
                     });
-                    
+
                 });
                 this.enableEncryption = this.selectedFileShare['encrypted'] ? this.selectedFileShare['encrypted'] : false;
-                
+
                 this.showModifyForm = true;
                 this.cloudFileShareModifyForm = this.fb.group({
                     'description': new FormControl(this.selectedFileShare['description'] ? this.selectedFileShare['description'] : '', {validators:[Validators.maxLength(250),Validators.pattern(this.validRule.description)]}),
@@ -131,14 +131,20 @@ export class CloudFileShareModifyComponent implements OnInit{
                         self.cloudFileShareModifyForm.controls['size'].updateValueAndValidity();
                     }
                 }
-               
+
+                if(this.selectedFileShare['backend_type'] == 'hw-file'){
+                    if(this.selectedFileShare['size']){
+                        self.cloudFileShareModifyForm.addControl('size', this.fb.control((this.selectedFileShare['size'] / Math.pow(Consts.TO_GiB_CONVERTER, 3)), [Validators.required, Validators.min(1)]));
+                    }
+                }
+
                 if(this.selectedFileShare['size'] && this.selectedFileShare['backend_type'] == 'azure-file'){
                     self.cloudFileShareModifyForm.addControl('size', this.fb.control((this.selectedFileShare['size'] / Math.pow(Consts.TO_GiB_CONVERTER, 3)), Validators.required));
                 }
                 if(this.selectedFileShare['availabilityZone'] && this.selectedFileShare['backend_type'] == 'gcp-file'){
                     self.cloudFileShareModifyForm.addControl('availabilityZone', this.fb.control(this.selectedFileShare['availabilityZone']));
                 }
-                if(this.selectedFileShare['tags'] && this.selectedFileShare['tags'].length){
+                if(this.selectedFileShare['backend_type'] != 'hw-file' && this.selectedFileShare['tags'] && this.selectedFileShare['tags'].length){
                     _.each(this.selectedFileShare['tags'], function(item){
                        self.cloudFileShareModifyForm.addControl('tags', self.fb.array([self.createTags('','',item)]));
                    });
@@ -158,7 +164,7 @@ export class CloudFileShareModifyComponent implements OnInit{
                             }
                             if(value['Kind'].hasOwnProperty('NumberValue')){
                                 metaitem = {
-                                    key: "PerformanceMode", 
+                                    key: "PerformanceMode",
                                     value : value['Kind']['NumberValue'],
                                     type : 'number'
                                 }
@@ -168,14 +174,14 @@ export class CloudFileShareModifyComponent implements OnInit{
                         if(key=="ThroughputMode"){
                             if(value['Kind'].hasOwnProperty('StringValue')){
                                 metaitem = {
-                                    key : "ThroughputMode", 
+                                    key : "ThroughputMode",
                                     value : value['Kind']['StringValue'],
                                     type : 'string'
                                 }
                             }
                             if(value['Kind'].hasOwnProperty('NumberValue')){
                                 metaitem = {
-                                    key: "ThroughputMode", 
+                                    key: "ThroughputMode",
                                     value : value['Kind']['NumberValue'],
                                     type : 'number'
                                 }
@@ -185,42 +191,42 @@ export class CloudFileShareModifyComponent implements OnInit{
                         if(key=="ProvisionedThroughputInMibps"){
                             if(value['Kind'].hasOwnProperty('StringValue')){
                                 metaitem = {
-                                    key : "ProvisionedThroughputInMibps", 
+                                    key : "ProvisionedThroughputInMibps",
                                     value : value['Kind']['StringValue'],
                                     type : 'string'
                                 }
                             }
                             if(value['Kind'].hasOwnProperty('NumberValue')){
                                 metaitem = {
-                                    key: "ProvisionedThroughputInMibps", 
-                                    value : value['Kind']['NumberValue'],
-                                    type : 'number'
-                                }
-                            }
-                            self.selectedFileShare['metadataArr'].push(metaitem);
-                        } 
-                        if(key=="Tier"){
-                            if(value['Kind'].hasOwnProperty('StringValue')){
-                                metaitem = {
-                                    key : "Tier", 
-                                    value : value['Kind']['StringValue'],
-                                    type : 'string'
-                                }
-                            }
-                            if(value['Kind'].hasOwnProperty('NumberValue')){
-                                metaitem = {
-                                    key: "Tier", 
+                                    key: "ProvisionedThroughputInMibps",
                                     value : value['Kind']['NumberValue'],
                                     type : 'number'
                                 }
                             }
                             self.selectedFileShare['metadataArr'].push(metaitem);
                         }
-                        
+                        if(key=="Tier"){
+                            if(value['Kind'].hasOwnProperty('StringValue')){
+                                metaitem = {
+                                    key : "Tier",
+                                    value : value['Kind']['StringValue'],
+                                    type : 'string'
+                                }
+                            }
+                            if(value['Kind'].hasOwnProperty('NumberValue')){
+                                metaitem = {
+                                    key: "Tier",
+                                    value : value['Kind']['NumberValue'],
+                                    type : 'number'
+                                }
+                            }
+                            self.selectedFileShare['metadataArr'].push(metaitem);
+                        }
+
                     })
                 }
                 if(this.selectedFileShare['metadataArr'] && this.selectedFileShare['metadataArr'].length){
-                  
+
                    self.cloudFileShareModifyForm.addControl('metadata', self.fb.array([self.createMetadata('','',this.selectedFileShare['metadataArr'][0])]));
                    this.selectedFileShare['metadataArr'].slice(1).forEach(element => {
                         (this.cloudFileShareModifyForm.controls['metadata'] as FormArray).push(self.createMetadata('','',element));
@@ -229,11 +235,11 @@ export class CloudFileShareModifyComponent implements OnInit{
                     this.cloudFileShareModifyForm.addControl('metadata', this.fb.array([this.createMetadata()]));
                 }
             });
-            
+
         }, (error) => {
             console.log("Something went wrong. Could not fetch fileshare.")
         })
-        
+
     }
 
     getFileShareById(fileShareId){
@@ -256,12 +262,12 @@ export class CloudFileShareModifyComponent implements OnInit{
             }
             });
         });
-        
+
     }
 
     createTags(key?, value?, tagObj?){
         if(tagObj){
-            
+
            return this.fb.group({
             key: new FormControl(tagObj.key),
             value: new FormControl(tagObj.value),
@@ -272,7 +278,7 @@ export class CloudFileShareModifyComponent implements OnInit{
                 value: new FormControl(value ? value : '')
             })
         }
-        
+
     }
     addNextTag(key?, value?) {
         (this.cloudFileShareModifyForm.controls['tags'] as FormArray).push(this.createTags((key ? key : ''), (value ? value : '')))
@@ -295,7 +301,7 @@ export class CloudFileShareModifyComponent implements OnInit{
                 value: new FormControl(value ? value : '')
             })
         }
-        
+
     }
 
     addNextMetadata(key?, value?) {
@@ -308,7 +314,7 @@ export class CloudFileShareModifyComponent implements OnInit{
     }
 
     getFileShareDataArray(value){
-        
+
         let dataArr = {
             description: value['description'] ? value['description'] : '',
             type: value['type']
