@@ -35,39 +35,42 @@ export const Consts = {
     BYTES_PER_CHUNK : 1024 * 1024 * 5,
     TIMEOUT: 30 * 60 * 1000,
 
-    CLOUD_TYPE:['aws-s3', 'aws-file', 'aws-block', 'azure-blob', 'azure-file','hw-obs','hw-file','fusionstorage-object','ceph-s3','ibm-cos','gcp-s3', 'gcp-file', 'yig', 'alibaba-oss'],
+    CLOUD_TYPE:['aws-s3', 'aws-file', 'aws-block', 'azure-blob', 'azure-file','hw-obs','hw-file', 'hw-block', 'fusionstorage-object','ceph-s3','ibm-cos','gcp-s3', 'gcp-file', 'yig', 'alibaba-oss'],
 
     TYPE_SVG:{
         "aws-s3":'aws.svg',
-        "hw-obs":"huawei.svg",
+        "aws-file" : 'aws.svg',
+        "aws-block" : 'aws.svg',
         "azure-blob":'azure.svg',
+        "azure-file" : 'azure.svg',
+        "hw-obs":"huawei.svg",
+        "hw-file" : 'huawei.svg',
+        "hw-block" : 'huawei.svg',
         "fusionstorage-object":"huawei.svg",
         "ceph-s3": "ceph.svg",
         "ibm-cos": "ibm.svg",
         "gcp-s3": "google.svg",
+        "gcp-file" : 'google.svg',
         "yig": "yig.png",
         'alibaba-oss': 'alibaba.svg',
-        "aws-file" : 'aws.svg',
-        "azure-file" : 'azure.svg',
-        "aws-block" : 'aws.svg',
-        "gcp-file" : 'google.svg',
-        "hw-file" : 'huawei.svg'
+        
     },
     CLOUD_TYPE_NAME: {
         'aws-s3': 'AWS S3',
+        'aws-file' : 'AWS File Storage',
+        'aws-block' : 'AWS Block Storage',
         'azure-blob': "Azure Blob Storage",
+        'azure-file' : 'Azure File Storage',
         'hw-obs': "Huawei OBS",
+        'hw-file' : 'Huawei File Storage',
+        'hw-block' : 'Huawei Block Storage',
         'fusionstorage-object': "FusionStorage Object",
         'ceph-s3': "Ceph S3",
         'gcp-s3': "GCP Object Storage",
+        'gcp-file' : 'GCP File Storage',
         'ibm-cos': "IBM COS",
         'yig': "YIG Ceph",
-        'alibaba-oss' : "Alibaba Object Storage",
-        'aws-file' : 'AWS File Storage',
-        'azure-file' : 'Azure File Storage',
-        'aws-block' : 'AWS Block Storage',
-        'gcp-file' : 'GCP File Storage',
-        'hw-file' : 'Huawei File Storage'
+        'alibaba-oss' : "Alibaba Object Storage"
     },
     S3_HOST_IP: '',
     S3_HOST_PORT: '',
@@ -78,5 +81,41 @@ export const Consts = {
             'storagePools' : 'resource-monitor/storage-pools',
             'volumes' : 'resource-monitor/volumes'
         }
-    }
+    },
+    AWS_VOLUME_TYPES: [
+        {
+            label: 'General Purpose',
+            value: 'gp2'
+        },
+        {
+            label: 'Provisioned IOPS',
+            value: 'io1'
+        },
+        {
+            label: 'Cold HDD',
+            value: 'sc1'
+        },
+        {
+            label: 'Throughput Optimized',
+            value: 'st1'
+        },
+        {
+            label: 'Magnetic(Standard)',
+            value: 'standard'
+        }
+    ],
+    HW_VOLUME_TYPES: [
+        {
+            label: 'SAS',
+            value: 'SAS'
+        },
+        {
+            label: 'GPSSD',
+            value: 'GPSSD'
+        },
+        {
+            label: 'SSD',
+            value: 'SSD'
+        }
+    ]
 }
