@@ -113,73 +113,51 @@ export class CloudVolumeCreateComponent implements OnInit{
             "iops": ['', { validators: [Validators.min(100), Validators.max(64000)], updateOn: 'change' }],
         });
         
-        this.createVolumeForm.addControl('encrypted', this.fb.control(false, Validators.required));
-        if(this.createVolumeForm.controls['encrypted']){
-            this.createVolumeForm.addControl('encryptionSettings', this.fb.array([this.createEncryptionSettings('KmsKeyId', '')]));
-        }
         
-        this.createVolumeForm.addControl('tags', this.fb.array([this.createTags('Name','')]));
-
-
-        this.volumeTypeOptions = [
-            {
-                label: 'General Purpose',
-                value: 'gp2'
-            },
-            {
-                label: 'Provisioned IOPS',
-                value: 'io1'
-            },
-            {
-                label: 'Cold HDD',
-                value: 'sc1'
-            },
-            {
-                label: 'Throughput Optimized',
-                value: 'st1'
-            },
-            {
-                label: 'Magnetic(Standard)',
-                value: 'standard'
-            }
-        ];
+        
+        
         this.getTypes();
         this.getBackends();
     }
 
     onChangeVolType(){
-        if(this.selectedVolType=='gp2'){
-            this.createVolumeForm.controls['size'].setValue(100);
-            this.createVolumeForm.controls['size'].setValidators([Validators.required, Validators.min(1), Validators.max(16384)]);
-            this.createVolumeForm.controls['size'].updateValueAndValidity();
-        }
-        if(this.selectedVolType=='io1'){
-            if(!this.createVolumeForm.controls['iops']){
-                this.createVolumeForm.addControl('iops', this.fb.control(3000, Validators.required));
+        if(this.selectType=='aws-block'){
+            if(this.selectedVolType=='gp2'){
+                this.createVolumeForm.controls['size'].setValue(100);
+                this.createVolumeForm.controls['size'].setValidators([Validators.required, Validators.min(1), Validators.max(16384)]);
+                this.createVolumeForm.controls['size'].updateValueAndValidity();
             }
-            this.createVolumeForm.controls['size'].setValidators([Validators.required, Validators.min(4), Validators.max(16384)]);
-            this.createVolumeForm.controls['size'].setValue(500);
-            this.errorMessage.size.min = "Min: 4 GiB"
-            this.createVolumeForm.controls['iops'].setValue(3000);
-            this.createVolumeForm.controls['iops'].setValidators([Validators.required, Validators.min(100), Validators.max(64000)]);
-            this.createVolumeForm.controls['size'].updateValueAndValidity();
-            this.createVolumeForm.controls['iops'].updateValueAndValidity();
+            if(this.selectedVolType=='io1'){
+                if(!this.createVolumeForm.controls['iops']){
+                    this.createVolumeForm.addControl('iops', this.fb.control(3000, Validators.required));
+                }
+                this.createVolumeForm.controls['size'].setValidators([Validators.required, Validators.min(4), Validators.max(16384)]);
+                this.createVolumeForm.controls['size'].setValue(500);
+                this.errorMessage.size.min = "Min: 4 GiB"
+                this.createVolumeForm.controls['iops'].setValue(3000);
+                this.createVolumeForm.controls['iops'].setValidators([Validators.required, Validators.min(100), Validators.max(64000)]);
+                this.createVolumeForm.controls['size'].updateValueAndValidity();
+                this.createVolumeForm.controls['iops'].updateValueAndValidity();
+            }
+            if(this.selectedVolType=='sc1' || this.selectedVolType=='st1'){
+                this.createVolumeForm.removeControl('iops');
+                this.createVolumeForm.controls['size'].setValue(500);
+                this.errorMessage.size.min = "Min: 500 GiB"
+                this.createVolumeForm.controls['size'].setValidators([Validators.required, Validators.min(500), Validators.max(16384)]);
+                this.createVolumeForm.controls['size'].updateValueAndValidity();
+            }
+            
+            if(this.selectedVolType=='standard'){
+                this.createVolumeForm.removeControl('iops');
+                this.createVolumeForm.controls['size'].setValue(500);
+                this.errorMessage.size.min = "Min: 1 GiB"
+                this.errorMessage.size.max = "Max: 1024 GiB"
+                this.createVolumeForm.controls['size'].setValidators([Validators.required, Validators.min(1), Validators.max(1024)]);
+                this.createVolumeForm.controls['size'].updateValueAndValidity();
+            }
         }
-        if(this.selectedVolType=='sc1' || this.selectedVolType=='st1'){
-            this.createVolumeForm.removeControl('iops');
-            this.createVolumeForm.controls['size'].setValue(500);
-            this.errorMessage.size.min = "Min: 500 GiB"
-            this.createVolumeForm.controls['size'].setValidators([Validators.required, Validators.min(500), Validators.max(16384)]);
-            this.createVolumeForm.controls['size'].updateValueAndValidity();
-        }
-        
-        if(this.selectedVolType=='standard'){
-            this.createVolumeForm.removeControl('iops');
-            this.createVolumeForm.controls['size'].setValue(500);
-            this.errorMessage.size.min = "Min: 1 GiB"
-            this.errorMessage.size.max = "Min: 1024 GiB"
-            this.createVolumeForm.controls['size'].setValidators([Validators.required, Validators.min(1), Validators.max(1024)]);
-            this.createVolumeForm.controls['size'].updateValueAndValidity();
+        if(this.selectType=='hw-block'){
+
         }
     }
 
@@ -187,7 +165,7 @@ export class CloudVolumeCreateComponent implements OnInit{
         this.allTypes = [];
         this.BucketService.getTypes().subscribe((res) => {
             res.json().types.forEach(element => {
-            if( element.name=='aws-block'){
+            if( element.name=='aws-block' || element.name=='hw-block'){
                 this.allTypes.push({
                     label: Consts.CLOUD_TYPE_NAME[element.name],
                     value: element.name
@@ -200,6 +178,42 @@ export class CloudVolumeCreateComponent implements OnInit{
 
     getBackendsByTypeId() {
         this.backendsOption = [];
+        if(this.selectType=='aws-block'){
+            this.volumeTypeOptions = Consts.AWS_VOLUME_TYPES;
+            if(!this.createVolumeForm.controls['iops']){
+                this.createVolumeForm.addControl('iops', this.fb.control('', [Validators.required, Validators.min(100), Validators.max(64000)]));
+                this.createVolumeForm.controls['iops'].updateValueAndValidity();
+            }
+            if(!this.createVolumeForm.controls['tags']){
+                this.createVolumeForm.addControl('tags', this.fb.array([this.createTags('Name','')]));
+            }
+            if(!this.createVolumeForm.controls['encrypted']){
+                this.createVolumeForm.addControl('encrypted', this.fb.control(false, Validators.required));
+            }
+            this.createVolumeForm.removeControl('encryptionSettings');
+            if(!this.createVolumeForm.controls['encryptionSettings']){
+                if(this.createVolumeForm.controls['encrypted']){
+                    this.createVolumeForm.get("encrypted").valueChanges.subscribe(
+                        (value:string)=>{
+                            if(value){
+                                this.createVolumeForm.addControl('encryptionSettings', this.fb.array([this.createEncryptionSettings('KmsKeyId', '')]));
+                            }
+                        }
+                    );
+                }
+            }
+        } else if(this.selectType=='hw-block'){
+            this.volumeTypeOptions = Consts.HW_VOLUME_TYPES;
+            this.createVolumeForm.controls['size'].setValue('');
+            this.errorMessage.size.min = "Min: 10 GiB"
+            this.errorMessage.size.max = "Max: 32768 GiB"
+            this.createVolumeForm.controls['size'].setValidators([Validators.required, Validators.min(10), Validators.max(32768)]);
+            this.createVolumeForm.controls['size'].updateValueAndValidity();
+            this.createVolumeForm.removeControl('iops');
+            this.createVolumeForm.removeControl('encrypted');
+            this.createVolumeForm.removeControl('encryptionSettings');
+            this.createVolumeForm.removeControl('tags');
+        }
         this.BucketService.getBackendsByTypeId(this.selectType).subscribe((res) => {
             let backends = res.json().backends ? res.json().backends :[];
             this.listedBackends = backends;
@@ -330,7 +344,7 @@ export class CloudVolumeCreateComponent implements OnInit{
                 dataArr['encryptionSettings'] = enc;
             }
         }
-        console.log("tags in create form ", value['tags']);
+        
         if(value['tags']){
             dataArr['tags'] = value['tags'];
         }

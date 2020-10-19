@@ -77,28 +77,7 @@ export class CloudBlockServiceComponent implements OnInit{
 
     ngOnInit(){
         
-        this.volumeTypeOptions = [
-            {
-                label: 'General Purpose',
-                value: 'gp2'
-            },
-            {
-                label: 'Provisioned IOPS',
-                value: 'io1'
-            },
-            {
-                label: 'Cold HDD',
-                value: 'sc1'
-            },
-            {
-                label: 'Throughput Optimized',
-                value: 'st1'
-            },
-            {
-                label: 'Magnetic(Standard)',
-                value: 'standard'
-            }
-        ];
+        this.volumeTypeOptions = this.volumeTypeOptions.concat(Consts.AWS_VOLUME_TYPES, Consts.HW_VOLUME_TYPES);
         this.getTypes();
         this.getBackends();
         
@@ -124,7 +103,7 @@ export class CloudBlockServiceComponent implements OnInit{
         this.allTypes = [];
         this.BucketService.getTypes().subscribe((res) => {
             res.json().types.forEach(element => {
-            if( element.name=='aws-block'){
+            if( element.name=='aws-block' || element.name=='hw-block'){
                 this.allTypes.push({
                     label: Consts.CLOUD_TYPE_NAME[element.name],
                     value: element.name
@@ -142,7 +121,7 @@ export class CloudBlockServiceComponent implements OnInit{
         this.http.get('v1/{project_id}/backends').subscribe((res)=>{
             this.allBackends = res.json().backends ? res.json().backends :[];
             this.allBackends.forEach(element => {
-                if(element.type == 'aws-block'){
+                if(element.type == 'aws-block' || element.type == 'hw-block'){
                     this.selectedBackends.push(element);
                 }
             });
@@ -163,8 +142,10 @@ export class CloudBlockServiceComponent implements OnInit{
             this.allAWSVolumes = vols;
             
             this.allAWSVolumes.forEach(volElement => {
-                this.volumeTypeOptions.forEach(typeEle => {
+                if(volElement['size'] && volElement['size'] > 0){
                     volElement['displaySize'] = Utils.formatBytes([volElement['size']]);
+                }
+                this.volumeTypeOptions.forEach(typeEle => {
                     if(typeEle['value'] == volElement['type']){
                         volElement['volType'] = typeEle['label'];
                     }
