@@ -152,5 +152,10 @@ export class DelfinService {
     deleteAlerts(id, seqNum): Observable<any>{
         return this.http.delete(this.delfinStoragesUrl + '/' + id + '/alerts/' + seqNum);
     }
+
+    //Configure performance metrics collection
+    metricsConfig(id, params): Observable<any>{
+        return this.http.put(this.delfinStoragesUrl + '/' + id + '/metrics-config', params);
+    }
 }
 
