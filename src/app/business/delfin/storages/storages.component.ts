@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewContainerRef, ViewChild, Directive, ElementRef, HostBinding, HostListener } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
-import { I18NService, Utils } from 'app/shared/api';
+import { Consts, I18NService, Utils } from 'app/shared/api';
 import { FormControl, FormGroup, FormBuilder, Validators, ValidatorFn, AbstractControl } from '@angular/forms';
 import { AppService } from 'app/app.service';
 import { I18nPluralPipe } from '@angular/common';
@@ -223,108 +223,26 @@ export class StoragesComponent implements OnInit {
                 value: 'hpe'
             }
         ];
+        //All Supported storage vendors
+        this.vendorOptions = Consts.STORAGES.vendors;
 
-        this.allStorageModels = {
-            'dellemc' : [
-                {
-                    label: "VMAX",
-                    value: 'vmax'
-                }
-            ],
-            'huawei' : [
-                {
-                    label: "OceanStor",
-                    value: 'oceanstor'
-                }
-            ],
-            'hpe' : [
-                {
-                    label: "3PAR",
-                    value: '3par'
-                }
-            ]
-        };
-        this.versionOptions = [
-            {
-                label: "SNMPV2C",
-                value: 'SNMPv2c'
-            },
-            {
-              label: "SNMPV3",
-              value: 'SNMPv3'
-            }
-        ];
+        //All supported storage models based on vendors
+        this.allStorageModels = Consts.STORAGES.models;
+
+        // Alert Source Version options
+        this.versionOptions = Consts.STORAGES.alertSourceVersionOptions;
+
         // Supported security levels
         // ['authPriv', 'authNoPriv', 'noAuthnoPriv']
-        this.securityLeveloptions = [
-            {
-                label: "noAuthnoPriv",
-                value: "noAuthnoPriv"
-            },
-            {
-                label: "authNoPriv",
-                value: "authNoPriv"
-            },
-            {
-                label: "authPriv",
-                value: "authPriv"
-            }
-        ];
+        this.securityLeveloptions = Consts.STORAGES.securityLevelOptions;
+
         // Supported Auth Protocols
         //['HMACSHA', 'HMACMD5', 'HMCSHA2224', 'HMCSHA2256', 'HMCSHA2384', 'HMCSHA2512']
-        this.authProtocolOptions = [
-            {
-                label: "HMACSHA",
-                value: "HMACSHA"
-            },
-            {
-                label: "HMACMD5",
-                value: "HMACMD5"
-            },
-            {
-                label: "HMCSHA2224",
-                value: "HMCSHA2224"
-            },
-            {
-                label: "HMCSHA2256",
-                value: "HMCSHA2256"
-            },
-            {
-                label: "HMCSHA2384",
-                value: "HMCSHA2384"
-            },
-            {
-                label: "HMCSHA2512",
-                value: "HMCSHA2512"
-            }
+        this.authProtocolOptions = Consts.STORAGES.authProtocolOptions;
         
-        ];
         //Supported Types
         //['DES', 'AES', 'AES192', 'AES256', '3DES']
-        this.privacyProtocolOptions = [
-            {
-                label: "DES",
-                value: "DES"
-            },
-            {
-                label: "AES",
-                value: "AES"
-            },
-            {
-                label: "AES192",
-                value: "AES192"
-            },
-            {
-                label: "AES256",
-                value: "AES256"
-            },
-            {
-                label: "3DES",
-                value: "3DES"
-            },
-            
-            
-        ];
+        this.privacyProtocolOptions = Consts.STORAGES.privacyProtocolOptions;
 
         this.registerAlertSourceForm = this.fb.group({});
            

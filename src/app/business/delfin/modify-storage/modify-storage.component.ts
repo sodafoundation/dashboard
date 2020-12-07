@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewContainerRef, ViewChild, Directive, ElementRef, HostBinding, HostListener } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
-import { I18NService, Utils } from 'app/shared/api';
+import { I18NService, Utils, Consts } from 'app/shared/api';
 import { FormControl, FormGroup, FormArray, FormBuilder, Validators, ValidatorFn, AbstractControl } from '@angular/forms';
 import { AppService } from 'app/app.service';
 import { I18nPluralPipe } from '@angular/common';
@@ -122,82 +122,11 @@ export class ModifyStorageComponent implements OnInit {
             },
 
         ];
-        this.vendorOptions = [
-            {
-                label: "Dell EMC",
-                value: 'dellemc'
-            },
-            {
-              label: "Huawei",
-              value: 'huawei'
-            },
-            {
-                label: "HPE",
-                value: 'hpe'
-            }
-        ];
+        this.vendorOptions = Consts.STORAGES.vendors;
 
-        this.allStorageModels = {
-            'dellemc' : [
-                {
-                    label: "VMAX",
-                    value: {
-                        name: 'vmax',
-                        rest: true,
-                        ssh: false,
-                        extra: true
-                    }
-                }
-            ],
-            'huawei' : [
-                {
-                    label: "OceanStor V3",
-                    value: {
-                        name: 'oceanstor',
-                        rest: true,
-                        ssh: false,
-                        extra: false
-                    }
-                }
-            ],
-            'hpe' : [
-                {
-                    label: "3PAR",
-                    value: {
-                        name: '3par',
-                        rest: true,
-                        ssh: true,
-                        extra: false
-                    }
-                }
-            ]
-        };
-        this.pubKeyTypeOptions = [
-            {
-                label: "ssh-ed25519",
-                value: "ssh-ed25519"
-            },
-            {
-                label: "ecdsa-sha2-nistp256",
-                value: "ecdsa-sha2-nistp256"
-            },
-            {
-                label: "ecdsa-sha2-nistp384",
-                value: "ecdsa-sha2-nistp384"
-            },
-            {
-                label: "ecdsa-sha2-nistp521",
-                value: "ecdsa-sha2-nistp521"
-            },
-            {
-                label: "ssh-rsa",
-                value: "ssh-rsa"
-            },
-            {
-                label: "ssh-dss",
-                value: "ssh-dss"
-            }
-        ];
+        this.allStorageModels = Consts.STORAGES.models;
+
+        this.pubKeyTypeOptions = Consts.STORAGES.pubKeyTypeOptions;
 
         this.ds.getStorageById(this.selectedStorageId).subscribe((res)=>{
             let storageDevice;
