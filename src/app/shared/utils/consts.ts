@@ -139,10 +139,6 @@ export const Consts = {
             {
                 label: "IBM",
                 value: 'ibm'
-            },
-            {
-                label: "Demo Storage",
-                value: 'fake_storage'
             }
         ],
         models: {
@@ -198,17 +194,6 @@ export const Consts = {
                         rest: false,
                         ssh: true,
                         extra: false
-                    }
-                }
-            ],
-            'fake_storage' : [
-                {
-                    label: "Demo Driver",
-                    value: {
-                        name: 'fake_driver',
-                        rest: true,
-                        ssh: true,
-                        extra: true
                     }
                 }
             ]
