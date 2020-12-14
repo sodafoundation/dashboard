@@ -115,10 +115,15 @@ export class RegisterStorageComponent implements OnInit {
                 url: '/registerStorage' 
             }
         ];
+                       
+        //All Supported storage vendors
         this.vendorOptions = Consts.STORAGES.vendors;
-
+        
+        //All supported storage models based on vendors
         this.allStorageModels = Consts.STORAGES.models;
-
+        
+        //All supported public key type options
+        //["ssh-ed25519", "ecdsa-sha2-nistp256", "ecdsa-sha2-nistp384", "ecdsa-sha2-nistp521", "ssh-rsa", "ssh-dss"]
         this.pubKeyTypeOptions = Consts.STORAGES.pubKeyTypeOptions;
 
         this.registerStorageForm = this.fb.group({
