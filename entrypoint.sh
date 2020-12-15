@@ -29,6 +29,10 @@ OPENSDS_GELATO_API_VERSION=${OPENSDS_GELATO_API_VERSION:-v1}
 OPENSDS_S3_API_VERSION=${OPENSDS_S3_API_VERSION:-s3}
 OPENSDS_AUTH_API_VERSION=${OPENSDS_AUTH_API_VERSION:-v3}
 
+SODA_GRAFANA_PORT=${SODA_GRAFANA_PORT:-3000},
+SODA_ALERTMANAGER_PORT=${SODA_ALERTMANAGER_PORT:-9093},
+SODA_PROMETHEUS_PORT=${SODA_PROMETHEUS_PORT:-9090},
+
 LISTEN_PORT=${LISTEN_PORT:-8088}
 cat > /etc/nginx/conf.d/default.conf <<EOF
     server {
@@ -73,7 +77,10 @@ cat /etc/nginx/conf.d/default.conf
 echo "Starting application..."
 echo "OPENSDS_S3_HOST = ${OPENSDS_S3_HOST}"
 echo "OPENSDS_S3_PORT = ${OPENSDS_S3_PORT}"
-echo "{\"hostIP\": \"$OPENSDS_S3_HOST\",\"hostPort\": \"$OPENSDS_S3_PORT\"}" >/var/www/html/assets/data/runtime.json
+echo "SODA_PROMETHEUS_PORT = ${SODA_PROMETHEUS_PORT}"
+echo "SODA_ALERTMANAGER_PORT = ${SODA_ALERTMANAGER_PORT}"
+echo "SODA_GRAFANA_PORT = ${SODA_GRAFANA_PORT}"
+echo "{\"hostIP\": \"$OPENSDS_S3_HOST\",\"hostPort\": \"$OPENSDS_S3_PORT\",\"SODA_PROMETHEUS_PORT\": \"$SODA_PROMETHEUS_PORT\",\"SODA_ALERTMANAGER_PORT\": \"$SODA_ALERTMANAGER_PORT\",\"SODA_GRAFANA_PORT\": \"$SODA_GRAFANA_PORT\"}" >/var/www/html/assets/data/runtime.json
 
 # start nginx service
 /usr/sbin/nginx -g "daemon off;"
