@@ -122,10 +122,11 @@ export class ModifyStorageComponent implements OnInit {
             },
 
         ];
+        //All Supported vendors
         this.vendorOptions = Consts.STORAGES.vendors;
-
+        //All Supported models
         this.allStorageModels = Consts.STORAGES.models;
-
+        //All Supported pubkey type options
         this.pubKeyTypeOptions = Consts.STORAGES.pubKeyTypeOptions;
 
         this.ds.getStorageById(this.selectedStorageId).subscribe((res)=>{
