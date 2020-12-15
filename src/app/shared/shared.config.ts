@@ -22,6 +22,10 @@ export class SharedConfig{
             httpService.get("../../assets/data/runtime.json").subscribe((r) => {
                 Consts.S3_HOST_IP = r.json().hostIP;
                 Consts.S3_HOST_PORT = r.json().hostPort;
+                Consts.SODA_HOST_IP = r.json().hostIP;
+                Consts.SODA_PROMETHEUS_PORT = r.json().prometheusPort;
+                Consts.SODA_ALERTMANAGER_PORT = r.json().alertmanagerPort;
+                Consts.SODA_GRAFANA_PORT = r.json().grafanaPort;
                 resolve();
             })
         })
