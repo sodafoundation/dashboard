@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Router,ActivatedRoute} from '@angular/router';
 import { I18NService, Utils, MsgBoxService, HttpService, Consts} from 'app/shared/api';
 import { BucketService} from '../buckets.service';
-import { MenuItem ,ConfirmationService} from '../../../components/common/api';
+import { MenuItem ,ConfirmationService, Message} from '../../../components/common/api';
 import { HttpClient } from '@angular/common/http';
 import {XHRBackend, RequestOptions, Request, RequestOptionsArgs, Response, Headers, BaseRequestOptions } from '@angular/http';
 import { FormControl, FormGroup, FormBuilder, Validators, ValidatorFn, AbstractControl } from '@angular/forms';
@@ -34,8 +34,11 @@ export class BucketDetailComponent implements OnInit {
   selectFileName;
   label;
   uploadFileDispaly:boolean = false;
+  enableArchival = false;
   buketName:string="";
   bucketId:string="";
+  bucketBackend: any;
+  bucketBackendType: any;
   items = [{
     label:"Buckets",
     url:["/block","fromBuckets"]
@@ -51,12 +54,19 @@ export class BucketDetailComponent implements OnInit {
   bucket;
   showCreateFolder = false;
   createFolderForm:FormGroup;
+  archiveTierOptions: any[];
+  restoreObjectForm: FormGroup;
+  restoreDisplay = false;
+  restoreOptions: any;
+  selectRestoreOptions: any;
   showErrorMsg = false;
   isReadyCopy = true;
   isReadyPast = true;
   UPLOAD_UPPER_LIMIT = 1024 * 1024 * 1024 * 2;
   moreItems = [];
   copySelectedDir = [];
+  msgs: Message[];
+  allBackends: any[];
   errorMessage = {
     "backend_type": { required: "Type is required." },
     "backend": { required: "Backend is required." },
@@ -64,6 +74,9 @@ export class BucketDetailComponent implements OnInit {
       required: "name is required.",
       isExisted:"Name is existing",
       pattern: "Folder names cannot contain the following names/:"
+    },
+    "archive_tier" : {
+      required: "Tier is required"
     }
   };
   validRule= {
@@ -74,6 +87,20 @@ export class BucketDetailComponent implements OnInit {
   allFolderNameForCheck = [];
 
   progressValue: number = 0;
+
+  restoreObjectFormLabel = {
+    "days" : "Days",
+    "tier" : "Retrieval Tier"
+  }
+
+  restoreObjectErrorMsg = {
+    "days": {
+      required: "Days are requried"
+    },
+    "tier":{
+      required: "Retrieval tier is required"
+    }
+  };
 
   constructor(
     private ActivatedRoute: ActivatedRoute,
@@ -90,14 +117,19 @@ export class BucketDetailComponent implements OnInit {
       "name": ["",{validators:[Validators.required,Utils.isExisted(this.allFolderNameForCheck),Validators.pattern(this.validRule.name)], updateOn:'change'}]
     });
     this.uploadForm = this.fb.group({
-        "backend":["",{validators:[Validators.required], updateOn:'change'}],
-        "backend_type":["",{validators:[Validators.required], updateOn:'change'}],
+        "archive_tier":["",{validators:[Validators.required], updateOn:'change'}]
     });
+    this.restoreObjectForm = this.fb.group({
+      "days":[1,{validators:[Validators.required], updateOn:'change'}],
+      "tier":["",{validators:[Validators.required], updateOn:'change'}],
+  });
   }
 
   ngOnInit() {
     this.ActivatedRoute.params.subscribe((params) => {
       this.bucketId = params.bucketId;
+      this.bucketBackend = params.bucketBackend;
+      
       this.items.push({
         label: this.bucketId,
         url: ["/" + this.bucketId],
@@ -111,6 +143,18 @@ export class BucketDetailComponent implements OnInit {
     }
     );
     this.copySelectedDir = window.sessionStorage['searchIndex'] != "" ? JSON.parse(window.sessionStorage.getItem("searchIndex")) : [];
+    
+    this.allBackends = [];
+    this.BucketService.getBckends().subscribe((res) => {
+      this.allBackends = res.json().backends;
+        this.allBackends.forEach(element => {
+            if(element['name'] == this.bucketBackend){
+              this.bucketBackendType = element['type'];
+            }
+        });
+    });
+    
+    this.restoreOptions = Consts.RETRIEVAL_OPTIONS;
   }
   clickOperate(){
     if(this.selectedDir.length >0){
@@ -400,6 +444,53 @@ export class BucketDetailComponent implements OnInit {
     }
   }
 
+  //Show Restore Form
+  showRestoreObject(file){
+    this.restoreDisplay = true;
+    this.selectFileName = file.Key;
+  }
+
+  cancelRestore(){
+    this.restoreDisplay = false;
+    this.restoreObjectForm.reset({
+      "days" : 1
+    });
+  }
+  restoreObject(value){
+    let params = {
+      "days" : value.days,
+      "tier" : value.tier
+    }
+    window['getAkSkList'](()=>{
+      let requestMethod = "POST";
+      let url = '/' + this.bucketId + '/' + this.selectFileName + '?restore';
+      let requestOptions: any;
+      let options: any = {};
+      options['headers'] = new Headers();
+      
+      requestOptions = window['getSignatureKey'](requestMethod, url, '', '', '', params);
+     
+      options = this.BucketService.getSignatureOptions(requestOptions, options);
+      
+      this.BucketService.restoreObject(this.bucketId, this.selectFileName, params, options).subscribe((res)=>{
+        this.restoreDisplay = false;
+        this.restoreObjectForm.reset({
+          "days" : 1
+        });
+        this.msgs = [];
+        this.msgs.push({severity: 'success', summary: 'Success', detail: 'Object has been retrieved successfully.'});
+      },
+      (error)=>{
+        console.log("Object could not be retrieved.", error);
+        this.restoreDisplay = false;
+        this.restoreObjectForm.reset();
+        this.msgs = [];
+        this.msgs.push({severity: 'error', summary: "Error", detail: error._body});
+      })
+  })
+
+    
+  }
   configUpload(from){
     switch(from){
       case 'fromFolder':
@@ -417,6 +508,7 @@ export class BucketDetailComponent implements OnInit {
         this.files = '';
         this.selectFile = '';
         this.selectFileName = '';
+        this.archiveTierOptions = Consts.STORAGE_CLASSES[this.bucketBackendType];
       break;
     }
     
@@ -429,20 +521,13 @@ export class BucketDetailComponent implements OnInit {
     }
     let headers = new Headers();
     headers.append('Content-Type', 'application/xml');
-    if(this.showBackend){
-      if(!this.uploadForm.valid){
-          for(let i in this.uploadForm.controls){
-              this.uploadForm.controls[i].markAsTouched();
-          }
-          return;
-      }
-      headers.append('x-amz-storage-class',this.uploadForm.value.backend);
+    if(this.enableArchival){
+      headers.append('X-Amz-Storage-Class',this.uploadForm.value.archive_tier);
     }
     let options = {
       headers: headers,
       timeout:Consts.TIMEOUT
     };
-
     this.uploadDisplay = false;
     this.isUpload = true;
     if(this.selectFile['size'] > this.UPLOAD_UPPER_LIMIT){
@@ -451,11 +536,18 @@ export class BucketDetailComponent implements OnInit {
     }else{
       window['startUpload'](this.selectFile, this.bucketId, options,this.folderId, ()=>{
         this.isUpload = false;
+        this.enableArchival = false;
+        this.uploadForm.reset();
         this.getAlldir();
       });
     }
   }
 
+  cancelUpload(){
+    this.uploadDisplay = false;
+    this.enableArchival = false;
+    this.uploadForm.reset();
+  }
   downloadFile(file) {
     let fileObjectKey;
     let fileString: any;

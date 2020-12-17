@@ -1934,7 +1934,7 @@ a {
 
 .upload-dialog{
     .ui-dialog-content{
-        height: 295px;
+        height: 250px;
     }
 }
 .create-bucket-dialog{
@@ -1962,6 +1962,11 @@ a {
 .create-migrate-dialog{
     .ui-dialog-content{
         height: 420px;
+    }
+}
+.restore-dialog{
+    .ui-dialog-content{
+        height: 200px;
     }
 }
 .a-upload {
@@ -2064,8 +2069,11 @@ a {
     color: #ffffff;
 }
 .ui-datatable tbody .ui-cell-data{
-    overflow: inherit !important;
+    overflow: hide !important;
     height: auto !important;
+}
+.ui-button.ui-button-icon-only{
+    padding: 0 0.12rem !important;
 }
 /* Common Overides end */
 /* Services Page Css */
