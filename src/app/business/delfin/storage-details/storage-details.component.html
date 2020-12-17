@@ -5,7 +5,7 @@
           <a [ngClass]="{'font-color-class': i===0}" [routerLink]="[item.url]">{{item.label}}</a>
           <span *ngIf="(i+1) !== items.length">></span>
         </span>
-        <span> : {{selectedStorage && selectedStorage.name ? selectedStorage.name : selectedStorageId}}</span>
+        <span> > {{selectedStorage && selectedStorage.name ? selectedStorage.name : selectedStorageId}}</span>
     </div>
     <div class="table-toolbar">
         <div class="left">
@@ -477,7 +477,7 @@
             <div class="ui-g-12">
                 <form-item label="{{perfMetricsConfigFormLabel.is_historic}}" >
                     <p-inputSwitch formControlName="is_historic" onLabel="Yes" offLabel="No"></p-inputSwitch>
-                    <span><i pTooltip="historic collection is the collection all availabe timestamps from previous polling to current polling, also supported only if the backend supports historic collection " tooltipPosition="right" class="fa fa-question-circle"></i></span>
+                    <span><i pTooltip="If backend supports historic collection, enabling this will collect data periodically." tooltipPosition="right" class="fa fa-question-circle"></i></span>
                 </form-item>
                 
             </div>
