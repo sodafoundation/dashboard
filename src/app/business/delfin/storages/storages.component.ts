@@ -97,7 +97,7 @@ export class StoragesComponent implements OnInit {
 
     perfMetricsConfigFormLabel = {
         "perf_collection": "Enable Performance collection?",
-        "interval" : "Polling Interval",
+        "interval" : "Polling Interval (seconds)",
         "is_historic": "Enable Historic metric collection?"
     }
 

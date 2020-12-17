@@ -79,7 +79,7 @@ export class StorageDetailsComponent implements OnInit {
 
     perfMetricsConfigFormLabel = {
         "perf_collection": "Enable Performance collection?",
-        "interval" : "Polling Interval",
+        "interval" : "Polling Interval (seconds)",
         "is_historic": "Enable Historic metric collection?"
     }
 
@@ -103,10 +103,6 @@ export class StorageDetailsComponent implements OnInit {
             { 
                 label: "Storages", 
                 url: '/resource-monitor' 
-            },
-            { 
-                label: "Storage Details", 
-                url: '/storageDetails' 
             }
         ];
         this.getStorageVolumes(this.selectedStorageId);
