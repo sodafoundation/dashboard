@@ -483,7 +483,9 @@ export class BucketDetailComponent implements OnInit {
       (error)=>{
         console.log("Object could not be retrieved.", error);
         this.restoreDisplay = false;
-        this.restoreObjectForm.reset();
+        this.restoreObjectForm.reset({
+          "days" : 1
+        });
         this.msgs = [];
         this.msgs.push({severity: 'error', summary: "Error", detail: error._body});
       })
