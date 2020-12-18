@@ -432,8 +432,46 @@ export class StorageDetailsComponent implements OnInit {
     }
 
     getAllActiveAlerts(storageId){
-        this.ds.getAlertsByStorageId(storageId).subscribe((res)=>{
-            this.allActiveAlerts = res.json().alerts;
+        this.ds.getAllAlerts().subscribe((res)=>{
+            let alertsFromAlertManager = res.json().data;
+            alertsFromAlertManager.forEach(element => {
+                if(element.labels.storage_id == storageId){
+                    let alert = {
+                        'alert_id' : '',
+                        'alert_name' : '',
+                        'severity' : '',
+                        'category' : '',
+                        'type' : '',
+                        'sequence_number' : 0,
+                        'occur_time' : 0,
+                        'description' : '',
+                        'resource_type' : '',
+                        'location' : '',
+                        'storage_id' : '',
+                        'storage_name' : '',
+                        'vendor' : '',
+                        'model' : '',
+                        'serial_number' : '',
+                        'recovery_advice' : ''
+                    };
+                    alert.alert_id = element.alert_id;
+                    alert.alert_name = element.labels.alert_name || element.labels.alertname;
+                    alert.severity = element.labels.severity;
+                    alert.category = element.labels.category;
+                    alert.type = element.labels.type;
+                    alert.occur_time = element.startsAt;
+                    alert.description = element.annotations.description;
+                    alert.resource_type = element.labels.resource_type;
+                    alert.location = element.labels.location;
+                    alert.storage_id = element.labels.storage_id;
+                    alert.storage_name = element.labels.storage_name;
+                    alert.vendor = element.labels.vendor;
+                    alert.model = element.labels.model;
+                    alert.serial_number = element.labels.serial_number;
+                    alert.recovery_advice = element.labels.recovery_advice;
+                    this.allActiveAlerts.push(alert);
+                }
+            });
         }, (error)=>{
             this.allActiveAlerts = [];
             console.log("Something went wrong. Could not fetch alerts.", error);
