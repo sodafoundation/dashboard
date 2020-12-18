@@ -1111,6 +1111,25 @@ a {
 
 /* profile css start */
 
+.new-card-class {
+    border: none !important;
+    border-radius: 12px;
+    height: 250px;
+    max-height: 250px;
+
+    
+}
+.profile-name-tooltip, .profile-desc-tooltip{
+    max-width: none;
+    font-size: 1.2em;
+}
+.delete-profile-name {
+    max-width: 300px;
+    overflow-wrap: break-word;
+    font-weight: 600;
+    font-style: italic;
+    font-size: 1.1em;
+}
 .relative-class {
     padding-right: 0.40rem;
     position: relative;
