@@ -209,7 +209,7 @@ export class ProfileCardComponent implements OnInit {
         })
     }
     showWarningDialogFun(profile) {
-        let msg = "<div>Are you sure you want to delete the Profile?</div><h3>[ "+ profile.name +" ]</h3>";
+        let msg = "<div>Are you sure you want to delete the Profile?</div><div class='delete-profile-name'>["+ profile.name +"]</div>";
         let header ="Delete Profile";
         let acceptLabel = "Delete";
         let warming = true;
