@@ -40,11 +40,7 @@
     -moz-box-shadow: 5px 5px 25px rgba(51, 59, 69, 0.149019607843137);
 }
 
-.new-card-class {
-    border: none !important;
-    border-radius: 12px;
-    
-}
+
 .ui-card-body{
     padding: .15rem .2rem;
 }
