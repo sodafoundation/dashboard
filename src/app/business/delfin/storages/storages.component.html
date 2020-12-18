@@ -656,6 +656,37 @@
 
 </p-dialog>
 
+<p-dialog styleClass="perf-metrics-config-dialog"  header="Configure Performance Metrics Collection" [(visible)]="showperfMetricsConfigForm" [width]="700" modal="modal">
+    <form *ngIf="showperfMetricsConfigForm" [formGroup]="perfMetricsConfigForm" [grid]="{label: 'ui-g-5', content:'ui-g-7'}" [errorMessage]="errorMessage">
+       
+        <div class="ui-g">
+            <div class="ui-g-12">
+                <form-item label="{{perfMetricsConfigFormLabel.perf_collection}}" >
+                    <p-inputSwitch formControlName="perf_collection" onLabel="Yes" offLabel="No"></p-inputSwitch>
+                </form-item>
+            </div>
+        </div>
+        <div class="ui-g">
+            <div class="ui-g-12">
+                <form-item label="{{perfMetricsConfigFormLabel.interval}}">
+                    <input formControlName="interval" value="10" type="number" size="30" pInputText> 
+                </form-item>
+            </div>
+        </div>
+        <div class="ui-g">
+            <div class="ui-g-12">
+                <form-item label="{{perfMetricsConfigFormLabel.is_historic}}" >
+                    <p-inputSwitch formControlName="is_historic" onLabel="Yes" offLabel="No"></p-inputSwitch>
+                </form-item>
+            </div>
+        </div>
+    </form>
+    <p-footer>
+        <button type="submit" class="ui-button-secondary" pButton [disabled]="perfMetricsConfigForm.invalid" (click)="configurePerformanceMetrics(perfMetricsConfigForm.value)"  label="{{i18n.keyID['ok']}}"></button>
+        <button type="button" pButton (click)="closePerfConfigDialog()"  label="{{i18n.keyID['cancel']}}"></button>
+    </p-footer>
+
+</p-dialog>
 <p-overlayPanel styleClass="overview-panel" #deviceOverviewPanel>
     <div class="ui-g overview-title">
         <h4>{{storageOverview && storageOverview.name}}</h4>

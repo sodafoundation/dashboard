@@ -43,6 +43,8 @@ export class StoragesComponent implements OnInit {
     selectedAuthProtocol: any;
     privacyProtocolOptions: any;
     selectedPrivacyProtocol: any;
+    perfMetricsConfigForm: any;
+    showperfMetricsConfigForm: boolean = false;
     registerAlertSourceForm: any;
     showRegisterAlertSourceForm: boolean = false;
     v2cFields: boolean = false;
@@ -92,6 +94,12 @@ export class StoragesComponent implements OnInit {
         sync_status : "Sync Status"
 
     };
+
+    perfMetricsConfigFormLabel = {
+        "perf_collection": "Enable Performance collection?",
+        "interval" : "Polling Interval (seconds)",
+        "is_historic": "Enable Historic metric collection?"
+    }
 
     alertSourceFormlabel = {
         "version": "Version",
@@ -202,6 +210,14 @@ export class StoragesComponent implements OnInit {
                 disabled:false
             },
             {
+                "label": "Configure Metric Collection",
+
+                command: () => {
+                    this.showPerfConfigDialog(this.selectStorage);
+                },
+                disabled:false
+            },
+            {
                 "label": this.i18n.keyID['sds_block_volume_delete'],
                 command: () => {
                     this.batchDeleteStorages(this.selectStorage);
@@ -245,6 +261,11 @@ export class StoragesComponent implements OnInit {
         this.privacyProtocolOptions = Consts.STORAGES.privacyProtocolOptions;
 
         this.registerAlertSourceForm = this.fb.group({});
+        this.perfMetricsConfigForm = this.fb.group({
+            'perf_collection': new FormControl(true, Validators.required),
+            'interval': new FormControl(10, Validators.required),
+            "is_historic": new FormControl(true, Validators.required)            
+        });
            
     }
     updateAccessInfo(storage){
@@ -654,6 +675,14 @@ export class StoragesComponent implements OnInit {
                     disabled:false
                 },
                 {
+                    "label": "Configure Metric Collection",
+    
+                    command: () => {
+                        this.showPerfConfigDialog(node['details']);
+                    },
+                    disabled:false
+                },
+                {
                     "label": this.i18n.keyID['sds_block_volume_delete'],
                     command: () => {
                         this.batchDeleteStorages(node['details']);
@@ -843,6 +872,56 @@ export class StoragesComponent implements OnInit {
             })
         }
         
+    }
+    
+    showPerfConfigDialog(storage){
+        this.selectedStorageId = storage['id'];
+        this.showperfMetricsConfigForm = true;
+    }
+
+    closePerfConfigDialog(){
+        this.showperfMetricsConfigForm = false;
+        this.perfMetricsConfigForm.reset({
+            'perf_collection': true,
+            'interval': 10,
+            'is_historic': true
+        });
+    }
+
+    configurePerformanceMetrics(value){
+        if(!this.perfMetricsConfigForm.valid){
+            for(let i in this.perfMetricsConfigForm.controls){
+                this.perfMetricsConfigForm.controls[i].markAsTouched();
+            }
+            return;
+        }
+        let perfParam = {
+            "array_polling":{
+                "perf_collection" : value['perf_collection'],
+                "interval": value['interval'],
+                "is_historic": value['is_historic']
+            }
+        }
+
+        this.ds.metricsConfig(this.selectedStorageId, perfParam).subscribe((res)=>{
+            this.showperfMetricsConfigForm=false;
+            this.msgs = [];
+            this.msgs.push({severity: 'success', summary: 'Success', detail: 'Performance metrics collection configured successfully.'});
+            this.perfMetricsConfigForm.reset({
+                'perf_collection': true,
+                'interval': 10,
+                'is_historic': true
+            });
+        }, (error) =>{
+            this.msgs = [];
+            this.msgs.push({severity: 'error', summary: "Error", detail:"Something went wrong. Performance metrics collection could not be configured."});
+            console.log("Something went wrong. Performance metrics collection could not be configured.", error);
+            this.perfMetricsConfigForm.reset({
+                'perf_collection': true,
+                'interval': 10,
+                'is_historic': true
+            });
+        })
     }
 
     showAlertSourceDialog(storage){
