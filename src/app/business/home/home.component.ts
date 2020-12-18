@@ -56,7 +56,7 @@ export class HomeComponent implements OnInit {
             type: 'text',
             name: 'region',
             formControlName: 'region',
-            arr:['aws-s3','azure-blob','hw-obs','fusionstorage-object', 'gcp-s3','ibm-cos', 'alibaba-oss', 'aws-file', 'aws-block', 'azure-file', 'hw-file']
+            arr:['aws-s3','azure-blob','hw-obs','fusionstorage-object', 'gcp-s3','ibm-cos', 'alibaba-oss', 'aws-file', 'aws-block', 'azure-file', 'hw-file', 'hw-block']
         },
         {
             label: 'Project',
@@ -92,7 +92,7 @@ export class HomeComponent implements OnInit {
             type: 'text',
             name: 'accessKey',
             formControlName: 'ak',
-            arr:['aws-s3','azure-blob','hw-obs','fusionstorage-object','ceph-s3','gcp-s3','ibm-cos', 'alibaba-oss', 'aws-file', 'aws-block', 'azure-file', 'gcp-file', 'hw-file']
+            arr:['aws-s3','azure-blob','hw-obs','fusionstorage-object','ceph-s3','gcp-s3','ibm-cos', 'alibaba-oss', 'aws-file', 'aws-block', 'azure-file', 'gcp-file', 'hw-file', 'hw-block']
         },
         {
             label: 'Secret Key',
@@ -101,7 +101,7 @@ export class HomeComponent implements OnInit {
             type: 'password',
             name: 'secretKey',
             formControlName: 'sk',
-            arr:['aws-s3','azure-blob','hw-obs','fusionstorage-object','ceph-s3','gcp-s3','ibm-cos','alibaba-oss', 'aws-file', 'aws-block', 'azure-file', 'gcp-file', 'hw-file']
+            arr:['aws-s3','azure-blob','hw-obs','fusionstorage-object','ceph-s3','gcp-s3','ibm-cos','alibaba-oss', 'aws-file', 'aws-block', 'azure-file', 'gcp-file', 'hw-file', 'hw-block']
         },
 
     ]
@@ -333,6 +333,9 @@ export class HomeComponent implements OnInit {
         if( this.Allbackends['hw-file']){
             this.allBackends_count.localBKD += this.Allbackends['hw-file'].length;
         }
+        if( this.Allbackends['hw-block']){
+            this.allBackends_count.localBKD += this.Allbackends['hw-block'].length;
+        }
 
         this.allBackends_count.ibmcos = this.Allbackends['ibm-cos'] ? this.Allbackends['ibm-cos'].length :0;
         this.allBackends_count.gcp = this.Allbackends['gcp-s3'] ? this.Allbackends['gcp-s3'].length :0;
@@ -415,7 +418,8 @@ export class HomeComponent implements OnInit {
             let azure_fs_arr = this.Allbackends['azure-file'] ? this.Allbackends['azure-file'] : [];
             let gcp_fs_arr = this.Allbackends['gcp-file'] ? this.Allbackends['gcp-file'] : [];
             let hw_fs_arr = this.Allbackends['hw-file'] ? this.Allbackends['hw-file'] : [];
-            this.typeDetail = fs_arr.concat(ceph_arr,yig_arr,aws_fs_arr,aws_bs_arr,azure_fs_arr, gcp_fs_arr, hw_fs_arr);
+            let hw_bs_arr = this.Allbackends['hw-block'] ? this.Allbackends['hw-block'] : [];
+            this.typeDetail = fs_arr.concat(ceph_arr,yig_arr,aws_fs_arr,aws_bs_arr,azure_fs_arr, gcp_fs_arr, hw_fs_arr, hw_bs_arr);
         }
     }
 
