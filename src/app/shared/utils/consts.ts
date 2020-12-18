@@ -74,6 +74,28 @@ export const Consts = {
     },
     S3_HOST_IP: '',
     S3_HOST_PORT: '',
+    STORAGE_CLASSES: {
+        'aws-s3' : [
+            {
+                label: 'S3 GLACIER',
+                value: 'GLACIER'
+            }
+        ]
+    },
+    RETRIEVAL_OPTIONS: [
+        {
+            label: "Expedited",
+            value: "Expedited"
+        },
+        {
+            label: "Standard",
+            value: "Standard"
+        },
+        {
+            label: "Bulk",
+            value: "Bulk"
+        }
+    ],
     API: {
 
         DELFIN : {
