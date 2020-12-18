@@ -1,7 +1,7 @@
 import { NgModule, APP_INITIALIZER } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { ButtonModule, DataTableModule, PanelModule, OverlayPanelModule,  ChartModule, CardModule, TabViewModule, InputTextModule, DropMenuModule, DialogModule,FormModule,MultiSelectModule, GrowlModule ,DropdownModule,InputTextareaModule} from '../../components/common/api';
+import { ButtonModule, DataTableModule, PanelModule, OverlayPanelModule,  ChartModule, CardModule, TabViewModule, InputTextModule, InputSwitchModule, DropMenuModule, DialogModule,FormModule,MultiSelectModule, GrowlModule ,DropdownModule,InputTextareaModule} from '../../components/common/api';
 import { ScrollPanelModule } from '../../components/scrollpanel/scrollpanel';
 import { DataScrollerModule } from '../../components/datascroller/datascroller';
 import { TreeModule } from '../../components/tree/tree';
@@ -46,6 +46,7 @@ const routers: Routes = [{
     CardModule,
     TabViewModule,
     InputTextModule, 
+    InputSwitchModule,
     DropMenuModule, 
     DialogModule,
     FormModule,
