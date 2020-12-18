@@ -124,7 +124,7 @@ export class CreateHostComponent implements OnInit {
     this.getAZ();
     this.items = [
         { label: this.i18n.keyID["sds_Hosts_title"], url: '/block' },
-        { label: this.i18n.keyID["sds_create_host"], url: '/createHost' }
+        { label: this.i18n.keyID["sds_create_host"], url: '/registerHost' }
     ];
     this.createHostform = this.fb.group({
         'availabilityZones': new FormControl('', Validators.required),

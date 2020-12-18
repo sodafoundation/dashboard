@@ -116,8 +116,8 @@
             <p-dropdown [disabled]="noHosts" [options]="hostOptions" formControlName="hostId" placeholder="Please select"></p-dropdown>
             <div *ngIf="noHosts">
                 <i class="fa fa-exclamation-circle fa-2x"></i>
-                <span >There are no hosts. Would you like to add one? </span>
-                <a  [routerLink]="['/createHost']">Add Host</a>
+                <span >There are no hosts. Would you like to register one? </span>
+                <a  [routerLink]="['/registerHost']">{{I18N.keyID['sds_register_host']}}</a>
             </div>
             
         </form-item>
