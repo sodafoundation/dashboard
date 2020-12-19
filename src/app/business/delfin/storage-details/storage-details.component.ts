@@ -1,4 +1,5 @@
-import { Component, OnInit, ViewContainerRef, ViewChild, Directive, ElementRef, HostBinding, HostListener } from '@angular/core';
+import { Component, OnInit, ViewContainerRef, ViewChild, Directive, ElementRef, HostBinding, HostListener, PipeTransform, Pipe,  } from '@angular/core';
+import { DomSanitizer } from "@angular/platform-browser";
 import { Router, ActivatedRoute } from '@angular/router';
 import { I18NService, Utils, Consts} from 'app/shared/api';
 import { FormControl, FormGroup, FormBuilder, Validators, ValidatorFn, AbstractControl } from '@angular/forms';
@@ -10,6 +11,15 @@ import { DelfinService } from '../delfin.service';
 
 
 let _ = require("underscore");
+
+@Pipe({ name: 'safe' })
+export class SafePipe implements PipeTransform {
+  constructor(private sanitizer: DomSanitizer) { }
+  transform(url) {
+    return this.sanitizer.bypassSecurityTrustResourceUrl(url);
+  }
+}
+
 @Component({
     selector: 'app-delfin-storage-details',
     templateUrl: 'storage-details.component.html',
@@ -37,6 +47,9 @@ export class StorageDetailsComponent implements OnInit {
     allActiveAlerts: any = [];
     detailsTabIndex: number = 0;
     configTabIndex: number = 0;
+    perfMetricsConfigForm: any;
+    showperfMetricsConfigForm: boolean = false;
+    performanceMonitorURL: any = "";
     msgs: Message[];
 
     label = {
@@ -64,6 +77,12 @@ export class StorageDetailsComponent implements OnInit {
 
     };
 
+    perfMetricsConfigFormLabel = {
+        "perf_collection": "Enable Performance collection?",
+        "interval" : "Polling Interval (seconds)",
+        "is_historic": "Enable Historic metric collection?"
+    }
+
     constructor(
         private ActivatedRoute: ActivatedRoute,
         public i18n: I18NService,
@@ -84,14 +103,16 @@ export class StorageDetailsComponent implements OnInit {
             { 
                 label: "Storages", 
                 url: '/resource-monitor' 
-            },
-            { 
-                label: "Storage Details", 
-                url: '/storageDetails' 
             }
         ];
         this.getStorageVolumes(this.selectedStorageId);
         this.getStoragePools(this.selectedStorageId);
+        this.perfMetricsConfigForm = this.fb.group({
+            'perf_collection': new FormControl(true, Validators.required),
+            'interval': new FormControl(10, Validators.required),
+            "is_historic": new FormControl(true, Validators.required)            
+        });
+        this.performanceMonitorURL = "http://" + Consts.SODA_HOST_IP + ":" + Consts.SODA_GRAFANA_PORT + "/d/Tut2q3AMk/performance-monitor-storage-details?orgId=1&refresh=30s&var-filters=storage_id%7C%3D%7C" + this.selectedStorageId + "&kiosk";
         
     }
     changeDetailsTab(e){
@@ -442,5 +463,54 @@ export class StorageDetailsComponent implements OnInit {
             this.msgs.push({severity: 'error', summary: 'Error', detail: error});
         })
         
+    }
+    showPerfConfigDialog(){
+        
+        this.showperfMetricsConfigForm = true;
+    }
+
+    closePerfConfigDialog(){
+        this.showperfMetricsConfigForm = false;
+        this.perfMetricsConfigForm.reset({
+            'perf_collection': true,
+            'interval': 10,
+            'is_historic': true
+        });
+    }
+
+    configurePerformanceMetrics(value){
+        if(!this.perfMetricsConfigForm.valid){
+            for(let i in this.perfMetricsConfigForm.controls){
+                this.perfMetricsConfigForm.controls[i].markAsTouched();
+            }
+            return;
+        }
+        let perfParam = {
+            "array_polling":{
+                "perf_collection" : value['perf_collection'],
+                "interval": value['interval'],
+                "is_historic": value['is_historic']
+            }
+        }
+
+        this.ds.metricsConfig(this.selectedStorageId, perfParam).subscribe((res)=>{
+            this.showperfMetricsConfigForm=false;
+            this.msgs = [];
+            this.msgs.push({severity: 'success', summary: 'Success', detail: 'Performance metrics collection configured successfully.'});
+            this.perfMetricsConfigForm.reset({
+                'perf_collection': true,
+                'interval': 10,
+                'is_historic': true
+            });
+        }, (error) =>{
+            this.msgs = [];
+            this.msgs.push({severity: 'error', summary: "Error", detail:"Something went wrong. Performance metrics collection could not be configured."});
+            console.log("Something went wrong. Performance metrics collection could not be configured.", error);
+            this.perfMetricsConfigForm.reset({
+                'perf_collection': true,
+                'interval': 10,
+                'is_historic': true
+            });
+        })
     }
 }

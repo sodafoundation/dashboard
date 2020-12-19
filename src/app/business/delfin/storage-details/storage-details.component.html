@@ -5,12 +5,14 @@
           <a [ngClass]="{'font-color-class': i===0}" [routerLink]="[item.url]">{{item.label}}</a>
           <span *ngIf="(i+1) !== items.length">></span>
         </span>
+        <span> > {{selectedStorage && selectedStorage.name ? selectedStorage.name : selectedStorageId}}</span>
     </div>
     <div class="table-toolbar">
         <div class="left">
             
         </div>
         <div class="right">
+            <button pButton type="button" (click)="showPerfConfigDialog()" icon="fa-cog" label="Configure Metric Collection"></button>
             <button pButton type="button" (click)="syncStorage(selectedStorageId)" icon="fa-exchange" label="Sync Storage"></button>
             <button class="" title="Refresh" label="Refresh" pButton type="button" (click)="getStorageById(selectedStorageId)" icon="fa-refresh"></button>
         </div>
@@ -445,9 +447,45 @@
                     </div>
                 </ng-template>
             </p-tabPanel>
+            <p-tabPanel header="Performance Monitoring">
+                <iframe [src]="performanceMonitorURL | safe"
+                width="100%" height="750" frameborder="0"></iframe>
+            </p-tabPanel>
         </p-tabView>
     </div>
     
     
 </div>
+<p-dialog styleClass="perf-metrics-config-dialog"  header="Configure Performance Metrics Collection" [(visible)]="showperfMetricsConfigForm" [width]="700" modal="modal">
+    <form *ngIf="showperfMetricsConfigForm" [formGroup]="perfMetricsConfigForm" [grid]="{label: 'ui-g-5', content:'ui-g-7'}" [errorMessage]="errorMessage">
+       
+        <div class="ui-g">
+            <div class="ui-g-12">
+                <form-item label="{{perfMetricsConfigFormLabel.perf_collection}}" >
+                    <p-inputSwitch formControlName="perf_collection" onLabel="Yes" offLabel="No"></p-inputSwitch>
+                </form-item>
+            </div>
+        </div>
+        <div class="ui-g">
+            <div class="ui-g-12">
+                <form-item label="{{perfMetricsConfigFormLabel.interval}}">
+                    <input formControlName="interval" value="10" type="number" size="30" pInputText> 
+                </form-item>
+            </div>
+        </div>
+        <div class="ui-g">
+            <div class="ui-g-12">
+                <form-item label="{{perfMetricsConfigFormLabel.is_historic}}" >
+                    <p-inputSwitch formControlName="is_historic" onLabel="Yes" offLabel="No"></p-inputSwitch>
+                    <span><i pTooltip="If backend supports historic collection, enabling this will collect data periodically." tooltipPosition="right" class="fa fa-question-circle"></i></span>
+                </form-item>
+                
+            </div>
+        </div>
+    </form>
+    <p-footer>
+        <button type="submit" class="ui-button-secondary" pButton [disabled]="perfMetricsConfigForm.invalid" (click)="configurePerformanceMetrics(perfMetricsConfigForm.value)"  label="{{i18n.keyID['ok']}}"></button>
+        <button type="button" pButton (click)="closePerfConfigDialog()"  label="{{i18n.keyID['cancel']}}"></button>
+    </p-footer>
 
+</p-dialog>

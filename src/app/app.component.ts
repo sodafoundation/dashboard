@@ -175,6 +175,15 @@ export class AppComponent implements OnInit, AfterViewInit {
                     "title" : "Storage Summary",
                     "routerLink": "/resource-monitor"
                 },
+                {
+                    "title" : "Performance Monitor",
+                    "routerLink": "/performance-monitor"                    
+                },
+                {
+                    "title" : "Alert Manager",
+                    "is_external_link" : true,
+                    "link" : "http://" + Consts.SODA_HOST_IP + ":" + Consts.SODA_ALERTMANAGER_PORT
+                },
             ]
         },
 	    {
@@ -725,6 +734,11 @@ export class AppComponent implements OnInit, AfterViewInit {
             })
             return requestOptions;
     	}
+    }
+
+
+    openAlertsManager(){
+        window.open("http://" + Consts.SODA_HOST_IP + ":" + Consts.SODA_ALERTMANAGER_PORT + "/#/alerts", "_blank")
     }
     confirmDialog([msg,header,acceptLabel,warning]){
         this.confirmationService.confirm({

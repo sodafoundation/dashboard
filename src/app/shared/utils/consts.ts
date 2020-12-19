@@ -72,6 +72,10 @@ export const Consts = {
         'yig': "YIG Ceph",
         'alibaba-oss' : "Alibaba Object Storage"
     },
+    SODA_HOST_IP: '',
+    SODA_GRAFANA_PORT: '',
+    SODA_ALERTMANAGER_PORT: '',
+    SODA_PROMETHEUS_PORT: '',
     S3_HOST_IP: '',
     S3_HOST_PORT: '',
     STORAGE_CLASSES: {

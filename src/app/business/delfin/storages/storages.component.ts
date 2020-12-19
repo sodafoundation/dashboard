@@ -209,6 +209,14 @@ export class StoragesComponent implements OnInit {
                 },
                 disabled:false
             },
+	    {
+                "label": "Configure Metric Collection",
+
+                command: () => {
+                    this.showPerfConfigDialog(this.selectStorage);
+                },
+                disabled:false
+            },
             {
                 "label": "Configure Metric Collection",
 
@@ -1071,8 +1079,8 @@ export class StoragesComponent implements OnInit {
             this.msgs.push({severity: 'success', summary: 'Success', detail: 'Alert source registered successfully.'});
         }, (error) =>{
             this.msgs = [];
-            this.msgs.push({severity: 'error', summary: "Error", detail:"Something went wrong. Alert source could not be registered."});
-            console.log("Something went wrong. Alert source could not be registered.", error);
+            this.msgs.push({severity: 'error', summary: "Error", detail:"Something went wrong. Alert source could not be registered. \n" + error.json().error_msg});
+            console.log("Something went wrong. Alert source could not be registered.", error.json().error_msg);
         })
     }
 

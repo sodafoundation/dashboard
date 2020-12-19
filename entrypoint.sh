@@ -73,7 +73,10 @@ cat /etc/nginx/conf.d/default.conf
 echo "Starting application..."
 echo "OPENSDS_S3_HOST = ${OPENSDS_S3_HOST}"
 echo "OPENSDS_S3_PORT = ${OPENSDS_S3_PORT}"
-echo "{\"hostIP\": \"$OPENSDS_S3_HOST\",\"hostPort\": \"$OPENSDS_S3_PORT\"}" >/var/www/html/assets/data/runtime.json
+echo "SODA_PROMETHEUS_PORT = ${SODA_PROMETHEUS_PORT}"
+echo "SODA_ALERTMANAGER_PORT = ${SODA_ALERTMANAGER_PORT}"
+echo "SODA_GRAFANA_PORT = ${SODA_GRAFANA_PORT}"
+echo "{\"hostIP\": \"$OPENSDS_S3_HOST\",\"hostPort\": \"$OPENSDS_S3_PORT\",\"prometheusPort\": \"$SODA_PROMETHEUS_PORT\",\"alertmanagerPort\": \"$SODA_ALERTMANAGER_PORT\",\"grafanaPort\": \"$SODA_GRAFANA_PORT\"}" >/var/www/html/assets/data/runtime.json
 
 # start nginx service
 /usr/sbin/nginx -g "daemon off;"
