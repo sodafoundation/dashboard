@@ -139,5 +139,187 @@ export const Consts = {
             label: 'SSD',
             value: 'SSD'
         }
-    ]
+    ],
+    STORAGES: {
+        vendors: [
+            {
+                label: "Dell EMC",
+                value: 'dellemc'
+            },
+            {
+                label: "Huawei",
+                value: 'huawei'
+            },
+            {
+                label: "HPE",
+                value: 'hpe'
+            },
+            {
+                label: "Hitachi",
+                value: 'hitachi'
+            },
+            {
+                label: "IBM",
+                value: 'ibm'
+            }
+        ],
+        models: {
+            'dellemc' : [
+                {
+                    label: "VMAX",
+                    value: {
+                        name: 'vmax',
+                        rest: true,
+                        ssh: false,
+                        extra: true
+                    }
+                }
+            ],
+            'huawei' : [
+                {
+                    label: "OceanStor V3",
+                    value: {
+                        name: 'oceanstor',
+                        rest: true,
+                        ssh: false,
+                        extra: false
+                    }
+                }
+            ],
+            'hpe' : [
+                {
+                    label: "3PAR",
+                    value: {
+                        name: '3par',
+                        rest: true,
+                        ssh: true,
+                        extra: false
+                    }
+                }
+            ],
+            'hitachi' : [
+                {
+                    label: "VSP",
+                    value: {
+                        name: 'vsp',
+                        rest: true,
+                        ssh: false,
+                        extra: false
+                    }
+                }
+            ],
+            'ibm' : [
+                {
+                    label: "Storwize / SVC",
+                    value: {
+                        name: 'storwize_svc',
+                        rest: false,
+                        ssh: true,
+                        extra: false
+                    }
+                }
+            ]
+        },
+        pubKeyTypeOptions: [
+            {
+                label: "ssh-ed25519",
+                value: "ssh-ed25519"
+            },
+            {
+                label: "ecdsa-sha2-nistp256",
+                value: "ecdsa-sha2-nistp256"
+            },
+            {
+                label: "ecdsa-sha2-nistp384",
+                value: "ecdsa-sha2-nistp384"
+            },
+            {
+                label: "ecdsa-sha2-nistp521",
+                value: "ecdsa-sha2-nistp521"
+            },
+            {
+                label: "ssh-rsa",
+                value: "ssh-rsa"
+            },
+            {
+                label: "ssh-dss",
+                value: "ssh-dss"
+            }
+        ],
+        alertSourceVersionOptions: [
+            {
+                label: "SNMPV2C",
+                value: 'SNMPv2c'
+            },
+            {
+              label: "SNMPV3",
+              value: 'SNMPv3'
+            }
+        ],
+        securityLevelOptions: [
+            {
+                label: "noAuthnoPriv",
+                value: "noAuthnoPriv"
+            },
+            {
+                label: "authNoPriv",
+                value: "authNoPriv"
+            },
+            {
+                label: "authPriv",
+                value: "authPriv"
+            }
+        ],
+        authProtocolOptions: [
+            {
+                label: "HMACSHA",
+                value: "HMACSHA"
+            },
+            {
+                label: "HMACMD5",
+                value: "HMACMD5"
+            },
+            {
+                label: "HMCSHA2224",
+                value: "HMCSHA2224"
+            },
+            {
+                label: "HMCSHA2256",
+                value: "HMCSHA2256"
+            },
+            {
+                label: "HMCSHA2384",
+                value: "HMCSHA2384"
+            },
+            {
+                label: "HMCSHA2512",
+                value: "HMCSHA2512"
+            }
+        
+        ],
+        privacyProtocolOptions: [
+            {
+                label: "DES",
+                value: "DES"
+            },
+            {
+                label: "AES",
+                value: "AES"
+            },
+            {
+                label: "AES192",
+                value: "AES192"
+            },
+            {
+                label: "AES256",
+                value: "AES256"
+            },
+            {
+                label: "3DES",
+                value: "3DES"
+            },
+            
+            
+        ]
+    },
 }
