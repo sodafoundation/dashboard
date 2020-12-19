@@ -12,7 +12,7 @@ const routes: Routes = [
     {path: 'createCloudVolume', loadChildren: './business/block/cloud-block-service/create/cloud-volume-create.module#CloudVolumeCreateModule'},
     {path: 'modifyCloudVolume/:volumeId', loadChildren: './business/block/cloud-block-service/modify/cloud-volume-modify.module#CloudVolumeModifyModule'},
     {path: 'volumeDetails/:volumeId', loadChildren: './business/block/volume-detail/volume-detail.module#VolumeDetailModule'},
-    {path: 'createHost', loadChildren: './business/block/create-host/create-host.module#CreateHostModule'},
+    {path: 'registerHost', loadChildren: './business/block/create-host/create-host.module#CreateHostModule'},
     {path: 'modifyHost/:hostId', loadChildren: './business/block/modify-host/modify-host.module#ModifyHostModule',
         resolve: {
             host: HostsResolver,
@@ -39,6 +39,7 @@ const routes: Routes = [
     {path: 'fileShareDetail/:fileShareId', loadChildren: './business/block/file-share-detail/file-share-detail.module#FileShareDetailModule'},
     {path: 'services', loadChildren: './business/services/services.module#ServicesModule'},
     {path: 'resource-monitor', loadChildren: './business/delfin/delfin.module#DelfinModule'},
+    {path: 'performance-monitor', loadChildren: './business/delfin/performance-monitor/performance-monitor.module#PerformanceMonitorModule'},
     {path: 'registerStorage', loadChildren: './business/delfin/register-storage/register-storage.module#RegisterStorageModule'},
     {path: 'storageDetails/:storageId', loadChildren: './business/delfin/storage-details/storage-details.module#StorageDetailsModule'},
     {path: 'modifyStorage/:storageId', loadChildren: './business/delfin/modify-storage/modify-storage.module#ModifyStorageModule'}

@@ -1,7 +1,7 @@
 <p-growl [value]="msgs" [sticky]="false" [life]="6000"></p-growl>
 <div class="table-toolbar">
     <div class="left">
-        <button class="ui-button-secondary" pButton type="button" label="{{I18N.keyID['sds_block_volume_create']}}" [routerLink]="['/createHost']"></button>
+        <button class="ui-button-secondary" pButton type="button" label="{{I18N.keyID['sds_common_register']}}" [routerLink]="['/registerHost']"></button>
         <button pButton type="button" label="{{I18N.keyID['sds_block_volume_delete']}}" [disabled]="selectedHosts.length == 0" (click)="batchDeleteHosts(selectedHosts)"></button></div>
     <div class="right">
         <div class="ui-inputsearch">

@@ -1111,6 +1111,25 @@ a {
 
 /* profile css start */
 
+.new-card-class {
+    border: none !important;
+    border-radius: 12px;
+    height: 250px;
+    max-height: 250px;
+
+    
+}
+.profile-name-tooltip, .profile-desc-tooltip{
+    max-width: none;
+    font-size: 1.2em;
+}
+.delete-profile-name {
+    max-width: 300px;
+    overflow-wrap: break-word;
+    font-weight: 600;
+    font-style: italic;
+    font-size: 1.1em;
+}
 .relative-class {
     padding-right: 0.40rem;
     position: relative;
@@ -1934,7 +1953,7 @@ a {
 
 .upload-dialog{
     .ui-dialog-content{
-        height: 295px;
+        height: 250px;
     }
 }
 .create-bucket-dialog{
@@ -1962,6 +1981,11 @@ a {
 .create-migrate-dialog{
     .ui-dialog-content{
         height: 420px;
+    }
+}
+.restore-dialog{
+    .ui-dialog-content{
+        height: 200px;
     }
 }
 .a-upload {
@@ -2064,8 +2088,11 @@ a {
     color: #ffffff;
 }
 .ui-datatable tbody .ui-cell-data{
-    overflow: inherit !important;
+    overflow: hide !important;
     height: auto !important;
+}
+.ui-button.ui-button-icon-only{
+    padding: 0 0.12rem !important;
 }
 /* Common Overides end */
 /* Services Page Css */

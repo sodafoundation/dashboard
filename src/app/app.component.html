@@ -70,7 +70,12 @@
                     </p-header>
                     <ul class="menuGroup-list">
                         <li class="menuGroup-child" *ngFor="let child of menuItem.children">
-                            <a href="#" [routerLink]="[child.routerLink]" [ngClass]="{'active-item':child==activeItem}" (click)="menuItemClick($event, child)">
+                            <a *ngIf="!child.is_external_link" href="#" [routerLink]="[child.routerLink]" [ngClass]="{'active-item':child==activeItem}" (click)="menuItemClick($event, child)">
+                                <h1>
+                                    {{child.title}}
+                                </h1>
+                            </a>
+                            <a *ngIf="child.is_external_link" [href]="[child.link]" target="_blank" [ngClass]="{'active-item':child==activeItem}">
                                 <h1>
                                     {{child.title}}
                                 </h1>

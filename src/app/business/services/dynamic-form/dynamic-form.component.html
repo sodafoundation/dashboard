@@ -56,8 +56,8 @@
                     <p-dropdown [disabled]="noHosts && (prop.key == 'host_id')" [options]="prop.options" [required]="true" [formControlName]="prop.key" [placeholder]="prop.description ? prop.description : ''"></p-dropdown>
                     <div class="input-context-help" *ngIf="(prop.key == 'host_id')">
                         <i class="fa fa-exclamation-circle fa-2x"></i>
-                        <span *ngIf="noHosts">There are no hosts.</span><span >Would you like to add a host? </span>
-                        <a  [routerLink]="['/createHost']">Add Host</a>
+                        <span *ngIf="noHosts">There are no hosts.</span><span >Would you like to register a host? </span>
+                        <a  [routerLink]="['/registerHost']">Register Host</a>
                     </div>
                 </form-item>      
             </div>
