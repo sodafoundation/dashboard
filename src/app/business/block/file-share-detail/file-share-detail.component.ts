@@ -353,7 +353,7 @@ export class FileShareDetailComponent implements OnInit{
             this.getSnapshots(this.fromFileShareId);
             this.showCreateSnapshot = true;
             this.msgs = [];
-            this.msgs.push({severity: 'success', summary: 'Success', detail: "Fileshare snapshot will be deleted shorty."});
+            this.msgs.push({severity: 'success', summary: 'Success', detail: "Fileshare snapshot will be deleted shortly."});
         }, (err)=>{
             this.msgs = [];
             this.showCreateSnapshot = true;
@@ -364,7 +364,7 @@ export class FileShareDetailComponent implements OnInit{
         this.FileShareAclService.deleteFileShareAcl(aclId).subscribe((res)=>{
             this.getAcls();
             this.msgs = [];
-            this.msgs.push({severity: 'success', summary: 'Success', detail: "Fileshare ACL will be deleted shorty."});
+            this.msgs.push({severity: 'success', summary: 'Success', detail: "Fileshare ACL will be deleted shortly."});
         }, (err)=>{
             this.msgs = [];
             this.msgs.push({severity: 'error', summary: 'Error', detail: err.message ? err.message : err.json().message});

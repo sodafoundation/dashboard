@@ -303,6 +303,11 @@ export class FileShareComponent implements OnInit{
                     }else{
                         this.FileShareService.deleteFileShare(fileShare).subscribe(res=>{
                             this.getFileShares();
+                            this.msgs = [];
+                            this.msgs.push({severity: 'success', summary: 'Success', detail: "Fileshare will be deleted shortly."});
+                        }, (err)=>{
+                            this.msgs = [];
+                            this.msgs.push({severity: 'error', summary: 'Error', detail: err.message ? err.message : err.json().message});
                         })
                     }
                 })
