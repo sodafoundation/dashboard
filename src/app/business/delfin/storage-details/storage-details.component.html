@@ -176,6 +176,12 @@
                         <p-tabPanel header="Storage pools">
                             <app-delfin-storage-pools [selectedStorage]="selectedStorageId"></app-delfin-storage-pools>
                         </p-tabPanel>
+                        <p-tabPanel header="Controllers">
+                            <app-delfin-controllers [selectedStorage]="selectedStorageId"></app-delfin-controllers>
+                        </p-tabPanel>
+                        <p-tabPanel header="Ports">
+                            <app-delfin-ports [selectedStorage]="selectedStorageId"></app-delfin-ports>
+                        </p-tabPanel>
                         
                     </p-tabView>
                 </div>
