@@ -13,6 +13,7 @@ export class DelfinService {
     delfinStoragesUrl = Consts.API.DELFIN.storages;
     delfinStoragePoolsUrl = Consts.API.DELFIN.storagePools;
     delfinVolumesUrl = Consts.API.DELFIN.volumes;
+    delfinAlertsUrl = Consts.API.DELFIN.alerts;
     
     //register storage
     registerStorage(params){
@@ -140,7 +141,7 @@ export class DelfinService {
 
     //Get All alerts
     getAllAlerts(): Observable<any>{
-        return this.http.get(this.delfinStoragesUrl + '/alerts');
+        return this.http.get(this.delfinAlertsUrl);
     }
 
     //Get Alerts by Storage ID
