@@ -67,7 +67,7 @@
                             </div>
                         </div>
                     <div style="padding: 20px 0;">
-                        <label>Do you want to Archive this object?</label>
+                        <label>Archive object?</label>
                         <p-inputSwitch [(ngModel)]="enableArchival" onLabel="Yes" offLabel="No"></p-inputSwitch>
                     </div>
                     <form *ngIf="enableArchival" [grid]="{label: 'ui-g-3', content:'ui-g-20'}" [formGroup]="uploadForm" [errorMessage]="errorMessage">

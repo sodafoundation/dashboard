@@ -131,8 +131,8 @@ export class BucketService {
   }
 
   //Restore Object
-  restoreObject(bucketName, objectName, param?, options?){
-    let url = this.url + bucketName + "/" + objectName + "?restore"
+  restoreObject(name, param?, options?){
+    let url = this.url + name + "?restore"
     return this.http.post(url, param, options);
   }
   
