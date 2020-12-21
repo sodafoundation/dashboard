@@ -236,11 +236,23 @@ export class FileShareComponent implements OnInit{
             }
             return;
         };
-        let dataArr = value;
+        let dataArr = {
+            name: '',
+            description: ''
+        };
+
+        dataArr['name'] = value['name'];
+        dataArr['description'] = value['description'] ? value['description'] : '';
+        
         this.FileShareService.updateFileShare(this.selectedFileShare.id,dataArr).subscribe((res)=>{
             this.getFileShares();
             this.modifyFileShareShow = false;
-        })
+            this.msgs = [];
+            this.msgs.push({severity: 'success', summary: 'Success', detail: "Fileshare details updated successfully."});
+        }, (err)=>{
+            this.msgs = [];
+            this.msgs.push({severity: 'error', summary: 'Error', detail: "Fileshare could not be updated." + err.message ? err.message : err.json().message});
+        });
     }
     batchDelete(fileShare){
         if(fileShare){
@@ -305,13 +317,15 @@ export class FileShareComponent implements OnInit{
             return;
         }
         let value = this.createSnapshotForm.value;
-        value.description = value.description != "" ? value.description: "--";
+        value.description = value.description != "" ? value.description: "-";
         value.fileshareId = this.selectedFileShare.id;
         
         this.SnapshotService.createSnapshot(value).subscribe((res)=>{
             this.createSnapshotShow = false;
             this.getProfile();
             this.showCreateSnapshot = false;
+            this.msgs = [];
+            this.msgs.push({severity: 'success', summary: 'Success', detail: "Fileshare snapshot created successfully."});
         },
         err=>{
           this.msgs = [];
@@ -355,6 +369,8 @@ export class FileShareComponent implements OnInit{
         this.FileShareAclService.createFileShareAcl(param,this.selectedFileShare.id).subscribe((res)=>{
             this.getProfile();
             this.aclCreateShow = false;
+            this.msgs = [];
+            this.msgs.push({severity: 'success', summary: 'Success', detail: "Fileshare ACL created successfully."});
         },
         err=>{
           this.msgs = [];
