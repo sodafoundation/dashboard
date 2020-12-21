@@ -283,24 +283,7 @@ export class StoragesComponent implements OnInit {
         this.ds.getAllAlerts().subscribe((res)=>{
             let alertsFromAlertManager = res.json().data;
             alertsFromAlertManager.forEach(element => {
-                let alert = {
-                    'alert_id' : '',
-                    'alert_name' : '',
-                    'severity' : '',
-                    'category' : '',
-                    'type' : '',
-                    'sequence_number' : 0,
-                    'occur_time' : 0,
-                    'description' : '',
-                    'resource_type' : '',
-                    'location' : '',
-                    'storage_id' : '',
-                    'storage_name' : '',
-                    'vendor' : '',
-                    'model' : '',
-                    'serial_number' : '',
-                    'recovery_advice' : ''
-                };
+                let alert = Consts.STORAGES.alertDataModel;
                 alert.alert_id = element.alert_id;
                 alert.alert_name = element.labels.alert_name || element.labels.alertname;
                 alert.severity = element.labels.severity;
