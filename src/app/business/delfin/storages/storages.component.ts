@@ -218,33 +218,11 @@ export class StoragesComponent implements OnInit {
                 disabled:false
             },
             {
-                "label": "Configure Metric Collection",
-
-                command: () => {
-                    this.showPerfConfigDialog(this.selectStorage);
-                },
-                disabled:false
-            },
-            {
                 "label": this.i18n.keyID['sds_block_volume_delete'],
                 command: () => {
                     this.batchDeleteStorages(this.selectStorage);
                 },
                 disabled:false
-            }
-        ];
-        this.vendorOptions = [
-            {
-                label: "Dell EMC",
-                value: 'dellemc'
-            },
-            {
-                label: "Huawei",
-                value: 'huawei'
-            },
-            {
-                label: "HPE",
-                value: 'hpe'
             }
         ];
         //All Supported storage vendors

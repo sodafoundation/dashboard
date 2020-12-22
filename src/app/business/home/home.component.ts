@@ -4,7 +4,7 @@ import { ProfileService } from 'app/business/profile/profile.service';
 import { Observable } from "rxjs/Rx";
 import { I18NService ,HttpService, MsgBoxService, Consts} from 'app/shared/api';
 import { ReactiveFormsModule, FormsModule,FormControl, FormGroup, FormBuilder,Validators,ValidatorFn, AbstractControl } from '@angular/forms';
-import { MenuItem ,ConfirmationService,ConfirmDialogModule} from '../../components/common/api';
+import { MenuItem ,ConfirmationService,ConfirmDialogModule, Message} from '../../components/common/api';
 import { Router } from '@angular/router';
 import { Headers } from '@angular/http';
 import { BucketService} from '../block/buckets.service';
@@ -48,6 +48,7 @@ export class HomeComponent implements OnInit {
     cloud_type = [];
     allBackendNameForCheck=[];
     formItemCopy = [];
+    msgs: Message[];
     formItems = [
         {
             label: 'Region',
@@ -396,8 +397,12 @@ export class HomeComponent implements OnInit {
             this.modifyBackendshow = false;
             this.showRightSidebar = true;
             this.showBackends = true;
+            this.msgs = [];
+            this.msgs.push({severity: 'success', summary: 'Success', detail: 'AK/SK updated successfully.'});
         }, (error)=>{
             console.log("Something went wrong. Could not modify the AK/SK.")
+            this.msgs = [];
+            this.msgs.push({severity: 'error', summary: "Error", detail: "Could not modify the AK/SK." + error._body});
         });
     }
 
@@ -455,6 +460,11 @@ export class HomeComponent implements OnInit {
                                 this.initBackendsAndNum(backends);
                                 this.showBackendsDetail(this.selectedType);
                             });
+                            this.msgs = [];
+                            this.msgs.push({severity: 'success', summary: 'Success', detail: 'Backend has been deleted successfully.'});
+                        }, (error)=>{
+                            this.msgs = [];
+                            this.msgs.push({severity: 'error', summary: "Error", detail: "Could not delete the backend." + error._body});
                         });
                     }
                 }
@@ -510,9 +520,12 @@ export class HomeComponent implements OnInit {
                 this.initBackendsAndNum(backends);
                 this.formItemCopy = []
             });
-
+            this.msgs = [];
+            this.msgs.push({severity: 'success', summary: 'Success', detail: 'Backend has been registered successfully.'});
         },(error)=>{
-            console.log("Something went wrong. Could not register the backend.")
+            console.log("Something went wrong. Could not register the backend.", error);
+            this.msgs = [];
+            this.msgs.push({severity: 'error', summary: "Error", detail: "Backend registration failed." + error._body});
         });
     }
     showRegister(){
