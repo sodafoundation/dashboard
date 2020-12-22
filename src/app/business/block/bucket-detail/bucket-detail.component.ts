@@ -460,28 +460,31 @@ export class BucketDetailComponent implements OnInit {
     let params = {
       "days" : value.days,
       "tier" : value.tier
-    }
+    };
     window['getAkSkList'](()=>{
       let requestMethod = "POST";
       let url = '/' + this.bucketId + '/' + this.selectFileName + '?restore';
       let requestOptions: any;
       let options: any = {};
+      let contentHeaders = {
+        'Content-Type' : 'application/json',
+        'X-Amz-Content-Sha256': 'UNSIGNED-PAYLOAD'
+      };
+      requestOptions = window['getSignatureKey'](requestMethod, url, '', '', '', '', '', '', contentHeaders);
+      
       options['headers'] = new Headers();
       
-      requestOptions = window['getSignatureKey'](requestMethod, url, '', '', '', params);
-     
       options = this.BucketService.getSignatureOptions(requestOptions, options);
       
-      this.BucketService.restoreObject(this.bucketId, this.selectFileName, params, options).subscribe((res)=>{
+      this.BucketService.restoreObject(this.bucketId + '/' + this.selectFileName, params, options).subscribe((res)=>{
         this.restoreDisplay = false;
         this.restoreObjectForm.reset({
           "days" : 1
         });
         this.msgs = [];
-        this.msgs.push({severity: 'success', summary: 'Success', detail: 'Object has been retrieved successfully.'});
+        this.msgs.push({severity: 'success', summary: 'Success', detail: 'Object restoration has been initiated successfully. Object will be available for download shortly.'});
       },
       (error)=>{
-        console.log("Object could not be retrieved.", error);
         this.restoreDisplay = false;
         this.restoreObjectForm.reset({
           "days" : 1
