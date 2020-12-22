@@ -1,3 +1,4 @@
+<p-growl [value]="msgs" [sticky]="false" [life]="6000" [baseZIndex]="9999"></p-growl>
 <div class="home-font-color-class ui-home-container" >
     <div class="ui-home-backend-container">
         <div #svgCon>
@@ -133,7 +134,7 @@
     </p-footer>
 </p-dialog>
 <p-confirmDialog></p-confirmDialog>
-<p-sidebar [(visible)]="showRightSidebar" (onHide)="closeSidebar()" position="right" styleClass="home-sidebar-panel ui-sidebar-lg" [baseZIndex]="10000">
+<p-sidebar [(visible)]="showRightSidebar" (onHide)="closeSidebar()" position="right" styleClass="home-sidebar-panel ui-sidebar-lg" [autoZIndex]="true" [baseZIndex]="1000">
     <div *ngIf="showRegisterFlag" class="right-sidebar-content-wrapper">
         <div class="right-sidebar-header">
             <h1 style="font-weight:normal">Register Backend</h1>
