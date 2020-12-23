@@ -741,7 +741,8 @@ export class AppComponent implements OnInit, AfterViewInit {
                 region: region ? region : 'us-east-1',
                 body: body ? body : '',
                 headers: {
-                    'X-Auth-Token': localStorage['auth-token']
+                    'X-Auth-Token': localStorage['auth-token'],
+                    'Content-Type': headers && headers['Content-Type'] ? headers['Content-Type'] : 'application/xml'
                 }
 
             }
@@ -771,11 +772,6 @@ export class AppComponent implements OnInit, AfterViewInit {
             if(headers && headers['X-Amz-Content-Sha256'] == 'UNSIGNED-PAYLOAD'){
                 requestOptions.headers['X-Amz-Content-Sha256'] = 'UNSIGNED-PAYLOAD';
             }
-
-            if(headers && headers['Content-Type']){
-                requestOptions.headers['Content-Type'] = headers['Content-Type'];
-            }
-            
             aws4.sign(requestOptions, {
                 secretAccessKey: this.SignatureKey['secretAccessKey'],
                 accessKeyId: this.SignatureKey['AccessKey']
