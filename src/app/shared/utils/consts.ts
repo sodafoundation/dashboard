@@ -325,24 +325,6 @@ export const Consts = {
             },
             
             
-        ],
-        alertDataModel: {
-            'alert_id' : '',
-            'alert_name' : '',
-            'severity' : '',
-            'category' : '',
-            'type' : '',
-            'sequence_number' : 0,
-            'occur_time' : 0,
-            'description' : '',
-            'resource_type' : '',
-            'location' : '',
-            'storage_id' : '',
-            'storage_name' : '',
-            'vendor' : '',
-            'model' : '',
-            'serial_number' : '',
-            'recovery_advice' : ''
-        }
+        ]
     },
 }
