@@ -22,7 +22,7 @@ let _ = require("underscore");
     styleUrls: []
 })
 export class AppComponent implements OnInit, AfterViewInit {
-    selectFileName: string = '';
+    selectFileName: string;
 
     progressValue: number = 0;
     downloadProgressValue: number = 0;
@@ -307,7 +307,7 @@ export class AppComponent implements OnInit, AfterViewInit {
         window['startUpload'] = (selectFile, bucketId, uploadOptions,folderId, cb) => {
             window['isUpload'] = true;
             this.showPrompt =  true;
-            if(folderId !=""){
+            if((folderId != "") || (folderId != null )){
                 this.selectFileName= folderId + selectFile.name;
             }else{
                 this.selectFileName = selectFile.name 
@@ -362,7 +362,7 @@ export class AppComponent implements OnInit, AfterViewInit {
             let fileContent: any;
             window['getAkSkList'](()=>{
                 let requestMethod = "PUT";
-                let url = '/'+ bucketId + '/' + selectFile.name;
+                let url = '/'+ bucketId + '/' + this.selectFileName;
                 let requestOptions: any;
                 let options: any = {};
                 const reader = new FileReader();
@@ -515,11 +515,11 @@ export class AppComponent implements OnInit, AfterViewInit {
         window['segmentUpload'] = (i, chunks, blob, uploadId, options, bucketId, cb) => {
             let fileString: any;
             let chunk = blob.slice(chunks[i].start, chunks[i].end);
-            let uploadUrl = this.BucketService.url + bucketId + '/' + blob['name'];
+            let uploadUrl = this.BucketService.url + bucketId + '/' + this.selectFileName;
             window['getAkSkList'](()=>{
                 
                 let requestMethod = "PUT";
-                let url = '/'+ bucketId + '/' + blob['name'] + '?partNumber=' + (i + 1) + '&uploadId=' + uploadId;
+                let url = '/'+ bucketId + '/' + this.selectFileName + '?partNumber=' + (i + 1) + '&uploadId=' + uploadId;
                 let requestOptions: any;
                 let options: any = {};
                 const reader = new FileReader();
