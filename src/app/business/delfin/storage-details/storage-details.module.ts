@@ -6,6 +6,7 @@ import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { StorageDetailsComponent, SafePipe  } from './storage-details.component';
 import { StorageVolumesComponent } from '../volumes/volumes.component';
 import { StoragePoolsComponent } from '../storage-pools/storage-pools.component';
+import { DisksComponent } from '../disks/disks.component';
 import { HttpService } from '../../../shared/api';
 import { ProfileService } from '../../profile/profile.service';
 import { AvailabilityZonesService } from '../../resource/resource.service';
@@ -44,7 +45,7 @@ let routers = [{
     TooltipModule,
     ProgressBarModule
   ],
-  declarations: [ StorageDetailsComponent, StorageVolumesComponent, StoragePoolsComponent, SafePipe  ],
+  declarations: [ StorageDetailsComponent, StorageVolumesComponent, StoragePoolsComponent, ControllersComponent, PortsComponent, DisksComponent, SafePipe  ],
   providers: [
     HttpService,
     ProfileService,

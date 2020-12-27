@@ -13,6 +13,7 @@ export class DelfinService {
     delfinStoragesUrl = Consts.API.DELFIN.storages;
     delfinStoragePoolsUrl = Consts.API.DELFIN.storagePools;
     delfinVolumesUrl = Consts.API.DELFIN.volumes;
+    delfinDisksUrl = Consts.API.DELFIN.disks;
     delfinAlertsUrl = Consts.API.DELFIN.alerts;
     
     //register storage
@@ -124,6 +125,41 @@ export class DelfinService {
         return this.http.get(this.delfinStoragePoolsUrl+'/'+id);
     }
 
+    //get all Disks
+    getAllDisks(storageId?, diskId?, nativeDiskId?, name?, status?, limit?, offset?, sort?): Observable<any> {
+        let query = "";
+        if(storageId){
+            query += "?storage_id=" + storageId;
+        }
+        if(diskId){
+            query += "?id=" + diskId;
+        }
+        if(nativeDiskId){
+            query += "?native_port_id=" + nativeDiskId;
+        }
+        if(name){
+            query += "?name=" + name;
+        }
+        if(status){
+            query += "?status=" + status;
+        }
+        if(limit){
+            query += "?limit=" + limit;
+        }
+        if(offset){
+            query += "?offset=" + offset;
+        }
+        if(sort){
+            query += "?sort=" + sort;
+        }
+        let url =this.delfinDisksUrl + query;
+        return this.http.get(url);
+    }
+
+    //get Disk details
+    getDiskDetails(id): Observable<any> {
+        return this.http.get(this.delfinDisksUrl +'/'+id);
+    }
     //get all alert sources
     getAlertSource(id): Observable<any>{
         return this.http.get(this.delfinStoragesUrl + '/' + id + '/alert-source')
