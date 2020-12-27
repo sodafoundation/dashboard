@@ -22,7 +22,7 @@ let _ = require("underscore");
     styleUrls: []
 })
 export class AppComponent implements OnInit, AfterViewInit {
-    selectFileName: string;
+    selectFileName: string = '';
 
     progressValue: number = 0;
     downloadProgressValue: number = 0;
@@ -362,7 +362,7 @@ export class AppComponent implements OnInit, AfterViewInit {
             let fileContent: any;
             window['getAkSkList'](()=>{
                 let requestMethod = "PUT";
-                let url = '/'+ bucketId + '/' + this.selectFileName;
+                let url = '/'+ bucketId + '/' + selectFile.name;
                 let requestOptions: any;
                 let options: any = {};
                 const reader = new FileReader();
@@ -384,7 +384,7 @@ export class AppComponent implements OnInit, AfterViewInit {
                     var xhr = new XMLHttpRequest();
                     xhr.withCredentials = true;
                     xhr.open('PUT', uploadUrl, true);    
-                    //xhr.responseType = "arraybuffer";
+                    
                     xhr.setRequestHeader('Content-Type', requestOptions.headers['Content-Type']);
                     xhr.setRequestHeader('X-Auth-Token', requestOptions.headers['X-Auth-Token']);
                     xhr.setRequestHeader('X-Amz-Content-Sha256', requestOptions.headers['X-Amz-Content-Sha256']);
@@ -515,11 +515,11 @@ export class AppComponent implements OnInit, AfterViewInit {
         window['segmentUpload'] = (i, chunks, blob, uploadId, options, bucketId, cb) => {
             let fileString: any;
             let chunk = blob.slice(chunks[i].start, chunks[i].end);
-            let uploadUrl = this.BucketService.url + bucketId + '/' + this.selectFileName;
+            let uploadUrl = this.BucketService.url + bucketId + '/' + blob['name'];
             window['getAkSkList'](()=>{
                 
                 let requestMethod = "PUT";
-                let url = '/'+ bucketId + '/' + this.selectFileName + '?partNumber=' + (i + 1) + '&uploadId=' + uploadId;
+                let url = '/'+ bucketId + '/' + blob['name'] + '?partNumber=' + (i + 1) + '&uploadId=' + uploadId;
                 let requestOptions: any;
                 let options: any = {};
                 const reader = new FileReader();
