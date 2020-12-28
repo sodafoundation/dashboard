@@ -307,7 +307,7 @@ export class AppComponent implements OnInit, AfterViewInit {
         window['startUpload'] = (selectFile, bucketId, uploadOptions,folderId, cb) => {
             window['isUpload'] = true;
             this.showPrompt =  true;
-            if((folderId != "") || (folderId != null )){
+            if(folderId !== null && folderId !== ""){
                 this.selectFileName= folderId + selectFile.name;
             }else{
                 this.selectFileName = selectFile.name 
