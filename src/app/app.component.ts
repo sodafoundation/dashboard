@@ -307,7 +307,7 @@ export class AppComponent implements OnInit, AfterViewInit {
         window['startUpload'] = (selectFile, bucketId, uploadOptions,folderId, cb) => {
             window['isUpload'] = true;
             this.showPrompt =  true;
-            if(folderId !=""){
+            if(folderId !== null && folderId !== ""){
                 this.selectFileName= folderId + selectFile.name;
             }else{
                 this.selectFileName = selectFile.name 
@@ -384,7 +384,7 @@ export class AppComponent implements OnInit, AfterViewInit {
                     var xhr = new XMLHttpRequest();
                     xhr.withCredentials = true;
                     xhr.open('PUT', uploadUrl, true);    
-                    //xhr.responseType = "arraybuffer";
+                    
                     xhr.setRequestHeader('Content-Type', requestOptions.headers['Content-Type']);
                     xhr.setRequestHeader('X-Auth-Token', requestOptions.headers['X-Auth-Token']);
                     xhr.setRequestHeader('X-Amz-Content-Sha256', requestOptions.headers['X-Amz-Content-Sha256']);
