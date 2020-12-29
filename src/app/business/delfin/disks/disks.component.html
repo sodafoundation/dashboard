@@ -69,12 +69,11 @@
                             <span *ngIf="disk.status=='offline'">Offline</span>
                         </div>
                         <div class="ui-grid-col-2">
-                            {{label.created_at}}:
+                            {{label.speed}}:
                         </div>
                         <div class="ui-grid-col-3 details-basic-item-value-color" *ngIf="disk">
-                            {{disk.created_at ? (disk.created_at | date:'long') : '--'}}
+                            {{ disk.speed }}
                         </div>
-                    
                     </div>
                     <div class="ui-grid-row details-basic-item-class">
                         <div class="ui-grid-col-2">
@@ -96,10 +95,10 @@
                             </a>
                         </div>
                         <div class="ui-grid-col-2">
-                            {{label.updated_at}}:
+                            {{label.capacity}}:
                         </div>
                         <div class="ui-grid-col-3 details-basic-item-value-color" *ngIf="disk">
-                            {{disk.updated_at ? (disk.updated_at | date:'long') : '--'}}
+                            {{ disk.capacity }}
                         </div>
                         
                     </div>
@@ -166,26 +165,6 @@
                             {{ disk.health_score }}
                         </div>
                     </div>
-                    <div class="ui-grid-row details-basic-item-class">
-                        <div class="ui-grid-col-2">
-                            {{label.speed}}:
-                        </div>
-                        <div class="ui-grid-col-2 details-basic-item-value-color" *ngIf="disk">
-                            {{ disk.speed}}
-                        </div>
-                        <div class="ui-grid-col-2">
-                            {{label.capacity}}:
-                        </div>
-                        <div class="ui-grid-col-2 details-basic-item-value-color" *ngIf="disk">
-                            {{ disk.displayCapacity}}
-                        </div>
-                        <div class="ui-grid-col-2">
-                        </div>
-                        <div class="ui-grid-col-3 details-basic-item-value-color" *ngIf="disk">
-                        </div>
-                    </div>
-                    
-                    
                 </div>
             </div>
         </div>
