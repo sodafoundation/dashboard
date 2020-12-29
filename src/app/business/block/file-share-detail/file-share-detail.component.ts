@@ -306,7 +306,7 @@ export class FileShareDetailComponent implements OnInit{
             let  msg, arr = [];
             if(_.isArray(param)){
                 param.forEach((item,index)=> {
-                    arr.push(item.id);
+                    arr.push(item);
                 })
                 if(dialog == 'snapshot'){
                     msg = "<div>Are you sure you want to delete the selected Snapshots?</div><h3>[ "+ param.length +" Snapshots ]</h3>";
@@ -314,7 +314,7 @@ export class FileShareDetailComponent implements OnInit{
                     msg = "<div>Are you sure you want to delete the selected Access?</div><h3>[ "+ param.length +" Access ]</h3>";
                 }
             }else{
-                arr.push(param.id);
+                arr.push(param);
                 if(dialog == 'snapshot'){
                     msg = "<div>Are you sure you want to delete the Snapshot?</div><h3>[ "+ param.name +" ]</h3>";
                 }else if(dialog == 'acls'){
@@ -334,6 +334,7 @@ export class FileShareDetailComponent implements OnInit{
                 acceptLabel: this.i18n.keyID['sds_block_volume_delete'],
                 isWarning: true,
                 accept: ()=>{
+                    this.msgs = [];
                     if(dialog =='snapshot'){
                         arr.forEach(item => {
                             this.deleteSnapshot(item);
@@ -348,15 +349,22 @@ export class FileShareDetailComponent implements OnInit{
             })
         }
     }
-    deleteSnapshot(id){
-        this.SnapshotService.deleteSnapshot(id).subscribe((res)=>{
+    deleteSnapshot(item){
+        this.SnapshotService.deleteSnapshot(item.id).subscribe((res)=>{
             this.getSnapshots(this.fromFileShareId);
             this.showCreateSnapshot = true;
+            this.msgs.push({severity: 'success', summary: 'Success', detail: "Fileshare snapshot " + item['name'] + " will be deleted shortly."});
+        }, (err)=>{
+            this.showCreateSnapshot = true;
+            this.msgs.push({severity: 'error', summary: 'Error', detail: err.message ? err.message : err.json().message});
         })
     }
-    deleteAcls(aclId){
-        this.FileShareAclService.deleteFileShareAcl(aclId).subscribe((res)=>{
+    deleteAcls(item){
+        this.FileShareAclService.deleteFileShareAcl(item.id).subscribe((res)=>{
             this.getAcls();
+            this.msgs.push({severity: 'success', summary: 'Success', detail: "Fileshare access " + item['name'] + " with level " + item['level'] +" successfully deleted."});
+        }, (err)=>{
+            this.msgs.push({severity: 'error', summary: 'Error', detail: err.message ? err.message : err.json().message});
         })
     }
     createSnapshot(){
@@ -369,10 +377,13 @@ export class FileShareDetailComponent implements OnInit{
         }
         let value = this.createSnapshotFormGroup.value;
         value.fileshareId = this.fromFileShareId;
+        value.description = value.description != "" ? value.description: "-";
         this.SnapshotService.createSnapshot(value).subscribe((res)=>{
             this.snapshotCreateShow = false;
             this.getSnapshots(this.fromFileShareId);
             this.showCreateSnapshot = true;
+            this.msgs = [];
+            this.msgs.push({severity: 'success', summary: 'Success', detail: "Fileshare snapshot " + value['name'] + " created successfully."});
         },
         err=>{
           this.msgs = [];
@@ -394,6 +405,11 @@ export class FileShareDetailComponent implements OnInit{
         this.SnapshotService.updateSnapshot(this.selectedSnapshotObj['id'],value).subscribe((res)=>{
             this.snapshotModifyShow = false;
             this.getSnapshots(this.fromFileShareId);
+            this.msgs = [];
+            this.msgs.push({severity: 'success', summary: 'Success', detail: "Fileshare snapshot " + value['name'] + " updated successfully."});
+        }, (err)=>{
+            this.snapshotModifyShow = false;
+            this.msgs.push({severity: 'error', summary: 'Error', detail: err.message ? err.message : err.json().message});
         })
     }
     createAclsSubmit(value){
@@ -422,6 +438,8 @@ export class FileShareDetailComponent implements OnInit{
         this.FileShareAclService.createFileShareAcl(param,this.fromFileShareId).subscribe((res)=>{
             this.getAcls();
             this.aclCreateShow = false;
+            this.msgs = [];
+            this.msgs.push({severity: 'success', summary: 'Success', detail: "Fileshare access " + param['accessTo'] + " with level " + param['accessCapability'] +" created successfully."});
         },
         err=>{
           this.msgs = [];
@@ -433,6 +451,12 @@ export class FileShareDetailComponent implements OnInit{
         this.FileShareAclService.updateFileShareAcl(this.modifyAcl.id,param).subscribe((res)=>{
             this.getAcls();
             this.aclModifyShow = false;
+            this.msgs = [];
+            this.msgs.push({severity: 'success', summary: 'Success', detail: "Fileshare access " + param['accessTo'] + " with level " + param['accessCapability'] +" updated successfully."});
+        }, (err) =>{
+            this.aclModifyShow = false;
+            this.msgs = [];
+            this.msgs.push({severity: 'error', summary: 'Error', detail: err.message ? err.message : err.json().message});
         })
     }
     getErrorMessage(control,extraParam){
