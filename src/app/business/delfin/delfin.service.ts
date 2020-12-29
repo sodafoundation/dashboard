@@ -13,6 +13,8 @@ export class DelfinService {
     delfinStoragesUrl = Consts.API.DELFIN.storages;
     delfinStoragePoolsUrl = Consts.API.DELFIN.storagePools;
     delfinVolumesUrl = Consts.API.DELFIN.volumes;
+    delfinControllersUrl = Consts.API.DELFIN.controllers;
+    delfinPortsUrl = Consts.API.DELFIN.ports;
     delfinDisksUrl = Consts.API.DELFIN.disks;
     delfinAlertsUrl = Consts.API.DELFIN.alerts;
     
@@ -125,6 +127,78 @@ export class DelfinService {
         return this.http.get(this.delfinStoragePoolsUrl+'/'+id);
     }
 
+//get all Controllers
+    getAllControllers(storageId?, controllerId?, nativeControllerId?, name?, status?, limit?, offset?, sort?): Observable<any> {
+        let query = "";
+        if(storageId){
+            query += "?storage_id=" + storageId;
+        }
+        if(controllerId){
+            query += "?id=" + controllerId;
+        }
+        if(nativeControllerId){
+            query += "?native_controller_id=" + nativeControllerId;
+        }
+        if(name){
+            query += "?name=" + name;
+        }
+        if(status){
+            query += "?status=" + status;
+        }
+        if(limit){
+            query += "?limit=" + limit;
+        }
+        if(offset){
+            query += "?offset=" + offset;
+        }
+        if(sort){
+            query += "?sort=" + sort;
+        }
+        let url =this.delfinControllersUrl + query;
+        return this.http.get(url);
+    }
+
+    //get Controller details
+    getControllerDetails(id): Observable<any> {
+        return this.http.get(this.delfinControllersUrl+'/'+id);
+    }
+
+    //get all Ports
+    getAllPorts(storageId?, portId?, nativePortId?, name?, status?, limit?, offset?, sort?): Observable<any> {
+        let query = "";
+        if(storageId){
+            query += "?storage_id=" + storageId;
+        }
+        if(portId){
+            query += "?id=" + portId;
+        }
+        if(nativePortId){
+            query += "?native_port_id=" + nativePortId;
+        }
+        if(name){
+            query += "?name=" + name;
+        }
+        if(status){
+            query += "?status=" + status;
+        }
+        if(limit){
+            query += "?limit=" + limit;
+        }
+        if(offset){
+            query += "?offset=" + offset;
+        }
+        if(sort){
+            query += "?sort=" + sort;
+        }
+        let url =this.delfinPortsUrl + query;
+        return this.http.get(url);
+    }
+
+    //get Port details
+    getPortDetails(id): Observable<any> {
+        return this.http.get(this.delfinPortsUrl +'/'+id);
+    }
+
     //get all Disks
     getAllDisks(storageId?, diskId?, nativeDiskId?, name?, status?, limit?, offset?, sort?): Observable<any> {
         let query = "";
@@ -160,6 +234,7 @@ export class DelfinService {
     getDiskDetails(id): Observable<any> {
         return this.http.get(this.delfinDisksUrl +'/'+id);
     }
+  
     //get all alert sources
     getAlertSource(id): Observable<any>{
         return this.http.get(this.delfinStoragesUrl + '/' + id + '/alert-source')
