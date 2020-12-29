@@ -106,6 +106,9 @@ export const Consts = {
             'storages' : 'resource-monitor/storages',
             'storagePools' : 'resource-monitor/storage-pools',
             'volumes' : 'resource-monitor/volumes',
+            'controllers' : 'resource-monitor/controllers',
+            'ports' : 'resource-monitor/ports',
+            'disks' : 'resource-monitor/disks',
             'alerts' : 'alertmanager/alerts'
         }
     },
