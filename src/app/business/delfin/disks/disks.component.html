@@ -14,7 +14,12 @@
         <ng-template pTemplate="body" let-disk="rowData">
             <a (mouseenter)="showDiskOverview($event, disk, diskOverviewPanel)" (mouseleave)="showDiskOverview($event, disk, diskOverviewPanel)">{{disk.name}}</a>
         </ng-template>
-    </p-column>    
+    </p-column>  
+    <p-column header="Manufacturer / Model">
+        <ng-template pTemplate="body" let-disk="rowData">
+            {{disk.manufacturer}} / {{disk.model}}
+        </ng-template>
+    </p-column>  
     <p-column field="status" header="Status" [style]="{'width': '8%'}">
         <ng-template pTemplate="body" let-disk="rowData">
             <span class="storage-status-icon" [ngClass]="{normal: disk.status=='normal', abnormal: disk.status=='abnormal' || disk.status=='unknown' || disk.status=='offline'}"><i class="fa fa-circle"></i></span>
@@ -23,16 +28,26 @@
             <span *ngIf="disk.status=='offline'">Offline</span>
         </ng-template>
     </p-column>
-    <p-column field="created_at" header="Created At">
+    <p-column header="Speed">
         <ng-template pTemplate="body" let-disk="rowData">
-            <span>{{disk.created_at ? (disk.created_at | date:'long') : '--'}}</span>
+            {{disk.speed}}
         </ng-template>
     </p-column>
-    <p-column field="updated_at" header="Updated At">
+    <p-column header="Capacity">
         <ng-template pTemplate="body" let-disk="rowData">
-            <span>{{disk.updated_at ? (disk.updated_at | date:'long') : '--'}}</span>
+            {{disk.displayCapacity}}
+        </ng-template>
+    </p-column>  
+    <p-column header="Type (Physical / Logical)">
+        <ng-template pTemplate="body" let-disk="rowData">
+            {{disk.physical_type}} / {{disk.logical_type}}
         </ng-template>
     </p-column>
+    <p-column header="Health Score">
+        <ng-template pTemplate="body" let-disk="rowData">
+            {{disk.health_score}}
+        </ng-template>
+    </p-column>  
     <ng-template let-disk pTemplate="rowexpansion">
         <div class="details-basic-info">
             <div class="ui-grid ui-grid-responsive ui-grid-pad ui-fluid">
