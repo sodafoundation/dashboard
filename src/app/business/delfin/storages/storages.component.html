@@ -81,7 +81,7 @@
                     </p-header>
                     <div>
                         <p-scrollPanel [style]="{height: '300px'}" styleClass="storage-summary-panel-2">
-                            <p-dataTable [value]="allActiveAlerts" [resizableColumns]="true" [rows]="5" [paginator]="true" [pageLinks]="3" [rowsPerPageOptions]="[5,10,15]">
+                            <p-dataTable *ngIf="allActiveAlerts" [value]="allActiveAlerts" [immutable]="false" [resizableColumns]="true" [rows]="5" [paginator]="true" [pageLinks]="3" [rowsPerPageOptions]="[5,10,15]">
                                 <p-column field="alert_name" header="Alert Name" [sortable]="true" [style]="{'width': '20%'}">
                                     <ng-template pTemplate="body" let-alert="rowData">
                                         <a title="{{alert.alert_name}}">{{alert.alert_name}}</a>
@@ -96,10 +96,10 @@
                                 <p-column field="severity" header="Severity" [style]="{'width': '20%'}">
                                     <ng-template pTemplate="body" let-alert="rowData" >
                                         <div class="severity-icon">
-                                            <i *ngIf="alert.severity=='Major'" class="fa fa-exclamation major"></i>
-                                            <i *ngIf="alert.severity=='Critical'" class="fa fa-exclamation-triangle critical"></i>
-                                            <i *ngIf="alert.severity=='Fatal'" class="fa fa-times-circle fatal"></i>
-                                            <i *ngIf="alert.severity=='Informational'" class="fa fa-info-circle informational"></i>
+                                            <i *ngIf="alert.severity.toLowerCase()=='major' || alert.severity.toLowerCase()=='warning'" class="fa fa-exclamation major"></i>
+                                            <i *ngIf="alert.severity.toLowerCase()=='critical'" class="fa fa-exclamation-triangle critical"></i>
+                                            <i *ngIf="alert.severity.toLowerCase()=='fatal'" class="fa fa-times-circle fatal"></i>
+                                            <i *ngIf="alert.severity.toLowerCase()=='informational'" class="fa fa-info-circle informational"></i>
                                         </div>
                                         <div class="severity-label">
                                             {{alert.severity}}
@@ -436,21 +436,21 @@
                     </div>
                 </p-header>
                 <div>
-                    <p-dataTable [value]="allActiveAlerts" [globalFilter]="searchAll" [rows]="10" [expandableRows]="true" [paginator]="true" [pageLinks]="3" [rowsPerPageOptions]="[10,20,50,100]" [totalRecords]="totalRecords" #at>
+                    <p-dataTable *ngIf="allActiveAlerts" [value]="allActiveAlerts" [immutable]="false" [globalFilter]="searchAll" [rows]="10" [expandableRows]="true" [paginator]="true" [pageLinks]="3" [rowsPerPageOptions]="[10,20,50,100]" [totalRecords]="totalRecords" #at>
                         <p-column expander="true" styleClass="col-icon" [style]="{'width': '3%'}"></p-column>
-                        <p-column field="alert_name" header="Name" #alertName>
+                        <p-column field="alert_name" header="Name" #alertName [style]="{'width': '25%'}">
                             <ng-template pTemplate="body" let-alert="rowData">
                                 {{alert.alert_name}}
                                 
                             </ng-template>
                         </p-column>    
-                        <p-column field="severity" header="Severity">
+                        <p-column field="severity" header="Severity" [style]="{'width': '10%'}">
                             <ng-template pTemplate="body" let-alert="rowData">
                                 <div class="severity-icon">
-                                    <i *ngIf="alert.severity=='Major'" class="fa fa-exclamation major"></i>
-                                    <i *ngIf="alert.severity=='Critical'" class="fa fa-exclamation-triangle critical"></i>
-                                    <i *ngIf="alert.severity=='Fatal'" class="fa fa-times-circle fatal"></i>
-                                    <i *ngIf="alert.severity=='Informational'" class="fa fa-info-circle informational"></i>
+                                    <i *ngIf="alert.severity.toLowerCase()=='major' || alert.severity.toLowerCase()=='warning'" class="fa fa-exclamation major"></i>
+                                    <i *ngIf="alert.severity.toLowerCase()=='critical'" class="fa fa-exclamation-triangle critical"></i>
+                                    <i *ngIf="alert.severity.toLowerCase()=='fatal'" class="fa fa-times-circle fatal"></i>
+                                    <i *ngIf="alert.severity.toLowerCase()=='informational'" class="fa fa-info-circle informational"></i>
                                 </div>
                                 <div class="severity-label">
                                     {{alert.severity}}
@@ -458,8 +458,8 @@
                                 
                             </ng-template>
                         </p-column> 
-                        <p-column field="description" header="Description" [sortable]="true" [style]="{'width': '40%'}"></p-column>
-                        <p-column field="occur_time" header="Occured At">
+                        <p-column field="description" header="Description" [sortable]="true" [style]="{'width': '45%'}"></p-column>
+                        <p-column field="occur_time" header="Occured At" [style]="{'width': '17%'}">
                             <ng-template pTemplate="body" let-alert="rowData">
                                 <span>{{alert.occur_time ? (alert.occur_time | date:'long') : '--'}}</span>
                             </ng-template>
@@ -531,7 +531,7 @@
                                                 <span>Recovery Advice:</span>
                                             </div>
                                             <div class="ui-grid-col-10 details-basic-item-value-color" *ngIf="alert">
-                                                <span> {{ alert.recovery_advice}}</span>
+                                                <span> {{ alert.recovery_advice }}</span>
                                             </div>
                                         </div>
                                         
@@ -656,6 +656,39 @@
 
 </p-dialog>
 
+<p-dialog styleClass="perf-metrics-config-dialog"  header="Configure Performance Metrics Collection" [(visible)]="showperfMetricsConfigForm" [width]="700" modal="modal">
+    <form *ngIf="showperfMetricsConfigForm" [formGroup]="perfMetricsConfigForm" [grid]="{label: 'ui-g-5', content:'ui-g-7'}" [errorMessage]="errorMessage">
+       
+        <div class="ui-g">
+            <div class="ui-g-12">
+                <form-item label="{{perfMetricsConfigFormLabel.perf_collection}}" >
+                    <p-inputSwitch formControlName="perf_collection" onLabel="Yes" offLabel="No"></p-inputSwitch>
+                </form-item>
+            </div>
+        </div>
+        <div class="ui-g">
+            <div class="ui-g-12">
+                <form-item label="{{perfMetricsConfigFormLabel.interval}}">
+                    <input formControlName="interval" value="10" type="number" size="30" pInputText> 
+                </form-item>
+            </div>
+        </div>
+        <div class="ui-g">
+            <div class="ui-g-12">
+                <form-item label="{{perfMetricsConfigFormLabel.is_historic}}" >
+                    <p-inputSwitch formControlName="is_historic" onLabel="Yes" offLabel="No"></p-inputSwitch>
+
+                    <span><i pTooltip="If backend supports historic collection, enabling this will collect data periodically." tooltipPosition="right" class="fa fa-question-circle"></i></span>
+                </form-item>
+            </div>
+        </div>
+    </form>
+    <p-footer>
+        <button type="submit" class="ui-button-secondary" pButton [disabled]="perfMetricsConfigForm.invalid" (click)="configurePerformanceMetrics(perfMetricsConfigForm.value)"  label="{{i18n.keyID['ok']}}"></button>
+        <button type="button" pButton (click)="closePerfConfigDialog()"  label="{{i18n.keyID['cancel']}}"></button>
+    </p-footer>
+
+</p-dialog>
 <p-overlayPanel styleClass="overview-panel" #deviceOverviewPanel>
     <div class="ui-g overview-title">
         <h4>{{storageOverview && storageOverview.name}}</h4>

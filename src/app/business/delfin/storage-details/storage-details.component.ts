@@ -1,6 +1,7 @@
-import { Component, OnInit, ViewContainerRef, ViewChild, Directive, ElementRef, HostBinding, HostListener } from '@angular/core';
+import { Component, OnInit, ViewContainerRef, ViewChild, Directive, ElementRef, HostBinding, HostListener, PipeTransform, Pipe,  } from '@angular/core';
+import { DomSanitizer } from "@angular/platform-browser";
 import { Router, ActivatedRoute } from '@angular/router';
-import { I18NService, Utils } from 'app/shared/api';
+import { I18NService, Utils, Consts} from 'app/shared/api';
 import { FormControl, FormGroup, FormBuilder, Validators, ValidatorFn, AbstractControl } from '@angular/forms';
 import { AppService } from 'app/app.service';
 import { I18nPluralPipe } from '@angular/common';
@@ -10,6 +11,15 @@ import { DelfinService } from '../delfin.service';
 
 
 let _ = require("underscore");
+
+@Pipe({ name: 'safe' })
+export class SafePipe implements PipeTransform {
+  constructor(private sanitizer: DomSanitizer) { }
+  transform(url) {
+    return this.sanitizer.bypassSecurityTrustResourceUrl(url);
+  }
+}
+
 @Component({
     selector: 'app-delfin-storage-details',
     templateUrl: 'storage-details.component.html',
@@ -37,6 +47,9 @@ export class StorageDetailsComponent implements OnInit {
     allActiveAlerts: any = [];
     detailsTabIndex: number = 0;
     configTabIndex: number = 0;
+    perfMetricsConfigForm: any;
+    showperfMetricsConfigForm: boolean = false;
+    performanceMonitorURL: any = "";
     msgs: Message[];
 
     label = {
@@ -64,6 +77,12 @@ export class StorageDetailsComponent implements OnInit {
 
     };
 
+    perfMetricsConfigFormLabel = {
+        "perf_collection": "Enable Performance collection?",
+        "interval" : "Polling Interval (seconds)",
+        "is_historic": "Enable Historic metric collection?"
+    }
+
     constructor(
         private ActivatedRoute: ActivatedRoute,
         public i18n: I18NService,
@@ -84,14 +103,16 @@ export class StorageDetailsComponent implements OnInit {
             { 
                 label: "Storages", 
                 url: '/resource-monitor' 
-            },
-            { 
-                label: "Storage Details", 
-                url: '/storageDetails' 
             }
         ];
         this.getStorageVolumes(this.selectedStorageId);
         this.getStoragePools(this.selectedStorageId);
+        this.perfMetricsConfigForm = this.fb.group({
+            'perf_collection': new FormControl(true, Validators.required),
+            'interval': new FormControl(10, Validators.required),
+            "is_historic": new FormControl(true, Validators.required)            
+        });
+        this.performanceMonitorURL = "http://" + Consts.SODA_HOST_IP + ":" + Consts.SODA_GRAFANA_PORT + "/d/Tut2q3AMk/performance-monitor-storage-details?orgId=1&refresh=30s&var-filters=storage_id%7C%3D%7C" + this.selectedStorageId + "&kiosk";
         
     }
     changeDetailsTab(e){
@@ -432,8 +453,52 @@ export class StorageDetailsComponent implements OnInit {
     }
 
     getAllActiveAlerts(storageId){
-        this.ds.getAlertsByStorageId(storageId).subscribe((res)=>{
-            this.allActiveAlerts = res.json().alerts;
+        this.allActiveAlerts = [];
+        this.ds.getAllAlerts().subscribe((res)=>{
+            let alertsFromAlertManager = res.json().data;
+            alertsFromAlertManager.forEach(element => {
+                if(element.labels.storage_id == storageId){
+                    let alert = {
+                        'alert_id' : '',
+                        'alert_name' : '',
+                        'severity' : '',
+                        'category' : '',
+                        'type' : '',
+                        'sequence_number' : 0,
+                        'occur_time' : 0,
+                        'description' : '',
+                        'resource_type' : '',
+                        'location' : '',
+                        'storage_id' : '',
+                        'storage_name' : '',
+                        'vendor' : '',
+                        'model' : '',
+                        'serial_number' : '',
+                        'recovery_advice' : ''
+                    };
+                    alert['alert_id'] = element.labels.alert_id ? element.labels.alert_id : '';
+                    if(element.labels.alert_name){
+                        alert.alert_name = element.labels.alert_name ? element.labels.alert_name : '';
+                    } else if(element.labels.alertname){
+                        alert.alert_name = element.labels.alertname ? element.labels.alertname : '';
+                    }
+                    alert['severity'] = element.labels.severity ? element.labels.severity : 'warning';
+                    alert['category'] = element.labels.category ? element.labels.category : 'Fault';
+                    alert['type'] = element.labels.type ? element.labels.type : '';
+                    alert['occur_time'] = element.startsAt ? element.startsAt : '';
+                    alert['description'] = element.annotations.description ? element.annotations.description : '-';
+                    alert['resource_type'] = element.labels.resource_type ? element.labels.resource_type : '';
+                    alert['sequence_number'] = element.labels.sequence_number ? element.labels.sequence_number : '-';
+                    alert['location'] = element.labels.location ? element.labels.location : '-';
+                    alert['storage_id'] = element.labels.storage_id ? element.labels.storage_id : '';
+                    alert['storage_name'] = element.labels.storage_name ? element.labels.storage_name : '-';
+                    alert['vendor'] = element.labels.vendor ? element.labels.vendor : '-';
+                    alert['model'] = element.labels.model ? element.labels.model : '-';
+                    alert['serial_number'] = element.labels.serial_number ? element.labels.serial_number : element.labels.storage_sn;
+                    alert['recovery_advice'] = element.labels.recovery_advice ? element.labels.recovery_advice : '-';
+                    this.allActiveAlerts.push(alert);
+                }
+            });
         }, (error)=>{
             this.allActiveAlerts = [];
             console.log("Something went wrong. Could not fetch alerts.", error);
@@ -441,111 +506,55 @@ export class StorageDetailsComponent implements OnInit {
             let errorMsg = 'Error fetching alerts.' + error.error_msg;
             this.msgs.push({severity: 'error', summary: 'Error', detail: error});
         })
-        // FIXME ALERTS DUMMY DATA
-        /* this.allActiveAlerts.push(
-            {
-                'alert_id' : '255911',
-                'alert_name' : 'TP VV allocation failure',
-                'severity' : 'Critical',
-                'category' : 'Fault',
-                'type' : 'EquipmentAlarm',
-                'sequence_number' : 657,
-                'occur_time' : 1514140673000,
-                'description' : 'Thin provisioned VV LUN_performance_test.531 unable to allocate SD space from CPG cpg_zhu',
-                'resource_type' : 'Storage',
-                'location' : 'sw_vv:20656:LUN_performance_test.899',
-                'storage_id' : '4ec28b27-0d3d-4876-8da7-a16876ea489c',
-                'storage_name' : 'HPEDevice',
-                'vendor' : 'HPE',
-                'model' : 'HP_3PAR 8450',
-                'serial_number' : 'XXYYZZ1234'
-            },
-            {
-                'alert_id' : '255912',
-                'alert_name' : 'Storage Array Usable Free Space is less than 20%',
-                'severity' : 'Critical',
-                'category' : 'Fault',
-                'type' : 'EquipmentAlarm',
-                'sequence_number' : 658,
-                'occur_time' : 1514140673010,
-                'description' : 'Storage Array Usable Free Space is less than 20% was triggered.',
-                'resource_type' : 'Storage',
-                'location' : 'sw_vv:20656:LUN_performance_test.900',
-                'storage_id' : '4ec28b27-0d3d-4876-8da7-a16876ea479c',
-                'storage_name' : 'DellVMAX250F',
-                'vendor' : 'Dell EMC',
-                'model' : 'VMAX250F',
-                'serial_number' : 'XXYY5678'
-            },
-            {
-                'alert_id' : '255915',
-                'alert_name' : 'Pool Usable Free Space is less than 20%',
-                'severity' : 'Warning',
-                'category' : 'Fault',
-                'type' : 'EquipmentAlarm',
-                'sequence_number' : 659,
-                'occur_time' : 1514140674050,
-                'description' : 'Pool Usable Free Space is less than 20% was triggered.',
-                'resource_type' : 'Storage',
-                'location' : 'sw_vv:20656:LUN_performance_test.900',
-                'storage_id' : '4ec28b27-0d3d-4876-8da7-a16876ea479c',
-                'storage_name' : 'OceanStorV3',
-                'vendor' : 'Huawei',
-                'model' : 'OceanStor V3',
-                'serial_number' : 'XXYY9101'
-            },
-            {
-                'alert_id' : '255811',
-                'alert_name' : 'TP VV allocation failure',
-                'severity' : 'Critical',
-                'category' : 'Fault',
-                'type' : 'EquipmentAlarm',
-                'sequence_number' : 657,
-                'occur_time' : 1514140673000,
-                'description' : 'Thin provisioned VV LUN_performance_test.531 unable to allocate SD space from CPG cpg_zhu',
-                'resource_type' : 'Storage',
-                'location' : 'sw_vv:20656:LUN_performance_test.899',
-                'storage_id' : '4ec28b27-0d3d-4876-8da7-a16876ea489c',
-                'storage_name' : 'HPEDevice',
-                'vendor' : 'HPE',
-                'model' : 'HP_3PAR 8450',
-                'serial_number' : 'XXYYZZ1234'
-            },
-            {
-                'alert_id' : '255812',
-                'alert_name' : 'Storage Array Usable Free Space is less than 20%',
-                'severity' : 'Critical',
-                'category' : 'Fault',
-                'type' : 'EquipmentAlarm',
-                'sequence_number' : 658,
-                'occur_time' : 1514140673010,
-                'description' : 'Storage Array Usable Free Space is less than 20% was triggered.',
-                'resource_type' : 'Storage',
-                'location' : 'sw_vv:20656:LUN_performance_test.900',
-                'storage_id' : '4ec28b27-0d3d-4876-8da7-a16876ea479c',
-                'storage_name' : 'DellVMAX250F',
-                'vendor' : 'Dell EMC',
-                'model' : 'VMAX250F',
-                'serial_number' : 'XXYY5678'
-            },
-            {
-                'alert_id' : '255815',
-                'alert_name' : 'Pool Usable Free Space is less than 20%',
-                'severity' : 'Warning',
-                'category' : 'Fault',
-                'type' : 'EquipmentAlarm',
-                'sequence_number' : 659,
-                'occur_time' : 1514140674050,
-                'description' : 'Pool Usable Free Space is less than 20% was triggered.',
-                'resource_type' : 'Storage',
-                'location' : 'sw_vv:20656:LUN_performance_test.900',
-                'storage_id' : '4ec28b27-0d3d-4876-8da7-a16876ea479c',
-                'storage_name' : 'OceanStorV3',
-                'vendor' : 'Huawei',
-                'model' : 'OceanStor V3',
-                'serial_number' : 'XXYY9101'
+        
+    }
+    showPerfConfigDialog(){
+        
+        this.showperfMetricsConfigForm = true;
+    }
+
+    closePerfConfigDialog(){
+        this.showperfMetricsConfigForm = false;
+        this.perfMetricsConfigForm.reset({
+            'perf_collection': true,
+            'interval': 10,
+            'is_historic': true
+        });
+    }
+
+    configurePerformanceMetrics(value){
+        if(!this.perfMetricsConfigForm.valid){
+            for(let i in this.perfMetricsConfigForm.controls){
+                this.perfMetricsConfigForm.controls[i].markAsTouched();
             }
-        ); */
-        // FIXME ALERTS DUMMY DATA
+            return;
+        }
+        let perfParam = {
+            "array_polling":{
+                "perf_collection" : value['perf_collection'],
+                "interval": value['interval'],
+                "is_historic": value['is_historic']
+            }
+        }
+
+        this.ds.metricsConfig(this.selectedStorageId, perfParam).subscribe((res)=>{
+            this.showperfMetricsConfigForm=false;
+            this.msgs = [];
+            this.msgs.push({severity: 'success', summary: 'Success', detail: 'Performance metrics collection configured successfully.'});
+            this.perfMetricsConfigForm.reset({
+                'perf_collection': true,
+                'interval': 10,
+                'is_historic': true
+            });
+        }, (error) =>{
+            this.msgs = [];
+            this.msgs.push({severity: 'error', summary: "Error", detail:"Something went wrong. Performance metrics collection could not be configured."});
+            console.log("Something went wrong. Performance metrics collection could not be configured.", error);
+            this.perfMetricsConfigForm.reset({
+                'perf_collection': true,
+                'interval': 10,
+                'is_historic': true
+            });
+        })
     }
 }

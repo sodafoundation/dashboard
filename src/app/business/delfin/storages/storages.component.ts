@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewContainerRef, ViewChild, Directive, ElementRef, HostBinding, HostListener } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
-import { I18NService, Utils } from 'app/shared/api';
+import { Consts, I18NService, Utils } from 'app/shared/api';
 import { FormControl, FormGroup, FormBuilder, Validators, ValidatorFn, AbstractControl } from '@angular/forms';
 import { AppService } from 'app/app.service';
 import { I18nPluralPipe } from '@angular/common';
@@ -43,6 +43,8 @@ export class StoragesComponent implements OnInit {
     selectedAuthProtocol: any;
     privacyProtocolOptions: any;
     selectedPrivacyProtocol: any;
+    perfMetricsConfigForm: any;
+    showperfMetricsConfigForm: boolean = false;
     registerAlertSourceForm: any;
     showRegisterAlertSourceForm: boolean = false;
     v2cFields: boolean = false;
@@ -92,6 +94,12 @@ export class StoragesComponent implements OnInit {
         sync_status : "Sync Status"
 
     };
+
+    perfMetricsConfigFormLabel = {
+        "perf_collection": "Enable Performance collection?",
+        "interval" : "Polling Interval (seconds)",
+        "is_historic": "Enable Historic metric collection?"
+    }
 
     alertSourceFormlabel = {
         "version": "Version",
@@ -201,6 +209,14 @@ export class StoragesComponent implements OnInit {
                 },
                 disabled:false
             },
+	    {
+                "label": "Configure Metric Collection",
+
+                command: () => {
+                    this.showPerfConfigDialog(this.selectStorage);
+                },
+                disabled:false
+            },
             {
                 "label": this.i18n.keyID['sds_block_volume_delete'],
                 command: () => {
@@ -209,132 +225,85 @@ export class StoragesComponent implements OnInit {
                 disabled:false
             }
         ];
-        this.vendorOptions = [
-            {
-                label: "Dell EMC",
-                value: 'dellemc'
-            },
-            {
-                label: "Huawei",
-                value: 'huawei'
-            },
-            {
-                label: "HPE",
-                value: 'hpe'
-            }
-        ];
+        //All Supported storage vendors
+        this.vendorOptions = Consts.STORAGES.vendors;
 
-        this.allStorageModels = {
-            'dellemc' : [
-                {
-                    label: "VMAX",
-                    value: 'vmax'
-                }
-            ],
-            'huawei' : [
-                {
-                    label: "OceanStor",
-                    value: 'oceanstor'
-                }
-            ],
-            'hpe' : [
-                {
-                    label: "3PAR",
-                    value: '3par'
-                }
-            ]
-        };
-        this.versionOptions = [
-            {
-                label: "SNMPV2C",
-                value: 'SNMPv2c'
-            },
-            {
-              label: "SNMPV3",
-              value: 'SNMPv3'
-            }
-        ];
+        //All supported storage models based on vendors
+        this.allStorageModels = Consts.STORAGES.models;
+
+        // Alert Source Version options
+        this.versionOptions = Consts.STORAGES.alertSourceVersionOptions;
+
         // Supported security levels
         // ['authPriv', 'authNoPriv', 'noAuthnoPriv']
-        this.securityLeveloptions = [
-            {
-                label: "noAuthnoPriv",
-                value: "noAuthnoPriv"
-            },
-            {
-                label: "authNoPriv",
-                value: "authNoPriv"
-            },
-            {
-                label: "authPriv",
-                value: "authPriv"
-            }
-        ];
+        this.securityLeveloptions = Consts.STORAGES.securityLevelOptions;
+
         // Supported Auth Protocols
         //['HMACSHA', 'HMACMD5', 'HMCSHA2224', 'HMCSHA2256', 'HMCSHA2384', 'HMCSHA2512']
-        this.authProtocolOptions = [
-            {
-                label: "HMACSHA",
-                value: "HMACSHA"
-            },
-            {
-                label: "HMACMD5",
-                value: "HMACMD5"
-            },
-            {
-                label: "HMCSHA2224",
-                value: "HMCSHA2224"
-            },
-            {
-                label: "HMCSHA2256",
-                value: "HMCSHA2256"
-            },
-            {
-                label: "HMCSHA2384",
-                value: "HMCSHA2384"
-            },
-            {
-                label: "HMCSHA2512",
-                value: "HMCSHA2512"
-            }
+        this.authProtocolOptions = Consts.STORAGES.authProtocolOptions;
         
-        ];
         //Supported Types
         //['DES', 'AES', 'AES192', 'AES256', '3DES']
-        this.privacyProtocolOptions = [
-            {
-                label: "DES",
-                value: "DES"
-            },
-            {
-                label: "AES",
-                value: "AES"
-            },
-            {
-                label: "AES192",
-                value: "AES192"
-            },
-            {
-                label: "AES256",
-                value: "AES256"
-            },
-            {
-                label: "3DES",
-                value: "3DES"
-            },
-            
-            
-        ];
+        this.privacyProtocolOptions = Consts.STORAGES.privacyProtocolOptions;
 
         this.registerAlertSourceForm = this.fb.group({});
+        this.perfMetricsConfigForm = this.fb.group({
+            'perf_collection': new FormControl(true, Validators.required),
+            'interval': new FormControl(10, Validators.required),
+            "is_historic": new FormControl(true, Validators.required)            
+        });
            
     }
     updateAccessInfo(storage){
         this.router.navigate(['/modifyStorage', storage['id']]);
     }
     getAllActiveAlerts(){
+        this.allActiveAlerts = [];
         this.ds.getAllAlerts().subscribe((res)=>{
-            this.allActiveAlerts = res.json().alerts;
+            let alertsFromAlertManager = res.json().data;
+            let alertsArr = [];
+            alertsFromAlertManager.forEach((element) => {
+                let alert = {
+                    'alert_id' : '',
+                    'alert_name' : '',
+                    'severity' : '',
+                    'category' : '',
+                    'type' : '',
+                    'sequence_number' : 0,
+                    'occur_time' : 0,
+                    'description' : '',
+                    'resource_type' : '',
+                    'location' : '',
+                    'storage_id' : '',
+                    'storage_name' : '',
+                    'vendor' : '',
+                    'model' : '',
+                    'serial_number' : '',
+                    'recovery_advice' : ''
+                };
+                alert['alert_id'] = element.labels.alert_id ? element.labels.alert_id : '';
+                if(element.labels.alert_name){
+                    alert.alert_name = element.labels.alert_name ? element.labels.alert_name : '';
+                } else if(element.labels.alertname){
+                    alert.alert_name = element.labels.alertname ? element.labels.alertname : '';
+                }
+                alert['severity'] = element.labels.severity ? element.labels.severity : 'warning';
+                alert['category'] = element.labels.category ? element.labels.category : 'Fault';
+                alert['type'] = element.labels.type ? element.labels.type : '';
+                alert['occur_time'] = element.startsAt ? element.startsAt : '';
+                alert['description'] = element.annotations.description ? element.annotations.description : '-';
+                alert['resource_type'] = element.labels.resource_type ? element.labels.resource_type : '';
+                alert['sequence_number'] = element.labels.sequence_number ? element.labels.sequence_number : '-';
+                alert['location'] = element.labels.location ? element.labels.location : '-';
+                alert['storage_id'] = element.labels.storage_id ? element.labels.storage_id : '';
+                alert['storage_name'] = element.labels.storage_name ? element.labels.storage_name : '-';
+                alert['vendor'] = element.labels.vendor ? element.labels.vendor : '-';
+                alert['model'] = element.labels.model ? element.labels.model : '-';
+                alert['serial_number'] = element.labels.serial_number ? element.labels.serial_number : element.labels.storage_sn;
+                alert['recovery_advice'] = element.labels.recovery_advice ? element.labels.recovery_advice : '-';
+                alertsArr.push(alert);
+            });
+            this.allActiveAlerts = alertsArr;
         }, (error)=>{
             this.allActiveAlerts = [];
             console.log("Something went wrong. Could not fetch alerts.", error);
@@ -376,13 +345,7 @@ export class StoragesComponent implements OnInit {
                 let pools = [];
                 let alerts = [];
 
-                //Get all Alerts for the storage
-                this.ds.getAlertsByStorageId(element['id']).subscribe((res)=>{
-                    alerts = res.json().alerts;
-                    element['alerts'] = alerts;
-                }, (error)=>{
-                    console.log("Something went wrong. Could not fetch Alerts for storage.", error)
-                });
+                
 
                 // Get all the Storage pools associated with the Storage device
                 this.ds.getAllStoragePools(element['id']).subscribe((res)=>{
@@ -736,6 +699,14 @@ export class StoragesComponent implements OnInit {
                     disabled:false
                 },
                 {
+                    "label": "Configure Metric Collection",
+    
+                    command: () => {
+                        this.showPerfConfigDialog(node['details']);
+                    },
+                    disabled:false
+                },
+                {
                     "label": this.i18n.keyID['sds_block_volume_delete'],
                     command: () => {
                         this.batchDeleteStorages(node['details']);
@@ -758,7 +729,7 @@ export class StoragesComponent implements OnInit {
 
     refreshAllLists(){
         this.getAllStorages();
-
+        this.getAllActiveAlerts();
     }
 
     syncAllStorageDevices(){
@@ -926,6 +897,56 @@ export class StoragesComponent implements OnInit {
         }
         
     }
+    
+    showPerfConfigDialog(storage){
+        this.selectedStorageId = storage['id'];
+        this.showperfMetricsConfigForm = true;
+    }
+
+    closePerfConfigDialog(){
+        this.showperfMetricsConfigForm = false;
+        this.perfMetricsConfigForm.reset({
+            'perf_collection': true,
+            'interval': 10,
+            'is_historic': true
+        });
+    }
+
+    configurePerformanceMetrics(value){
+        if(!this.perfMetricsConfigForm.valid){
+            for(let i in this.perfMetricsConfigForm.controls){
+                this.perfMetricsConfigForm.controls[i].markAsTouched();
+            }
+            return;
+        }
+        let perfParam = {
+            "array_polling":{
+                "perf_collection" : value['perf_collection'],
+                "interval": value['interval'],
+                "is_historic": value['is_historic']
+            }
+        }
+
+        this.ds.metricsConfig(this.selectedStorageId, perfParam).subscribe((res)=>{
+            this.showperfMetricsConfigForm=false;
+            this.msgs = [];
+            this.msgs.push({severity: 'success', summary: 'Success', detail: 'Performance metrics collection configured successfully.'});
+            this.perfMetricsConfigForm.reset({
+                'perf_collection': true,
+                'interval': 10,
+                'is_historic': true
+            });
+        }, (error) =>{
+            this.msgs = [];
+            this.msgs.push({severity: 'error', summary: "Error", detail:"Something went wrong. Performance metrics collection could not be configured."});
+            console.log("Something went wrong. Performance metrics collection could not be configured.", error);
+            this.perfMetricsConfigForm.reset({
+                'perf_collection': true,
+                'interval': 10,
+                'is_historic': true
+            });
+        })
+    }
 
     showAlertSourceDialog(storage){
         this.registerAlertSourceForm.addControl('version', this.fb.control(this.selectedAlertSource && this.selectedAlertSource['version'] ? this.selectedAlertSource['version'] : '', Validators.required))
@@ -1074,8 +1095,8 @@ export class StoragesComponent implements OnInit {
             this.msgs.push({severity: 'success', summary: 'Success', detail: 'Alert source registered successfully.'});
         }, (error) =>{
             this.msgs = [];
-            this.msgs.push({severity: 'error', summary: "Error", detail:"Something went wrong. Alert source could not be registered."});
-            console.log("Something went wrong. Alert source could not be registered.", error);
+            this.msgs.push({severity: 'error', summary: "Error", detail:"Something went wrong. Alert source could not be registered. \n" + error.json().error_msg});
+            console.log("Something went wrong. Alert source could not be registered.", error.json().error_msg);
         })
     }
 

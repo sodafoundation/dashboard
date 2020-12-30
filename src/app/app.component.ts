@@ -175,6 +175,15 @@ export class AppComponent implements OnInit, AfterViewInit {
                     "title" : "Storage Summary",
                     "routerLink": "/resource-monitor"
                 },
+                {
+                    "title" : "Performance Monitor",
+                    "routerLink": "/performance-monitor"                    
+                },
+                {
+                    "title" : "Alert Manager",
+                    "is_external_link" : true,
+                    "link" : "http://" + Consts.SODA_HOST_IP + ":" + Consts.SODA_ALERTMANAGER_PORT
+                },
             ]
         },
 	    {
@@ -295,10 +304,10 @@ export class AppComponent implements OnInit, AfterViewInit {
         window['downloadProgress'] = (value) =>{
             this.downloadProgressValue = value;
         }
-        window['startUpload'] = (selectFile, bucketId, options,folderId, cb) => {
+        window['startUpload'] = (selectFile, bucketId, uploadOptions,folderId, cb) => {
             window['isUpload'] = true;
             this.showPrompt =  true;
-            if(folderId !=""){
+            if(folderId !== null && folderId !== ""){
                 this.selectFileName= folderId + selectFile.name;
             }else{
                 this.selectFileName = selectFile.name 
@@ -315,6 +324,9 @@ export class AppComponent implements OnInit, AfterViewInit {
                     let contentHeaders = {
                         'X-Amz-Content-Sha256': 'UNSIGNED-PAYLOAD'
                     };
+                    if(uploadOptions['headers'] && uploadOptions['headers']['X-Amz-Storage-Class']){
+                        contentHeaders['X-Amz-Storage-Class'] = uploadOptions['headers']['X-Amz-Storage-Class'];
+                    }
                     requestOptions = window['getSignatureKey'](requestMethod, url, '', '', '', '', '', '', contentHeaders) ;
                     options['headers'] = new Headers();
                     options = this.BucketService.getSignatureOptions(requestOptions, options);
@@ -341,11 +353,11 @@ export class AppComponent implements OnInit, AfterViewInit {
                     });  
                 })
             } else {
-                window['singleUpload'](selectFile, bucketId, options, uploadUrl, cb);
+                window['singleUpload'](selectFile, bucketId, uploadOptions, uploadUrl, cb);
             }
         }
         
-        window['singleUpload'] = (selectFile, bucketId, options, uploadUrl, cb) => {
+        window['singleUpload'] = (selectFile, bucketId, uploadOptions, uploadUrl, cb) => {
             let fileString: any;
             let fileContent: any;
             window['getAkSkList'](()=>{
@@ -362,6 +374,9 @@ export class AppComponent implements OnInit, AfterViewInit {
                         'Content-Type' : selectFile.type,
                         'X-Amz-Content-Sha256': 'UNSIGNED-PAYLOAD'
                     };
+                    if(uploadOptions['headers'] && uploadOptions['headers'].get('X-Amz-Storage-Class')){
+                        contentHeaders['X-Amz-Storage-Class'] = uploadOptions['headers'].get('X-Amz-Storage-Class');
+                    }
                     requestOptions = window['getSignatureKey'](requestMethod, url, '', '', '', '', '', '', contentHeaders) ;
                     options['headers'] = new Headers();
                     options = this.BucketService.getSignatureOptions(requestOptions, options);
@@ -369,29 +384,59 @@ export class AppComponent implements OnInit, AfterViewInit {
                     var xhr = new XMLHttpRequest();
                     xhr.withCredentials = true;
                     xhr.open('PUT', uploadUrl, true);    
-                    //xhr.responseType = "arraybuffer";
+                    
                     xhr.setRequestHeader('Content-Type', requestOptions.headers['Content-Type']);
                     xhr.setRequestHeader('X-Auth-Token', requestOptions.headers['X-Auth-Token']);
                     xhr.setRequestHeader('X-Amz-Content-Sha256', requestOptions.headers['X-Amz-Content-Sha256']);
                     xhr.setRequestHeader('X-Amz-Date', requestOptions.headers['X-Amz-Date']);
                     xhr.setRequestHeader('Authorization', requestOptions.headers['Authorization']);
-
+                    if(requestOptions.headers['X-Amz-Storage-Class']){
+                        xhr.setRequestHeader('X-Amz-Storage-Class', requestOptions.headers['X-Amz-Storage-Class']);
+                    }
                     xhr.onload = function () {
                         if(xhr.status == 200) {
                             self.showPrompt = false;
                             window['isUpload'] = false;
                             self.msg.success("Upload file ["+ selectFile.name +"] successfully.");
+                            if(requestOptions.headers['X-Amz-Storage-Class']){
+                                self.msg.success("File ["+ selectFile.name +"] successfully archived.");
+                            }
                             if (cb) {
                                 cb();
                             }
                             uploadNum = 0;
                             self.progressValue = 0;
                         } else {
+                            let errMessage = {
+                                header: '',
+                                content: ''
+                            };
                             self.showPrompt = false;
                             uploadNum = 0;
                             self.progressValue = 0;
                             window['isUpload'] = false;
-                            self.msg.error("Upload failed. The network may be unstable. Please try again later.");
+                            let x2js = new X2JS();
+                            let jsonObj = x2js.xml_str2json(xhr.responseText);
+                            if(jsonObj.Error && jsonObj.Error.Code){
+                                errMessage['header'] = jsonObj.Error.Code;
+                                errMessage['content'] = jsonObj.Error.Message;
+                            } else{
+                                errMessage.content="Upload failed. The network may be unstable. Please try again later.";
+                            }
+                            
+                            if(requestOptions.headers['X-Amz-Storage-Class']){
+                                errMessage.content+=". File ["+ selectFile.name +"] could not be archived."
+                                self.msg.error(errMessage);
+                                if (cb) {
+                                    cb();
+                                }
+                            } else{
+                                errMessage.content+=". File ["+ selectFile.name +"] could not be uploaded."
+                                self.msg.error(errMessage);
+                                if (cb) {
+                                    cb();
+                                }
+                            }
                         }
                     };
                     xhr.upload.onprogress = function(e){
@@ -401,18 +446,39 @@ export class AppComponent implements OnInit, AfterViewInit {
                     }
 
                     xhr.onerror = (err)=>{
-                        console.log(err);
                         if(uploadNum < 5){
                             window['singleUpload'](selectFile, bucketId, options, uploadUrl, cb);
                             uploadNum++;
                         }else{
-                            this.showPrompt = false;
+                            let errMessage = {
+                                header: '',
+                                content: ''
+                            };
+                            self.showPrompt = false;
                             uploadNum = 0;
-                            console.log(err);
+                            self.progressValue = 0;
                             window['isUpload'] = false;
-                            this.msg.error("Upload failed. The network may be unstable. Please try again later.");
-                            if (cb) {
-                                cb();
+                            let x2js = new X2JS();
+                            let jsonObj = x2js.xml_str2json(xhr.responseText);
+                            if(jsonObj.Error && jsonObj.Error.Code){
+                                errMessage['header'] = jsonObj.Error.Code;
+                                errMessage['content'] = jsonObj.Error.Message;
+                            } else{
+                                errMessage.content="Upload failed. The network may be unstable. Please try again later.";
+                            }
+                            
+                            if(requestOptions.headers['X-Amz-Storage-Class']){
+                                errMessage.content+=". File ["+ selectFile.name +"] could not be archived."
+                                self.msg.error(errMessage);
+                                if (cb) {
+                                    cb();
+                                }
+                            } else{
+                                errMessage.content+=". File ["+ selectFile.name +"] could not be uploaded."
+                                self.msg.error(errMessage);
+                                if (cb) {
+                                    cb();
+                                }
                             }
                         }
                     }
@@ -672,7 +738,7 @@ export class AppComponent implements OnInit, AfterViewInit {
                 method: method,
                 path: canonicalUri,
                 service: service ? service : 's3',
-                region: region ? region : 'ap-south-1',
+                region: region ? region : 'us-east-1',
                 body: body ? body : '',
                 headers: {
                     'X-Auth-Token': localStorage['auth-token'],
@@ -680,7 +746,9 @@ export class AppComponent implements OnInit, AfterViewInit {
                 }
 
             }
-
+            if(region){
+                requestOptions['region'] = region;
+            }
             /****** 
             ToDo: 
             Currently we are checking for the known headers in our API requests and adding them to the signature generation. 
@@ -697,6 +765,9 @@ export class AppComponent implements OnInit, AfterViewInit {
             if(headers && headers['x-amz-copy-source']){
                 requestOptions.headers['x-amz-copy-source'] = headers['x-amz-copy-source'];
             }
+            if(headers && headers['X-Amz-Storage-Class']){
+                requestOptions.headers['X-Amz-Storage-Class'] = headers['X-Amz-Storage-Class'];
+            }
             
             if(headers && headers['X-Amz-Content-Sha256'] == 'UNSIGNED-PAYLOAD'){
                 requestOptions.headers['X-Amz-Content-Sha256'] = 'UNSIGNED-PAYLOAD';
@@ -707,6 +778,11 @@ export class AppComponent implements OnInit, AfterViewInit {
             })
             return requestOptions;
     	}
+    }
+
+
+    openAlertsManager(){
+        window.open("http://" + Consts.SODA_HOST_IP + ":" + Consts.SODA_ALERTMANAGER_PORT + "/#/alerts", "_blank")
     }
     confirmDialog([msg,header,acceptLabel,warning]){
         this.confirmationService.confirm({
