@@ -16,7 +16,7 @@
             <a (mouseenter)="showControllerOverview($event, controller, controllerOverviewPanel)" (mouseleave)="showControllerOverview($event, controller, controllerOverviewPanel)">{{controller.name}}</a>
         </ng-template>
     </p-column>    
-    <p-column field="status" header="Status" [style]="{'width': '8%'}">
+    <p-column field="status" header="Status">
         <ng-template pTemplate="body" let-controller="rowData">
             <span class="storage-status-icon" [ngClass]="{normal: controller.status=='normal', abnormal: controller.status=='abnormal' || controller.status=='unknown' || controller.status=='offline'}"><i class="fa fa-circle"></i></span>
             <span *ngIf="controller.status=='normal'">Normal</span>
@@ -24,14 +24,11 @@
             <span *ngIf="controller.status=='offline'">Offline</span>
         </ng-template>
     </p-column>
-    <p-column field="created_at" header="Created At">
-        <ng-template pTemplate="body" let-controller="rowData">
-            <span>{{controller.created_at ? (controller.created_at | date:'long') : '--'}}</span>
-        </ng-template>
+    <p-column field="cpu_info" header="CPU Info">
     </p-column>
-    <p-column field="updated_at" header="Updated At">
+    <p-column header="Memory Size">
         <ng-template pTemplate="body" let-controller="rowData">
-            <span>{{controller.updated_at ? (controller.updated_at | date:'long') : '--'}}</span>
+            {{controller.displayMemory}}
         </ng-template>
     </p-column>
     <ng-template let-controller pTemplate="rowexpansion">
@@ -55,10 +52,10 @@
                             <span *ngIf="controller.status=='offline'">Offline</span>
                         </div>
                         <div class="ui-grid-col-2">
-                            {{label.created_at}}:
+                            {{label.location}}:
                         </div>
                         <div class="ui-grid-col-3 details-basic-item-value-color" *ngIf="controller">
-                            {{controller.created_at ? (controller.created_at | date:'long') : '--'}}
+                            {{controller.location ? controller.location : '--'}}
                         </div>
                     
                     </div>
@@ -82,54 +79,35 @@
                             </a>
                         </div>
                         <div class="ui-grid-col-2">
-                            {{label.updated_at}}:
+                            {{label.storage_id}}:
                         </div>
                         <div class="ui-grid-col-3 details-basic-item-value-color" *ngIf="controller">
-                            {{controller.updated_at ? (controller.updated_at | date:'long') : '--'}}
+                            {{controller.storage_id | slice:0:20}}
+                            <a *ngIf="controller.storage_id.length > 20" pTooltip="{{controller.storage_id}}" tooltipPosition="top">
+                                ...
+                            </a>
                         </div>
                         
                     </div>
                     <div class="ui-grid-row details-basic-item-class">
-                            <div class="ui-grid-col-2">
-                                {{label.storage_id}}:
-                            </div>
-                            <div class="ui-grid-col-2 details-basic-item-value-color" *ngIf="controller">
-                                {{controller.storage_id | slice:0:20}}
-                                <a *ngIf="controller.storage_id.length > 20" pTooltip="{{controller.storage_id}}" tooltipPosition="top">
-                                    ...
-                                </a>
-                            </div>
                             <div class="ui-grid-col-2">
                                 {{label.cpu_info}}:
                             </div>
                             <div class="ui-grid-col-2 details-basic-item-value-color" *ngIf="controller">
                                 {{controller.cpu_info ? controller.cpu_info : '--'}}
                             </div>
-                            
                             <div class="ui-grid-col-2">
-                                {{label.soft_version}}:
+                                {{label.soft_version}}:  
+                            </div>
+                            <div class="ui-grid-col-2 details-basic-item-value-color" *ngIf="controller">
+                                {{controller.soft_version ? controller.soft_version : '--'}}           
+                            </div>
+                            <div class="ui-grid-col-2">
+                                {{label.memory_size}}:
                             </div>
                             <div class="ui-grid-col-3 details-basic-item-value-color" *ngIf="controller">
-                                {{controller.soft_version ? controller.soft_version : '--'}}
+                                {{controller.displayMemory ? controller.displayMemory : '--'}}
                             </div>
-                    </div>
-                    <div class="ui-grid-row details-basic-item-class">
-                        <div class="ui-grid-col-2">
-                            {{label.location}}:
-                        </div>
-                        <div class="ui-grid-col-2 details-basic-item-value-color" *ngIf="controller">
-                            {{controller.location ? controller.location : '--'}}
-                        </div>
-                        <div class="ui-grid-col-2">
-                            {{label.memory_size}}:
-                        </div>
-                        <div class="ui-grid-col-2 details-basic-item-value-color" *ngIf="controller">
-                            {{controller.displayMemory ? controller.displayMemory : '--'}}
-                        </div>
-                        <div class="ui-grid-col-2">
-                        </div>
-                        <div class="ui-grid-col-3 details-basic-item-value-color" *ngIf="controller">
-                        </div>
                     </div>
                 </div>
             </div>
