@@ -67,6 +67,7 @@ export class BucketDetailComponent implements OnInit {
   copySelectedDir = [];
   msgs: Message[];
   allBackends: any[];
+  archivalEnabled: any = {};
   errorMessage = {
     "backend_type": { required: "Type is required." },
     "backend": { required: "Backend is required." },
@@ -117,7 +118,7 @@ export class BucketDetailComponent implements OnInit {
       "name": ["",{validators:[Validators.required,Utils.isExisted(this.allFolderNameForCheck),Validators.pattern(this.validRule.name)], updateOn:'change'}]
     });
     this.uploadForm = this.fb.group({
-        "archive_tier":["",{validators:[Validators.required], updateOn:'change'}]
+        "archive_tier":[""]
     });
     this.restoreObjectForm = this.fb.group({
       "days":[1,{validators:[Validators.required], updateOn:'change'}],
@@ -150,6 +151,9 @@ export class BucketDetailComponent implements OnInit {
         this.allBackends.forEach(element => {
             if(element['name'] == this.bucketBackend){
               this.bucketBackendType = element['type'];
+              if(this.bucketBackendType=='aws-s3'){
+                this.archivalEnabled[this.bucketBackendType] = true;
+              }
             }
         });
     });
@@ -548,9 +552,21 @@ export class BucketDetailComponent implements OnInit {
     }
   }
 
+  archivalControl(e){
+    if(e.checked){
+      this.uploadForm.controls['archive_tier'].setValidators([Validators.required]);
+      this.uploadForm.controls['archive_tier'].updateValueAndValidity();
+    } else{
+      this.uploadForm.controls['archive_tier'].setValidators([]);
+      this.uploadForm.controls['archive_tier'].updateValueAndValidity();
+    }
+  }
+
   cancelUpload(){
     this.uploadDisplay = false;
     this.enableArchival = false;
+    this.uploadForm.controls['archive_tier'].setValidators([]);
+    this.uploadForm.controls['archive_tier'].updateValueAndValidity();
     this.uploadForm.reset();
   }
   downloadFile(file) {
