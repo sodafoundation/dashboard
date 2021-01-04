@@ -181,6 +181,15 @@ export const Consts = {
                         ssh: false,
                         extra: true
                     }
+                },
+                {
+                    label: "Unity",
+                    value: {
+                        name: 'unity',
+                        rest: true,
+                        ssh: false,
+                        extra: false
+                    }
                 }
             ],
             'huawei' : [
