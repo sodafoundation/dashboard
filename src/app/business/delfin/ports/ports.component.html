@@ -196,10 +196,10 @@
             <span class="overview-item-label">Connection Status: </span>
         </div>
         <div *ngIf="portOverview" class="ui-g-6">
-            <span class="storage-status-icon" [ngClass]="{normal:  portOverview && portOverview.connection_status =='normal', abnormal: portOverview && portOverview.connection_status =='abnormal' || portOverview.connection_status =='unknown'}"><i class="fa fa-circle"></i></span>
-            <span *ngIf="portOverview && portOverview.connection_status=='normal'">Normal</span>
-            <span *ngIf=" portOverview && portOverview.connection_status=='abnormal' || portOverview.connection_status=='unknown'">Unknown</span>
-            <span *ngIf=" portOverview && portOverview.connection_status=='offline'">Offline</span>
+            <span class="storage-status-icon" [ngClass]="{normal: portOverview.connection_status=='connected', abnormal: portOverview.connection_status=='unknown' || portOverview.connection_status=='disconnected'}"><i class="fa fa-circle"></i></span>
+            <span *ngIf="portOverview.connection_status=='connected'">Connected</span>
+            <span *ngIf="portOverview.connection_status=='disconnected'">Disconnected</span>
+            <span *ngIf="portOverview.connection_status=='unknown'">Unknown</span>
         </div>
     </div>
     <div class="ui-g overview-item">

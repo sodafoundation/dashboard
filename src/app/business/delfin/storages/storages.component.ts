@@ -61,6 +61,9 @@ export class StoragesComponent implements OnInit {
     modelOverview;
     volumeOverview;
     poolOverview;
+    controllerOverview;
+    portOverview;
+    diskOverview;
     parentOverview;
     groupedByVendor;
     totalArrayRawCapacity: any;
@@ -341,11 +344,14 @@ export class StoragesComponent implements OnInit {
                 
                 element['volumes'] = [];
                 element['storagePools'] = [];
+                element['controllers'] = [];
+                element['ports'] = [];
+                element['disks'] = [];
                 let vols = [];
                 let pools = [];
-                let alerts = [];
-
-                
+                let controllers = [];
+                let ports = [];
+                let disks = [];
 
                 // Get all the Storage pools associated with the Storage device
                 this.ds.getAllStoragePools(element['id']).subscribe((res)=>{
@@ -363,8 +369,30 @@ export class StoragesComponent implements OnInit {
                     console.log("Something went wrong. Could not fetch Volumes.", error)
                 });
 
+                // Get all the Controllers associated with the Storage device
+                this.ds.getAllControllers(element['id']).subscribe((res)=>{
+                    controllers = res.json().controllers;
+                    element['controllers'] = controllers;
+                }, (error)=>{
+                    console.log("Something went wrong. Could not fetch Controllers.", error)
+                });
+
+                // Get all the Ports associated with the Storage device
+                this.ds.getAllPorts(element['id']).subscribe((res)=>{
+                    ports = res.json().ports;
+                    element['ports'] = ports;
+                }, (error)=>{
+                    console.log("Something went wrong. Could not fetch Ports.", error)
+                });
                 
-                
+                // Get all the Disks associated with the Storage device
+                this.ds.getAllDisks(element['id']).subscribe((res)=>{
+                    disks = res.json().disks;
+                    element['disks'] = disks;
+                }, (error)=>{
+                    console.log("Something went wrong. Could not fetch Disks.", error)
+                });
+
                 let capData = {
                     labels: ['Used','Free'],
                     datasets: [
@@ -390,6 +418,9 @@ export class StoragesComponent implements OnInit {
                 element['chartOptions'] = opt;
                 element['volumes'] = vols;
                 element['storagePools'] = pools;
+                element['controllers'] = controllers;
+                element['ports'] = ports;
+                element['disks'] = disks;
             });
 
             // Invoke prepareTree() to prepare the tree structure for the widget
@@ -544,6 +575,48 @@ export class StoragesComponent implements OnInit {
                                 modelTreeNode['children'].push(parentPoolNode);
                             }
 
+                            // Create the Controller parent Node
+                            let parentControllerNode = {};
+                            if(storageDevice['controllers']){
+                                parentControllerNode = {
+                                    label : "Controllers",
+                                    collapsedIcon: 'fa-microchip',
+                                    expandedIcon: 'fa-microchip',
+                                    styleClass: 'controller-parent-node',
+                                    type: 'controllerParent',
+                                    leaf: false
+                                }
+                                modelTreeNode['children'].push(parentControllerNode);
+                            }
+
+                            // Create the Port parent Node
+                            let parentPortNode = {};
+                            if(storageDevice['ports']){
+                                parentPortNode = {
+                                    label : "ports",
+                                    collapsedIcon: 'fa-plug',
+                                    expandedIcon: 'fa-plug',
+                                    styleClass: 'port-parent-node',
+                                    type: 'portParent',
+                                    leaf: false
+                                }
+                                modelTreeNode['children'].push(parentPortNode);
+                            }
+
+                            // Create the Port parent Node
+                            let parentDiskNode = {};
+                            if(storageDevice['disks']){
+                                parentDiskNode = {
+                                    label : "Disks",
+                                    collapsedIcon: 'fa-floppy-o',
+                                    expandedIcon: 'fa-floppy-o',
+                                    styleClass: 'disk-parent-node',
+                                    type: 'diskParent',
+                                    leaf: false
+                                }
+                                modelTreeNode['children'].push(parentDiskNode);
+                            }
+
                             // Push each storage device as a child of the model node
                             modelGroupNode['children'].push(modelTreeNode);
                         });
@@ -622,8 +695,8 @@ export class StoragesComponent implements OnInit {
                 } else if(devChild['type']=='poolParent'){
                     devChild['children'] = [];
 
-                    // If Volume parent then iterate through all volumes and calculate the capacities and stats for 
-                    // each volume parent and volume node
+                    // If pool parent then iterate through all storage pools and calculate the capacities and stats for 
+                    // each pool parent and pool node
 
                     if(device['details'].storagePools && device['details'].storagePools.length){
                         let poolChildNode ={};
@@ -658,6 +731,66 @@ export class StoragesComponent implements OnInit {
                         devChild['details'].displayFree = Utils.formatBytes(devChild['details'].totalFreeCapacity);
                         devChild['details'].displayUsed = Utils.formatBytes(devChild['details'].totalUsedCapacity);
                         devChild['label'] = "Storage Pools " + "(" + devChild['children'].length + ")";
+                    }
+                } else if(devChild['type']=='controllerParent'){
+                    devChild['children']=[];
+
+                    if(device['details'].controllers && device['details'].controllers.length){
+                        let controllerChildNode = {};
+                        _.each(device['details'].controllers, function(controllerItem){
+
+                            controllerItem['displayMemory'] = Utils.formatBytes(controllerItem['memory_size']);
+                            controllerChildNode = {
+                                label: controllerItem['name'],
+                                collapsedIcon: 'fa-microchip',
+                                expandedIcon: 'fa-microchip',
+                                styleClass: 'controller-node',
+                                type: 'controllerNode',
+                                details: controllerItem
+                            }
+                            devChild['children'].push(controllerChildNode);
+                        });
+                        devChild['label'] = "Controllers " + "(" + devChild['children'].length + ")";
+                    }
+                } else if(devChild['type']=='portParent'){
+                    devChild['children']=[];
+
+                    if(device['details'].ports && device['details'].ports.length){
+                        let portChildNode = {};
+                        _.each(device['details'].ports, function(portItem){
+
+                            portItem['displayMemory'] = Utils.formatBytes(portItem['memory_size']);
+                            portChildNode = {
+                                label: portItem['name'],
+                                collapsedIcon: 'fa-plug',
+                                expandedIcon: 'fa-plug',
+                                styleClass: 'port-node',
+                                type: 'portNode',
+                                details: portItem
+                            }
+                            devChild['children'].push(portChildNode);
+                        });
+                        devChild['label'] = "Ports " + "(" + devChild['children'].length + ")";
+                    }
+                } else if(devChild['type']=='diskParent'){
+                    devChild['children']=[];
+
+                    if(device['details'].disks && device['details'].disks.length){
+                        let diskChildNode = {};
+                        _.each(device['details'].disks, function(diskItem){
+
+                            diskItem['displayCapacity'] = Utils.formatBytes(diskItem['capacity']);
+                            diskChildNode = {
+                                label: diskItem['name'],
+                                collapsedIcon: 'fa-floppy-o',
+                                expandedIcon: 'fa-floppy-o',
+                                styleClass: 'port-node',
+                                type: 'diskNode',
+                                details: diskItem
+                            }
+                            devChild['children'].push(diskChildNode);
+                        });
+                        devChild['label'] = "Disks " + "(" + devChild['children'].length + ")";
                     }
                 }
             })
@@ -782,7 +915,7 @@ export class StoragesComponent implements OnInit {
 
     //Show the overview panel when hovering on device in the tree.
     showOverview(event, node, overlaypanel: OverlayPanel){
-        let deviceOverlaypanel, modelOverlayPanel, volumeParentOverlayPanel, poolParentOverlayPanel, volumeOverlayPanel, poolOverlayPanel;
+        let deviceOverlaypanel, modelOverlayPanel, volumeParentOverlayPanel, poolParentOverlayPanel, controllerOverlayPanel, portOverlayPanel, diskOverlayPanel, volumeOverlayPanel, poolOverlayPanel;
         switch (node.type) {
             case "device":
                 this.storageOverview = node.details;
@@ -816,7 +949,21 @@ export class StoragesComponent implements OnInit {
                     poolOverlayPanel = overlaypanel;
                     poolOverlayPanel.toggle(event);
                 break;
-        
+            case "controllerNode":
+                    this.controllerOverview = node;
+                    controllerOverlayPanel = overlaypanel;
+                    controllerOverlayPanel.toggle(event);
+                break;
+            case "portNode":
+                    this.portOverview = node;
+                    portOverlayPanel = overlaypanel;
+                    portOverlayPanel.toggle(event);
+                break;
+            case "diskNode":
+                    this.diskOverview = node;
+                    diskOverlayPanel = overlaypanel;
+                    diskOverlayPanel.toggle(event);
+                break;
             default:
                 this.storageOverview = node;
                 overlaypanel.toggle(event);
@@ -1031,16 +1178,14 @@ export class StoragesComponent implements OnInit {
             if(!this.registerAlertSourceForm.get('auth_key')){
                 this.registerAlertSourceForm.addControl('auth_key', this.fb.control('', Validators.required));
             }
-            this.registerAlertSourceForm.removeControl('privacy_protocol');
-            this.registerAlertSourceForm.removeControl('privacy_key');
+            if(this.registerAlertSourceForm.get('privacy_protocol')){
+                this.registerAlertSourceForm.removeControl('privacy_protocol');
+            }
+            if(this.registerAlertSourceForm.get('privacy_key')){
+                this.registerAlertSourceForm.removeControl('privacy_key');
+            }
         }
         if(this.selectedSecurityLevel=='authPriv'){
-            if(!this.registerAlertSourceForm.get('auth_protocol')){
-                this.registerAlertSourceForm.addControl('auth_protocol', this.fb.control(this.selectedAlertSource && this.selectedAlertSource['auth_protocol'] ? this.selectedAlertSource['auth_protocol'] : '', Validators.required));
-            }
-            if(!this.registerAlertSourceForm.get('auth_key')){
-                this.registerAlertSourceForm.addControl('auth_key', this.fb.control('', Validators.required));
-            }
             if(!this.registerAlertSourceForm.get('privacy_protocol')){
                 this.registerAlertSourceForm.addControl('privacy_protocol', this.fb.control(this.selectedAlertSource && this.selectedAlertSource['privacy_protocol'] ? this.selectedAlertSource['privacy_protocol'] : '', Validators.required));
                 
@@ -1048,6 +1193,13 @@ export class StoragesComponent implements OnInit {
             if(!this.registerAlertSourceForm.get('privacy_key')){
                 this.registerAlertSourceForm.addControl('privacy_key', this.fb.control('', Validators.required));
             }
+            if(!this.registerAlertSourceForm.get('auth_protocol')){
+                this.registerAlertSourceForm.addControl('auth_protocol', this.fb.control(this.selectedAlertSource && this.selectedAlertSource['auth_protocol'] ? this.selectedAlertSource['auth_protocol'] : '', Validators.required));
+            }
+            if(!this.registerAlertSourceForm.get('auth_key')){
+                this.registerAlertSourceForm.addControl('auth_key', this.fb.control('', Validators.required));
+            }
+            
             
         }
     }
