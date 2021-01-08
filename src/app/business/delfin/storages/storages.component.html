@@ -51,11 +51,29 @@
                                 <ng-template #poolParentTreeItem let-node pTemplate="poolParent">
                                     <a (mouseenter)="showOverview($event, node, parentOverviewPanel)" (mouseleave)="parentOverviewPanel.hide()">{{node.label}}</a>
                                 </ng-template>
+                                <ng-template #controllerParentTreeItem let-node pTemplate="controllerParent">
+                                    {{node.label}}
+                                </ng-template>
+                                <ng-template #portParentTreeItem let-node pTemplate="portParent">
+                                    {{node.label}}
+                                </ng-template>
+                                <ng-template #diskParentTreeItem let-node pTemplate="diskParent">
+                                    {{node.label}}
+                                </ng-template>
                                 <ng-template #volumeTreeItem let-node pTemplate="volNode">
                                     <a (mouseenter)="showOverview($event, node, volumeOverviewPanel)" (mouseleave)="volumeOverviewPanel.hide()">{{node.label}}</a>
                                 </ng-template>
                                 <ng-template #poolTreeItem let-node pTemplate="poolNode">
                                     <a (mouseenter)="showOverview($event, node, poolOverviewPanel)" (mouseleave)="poolOverviewPanel.hide()">{{node.label}}</a>
+                                </ng-template>
+                                <ng-template #controllerTreeItem let-node pTemplate="controllerNode">
+                                    <a (mouseenter)="showOverview($event, node, controllerOverviewPanel)" (mouseleave)="controllerOverviewPanel.hide()">{{node.label}}</a>
+                                </ng-template>
+                                <ng-template #portTreeItem let-node pTemplate="portNode">
+                                    <a (mouseenter)="showOverview($event, node, portOverviewPanel)" (mouseleave)="portOverviewPanel.hide()">{{node.label}}</a>
+                                </ng-template>
+                                <ng-template #diskTreeItem let-node pTemplate="diskNode">
+                                    <a (mouseenter)="showOverview($event, node, diskOverviewPanel)" (mouseleave)="diskOverviewPanel.hide()">{{node.label}}</a>
                                 </ng-template>
                             </p-tree>
                             <p-contextMenu #cm appendTo="body" [model]="contextMenuItems"></p-contextMenu>
@@ -590,7 +608,7 @@
                     <input formControlName="engine_id" type="text" size="30" pInputText> 
                 </form-item>
                 <form-item *ngIf="v3Fields" [required]="true" label="{{alertSourceFormlabel.security_level}}">
-                    <p-dropdown [style]="{'min-width':'150px','width':'220px'}" placeholder="Please select" (click)="onSelectSecuritylevel()" [options]="securityLeveloptions" name='selectedSecurityLevel' [(ngModel)]='selectedSecurityLevel' formControlName="security_level"></p-dropdown>
+                    <p-dropdown [style]="{'min-width':'150px','width':'220px'}" placeholder="Please select" (change)="onSelectSecuritylevel()" [options]="securityLeveloptions" name='selectedSecurityLevel' [(ngModel)]='selectedSecurityLevel' formControlName="security_level"></p-dropdown>
                 </form-item>
             </div>
             <div class="ui-g-6">
@@ -1008,3 +1026,190 @@
     </div>
 </p-overlayPanel>
 
+<p-overlayPanel styleClass="overview-panel" #controllerOverviewPanel>
+    <div class="ui-g overview-title">
+        <h4>{{controllerOverview && controllerOverview.details.name}}</h4>
+    </div>
+    <div class="ui-g ui-g-nopad overview-item" >
+        <div class="ui-g-6">
+            <span class="overview-item-label">Status: </span>
+        </div>
+        <div *ngIf="controllerOverview" class="ui-g-6">
+            <span class="storage-status-icon" [ngClass]="{normal:  controllerOverview && controllerOverview.details.status =='normal', abnormal: controllerOverview && controllerOverview.details.status =='abnormal' || controllerOverview.details.status =='unknown'}"><i class="fa fa-circle"></i></span>
+            <span *ngIf="controllerOverview && controllerOverview.details.status=='normal'">Normal</span>
+            <span *ngIf=" controllerOverview && controllerOverview.details.status=='abnormal' || controllerOverview.details.status=='unknown'">Unknown</span>
+            <span *ngIf=" controllerOverview && controllerOverview.details.status=='offline'">Offline</span>
+        </div>
+    </div>
+    <div class="ui-g overview-item">
+        <div class="ui-g-6">
+            CPU Info
+        </div>
+        <div class="ui-g-6">
+            {{ controllerOverview && controllerOverview.details.cpu_info}}
+        </div>
+    </div>
+    <div class="ui-g overview-item">
+        <div class="ui-g-6">
+            Software Version
+        </div>
+        <div class="ui-g-6">
+            {{controllerOverview && controllerOverview.details.soft_version}}
+        </div>
+    </div>
+    <div class="ui-g overview-item">
+        <div class="ui-g-6">
+            Memory Size
+        </div>
+        <div class="ui-g-6">
+            {{controllerOverview && controllerOverview.details.displayMemory}}
+        </div>
+    </div>
+</p-overlayPanel>
+<p-overlayPanel styleClass="overview-panel" #portOverviewPanel>
+    <div class="ui-g overview-title">
+        <h4>{{portOverview && portOverview.details.name}}</h4>
+    </div>
+    <div class="ui-g ui-g-nopad overview-item" >
+        <div class="ui-g-6">
+            <span class="overview-item-label">Health Status: </span>
+        </div>
+        <div *ngIf="portOverview" class="ui-g-6">
+            <span class="storage-status-icon" [ngClass]="{normal:  portOverview && portOverview.details.health_status =='normal', abnormal: portOverview && portOverview.details.health_status =='abnormal' || portOverview.details.health_status =='unknown'}"><i class="fa fa-circle"></i></span>
+            <span *ngIf="portOverview && portOverview.details.health_status=='normal'">Normal</span>
+            <span *ngIf=" portOverview && portOverview.details.health_status=='abnormal' || portOverview.details.health_status=='unknown'">Unknown</span>
+            <span *ngIf=" portOverview && portOverview.details.health_status=='offline'">Offline</span>
+        </div>
+    </div>
+    <div class="ui-g ui-g-nopad overview-item" >
+        <div class="ui-g-6">
+            <span class="overview-item-label">Connection Status: </span>
+        </div>
+        <div *ngIf="portOverview" class="ui-g-6">
+            <span class="storage-status-icon" [ngClass]="{normal: portOverview && portOverview.details.connection_status=='connected', abnormal: portOverview && portOverview.details.connection_status=='unknown' || portOverview && portOverview.details.connection_status=='disconnected'}"><i class="fa fa-circle"></i></span>
+            <span *ngIf="portOverview && portOverview.details.connection_status=='connected'">Connected</span>
+            <span *ngIf="portOverview && portOverview.details.connection_status=='disconnected'">Disconnected</span>
+            <span *ngIf="portOverview && portOverview.details.connection_status=='unknown'">Unknown</span>
+        </div>
+    </div>
+    <div class="ui-g overview-item">
+        <div class="ui-g-6">
+            Speed / Max Speed
+        </div>
+        <div class="ui-g-6">
+            {{ portOverview && portOverview.details.speed}} / {{ portOverview && portOverview.details.max_speed}}
+        </div>
+    </div>
+    <div class="ui-g overview-item">
+        <div class="ui-g-6">
+            WWN / MAC Address
+        </div>
+        <div class="ui-g-6">
+            {{portOverview && portOverview.details.wwn}} / {{portOverview && portOverview.details.mac_address}}
+        </div>
+    </div>
+    <div class="ui-g overview-item">
+        <div class="ui-g-6">
+           Location
+        </div>
+        <div class="ui-g-6">
+            {{portOverview && portOverview.details.location}}
+        </div>
+    </div>
+    <div class="ui-g overview-item">
+        <div class="ui-g-6">
+           IPV4 / IPV4 Mask
+        </div>
+        <div class="ui-g-6">
+            {{portOverview && portOverview.details.ipv4}} / {{portOverview && portOverview.details.ipv4_mask}}
+        </div>
+    </div>
+</p-overlayPanel>
+<p-overlayPanel styleClass="overview-panel" #diskOverviewPanel>
+    <div class="ui-g overview-title">
+        <h4>{{diskOverview && diskOverview.details.name}}</h4>
+    </div>
+    <div *ngIf="diskOverview" class="ui-g ui-g-nopad overview-item" >
+        <div class="ui-g-6">
+            <span class="overview-item-label">Status: </span>
+        </div>
+        <div class="ui-g-6">
+            <span class="storage-status-icon" [ngClass]="{normal: diskOverview.details.status=='normal', abnormal: diskOverview.details.status=='abnormal' || diskOverview.details.status=='unknown' || diskOverview.details.status=='offline'}"><i class="fa fa-circle"></i></span>
+            <span *ngIf="diskOverview.details.status=='normal'">Normal</span>
+            <span *ngIf="diskOverview.details.status=='abnormal' || diskOverview.details.status=='unknown'">Unknown</span>
+            <span *ngIf="diskOverview.details.status=='offline'">Offline</span>
+        </div>
+    </div>
+    <div class="ui-g overview-item">
+        <div class="ui-g-6">
+            <span class="overview-item-label">
+              Manufacturer / Model  
+            </span>
+        </div>
+        <div class="ui-g-6">
+            <span>
+                {{ diskOverview && diskOverview.details.manufacturer}} / {{ diskOverview && diskOverview.details.model}}
+            </span>
+        </div>
+    </div>
+    <div class="ui-g overview-item">
+        <div class="ui-g-6">
+            <span class="overview-item-label">
+              Speed
+            </span>
+        </div>
+        <div class="ui-g-6">
+            <span>
+                {{ diskOverview && diskOverview.details.speed}}
+            </span>
+        </div>
+    </div>
+    <div class="ui-g overview-item">
+        <div class="ui-g-6">
+            <span class="overview-item-label">
+              Capacity
+            </span>
+        </div>
+        <div class="ui-g-6">
+            <span>
+                {{ diskOverview && diskOverview.details.displayCapacity}}
+            </span>
+        </div>
+    </div>
+    <div class="ui-g overview-item">
+        <div class="ui-g-6">
+            <span class="overview-item-label">
+              Physical Type
+            </span>
+        </div>
+        <div class="ui-g-6">
+            <span>
+                {{ diskOverview && diskOverview.details.physical_type}}
+            </span>
+        </div>
+    </div>
+    <div class="ui-g overview-item">
+        <div class="ui-g-6">
+            <span class="overview-item-label">
+              Logical Type
+            </span>
+        </div>
+        <div class="ui-g-6">
+            <span>
+                {{ diskOverview && diskOverview.details.logical_type}}
+            </span>
+        </div>
+    </div>
+    <div class="ui-g overview-item">
+        <div class="ui-g-6">
+            <span class="overview-item-label">
+              Health Score
+            </span>
+        </div>
+        <div class="ui-g-6">
+            <span>
+                {{ diskOverview && diskOverview.details.health_score}}
+            </span>
+        </div>
+    </div>
+</p-overlayPanel>
