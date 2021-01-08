@@ -1,4 +1,4 @@
-# Changelog since Greendlan(v1.1.0) release
+# Changelog since Greenland(v1.1.0) release
 
 ## [v1.2.0-rc2](https://github.com/sodafoundation/dashboard/tree/v1.2.0-rc2) (2021-01-04)
 
