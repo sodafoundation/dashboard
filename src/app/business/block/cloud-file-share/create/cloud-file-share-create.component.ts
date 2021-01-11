@@ -6,7 +6,7 @@ import { trigger, state, style, transition, animate} from '@angular/animations';
 import { I18nPluralPipe } from '@angular/common';
 import { FormGroup, Validators, FormBuilder, FormControl, FormArray } from '@angular/forms';
 import { Http } from '@angular/http';
-import { AvailabilityZonesService } from '../../../resource/resource.service';
+import { AvailabilityZonesService } from '../../../infrastructure/infrastructure.service';
 import { ProfileService } from '../../../profile/profile.service';
 import { CloudFileShareService } from '../cloud-file-share.service';
 import { BucketService} from '../../buckets.service';

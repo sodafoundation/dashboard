@@ -7,7 +7,7 @@ import { RegisterStorageComponent } from './register-storage.component';
 
 import { HttpService } from './../../../shared/api';
 import { ProfileService } from './../../profile/profile.service';
-import { AvailabilityZonesService } from './../../resource/resource.service';
+import { AvailabilityZonesService } from '../../infrastructure/infrastructure.service';
 import { DelfinService } from '../delfin.service';
 import { InputTextModule, InputSwitchModule, CheckboxModule, ButtonModule, DropdownModule, MultiSelectModule, DialogModule, Message, GrowlModule, SpinnerModule, FormModule } from './../../../components/common/api';
 import { FieldsetModule } from '../../../components/fieldset/fieldset';

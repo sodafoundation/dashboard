@@ -9,7 +9,7 @@ import {DataTableModule, DropMenuModule, DialogModule, FormModule, InputTextModu
   DropdownModule ,ConfirmationService,ConfirmDialogModule,CalendarModule,CheckboxModule, InputSwitchModule, 
   TableModule,TabViewModule, ButtonModule, SpinnerModule, GrowlModule } from '../../../../components/common/api';
 import { HttpService } from '../../../../shared/service/Http.service';
-import { AvailabilityZonesService } from '../../../resource/resource.service';
+import { AvailabilityZonesService } from '../../../infrastructure/infrastructure.service';
 import { ProfileService } from '../../../profile/profile.service';
 import { FileShareService } from '../../fileShare.service';
 import { CloudBlockServiceService } from '../cloud-block-service.service';

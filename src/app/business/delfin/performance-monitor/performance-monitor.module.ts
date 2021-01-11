@@ -5,7 +5,7 @@ import { ButtonModule, DataTableModule, PanelModule, OverlayPanelModule,  ChartM
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { HttpService } from '../../../shared/service/Http.service';
 import { DelfinService } from '../delfin.service';
-import { AvailabilityZonesService } from '../../resource/resource.service';
+import { AvailabilityZonesService } from '../../infrastructure/infrastructure.service';
 import { ConfirmationService,ConfirmDialogModule} from '../../../components/common/api';
 import { TooltipModule } from '../../../components/tooltip/tooltip';
 import { StoragesComponent } from '../storages/storages.component';

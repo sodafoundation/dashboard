@@ -7,7 +7,7 @@ import { DialogModule } from '../../components/common/api';
 import { FormControl, FormGroup, FormBuilder, Validators, ValidatorFn, AbstractControl} from '@angular/forms';
 import { VolumeService ,VolumeGroupService} from './volume.service';
 import { ProfileService } from './../profile/profile.service';
-import { AvailabilityZonesService } from './../resource/resource.service';
+import { AvailabilityZonesService } from '../infrastructure/infrastructure.service';
 import { ConfirmationService,ConfirmDialogModule} from '../../components/common/api';
 import { Router } from '@angular/router';
 

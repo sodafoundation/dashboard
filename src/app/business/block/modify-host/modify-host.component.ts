@@ -4,7 +4,7 @@ import { trigger, state, style, transition, animate } from '@angular/animations'
 import { Validators, FormControl, FormGroup, FormBuilder, FormArray } from '@angular/forms';
 
 import { Message, SelectItem } from './../../../components/common/api';
-import { AvailabilityZonesService } from './../../resource/resource.service';
+import { AvailabilityZonesService } from '../../infrastructure/infrastructure.service';
 import { HostsService} from './../hosts.service';
 import { I18NService,Utils } from '../../../../app/shared/api';
 import { Form } from '../../../components/form/form';

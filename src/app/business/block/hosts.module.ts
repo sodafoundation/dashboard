@@ -6,7 +6,7 @@ import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { HttpService } from './../../shared/service/Http.service';
 import { VolumeService} from './volume.service';
 import { HostsService } from './hosts.service';
-import { AvailabilityZonesService } from './../resource/resource.service';
+import { AvailabilityZonesService } from '../infrastructure/infrastructure.service';
 import { ConfirmationService,ConfirmDialogModule} from '../../components/common/api';
 import { TooltipModule } from '../../components/tooltip/tooltip';
 import { RouterModule } from '@angular/router';

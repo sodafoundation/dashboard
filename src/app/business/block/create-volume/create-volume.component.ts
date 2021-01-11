@@ -7,7 +7,7 @@ import { Message, SelectItem } from './../../../components/common/api';
 
 import { VolumeService ,ReplicationService} from './../volume.service';
 import { ProfileService } from './../../profile/profile.service';
-import { AvailabilityZonesService } from './../../resource/resource.service';
+import { AvailabilityZonesService } from '../../infrastructure/infrastructure.service';
 import { I18NService,Utils } from 'app/shared/api';
 
 @Component({

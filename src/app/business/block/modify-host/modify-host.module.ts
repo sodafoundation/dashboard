@@ -8,7 +8,7 @@ import { ModifyHostComponent } from './modify-host.component';
 import { HttpService } from './../../../shared/api';
 import { VolumeService } from './../volume.service';
 import { ProfileService } from './../../profile/profile.service';
-import { AvailabilityZonesService } from './../../resource/resource.service';
+import { AvailabilityZonesService } from '../../infrastructure/infrastructure.service';
 import { HostsService } from '../hosts.service';
 import { InputTextModule, CheckboxModule, ButtonModule, DropdownModule, MultiSelectModule, DialogModule, Message, GrowlModule, SpinnerModule, FormModule } from './../../../components/common/api';
 

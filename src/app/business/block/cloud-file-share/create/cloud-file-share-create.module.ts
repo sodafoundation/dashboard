@@ -11,7 +11,7 @@ import {
     TableModule, TabViewModule, ButtonModule, SpinnerModule, GrowlModule, RadioButtonModule
 } from '../../../../components/common/api';
 import { HttpService } from '../../../../shared/service/Http.service';
-import { AvailabilityZonesService } from '../../../resource/resource.service';
+import { AvailabilityZonesService } from '../../../infrastructure/infrastructure.service';
 import { ProfileService } from '../../../profile/profile.service';
 import { FileShareService } from '../../fileShare.service';
 import { CloudFileShareService } from '../cloud-file-share.service';
