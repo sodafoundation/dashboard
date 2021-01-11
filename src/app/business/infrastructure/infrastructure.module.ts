@@ -1,19 +1,19 @@
 import { NgModule, APP_INITIALIZER } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ResourceComponent } from './resource.component';
+import { InfrastructureComponent } from './infrastructure.component';
 import { RouterModule } from '@angular/router';
-import { TabViewModule, ButtonModule, DataTableModule, InputTextModule } from './../../components/common/api';
-import { HttpService } from './../../shared/service/Http.service';
-import { AvailabilityZonesService } from './resource.service';
+import { TabViewModule, ButtonModule, DataTableModule, InputTextModule } from '../../components/common/api';
+import { HttpService } from '../../shared/service/Http.service';
+import { AvailabilityZonesService } from './infrastructure.service';
 
 let routers = [{
   path: '',
-  component: ResourceComponent
+  component: InfrastructureComponent
 }]
 
 @NgModule({
   declarations: [
-    ResourceComponent
+    InfrastructureComponent
   ],
   imports: [
     RouterModule.forChild(routers),
@@ -25,4 +25,4 @@ let routers = [{
   ],
   providers: [HttpService,AvailabilityZonesService]
 })
-export class ResourceModule { }
+export class InfrastructureModule { }

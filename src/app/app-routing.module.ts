@@ -24,7 +24,7 @@ const routes: Routes = [
     {path: 'profile', loadChildren: './business/profile/profile.module#ProfileModule'},
     {path: 'createProfile', loadChildren: './business/profile/createProfile/createProfile.module#CreateProfileModule'},
     {path: 'modifyProfile/:profileId', loadChildren: './business/profile/modifyProfile/modifyProfile.module#ModifyProfileModule'},
-    {path: 'resource', loadChildren: './business/resource/resource.module#ResourceModule'},
+    {path: 'infrastructure', loadChildren: './business/infrastructure/infrastructure.module#InfrastructureModule'},
     {path: 'identity', loadChildren: './business/identity/identity.module#IdentityModule'},
     {path: 'volumeGroupDetails/:groupId', loadChildren: './business/block/volume-group-detail/volume-group-detail.module#VolumeGroupDetailModule'},
     {path: 'block/:fromRoute', loadChildren: './business/block/block.module#BlockModule'},

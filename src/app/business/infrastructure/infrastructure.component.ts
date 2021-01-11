@@ -4,10 +4,10 @@ import { I18NService, ParamStorService, Consts} from 'app/shared/api';
 import { Http } from '@angular/http';
 import { trigger, state, style, transition, animate} from '@angular/animations';
 import { I18nPluralPipe } from '@angular/common';
-import { AvailabilityZonesService } from './resource.service';
+import { AvailabilityZonesService } from './infrastructure.service';
 
 @Component({
-    templateUrl: './resource.html',
+    templateUrl: './infrastructure.html',
     styleUrls: [],
     animations: [
         trigger('overlayState', [
@@ -35,7 +35,7 @@ import { AvailabilityZonesService } from './resource.service';
         ])
     ]
 })
-export class ResourceComponent implements OnInit{
+export class InfrastructureComponent implements OnInit{
     blockStorages = [];
     fileStorages = [];
     objectStorages = [];

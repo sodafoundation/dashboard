@@ -196,7 +196,7 @@ export class AppComponent implements OnInit, AfterViewInit {
         {
             "title": "Infrastructure",
             "description": "Regions, availability zones and storage",
-            "routerLink": "/resource",
+            "routerLink": "/infrastructure",
             "joyrideStep" : "menuInfrastructure",
             "text" : "A quick overview of the block, Object and File infrastructure."
         },
