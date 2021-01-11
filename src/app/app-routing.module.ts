@@ -20,7 +20,6 @@ const routes: Routes = [
         }
     },
     {path: 'hostDetails/:hostId', loadChildren: './business/block/host-detail/host-detail.module#HostDetailModule'},
-    {path: 'cloud', loadChildren: './business/cloud/cloud.module#CloudModule'},
     {path: 'profile', loadChildren: './business/profile/profile.module#ProfileModule'},
     {path: 'createProfile', loadChildren: './business/profile/createProfile/createProfile.module#CreateProfileModule'},
     {path: 'modifyProfile/:profileId', loadChildren: './business/profile/modifyProfile/modifyProfile.module#ModifyProfileModule'},
