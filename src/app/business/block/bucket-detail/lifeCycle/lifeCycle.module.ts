@@ -5,9 +5,8 @@ import { LifeCycleComponent } from './lifeCycle.component';
 import { RouterModule } from '@angular/router';
 import {DataTableModule, DropMenuModule, DialogModule, FormModule, InputTextModule, InputTextareaModule, 
   DropdownModule ,ConfirmationService,ConfirmDialogModule,CalendarModule,CheckboxModule, InputSwitchModule, 
-  TableModule,TabViewModule, ButtonModule,SpinnerModule } from '../../../../components/common/api';
-
-
+  TableModule,TabViewModule, ButtonModule,SpinnerModule, GrowlModule } from '../../../../components/common/api';
+import { SidebarModule } from '../../../../components/sidebar/sidebar';
 import { HttpService } from '../../../../shared/service/Http.service';
 import { BucketService } from '../../buckets.service';
 
@@ -35,7 +34,9 @@ import { BucketService } from '../../buckets.service';
     CheckboxModule,
     InputSwitchModule,
     TableModule,
-    SpinnerModule
+    SpinnerModule,
+    GrowlModule,
+    SidebarModule
   ],
   exports: [ LifeCycleComponent ],
   providers: [

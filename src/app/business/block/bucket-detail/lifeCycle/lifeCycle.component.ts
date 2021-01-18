@@ -2,7 +2,7 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { Component, OnInit, ViewContainerRef, ViewChild, Directive, ElementRef, HostBinding, HostListener, Input } from '@angular/core';
 import { I18NService, MsgBoxService, HttpService, Utils } from 'app/shared/api';
 import { BucketService } from '../../buckets.service';
-import { ConfirmationService, ConfirmDialogModule } from '../../../../components/common/api';
+import { ConfirmationService, ConfirmDialogModule, Message } from '../../../../components/common/api';
 import { trigger, state, style, transition, animate } from '@angular/animations';
 import { I18nPluralPipe } from '@angular/common';
 import { FormGroup, Validators, FormBuilder, FormControl } from '@angular/forms';
@@ -20,6 +20,7 @@ let lodash = require('lodash');
 })
 export class LifeCycleComponent implements OnInit {
     @Input() bucketId;
+    showRightSidebar: boolean = false;
     showCreateLifeCycle = false;
     showModifyLifeCycle = false;
     createLifeCycleForm;
@@ -79,6 +80,7 @@ export class LifeCycleComponent implements OnInit {
         expirDelete: this.i18n.keyID['sds_lifeCycle_expiration_delete']
     }
     modifyArr = [];
+    msgs: Message[];
 
     constructor(
         private ActivatedRoute: ActivatedRoute,
@@ -92,6 +94,9 @@ export class LifeCycleComponent implements OnInit {
     ngOnInit() {
         this.getLifeCycleForm();
         this.getLifeCycleList();
+    }
+    closeSidebar(){
+        this.showRightSidebar = false;
     }
     getLifeCycleForm() {
         this.createLifeCycleForm = this.fb.group({
@@ -534,7 +539,7 @@ export class LifeCycleComponent implements OnInit {
             this.showModifyLifeCycle = true;
         }
         this.getLifeCycleList(dialog, cycle);
-        this.liceCycleDialog = (this.showCreateLifeCycle || this.showModifyLifeCycle) ? true : false;
+        this.showRightSidebar = (this.showCreateLifeCycle || this.showModifyLifeCycle) ? true : false;
     }
     getLifeCycleDataArray(value, object?, dialog?) {
         let xmlStr = `<LifecycleConfiguration xmlns=\"http://s3.amazonaws.com/doc/2006-03-01/\">`;
@@ -833,9 +838,12 @@ export class LifeCycleComponent implements OnInit {
                 options = this.BucketService.getSignatureOptions(requestOptions, options);
                 this.BucketService.createLifeCycle(this.bucketId , param, options).subscribe((res) => {
                     this.showCreateLifeCycle = false;
-                    this.liceCycleDialog = false;
+                    this.showRightSidebar = false;
                     this.showModifyLifeCycle = false;
                     this.getLifeCycleList();
+		},(error) => {
+                    this.msgs = [];
+                    this.msgs.push({severity: 'error', summary: "Error", detail: error._body});		
                 })
             
         })
@@ -956,6 +964,9 @@ export class LifeCycleComponent implements OnInit {
                     }else{
                         this.getLifeCycleList();
                     }
+		}, (error) => {
+                    this.msgs = [];
+                    this.msgs.push({severity: 'error', summary: "Error", detail: error._body});
                 })
         })
     }
@@ -1029,6 +1040,7 @@ export class LifeCycleComponent implements OnInit {
     cancelCycle() {
         this.showCreateLifeCycle = false;
         this.showModifyLifeCycle = false;
-        this.liceCycleDialog = false;
+        this.showRightSidebar = false;
+        this.createLifeCycleForm.reset();
     }
 }
