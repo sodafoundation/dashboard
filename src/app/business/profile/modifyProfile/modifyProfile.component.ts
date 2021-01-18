@@ -5,7 +5,8 @@ import { AppService } from 'app/app.service';
 import { trigger, state, style, transition, animate } from '@angular/animations';
 import { I18nPluralPipe } from '@angular/common';
 
-import { ProfileService, PoolService} from './../profile.service';
+import { ProfileService } from './../profile.service';
+import { PoolService } from './../pool.service';
 
 @Component({
     templateUrl: './modifyProfile.component.html',
