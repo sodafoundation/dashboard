@@ -185,6 +185,15 @@
                         <p-tabPanel header="Disks">
                             <app-delfin-disks [selectedStorage]="selectedStorageId"></app-delfin-disks>
                         </p-tabPanel>
+                        <p-tabPanel header="Qtrees">
+                            <app-delfin-qtrees [selectedStorage]="selectedStorageId"></app-delfin-qtrees>
+                        </p-tabPanel>
+                        <p-tabPanel header="Filesystems">
+                            <app-delfin-filesystems [selectedStorage]="selectedStorageId"></app-delfin-filesystems>
+                        </p-tabPanel>
+                        <p-tabPanel header="Shares">
+                            <app-delfin-shares [selectedStorage]="selectedStorageId"></app-delfin-shares>
+                        </p-tabPanel>
                     </p-tabView>
                 </div>
             </p-tabPanel>

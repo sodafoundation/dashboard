@@ -109,6 +109,9 @@ export const Consts = {
             'controllers' : 'resource-monitor/controllers',
             'ports' : 'resource-monitor/ports',
             'disks' : 'resource-monitor/disks',
+            'qtrees' : 'resource-monitor/qtrees',
+            'filesystems' : 'resource-monitor/filesystems',
+            'shares' : 'resource-monitor/shares',
             'alerts' : 'alertmanager/alerts'
         }
     },
