@@ -72,7 +72,7 @@ export class LifeCycleComponent implements OnInit {
     lifeCycleTitle;
     sameTransition = false;
     label = {
-        header: "The data in the bucket will flow automatically according to the following rules.",
+        header: "Create lifecycle rules that will be applied to the objects in the source bucket.",
         days: this.i18n.keyID['sds_lifeCycleDays'] + ":",
         trans: this.i18n.keyID['sds_lifeCycleTrans'] + ":",
         backend: this.i18n.keyID['sds_backend'] + ":",
