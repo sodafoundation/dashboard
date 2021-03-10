@@ -5,7 +5,8 @@ import { CreateProfileComponent } from './createProfile.component';
 import { RouterModule } from '@angular/router';
 import { InputTextModule,InputTextareaModule, CheckboxModule, FormModule, ButtonModule, DropdownModule,MultiSelectModule, RadioButtonModule, DialogModule, Message, GrowlModule, SelectButtonModule } from '../../../components/common/api';
 import { HttpService } from './../../../shared/api';
-import { ProfileService,PoolService } from './../profile.service';
+import { ProfileService } from './../profile.service';
+import { PoolService } from './../pool.service';
 import { PoolModule } from './../storage-pools-table/storage-pools-table.module';
 
 let routers = [{
