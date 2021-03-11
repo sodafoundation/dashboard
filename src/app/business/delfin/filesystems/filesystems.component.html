@@ -204,14 +204,6 @@
     </div>
     <div class="ui-g overview-item">
         <div class="ui-g-6">
-            Vendor / Model
-        </div>
-        <div class="ui-g-6">
-            {{ selectedStorageDetails && selectedStorageDetails.vendor}} {{selectedStorageDetails && selectedStorageDetails.model}}
-        </div>
-    </div>
-    <div class="ui-g overview-item">
-        <div class="ui-g-6">
             <span class="overview-item-label">
               Storage ID  
             </span>
@@ -224,13 +216,37 @@
     </div>
     <div class="ui-g overview-item">
         <div class="ui-g-6">
+            Type
+        </div>
+        <div class="ui-g-6">
+            {{ filesystemOverview && filesystemOverview.type}}
+        </div>
+    </div>
+    <div class="ui-g overview-item">
+        <div class="ui-g-6">
+            Compressed
+        </div>
+        <div class="ui-g-6">
+            {{ filesystemOverview && filesystemOverview.compressed ? "Yes" : "No"}}
+        </div>
+    </div>
+    <div class="ui-g overview-item">
+        <div class="ui-g-6">
+            Deduplicated
+        </div>
+        <div class="ui-g-6">
+            {{ filesystemOverview && filesystemOverview.deduplicated ? "Yes" : "No"}}
+        </div>
+    </div>
+    <div class="ui-g overview-item">
+        <div class="ui-g-6">
             <span class="overview-item-label">
-              Storage Serial No.  
+              Security Mode
             </span>
         </div>
         <div class="ui-g-6">
             <span>
-                {{ selectedStorageDetails && selectedStorageDetails.serial_number}}
+                {{ filesystemOverview && filesystemOverview.security_mode}}
             </span>
         </div>
     </div>
