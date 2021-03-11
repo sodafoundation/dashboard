@@ -194,17 +194,6 @@ export const Consts = {
                         smis: false,
                         extra: false
                     }
-                },
-                {
-                    label: "VNX",
-                    value: {
-                        name: 'vnx',
-                        rest: false,
-                        ssh: false,
-                        cli: true,
-                        smis: false,
-                        extra: false
-                    }
                 }
             ],
             'huawei' : [
