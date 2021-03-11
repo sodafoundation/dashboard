@@ -57,7 +57,7 @@ export class BucketDetailComponent implements OnInit {
   archiveTierOptions: any[];
   restoreObjectForm: FormGroup;
   restoreDisplay = false;
-  restoreOptions: any;
+  restoreOptions: any = [];
   selectRestoreOptions: any;
   showErrorMsg = false;
   isReadyCopy = true;
@@ -130,7 +130,6 @@ export class BucketDetailComponent implements OnInit {
     this.ActivatedRoute.params.subscribe((params) => {
       this.bucketId = params.bucketId;
       this.bucketBackend = params.bucketBackend;
-      
       this.items.push({
         label: this.bucketId,
         url: ["/" + this.bucketId],
@@ -151,15 +150,15 @@ export class BucketDetailComponent implements OnInit {
         this.allBackends.forEach(element => {
             if(element['name'] == this.bucketBackend){
               this.bucketBackendType = element['type'];
-              if(this.bucketBackendType=='aws-s3'){
+              if(Consts.STORAGE_CLASSES[this.bucketBackendType]){
                 this.archivalEnabled[this.bucketBackendType] = true;
+                this.restoreOptions = Consts.RETRIEVAL_OPTIONS[this.bucketBackendType];
               }
             }
         });
     });
-    
-    this.restoreOptions = Consts.RETRIEVAL_OPTIONS;
   }
+
   clickOperate(){
     if(this.selectedDir.length >0){
       this.isReadyCopy = false;
@@ -451,20 +450,49 @@ export class BucketDetailComponent implements OnInit {
   //Show Restore Form
   showRestoreObject(file){
     this.restoreDisplay = true;
+    if(this.bucketBackendType=='azure-blob'){
+      this.restoreObjectForm.removeControl('days');
+      this.restoreObjectFormLabel.tier = "Storage Class";
+      this.restoreObjectErrorMsg.tier.required = "Storage Class is required";
+    }
     this.selectFileName = file.Key;
   }
 
   cancelRestore(){
     this.restoreDisplay = false;
-    this.restoreObjectForm.reset({
-      "days" : 1
-    });
+    switch (this.bucketBackendType) {
+      case 'aws-s3':
+          this.restoreObjectForm.reset({
+            "days" : 1
+          });  
+          break;
+      case 'azure-blob':
+          this.restoreObjectForm.reset(); 
+          break;
+      default:
+        break;
+    }
+    
   }
+  
   restoreObject(value){
-    let params = {
-      "days" : value.days,
-      "tier" : value.tier
-    };
+    let params = {};
+    switch (this.bucketBackendType) {
+      case 'aws-s3':
+        params = {
+          "days" : value.days,
+          "tier" : value.tier
+        };  
+        break;
+      case 'azure-blob':
+        params = {
+          "storageClass" : value.tier
+        };
+        break;
+      default:
+        break;
+    }
+      
     window['getAkSkList'](()=>{
       let requestMethod = "POST";
       let url = '/' + this.bucketId + '/' + this.selectFileName + '?restore';

@@ -37,7 +37,7 @@ let routers = [{
     HttpClientModule,
     SplitButtonModule,
     GrowlModule,
-    AclModule,
+    AclModule
   ],
   declarations: [
     BucketDetailComponent
