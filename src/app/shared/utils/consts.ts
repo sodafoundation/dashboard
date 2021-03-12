@@ -175,14 +175,14 @@ export const Consts = {
             }
         ],
         resources:{
-            volumes : ['vmax', 'unity', 'vnx', 'oceanstor', '3par', 'vsp', 'storwize_svc', 'fake_driver'],
-            pools : ['vmax', 'unity', 'vnx', 'oceanstor', '3par', 'vsp', 'storwize_svc', 'fake_driver'],
-            controllers : ['vmax', 'unity', 'vnx', 'oceanstor', '3par', 'vsp', 'storwize_svc', 'fake_driver'],
-            ports : ['vmax', 'unity', 'vnx', 'oceanstor', '3par', 'vsp', 'storwize_svc'],
-            disks : ['vmax', 'unity', 'vnx', 'oceanstor', '3par', 'vsp', 'storwize_svc', 'fake_driver'],
-            qtrees : ['vmax', 'unity', 'vnx', 'oceanstor', '3par', 'vsp', 'storwize_svc', 'fake_driver'],
-            filesystems : ['vmax', 'unity', 'vnx', 'oceanstor', '3par', 'vsp', 'storwize_svc', 'fake_driver'],
-            shares: ['vmax', 'unity', 'vnx', 'oceanstor', '3par', 'vsp', 'storwize_svc']
+            volumes : ['vmax', 'unity', 'vnx', 'oceanstor', '3par', 'vsp', 'storwize_svc'],
+            pools : ['vmax', 'unity', 'vnx', 'oceanstor', '3par', 'vsp', 'storwize_svc'],
+            controllers : ['oceanstor'],
+            ports : ['oceanstor'],
+            disks : ['oceanstor'],
+            qtrees : ['oceanstor'],
+            filesystems : ['oceanstor'],
+            shares: ['oceanstor']
         },
         models: {
             'dellemc' : [
