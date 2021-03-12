@@ -113,6 +113,7 @@ export class BucketDetailComponent implements OnInit {
       required: 'true',
       id: 'days',
       type: 'number',
+      options: [],
       name: 'days',
       formControlName: 'days',
       value: 1,
