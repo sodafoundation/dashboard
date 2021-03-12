@@ -123,7 +123,7 @@ export class BucketDetailComponent implements OnInit {
       required: 'true',
       id: 'tier',
       type: 'select',
-      options: this.restoreOptions,
+      options: [],
       name: 'tier',
       formControlName: 'tier',
       arr:['aws-s3']
@@ -133,7 +133,7 @@ export class BucketDetailComponent implements OnInit {
       required: 'true',
       id: 'storage-class',
       type: 'select',
-      options: this.restoreOptions,
+      options: [],
       name: 'storage-class',
       formControlName: 'storageClass',
       arr:['azure-blob']
@@ -502,7 +502,7 @@ export class BucketDetailComponent implements OnInit {
               this.restoreFormItemsCopy.push(item)
               this.restoreObjectForm.controls[`${item.formControlName}`].setValidators(Validators.required);
           }else{
-              this.restoreObjectForm.controls[`${item.formControlName}`].setValidators('');
+              this.restoreObjectForm.controls[`${item.formControlName}`].setValidators([]);
           }
       })
     })
