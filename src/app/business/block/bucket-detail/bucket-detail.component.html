@@ -82,11 +82,9 @@
                 </p-dialog>
                 <p-dialog styleClass="restore-dialog" header="Restore" [(visible)]="restoreDisplay" [width]="600" [height]="280" modal="modal">
                     <form [grid]="{label: 'ui-g-3', content:'ui-g-20'}" [formGroup]="restoreObjectForm" [errorMessage]="restoreObjectErrorMsg">
-                        <form-item *ngIf="bucketBackendType=='aws-s3'" label="{{restoreObjectFormLabel.days}}" [required]="true">
-                            <input id="restore-days" type="number" pInputText formControlName="days"/>
-                        </form-item>
-                        <form-item label="{{restoreObjectFormLabel.tier}}" [required]="true">
-                            <p-dropdown [style]="{'min-width':'150px','width':'220px'}" placeholder="Please select" [options]="restoreOptions" name='selectRestoreOptions' [(ngModel)]='selectRestoreOptions' formControlName="tier"></p-dropdown>
+                        <form-item *ngFor="let item of restoreFormItemsCopy" [label]="item.label" [required]="item.required">
+                            <input *ngIf="item.type=='number'" [id]="item.id" type="number" min="1" [(ngModel)]="item.value" [name]="item.name"  [formControlName]="item.formControlName"  pInputText />
+                            <p-dropdown *ngIf="item.type=='select'" [style]="{'min-width':'150px','width':'220px'}" placeholder="Please select" [options]="item.options" [name]="item.name" [(ngModel)]='selectRestoreOptions' [formControlName]="item.formControlName"></p-dropdown>
                         </form-item>
                     </form>
                     <p-footer>
