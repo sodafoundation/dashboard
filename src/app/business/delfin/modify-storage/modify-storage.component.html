@@ -22,9 +22,6 @@
                 <span [style]="{'min-width':'150px','width':'220px'}">{{selectedModel}}</span>
             </form-item>
         </p-fieldset>
-        <form-item *ngIf="selectedAccessInfo && selectedAccessInfo.rest" label="Configure REST Connection details?" >
-            <p-inputSwitch [disabled]="showRest && !showSsh" formControlName="enable_rest" onLabel="Yes" offLabel="No" (onChange)="showRestControl()"></p-inputSwitch>
-        </form-item>
         <p-fieldset *ngIf="showRest" styleClass="modify-storage-param-group" legend="REST Parameters">
             <form-item [required]="true" label="{{label.restHost}}">
                 <input formControlName="restHost" type="text" size="30" pInputText> 
@@ -39,9 +36,6 @@
                 <input formControlName="restPassword" type="password" size="30" pInputText> 
             </form-item>
         </p-fieldset>
-        <form-item *ngIf="selectedAccessInfo && selectedAccessInfo.ssh" label="Configure SSH Connection details?" >
-            <p-inputSwitch [disabled]="showSsh && !showRest" formControlName="enable_ssh" onLabel="Yes" offLabel="No" (onChange)="showSshControl()"></p-inputSwitch>
-        </form-item>
         <p-fieldset *ngIf="showSsh" styleClass="modify-storage-param-group" legend="SSH Parameters">
             <form-item [required]="true" label="{{label.sshHost}}">
                 <input formControlName="sshHost" type="text" size="30" pInputText> 
@@ -63,9 +57,37 @@
                 <textarea pInputTextarea formControlName="sshPubKey" [rows]="5" [cols]="32" autoResize="true"></textarea>
             </form-item>
         </p-fieldset>
-        <form-item *ngIf="selectedAccessInfo && selectedAccessInfo.extra_attributes" label="Extra Attributes?" >
-            <p-inputSwitch formControlName="enable_extra_attribs" onLabel="Yes" offLabel="No" (onChange)="extraAttribsControl()"></p-inputSwitch>
-        </form-item>
+        <p-fieldset *ngIf="showCli" styleClass="modify-storage-param-group" legend="CLI Parameters">
+            <form-item [required]="true" label="{{label.cliHost}}">
+                <input formControlName="cliHost" type="text" size="30" pInputText> 
+            </form-item>
+            <form-item [required]="true" label="{{label.cliPort}}">
+                <input formControlName="cliPort" type="text" size="30" pInputText> 
+            </form-item>
+            <form-item [required]="true" label="{{label.cliUsername}}">
+                <input formControlName="cliUsername" type="text" size="30" pInputText> 
+            </form-item>
+            <form-item [required]="true" label="{{label.cliPassword}}">
+                <input formControlName="cliPassword" type="password" size="30" pInputText> 
+            </form-item>
+        </p-fieldset>
+        <p-fieldset *ngIf="showSmis" styleClass="modify-storage-param-group" legend="SMI-S Parameters">
+            <form-item [required]="true" label="{{label.smisHost}}">
+                <input formControlName="smisHost" type="text" size="30" pInputText> 
+            </form-item>
+            <form-item [required]="true" label="{{label.smisPort}}">
+                <input formControlName="smisPort" type="text" size="30" pInputText> 
+            </form-item>
+            <form-item [required]="true" label="{{label.smisUsername}}">
+                <input formControlName="smisUsername" type="text" size="30" pInputText> 
+            </form-item>
+            <form-item [required]="true" label="{{label.smisPassword}}">
+                <input formControlName="smisPassword" type="password" size="30" pInputText> 
+            </form-item>
+            <form-item [required]="true" label="{{label.smisNamespace}}">
+                <input formControlName="smisNamespace" type="text" size="30" pInputText> 
+            </form-item>
+        </p-fieldset>
         <p-fieldset *ngIf="showExtraAttribs" styleClass="modify-storage-param-group" legend="Extra Attributes">
             <form-item *ngIf="modifyStorageForm.controls['extra_attributes']" label="{{label.extra_attributes}}">
                 <a class="add-extra-attribute" (click)="addNextAttribute()"><i class="fa fa-plus-circle" ></i></a>

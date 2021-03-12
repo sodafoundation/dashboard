@@ -203,6 +203,8 @@ export const Consts = {
                         name: 'vmax',
                         rest: true,
                         ssh: false,
+                        cli: false,
+                        smis: false,
                         extra: true
                     }
                 },
@@ -212,6 +214,8 @@ export const Consts = {
                         name: 'unity',
                         rest: true,
                         ssh: false,
+                        cli: false,
+                        smis: false,
                         extra: false
                     }
                 }
@@ -223,6 +227,8 @@ export const Consts = {
                         name: 'oceanstor',
                         rest: true,
                         ssh: false,
+                        cli: false,
+                        smis: false,
                         extra: false
                     }
                 }
@@ -234,6 +240,8 @@ export const Consts = {
                         name: '3par',
                         rest: true,
                         ssh: true,
+                        cli: false,
+                        smis: false,
                         extra: false
                     }
                 }
@@ -245,6 +253,8 @@ export const Consts = {
                         name: 'vsp',
                         rest: true,
                         ssh: false,
+                        cli: false,
+                        smis: false,
                         extra: false
                     }
                 }
@@ -256,6 +266,8 @@ export const Consts = {
                         name: 'storwize_svc',
                         rest: false,
                         ssh: true,
+                        cli: false,
+                        smis: false,
                         extra: false
                     }
                 }
