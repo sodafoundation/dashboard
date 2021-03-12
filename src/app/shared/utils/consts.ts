@@ -84,22 +84,46 @@ export const Consts = {
                 label: 'S3 GLACIER',
                 value: 'GLACIER'
             }
+        ],
+        'azure-blob' : [
+            {
+                label: 'Archive',
+                value: 'Archive'
+            }
+        ],
+        'gcp-s3' : [
+            {
+                label: 'Archive',
+                value: 'Archive'
+            }
         ]
     },
-    RETRIEVAL_OPTIONS: [
-        {
-            label: "Expedited",
-            value: "Expedited"
-        },
-        {
-            label: "Standard",
-            value: "Standard"
-        },
-        {
-            label: "Bulk",
-            value: "Bulk"
-        }
-    ],
+    RETRIEVAL_OPTIONS: {
+        'aws-s3' : [
+            {
+                label: "Expedited",
+                value: "Expedited"
+            },
+            {
+                label: "Standard",
+                value: "Standard"
+            },
+            {
+                label: "Bulk",
+                value: "Bulk"
+            }
+        ],
+        'azure-blob' : [
+            {
+                label: "Hot",
+                value: "Hot"
+            },
+            {
+                label: "Cold",
+                value: "Cold"
+            }
+        ]
+    },
     API: {
 
         DELFIN : {
