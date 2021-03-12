@@ -91,7 +91,8 @@ export class BucketDetailComponent implements OnInit {
 
   restoreObjectFormLabel = {
     "days" : "Days",
-    "tier" : "Retrieval Tier"
+    "tier" : "Retrieval Tier",
+    "storageClass" : "Storage Class"
   }
 
   restoreObjectErrorMsg = {
@@ -100,9 +101,44 @@ export class BucketDetailComponent implements OnInit {
     },
     "tier":{
       required: "Retrieval tier is required"
+    },
+    "storageClass":{
+      required: "Storage Class is required"
     }
   };
-
+  restoreFormItemsCopy = [];
+  restoreFormItems = [
+    {
+      label: 'Days',
+      required: 'true',
+      id: 'days',
+      type: 'number',
+      name: 'days',
+      formControlName: 'days',
+      value: 1,
+      arr:['aws-s3']
+    },
+    {
+      label: 'Tier',
+      required: 'true',
+      id: 'tier',
+      type: 'select',
+      options: this.restoreOptions,
+      name: 'tier',
+      formControlName: 'tier',
+      arr:['aws-s3']
+    },
+    {
+      label: 'Storage Class',
+      required: 'true',
+      id: 'storage-class',
+      type: 'select',
+      options: this.restoreOptions,
+      name: 'storage-class',
+      formControlName: 'storageClass',
+      arr:['azure-blob']
+    }
+  ];
   constructor(
     private ActivatedRoute: ActivatedRoute,
     public I18N:I18NService,
@@ -121,8 +157,9 @@ export class BucketDetailComponent implements OnInit {
         "archive_tier":[""]
     });
     this.restoreObjectForm = this.fb.group({
-      "days":[1,{validators:[Validators.required], updateOn:'change'}],
-      "tier":["",{validators:[Validators.required], updateOn:'change'}],
+      "days":new FormControl([]),
+      "tier":new FormControl([]),
+      "storageClass": new FormControl([])
   });
   }
 
@@ -450,14 +487,27 @@ export class BucketDetailComponent implements OnInit {
   //Show Restore Form
   showRestoreObject(file){
     this.restoreDisplay = true;
-    if(this.bucketBackendType=='azure-blob'){
-      this.restoreObjectForm.removeControl('days');
-      this.restoreObjectFormLabel.tier = "Storage Class";
-      this.restoreObjectErrorMsg.tier.required = "Storage Class is required";
-    }
+    this.restoreFormCreate(this.bucketBackendType);
     this.selectFileName = file.Key;
   }
 
+  restoreFormCreate(type){
+    this.restoreFormItemsCopy = []
+    this.restoreFormItems.forEach((item)=>{
+      if(item.type=='select'){
+        item.options = this.restoreOptions;
+      }
+      item.arr.forEach((it)=>{
+          if(it == type){
+              this.restoreFormItemsCopy.push(item)
+              this.restoreObjectForm.controls[`${item.formControlName}`].setValidators(Validators.required);
+          }else{
+              this.restoreObjectForm.controls[`${item.formControlName}`].setValidators('');
+          }
+      })
+    })
+    this.restoreObjectForm.updateValueAndValidity();
+  }
   cancelRestore(){
     this.restoreDisplay = false;
     switch (this.bucketBackendType) {
@@ -486,7 +536,7 @@ export class BucketDetailComponent implements OnInit {
         break;
       case 'azure-blob':
         params = {
-          "storageClass" : value.tier
+          "storageClass" : value.storageClass
         };
         break;
       default:
