@@ -44,6 +44,7 @@ export class LifeCycleComponent implements OnInit {
         value: { id: null, backendName: null }
     };
     backends = [];
+    allBuckets: any = [];
     expirCleanUp = false;
     lifeCycleItems = [0];
     createLifeCycleItem = [];
@@ -54,6 +55,7 @@ export class LifeCycleComponent implements OnInit {
     transChecked = false;
     lifeCycleAlls = [];
     backendShow = [];
+    bucketShow= [];
     selectedLifeCycle = [];
     transDaysArr = [];
     newExpirDays;
@@ -65,7 +67,8 @@ export class LifeCycleComponent implements OnInit {
     isHover = false;
     index;
     liceCycleDialog;
-    modifyBakend = [];
+    modifyBackend = [];
+    modifyBucket = [];
     modifyTrans = [];
     enableCycle = false;
     disableCycle = false;
@@ -76,6 +79,7 @@ export class LifeCycleComponent implements OnInit {
         days: this.i18n.keyID['sds_lifeCycleDays'] + ":",
         trans: this.i18n.keyID['sds_lifeCycleTrans'] + ":",
         backend: this.i18n.keyID['sds_backend'] + ":",
+        targetBucket: this.i18n.keyID['sds_dest_bucket'] + ":",
         addRule: this.i18n.keyID['sds_fileShare_addRule'],
         expirDelete: this.i18n.keyID['sds_lifeCycle_expiration_delete']
     }
@@ -110,7 +114,8 @@ export class LifeCycleComponent implements OnInit {
             "expirCleanUp": new FormControl([]),
             "days0": new FormControl(30,{ validators: [Validators.required], updateOn: 'change' }),
             "transId0": new FormControl(""),
-            "backendId0": new FormControl(this.defaultBackend)
+            "backendId0": new FormControl(this.defaultBackend),
+            "targetBucket0" : new FormControl("")
         });
     }
     // Expir Rules checkbox click
@@ -149,11 +154,19 @@ export class LifeCycleComponent implements OnInit {
             if (trans) {
                 if (_.isArray(item.Transition)) {
                     trans.forEach((arr) => {
-                        string = "Transition to " + arr.StorageClass + " after: " + arr.Days + " days" + (arr.Backend != "" ? ", Backend:" + arr.Backend : "");
+                        string = "Transition to " + arr.StorageClass + 
+                                 " after: " + arr.Days + 
+                                 " days" + 
+                                 (arr.TargetBucket != "" ? ", Target bucket: " + arr.TargetBucket : "") + 
+                                 (arr.Backend != "" ? ", Backend: " + arr.Backend : "");
                         newTrans.push(string);
                     })
                 } else {
-                    string = "Transition to " + trans.StorageClass + " after: " + trans.Days + " days" + (trans.Backend != "" ? ", Backend:" + trans.Backend : "");
+                    string = "Transition to " + trans.StorageClass + 
+                             " after: " + trans.Days + 
+                             " days" + 
+                             (trans.TargetBucket != "" ? ", Target bucket: " + trans.TargetBucket : "") + 
+                             (trans.Backend != "" ? ", Backend: " + trans.Backend : "");
                     newTrans.push(string);
                 }
             }
@@ -246,10 +259,14 @@ export class LifeCycleComponent implements OnInit {
     }
     // Transition Rules checkbox click
     transClick() {
-        if(this.modifyBakend.length > 0){
-            this.modifyBakend = [];
+        if(this.modifyBackend.length > 0){
+            this.modifyBackend = [];
+        }
+        if(this.modifyBucket.length > 0){
+            this.modifyBucket = [];
         }
         this.backendShow[0] = false;
+        this.bucketShow[0] = false;
         this.transChecked = !this.transChecked;
         this.lifeCycleItems.forEach((item, index) => {
             if (this.transChecked) {
@@ -264,6 +281,7 @@ export class LifeCycleComponent implements OnInit {
                     this.createLifeCycleForm.addControl('days0', this.fb.control('', Validators.required));
                     this.createLifeCycleForm.addControl('transId0', this.fb.control('', Validators.required));
                     this.createLifeCycleForm.addControl('backendId0', this.fb.control('', Validators.required));
+                    this.createLifeCycleForm.addControl('targetBucket0', this.fb.control('', Validators.required));
                 } else {
                     this.createLifeCycleForm.controls['transId0'].setValidators([Validators.required, this.checkStorageClass]);
                     this.createLifeCycleForm.controls['days0'].setValidators(Validators.required);
@@ -273,6 +291,7 @@ export class LifeCycleComponent implements OnInit {
                 this.lifeCycleDeleteControl(index);
                 this.showAddTransRule = false;
                 this.backendShow = [];
+                this.bucketShow = [];
             }
         })
     }
@@ -325,14 +344,32 @@ export class LifeCycleComponent implements OnInit {
         if(((dialog && event == "GLACIER") || (event.value && event.value.transName && event.value.transName == "GLACIER")) && transIndex < this.lifeCycleItems.length -1){
             this.deleteTransRules(transIndex+1);
         }
-        this.getBackets(event, transIndex);
+        this.getBuckets(event, transIndex);
         this.getTransValue(this.createLifeCycleForm.value);
     }
     //backend change
-    backendChange(){
+    backendChange(event, transIndex){
+        switch (event && event.value.backendType) {
+            case 'aws-s3':
+                    this.bucketShow[transIndex] = true;
+                    this.getBuckets(event, transIndex);
+                break;
+            case 'azure-blob':
+                    this.bucketShow[transIndex] = true;
+                    this.getBuckets(event, transIndex);
+                break;
+            case 'gcp-s3':
+                    this.bucketShow[transIndex] = true;
+                    this.getBuckets(event, transIndex);
+                break;
+            default:
+                this.bucketShow[transIndex] = false;
+                break;
+        }
         this.getTransValue(this.createLifeCycleForm.value); 
     }
-    getBackets(event, transIndex) {
+    getBuckets(event?, transIndex?) {
+        let bucketsArr = [];
         window['getAkSkList'](() => {
                 let requestMethod = "GET";
                 let url = this.BucketService.url;
@@ -352,15 +389,47 @@ export class LifeCycleComponent implements OnInit {
                         } else if (Object.prototype.toString.call(buckets) === "[object Object]") {
                             buckets = [buckets];
                         }
-                        let newBackend;
-                        buckets.forEach(item => {
-                            if (this.bucketId == item.Name) {
-                                newBackend = item.LocationConstraint
+                        if(event.value && event.value.transName){
+                            let newBackend;
+                            buckets.forEach(item => {
+                                if (this.bucketId == item.Name) {
+                                    newBackend = item.LocationConstraint
+                                }
+                            });
+                            let selectedTrans = event.value ? event.value.transName : event;
+                            let tierId = event.value.id;
+                            this.getBackends(selectedTrans, tierId, newBackend, transIndex);
+                        } else if(event.value && event.value.backendName){
+                            buckets.forEach(element => {
+                                if(event.value.backendName == element.LocationConstraint){
+                                    let bucketItem = {
+                                        label: element.Name,
+                                        value: { name: element.Name, backendName: element.LocationConstraint, backendType: event.value.type }
+                                    }
+                                    bucketsArr.push(bucketItem);
+                                }
+                            });
+                            if(this.modifyBucket.length > transIndex && this.modifyBucket[transIndex] != ""){
+                                this.modifyBucket.forEach((item,index)=>{
+                                    if(index == transIndex){
+                                        bucketsArr.forEach((it,index)=>{
+                                            let firstItem = bucketsArr[0];
+                                            if(item == it.label){
+                                                bucketsArr[0]= it;
+                                                bucketsArr[index] = firstItem;
+                                            }
+                                        })
+                                    }
+                                    
+                                });
                             }
-                        });
-                        let selectedTrans = event.value ? event.value.transName : event;
-                        let tierId = event.value.id;
-                        this.getBackends(selectedTrans, tierId, newBackend, transIndex);
+                            if(this.allBuckets[transIndex]){
+                                this.allBuckets[transIndex] = bucketsArr;
+                            } else{
+                                this.allBuckets.push(bucketsArr);
+                            }
+                            
+                        }                    
                     });
                 }
         })
@@ -438,7 +507,7 @@ export class LifeCycleComponent implements OnInit {
                                 transName: arr.Name
                             }
                         }
-                        this.getBackets(event, transIndex);
+                        this.getBuckets(event, transIndex);
 
                     }
                     let transObj = {
@@ -477,7 +546,7 @@ export class LifeCycleComponent implements OnInit {
             backendsArr.map(item => {
                 let backends = {
                     label: item.name,
-                    value: { id: item.id, backendName: item.name }
+                    value: { id: item.id, backendName: item.name, backendType: item.type }
                 }
                 backendArr.push(backends);
             })
@@ -485,8 +554,8 @@ export class LifeCycleComponent implements OnInit {
                 label: "Not set",
                 value: {id: null, backendName: null}
             })
-            if(this.modifyBakend.length > transIndex && this.modifyBakend[transIndex] != ""){
-                this.modifyBakend.forEach((item,index)=>{
+            if(this.modifyBackend.length > transIndex && this.modifyBackend[transIndex] != ""){
+                this.modifyBackend.forEach((item,index)=>{
                     if(index == transIndex){
                         backendArr.forEach((it,index)=>{
                             let firstItem = backendArr[0];
@@ -510,7 +579,8 @@ export class LifeCycleComponent implements OnInit {
     
     //create/update pop-up box
     createLifeCycle(dialog, cycle?) {
-        this.modifyBakend = [];
+        this.modifyBackend = [];
+        this.modifyBucket = [];
         this.backendShow = [];
         this.transOptions = [];
         this.minDays = [];
@@ -589,7 +659,8 @@ export class LifeCycleComponent implements OnInit {
                     Transition: {
                         StorageClass: value['transId' + index].transName ? value['transId' + index].transName : value['transId' + index],
                         Days: value['days' + index],
-                        Backend: value['backendId' + index].backendName ? value['backendId' + index].backendName : value['backendId' + index]
+                        Backend: value['backendId' + index].backendName ? value['backendId' + index].backendName : value['backendId' + index],
+                        TargetBucket: value['targetBucket' + index].name ? value['targetBucket' + index].name : value['targetBucket' + index]
                     }
                 }
                 trans = x2js.json2xml_str(trans);
@@ -616,7 +687,8 @@ export class LifeCycleComponent implements OnInit {
                     Transition: {
                         StorageClass: newModifyTrans.StorageClass,
                         Days: newModifyTrans.Days,
-                        Backend: newModifyTrans.Backend
+                        Backend: newModifyTrans.Backend,
+                        TargetBucket: newModifyTrans.TargetBucket
                     }
                 }
                 trans = x2js.json2xml_str(trans);
@@ -800,8 +872,13 @@ export class LifeCycleComponent implements OnInit {
             
         }
         this.showAddTransRule = true;
-        if(this.modifyBakend){
-            this.modifyBakend = this.modifyBakend.filter((item,itemIndex)=>{
+        if(this.modifyBackend){
+            this.modifyBackend = this.modifyBackend.filter((item,itemIndex)=>{
+                return itemIndex != index;
+            })
+        }
+        if(this.modifyBucket){
+            this.modifyBucket = this.modifyBucket.filter((item,itemIndex)=>{
                 return itemIndex != index;
             })
         }
@@ -812,6 +889,7 @@ export class LifeCycleComponent implements OnInit {
             this.createLifeCycleForm.addControl('days' + index, this.fb.control(30, Validators.required));
             this.createLifeCycleForm.addControl('transId' + index, this.fb.control('', Validators.required));
             this.createLifeCycleForm.addControl('backendId' + index, this.fb.control(this.defaultBackend));
+            this.createLifeCycleForm.addControl('targetBucket' + index, this.fb.control('', Validators.required));
             this.backendShow.push(false)
         }
     }
@@ -821,30 +899,39 @@ export class LifeCycleComponent implements OnInit {
         this.createLifeCycleForm.removeControl('days' + index);
         this.createLifeCycleForm.removeControl('transId' + index);
         this.createLifeCycleForm.removeControl('backendId' + index);
+        this.createLifeCycleForm.removeControl('targetbucket' + index);
         this.backendShow = this.backendShow.filter((item, i) => {
+            return i != index;
+        })
+        this.bucketShow = this.bucketShow.filter((item, i) => {
             return i != index;
         })
     }
     createLifeCycleSubmit(param) {
         window['getAkSkList'](() => {
+            let requestMethod = "PUT";
+            let url = '/' + this.bucketId + "/?lifecycle";
+            let requestOptions: any;
+            let options: any = {};
+            requestOptions = window['getSignatureKey'](requestMethod, url, '', '', '', param) ;
+            options['headers'] = new Headers();
+            options = this.BucketService.getSignatureOptions(requestOptions, options);
+            this.BucketService.createLifeCycle(this.bucketId , param, options).subscribe((res) => {
                 
-            
-                let requestMethod = "PUT";
-                let url = '/' + this.bucketId + "/?lifecycle";
-                let requestOptions: any;
-                let options: any = {};
-                requestOptions = window['getSignatureKey'](requestMethod, url, '', '', '', param) ;
-                options['headers'] = new Headers();
-                options = this.BucketService.getSignatureOptions(requestOptions, options);
-                this.BucketService.createLifeCycle(this.bucketId , param, options).subscribe((res) => {
-                    this.showCreateLifeCycle = false;
-                    this.showRightSidebar = false;
-                    this.showModifyLifeCycle = false;
-                    this.getLifeCycleList();
-		},(error) => {
+                this.msgs = [];
+                if(this.showModifyLifeCycle){
+                    this.msgs.push({severity: 'success', summary: "Success", detail: "Lifecycle rule has been updated successfully"});	    
+                } else{
+                    this.msgs.push({severity: 'success', summary: "Success", detail: "Lifecycle rule has been created successfully"});	
+                }
+                this.showCreateLifeCycle = false;
+                this.showRightSidebar = false;
+                this.showModifyLifeCycle = false;
+                this.getLifeCycleList();
+            },(error) => {
                     this.msgs = [];
                     this.msgs.push({severity: 'error', summary: "Error", detail: error._body});		
-                })
+            })
             
         })
     }
@@ -854,11 +941,13 @@ export class LifeCycleComponent implements OnInit {
             let defaultSameTrans;
             this.lifeCycleItems.forEach((item,index)=>{
                 if(index < this.lifeCycleItems.length-1){
-                    let [trans1,trans2,backend1,backend2] = ['transId'+index, 'transId'+(index+1), 'backendId'+index, 'backendId'+(index+1)];
+                    let [trans1,trans2,backend1,backend2, targetBucket1, targetBucket2] = ['transId'+index, 'transId'+(index+1), 'backendId'+index, 'backendId'+(index+1), 'targetBucket'+index, 'targetBucket'+(index+1)];
                     let newTrans1 = value[trans1].transName? value[trans1].transName : value[trans1];
                     let newTrans2 = value[trans2].transName? value[trans2].transName : value[trans2];
                     let newBackend1 = value[backend1].backendName ? value[backend1].backendName : value[backend1];
                     let newBackend2 = value[backend2].backendName ? value[backend2].backendName : value[backend2];
+                    let newTargetBucket1 = value[targetBucket1].name ? value[targetBucket1].name : value[targetBucket1];
+                    let newTargetBucket2 = value[targetBucket2].name ? value[targetBucket2].name : value[targetBucket2];
                     let transTrue = newTrans1 && newTrans2 && newTrans1 == newTrans2;
                     if(transTrue && ((newBackend1 && newBackend2 && newBackend1 == newBackend2) || !newBackend1 || !newBackend2)){
                         this.sameTransition = true;
@@ -905,7 +994,7 @@ export class LifeCycleComponent implements OnInit {
         let key = Utils.getErrorKey(control, page);
         return extraParam ? this.i18n.keyID[key].replace("{0}", extraParam) : this.i18n.keyID[key];
     }
-    bathDelete(value) {
+    batchDelete(value) {
         if (value) {
             let msg, arr = [];
             if (_.isArray(value)) {
@@ -1019,9 +1108,12 @@ export class LifeCycleComponent implements OnInit {
         this.createLifeCycleForm.addControl('days' + index, this.fb.control(item.Days, Validators.required));
         this.createLifeCycleForm.addControl('transId' + index, this.fb.control(item.StorageClass, Validators.required));
         this.createLifeCycleForm.addControl('backendId' + index, this.fb.control(item.Backend));
-        this.modifyBakend.push(item.Backend);
+        this.createLifeCycleForm.addControl('targetBucket' + index, this.fb.control(item.TargetBucket));
+        this.modifyBackend.push(item.Backend);
+        this.modifyBucket.push(item.TargetBucket);
         this.transDaysArr[index] = parseInt(item.Days);
         this.backendShow.push(true)
+        this.bucketShow.push(true);
         if (index == 0) {
             this.lifeCycleItems = [0];
             let defaultTrans = this.createLifeCycleForm.value['transId0'];
