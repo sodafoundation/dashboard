@@ -133,6 +133,9 @@ export const Consts = {
             'controllers' : 'resource-monitor/controllers',
             'ports' : 'resource-monitor/ports',
             'disks' : 'resource-monitor/disks',
+            'qtrees' : 'resource-monitor/qtrees',
+            'filesystems' : 'resource-monitor/filesystems',
+            'shares' : 'resource-monitor/shares',
             'alerts' : 'alertmanager/alerts'
         }
     },
@@ -195,6 +198,16 @@ export const Consts = {
                 value: 'ibm'
             }
         ],
+        resources:{
+            volumes : ['vmax', 'unity', 'vnx', 'oceanstor', '3par', 'vsp', 'storwize_svc'],
+            pools : ['vmax', 'unity', 'vnx', 'oceanstor', '3par', 'vsp', 'storwize_svc'],
+            controllers : ['oceanstor'],
+            ports : ['oceanstor'],
+            disks : ['oceanstor'],
+            qtrees : ['oceanstor'],
+            filesystems : ['oceanstor'],
+            shares: ['oceanstor']
+        },
         models: {
             'dellemc' : [
                 {
