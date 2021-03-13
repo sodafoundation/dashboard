@@ -23,6 +23,7 @@ export class StoragesComponent implements OnInit {
     allArrays: TreeNode[];
     arrayTreeData: TreeNode[];
     allStorages: any = [];
+    allResolvedStorages: any = [];
     selectedStorages: any = [];
     selectedStorageId: any;
     selectStorage;
@@ -65,12 +66,23 @@ export class StoragesComponent implements OnInit {
     portOverview;
     diskOverview;
     parentOverview;
+    qtreeOverview;
+    filesystemOverview;
+    shareOverview;
     groupedByVendor;
     totalArrayRawCapacity: any;
     totalArrayUsableCapacity: any;
     totalArrayFreeCapacity: any;
     allActiveAlerts: any = [];
     scrollerData: any = [];
+    volumesExist: boolean = false;
+    poolsExist: boolean = false;
+    controllersExist: boolean = false;
+    portsExist: boolean = false;
+    disksExist: boolean = false;
+    qtreesExist: boolean = false;
+    filesystemsExist: boolean = false;
+    sharesExist: boolean = false;
     msgs: Message[];
 
     label = {
@@ -174,11 +186,16 @@ export class StoragesComponent implements OnInit {
                     this.msgs.push(JSON.parse(message));
                 }
             });
+            // Resolve the Storages before loading the page
+            this.ActivatedRoute.data.subscribe((res:Response) => {
+                let resolvedStorages = res['storages'];
+                this.allResolvedStorages = resolvedStorages;
+            });
     }
 
     ngOnInit() {
         this.loading = true;
-        this.getAllStorages();
+        this.onPageFirstLoad();
         this.getAllActiveAlerts();
         
         this.menuItems = [
@@ -319,6 +336,11 @@ export class StoragesComponent implements OnInit {
     toggleView(){
         this.showListView = this.showListView ? this.showListView : !this.showListView;
     }
+    onPageFirstLoad(){
+        this.allStorages = this.allResolvedStorages;
+        this.prepareTree(this.allStorages);
+        this.loading = false;
+    }
     
     getAllStorages(){
         this.allStorages = [];
@@ -342,56 +364,110 @@ export class StoragesComponent implements OnInit {
                 element['capacity'].system_used = Utils.formatBytes(element['system_used_capacity']) ;
                 element['capacity'].usage = percentUsage;
                 
-                element['volumes'] = [];
-                element['storagePools'] = [];
-                element['controllers'] = [];
-                element['ports'] = [];
-                element['disks'] = [];
                 let vols = [];
                 let pools = [];
                 let controllers = [];
                 let ports = [];
                 let disks = [];
+                let qtrees = [];
+                let filesystems = [];
+                let shares = [];
+                let accessInfo: any;
+                // Get the access info of the device to fetch the Delfin Driver model used
+                this.ds.getAccessinfoByStorageId(element['id']).subscribe((res)=>{                    
+                    accessInfo = res.json();
+                    element['delfin_model'] = accessInfo['model'];
+                    
+                    this.volumesExist = _.contains(Consts.STORAGES.resources.volumes, accessInfo['model']);
+                    this.poolsExist = _.contains(Consts.STORAGES.resources.pools, accessInfo['model']);
+                    this.controllersExist = _.contains(Consts.STORAGES.resources.controllers, accessInfo['model']);
+                    this.portsExist = _.contains(Consts.STORAGES.resources.ports, accessInfo['model']);
+                    this.disksExist = _.contains(Consts.STORAGES.resources.disks, accessInfo['model']);
+                    this.qtreesExist = _.contains(Consts.STORAGES.resources.qtrees, accessInfo['model']);
+                    this.filesystemsExist = _.contains(Consts.STORAGES.resources.filesystems, accessInfo['model']);
+                    this.sharesExist = _.contains(Consts.STORAGES.resources.shares, accessInfo['model']);
+                    if(this.volumesExist){
+                        // Get all the volumes associated with the Storage device
+                        this.ds.getAllVolumes(element['id']).subscribe((res)=>{
+                            vols = res.json().volumes;
+                            element['volumes'] = vols;
+                        }, (error)=>{
+                            console.log("Something went wrong. Could not fetch Volumes.", error)
+                        });
+                    }
 
-                // Get all the Storage pools associated with the Storage device
-                this.ds.getAllStoragePools(element['id']).subscribe((res)=>{
-                    pools = res.json().storage_pools;
-                    element['storagePools'] = pools;
+                    if(this.poolsExist){
+                        // Get all the Storage pools associated with the Storage device 
+                        this.ds.getAllStoragePools(element['id']).subscribe((res)=>{
+                            pools = res.json().storage_pools;
+                            element['storagePools'] = pools;
+                        }, (error)=>{
+                            console.log("Something went wrong. Could not fetch Storage Pools.", error)
+                        });
+                    }
+                    if(this.controllersExist){
+                        // Get all the Controllers associated with the Storage device
+                        this.ds.getAllControllers(element['id']).subscribe((res)=>{
+                            controllers = res.json().controllers;
+                            element['controllers'] = controllers;
+                        }, (error)=>{
+                            console.log("Something went wrong. Could not fetch Controllers.", error)
+                        });
+                    }
+                    if(this.portsExist){
+                        
+                        // Get all the Ports associated with the Storage device
+                        this.ds.getAllPorts(element['id']).subscribe((res)=>{
+                            console.log("Ports fetched")
+                            ports = res.json().ports;
+                            element['ports'] = ports;
+                        }, (error)=>{
+                            console.log("Something went wrong. Could not fetch Ports.", error)
+                        });
+                    } else{
+                        element['portsExist'] = this.portsExist;
+                    }
+                    if(this.disksExist){
+                        // Get all the Disks associated with the Storage device
+                        this.ds.getAllDisks(element['id']).subscribe((res)=>{
+                            disks = res.json().disks;
+                            element['disks'] = disks;
+                        }, (error)=>{
+                            console.log("Something went wrong. Could not fetch Disks.", error)
+                        });
+                    }
+                    if(this.qtreesExist){
+                        // Get all the Qtrees associated with the Storage device
+                        this.ds.getAllQtrees(element['id']).subscribe((res)=>{
+                            qtrees = res.json().qtrees;
+                            element['qtrees'] = qtrees;
+                        }, (error)=>{
+                            console.log("Something went wrong. Could not fetch Qtrees.", error)
+                        });
+                    }
+                    if(this.filesystemsExist){
+                        // Get all the Filesystems associated with the Storage device
+                        this.ds.getAllFilesystems(element['id']).subscribe((res)=>{
+                            filesystems = res.json().filesystems;
+                            element['filesystems'] = filesystems;
+                        }, (error)=>{
+                            console.log("Something went wrong. Could not fetch Filesystems.", error)
+                        });
+                    }
+                    if(this.sharesExist){
+                        // Get all the Shares associated with the Storage device
+                        this.ds.getAllShares(element['id']).subscribe((res)=>{
+                            shares = res.json().shares;
+                            element['shares'] = shares;
+                        }, (error)=>{
+                            console.log("Something went wrong. Could not fetch Shares.", error)
+                        });
+                    } else{
+                        element['sharesExist'] = this.sharesExist;
+                    }
                 }, (error)=>{
-                    console.log("Something went wrong. Could not fetch Storage Pools.", error)
-                });
-
-                // Get all the volumes associated with the Storage device
-                this.ds.getAllVolumes(element['id']).subscribe((res)=>{
-                    vols = res.json().volumes;
-                    element['volumes'] = vols;
-                }, (error)=>{
-                    console.log("Something went wrong. Could not fetch Volumes.", error)
-                });
-
-                // Get all the Controllers associated with the Storage device
-                this.ds.getAllControllers(element['id']).subscribe((res)=>{
-                    controllers = res.json().controllers;
-                    element['controllers'] = controllers;
-                }, (error)=>{
-                    console.log("Something went wrong. Could not fetch Controllers.", error)
-                });
-
-                // Get all the Ports associated with the Storage device
-                this.ds.getAllPorts(element['id']).subscribe((res)=>{
-                    ports = res.json().ports;
-                    element['ports'] = ports;
-                }, (error)=>{
-                    console.log("Something went wrong. Could not fetch Ports.", error)
-                });
-                
-                // Get all the Disks associated with the Storage device
-                this.ds.getAllDisks(element['id']).subscribe((res)=>{
-                    disks = res.json().disks;
-                    element['disks'] = disks;
-                }, (error)=>{
-                    console.log("Something went wrong. Could not fetch Disks.", error)
-                });
+                    console.log("Something went wrong. Could not fetch Access info.", error)
+                })
 
                 let capData = {
                     labels: ['Used','Free'],
@@ -421,6 +497,9 @@ export class StoragesComponent implements OnInit {
                 element['controllers'] = controllers;
                 element['ports'] = ports;
                 element['disks'] = disks;
+                element['qtrees'] = qtrees;
+                element['filesystems'] = filesystems;
+                element['shares'] = shares;
             });
 
             // Invoke prepareTree() to prepare the tree structure for the widget
@@ -445,7 +524,7 @@ export class StoragesComponent implements OnInit {
         return group;
     }
 
-    // This method
+    // This method prepares the array for the tree view
     prepareTree(storages){
         let self = this;
         let treeData = [];
@@ -517,35 +596,6 @@ export class StoragesComponent implements OnInit {
                             
                             modelGroupNode.details.totalSystemUsedCapacity = Math.ceil((storageDevice['raw_capacity'] - storageDevice['total_capacity']));
                             
-                            // Create the Volume parent Node
-                            
-                            let parentVolNode = {};
-                            if(storageDevice['volumes'] ){
-                                parentVolNode = {
-                                    label : "Volumes",
-                                    collapsedIcon: 'fa-database',
-                                    expandedIcon: 'fa-database',
-                                    type: 'volParent',
-                                    styleClass: 'volume-parent-node',
-                                    leaf: false,
-                                    details: {
-                                        totalUsableCapacity: 0,
-                                        totalFreeCapacity: 0,
-                                        totalUsedCapacity: 0,
-                                        totalUsagePercent: 0,
-                                        totalRawCapacity: 0,
-                                        totalSubscribedCapacity: 0,
-                                        totalSystemUsedCapacity: 0,
-                                        displayTotal: null,
-                                        displayFree: null,
-                                        displayUsed: null,
-                                        displayRaw: null,
-                                        displaySubscribed: null,
-                                        displaySystemUsed: null
-                                    }
-                                }
-                                modelTreeNode['children'].push(parentVolNode);
-                            }
                             // Create the Storage Pool parent Node
                             let parentPoolNode = {};
                             if(storageDevice['storagePools']){
@@ -573,6 +623,35 @@ export class StoragesComponent implements OnInit {
                                     }
                                 }
                                 modelTreeNode['children'].push(parentPoolNode);
+                            }
+
+                            // Create the Volume parent Node
+                            let parentVolNode = {};
+                            if(storageDevice['volumes'] ){
+                                parentVolNode = {
+                                    label : "Volumes",
+                                    collapsedIcon: 'fa-database',
+                                    expandedIcon: 'fa-database',
+                                    type: 'volParent',
+                                    styleClass: 'volume-parent-node',
+                                    leaf: false,
+                                    details: {
+                                        totalUsableCapacity: 0,
+                                        totalFreeCapacity: 0,
+                                        totalUsedCapacity: 0,
+                                        totalUsagePercent: 0,
+                                        totalRawCapacity: 0,
+                                        totalSubscribedCapacity: 0,
+                                        totalSystemUsedCapacity: 0,
+                                        displayTotal: null,
+                                        displayFree: null,
+                                        displayUsed: null,
+                                        displayRaw: null,
+                                        displaySubscribed: null,
+                                        displaySystemUsed: null
+                                    }
+                                }
+                                modelTreeNode['children'].push(parentVolNode);
                             }
 
                             // Create the Controller parent Node
@@ -603,7 +682,7 @@ export class StoragesComponent implements OnInit {
                                 modelTreeNode['children'].push(parentPortNode);
                             }
 
-                            // Create the Port parent Node
+                            // Create the Disk parent Node
                             let parentDiskNode = {};
                             if(storageDevice['disks']){
                                 parentDiskNode = {
@@ -615,6 +694,57 @@ export class StoragesComponent implements OnInit {
                                     leaf: false
                                 }
                                 modelTreeNode['children'].push(parentDiskNode);
+                            }
+
+                            // Create the Qtree parent Node
+                            let parentQtreeNode = {};
+                            if(storageDevice['qtrees']){
+                                parentQtreeNode = {
+                                    label : "Qtrees",
+                                    collapsedIcon: 'fa-pie-chart',
+                                    expandedIcon: 'fa-pie-chart',
+                                    styleClass: 'qtree-parent-node',
+                                    type: 'qtreeParent',
+                                    leaf: false
+                                }
+                                modelTreeNode['children'].push(parentQtreeNode);
+                            }
+
+                            // Create the Filesystems parent Node
+                            let parentFilesystemNode = {};
+                            if(storageDevice['filesystems']){
+                                parentFilesystemNode = {
+                                    label : "Filesystems",
+                                    collapsedIcon: 'fa-files-o',
+                                    expandedIcon: 'fa-files-o',
+                                    styleClass: 'filesystem-parent-node',
+                                    type: 'filesystemParent',
+                                    leaf: false,
+                                    details: {
+                                        totalUsableCapacity: 0,
+                                        totalFreeCapacity: 0,
+                                        totalUsedCapacity: 0,
+                                        totalUsagePercent: 0,
+                                        displayTotal: null,
+                                        displayFree: null,
+                                        displayUsed: null,
+                                    }
+                                }
+                                modelTreeNode['children'].push(parentFilesystemNode);
+                            }
+
+                            // Create the Shares parent Node
+                            let parentShareNode = {};
+                            if(storageDevice['shares']){
+                                parentShareNode = {
+                                    label : "Shares",
+                                    collapsedIcon: 'fa-share-square-o',
+                                    expandedIcon: 'fa-share-square-o',
+                                    styleClass: 'share-parent-node',
+                                    type: 'shareParent',
+                                    leaf: false
+                                }
+                                modelTreeNode['children'].push(parentShareNode);
                             }
 
                             // Push each storage device as a child of the model node
@@ -637,7 +767,6 @@ export class StoragesComponent implements OnInit {
             treeData.push(vendorTreeNode);
         })
         this.arrayTreeData = treeData;
-        
     }
 
     // Invoked on expanding a parent node in the tree above
@@ -645,153 +774,256 @@ export class StoragesComponent implements OnInit {
     loadNode(event){
         let self =this;
         //Check if the expanded node is a device
-
         if(event.node.type == 'device'){
             let device = event.node;
 
             //check each child if it is a Volume parent or Pool Parent
             _.each(device['children'], function(devChild){
-                if(devChild['type']=='volParent'){
-                    devChild['children'] = [];
+                switch (devChild['type']) {
+                    case 'poolParent':
+                        devChild['children'] = [];
 
-                    // If Volume parent then iterate through all volumes and calculate the capacities and stats for 
-                    // each volume parent and volume node
+                        // If pool parent then iterate through all storage pools and calculate the capacities and stats for 
+                        // each pool parent and pool node
 
-                    if(device['details'].volumes && device['details'].volumes.length){
-                        let volChildNode ={};
-                        _.each(device['details'].volumes, function(volItem){
-                            //Calculate the capacities for the Volume
-                            volItem['capacity'] = {};
-                            let percentUsage = Math.ceil((volItem['used_capacity']/volItem['total_capacity']) * 100);
-                            volItem['capacity'].used = Utils.formatBytes(volItem['used_capacity']);
-                            volItem['capacity'].free = Utils.formatBytes(volItem['free_capacity']);
-                            volItem['capacity'].total = Utils.formatBytes(volItem['total_capacity']);
-                            volItem['capacity'].system_used = Utils.formatBytes(volItem['system_used_capacity']) ;
-                            volItem['capacity'].usage = percentUsage;
+                        if(device['details'].storagePools && device['details'].storagePools.length){
+                            let poolChildNode ={};
+                            _.each(device['details'].storagePools, function(poolItem){
+                                //Calculate the capacities for the Volume
+                                poolItem['capacity'] = {};
+                                let percentUsage = Math.ceil((poolItem['used_capacity']/poolItem['total_capacity']) * 100);
+                                poolItem['capacity'].used = Utils.formatBytes(poolItem['used_capacity']);
+                                poolItem['capacity'].free = Utils.formatBytes(poolItem['free_capacity']);
+                                poolItem['capacity'].total = Utils.formatBytes(poolItem['total_capacity']);
+                                poolItem['capacity'].usage = percentUsage;
 
-                            //Create the capacity stats for each volume group by summing together the capacity of each device
-                            devChild['details'].totalUsableCapacity+=volItem['total_capacity'];
-                            devChild['details'].totalUsedCapacity+=volItem['used_capacity'];
-                            devChild['details'].totalFreeCapacity+=volItem['free_capacity'];
+                                //Create the capacity stats for each pool group by summing together the capacity of each device
+                                devChild['details'].totalUsableCapacity+=poolItem['total_capacity'];
+                                devChild['details'].totalUsedCapacity+=poolItem['used_capacity'];
+                                devChild['details'].totalFreeCapacity+=poolItem['free_capacity'];
+                                
+                                poolChildNode = {
+                                    label : poolItem['name'],
+                                    collapsedIcon: 'fa-cubes',
+                                    expandedIcon: 'fa-cubes',
+                                    styleClass: 'pool-node',
+                                    type: 'poolNode',
+                                    details: poolItem,
+                                }
+                                devChild['children'].push(poolChildNode);
+                            })
                             
-                            volChildNode = {
-                                label : volItem['name'],
-                                collapsedIcon: 'fa-database',
-                                expandedIcon: 'fa-database',
-                                styleClass: 'volume-node',
-                                type: 'volNode',
-                                details: volItem,
+                            //Populate the display values
+                            devChild['details'].totalUsagePercent = Math.ceil((devChild['details'].totalUsedCapacity/devChild['details'].totalUsableCapacity) * 100);
+                            devChild['details'].displayTotal = Utils.formatBytes(devChild['details'].totalUsableCapacity);
+                            devChild['details'].displayFree = Utils.formatBytes(devChild['details'].totalFreeCapacity);
+                            devChild['details'].displayUsed = Utils.formatBytes(devChild['details'].totalUsedCapacity);
+                            devChild['label'] = "Storage Pools " + "(" + devChild['children'].length + ")";
+                        } else {
+                            devChild['label'] = "Storage Pools " + "(" + devChild['children'].length + ")";
+                        }
+                        break;
+                    case 'volParent':
+                        devChild['children'] = [];
+                        // If Volume parent then iterate through all volumes and calculate the capacities and stats for 
+                        // each volume parent and volume node
+                        if(device['details'].volumes && device['details'].volumes.length){
+                            let volChildNode ={};
+                            _.each(device['details'].volumes, function(volItem){
+                                //Calculate the capacities for the Volume
+                                volItem['capacity'] = {};
+                                let percentUsage = Math.ceil((volItem['used_capacity']/volItem['total_capacity']) * 100);
+                                volItem['capacity'].used = Utils.formatBytes(volItem['used_capacity']);
+                                volItem['capacity'].free = Utils.formatBytes(volItem['free_capacity']);
+                                volItem['capacity'].total = Utils.formatBytes(volItem['total_capacity']);
+                                volItem['capacity'].system_used = Utils.formatBytes(volItem['system_used_capacity']) ;
+                                volItem['capacity'].usage = percentUsage;
+
+                                //Create the capacity stats for each volume group by summing together the capacity of each device
+                                devChild['details'].totalUsableCapacity+=volItem['total_capacity'];
+                                devChild['details'].totalUsedCapacity+=volItem['used_capacity'];
+                                devChild['details'].totalFreeCapacity+=volItem['free_capacity'];
+                                
+                                volChildNode = {
+                                    label : volItem['name'],
+                                    collapsedIcon: 'fa-database',
+                                    expandedIcon: 'fa-database',
+                                    styleClass: 'volume-node',
+                                    type: 'volNode',
+                                    details: volItem,
+                                }
+                                devChild['children'].push(volChildNode);
+                            })
+
+                            //Populate the display values
+                            devChild['details'].totalUsagePercent = Math.ceil((devChild['details'].totalUsedCapacity/devChild['details'].totalUsableCapacity) * 100);
+                            devChild['details'].displayTotal = Utils.formatBytes(devChild['details'].totalUsableCapacity);
+                            devChild['details'].displayFree = Utils.formatBytes(devChild['details'].totalFreeCapacity);
+                            devChild['details'].displayUsed = Utils.formatBytes(devChild['details'].totalUsedCapacity);
+                            devChild['label'] = "Volumes " + "(" + devChild['children'].length + ")";
+                        } else{
+                            devChild['label'] = "Volumes " + "(" + devChild['children'].length + ")";
+                        }
+                        break;
+                    
+                    case 'controllerParent':
+                        devChild['children']=[];
+
+                        if(device['details'].controllers && device['details'].controllers.length){
+                            let controllerChildNode = {};
+                            _.each(device['details'].controllers, function(controllerItem){
+
+                                controllerItem['displayMemory'] = Utils.formatBytes(controllerItem['memory_size']);
+                                controllerChildNode = {
+                                    label: controllerItem['name'],
+                                    collapsedIcon: 'fa-microchip',
+                                    expandedIcon: 'fa-microchip',
+                                    styleClass: 'controller-node',
+                                    type: 'controllerNode',
+                                    details: controllerItem
+                                }
+                                devChild['children'].push(controllerChildNode);
+                            });
+                            devChild['label'] = "Controllers " + "(" + devChild['children'].length + ")";
+                        } else {
+                            devChild['label'] = "Controllers " + "(" + devChild['children'].length + ")";
+                        }
+                        break;
+                    case 'portParent':
+                        devChild['children']=[];
+
+                        if(device['details'].ports && device['details'].ports.length){
+                            let portChildNode = {};
+                            _.each(device['details'].ports, function(portItem){
+
+                                portItem['displayMemory'] = Utils.formatBytes(portItem['memory_size']);
+                                portChildNode = {
+                                    label: portItem['name'],
+                                    collapsedIcon: 'fa-plug',
+                                    expandedIcon: 'fa-plug',
+                                    styleClass: 'port-node',
+                                    type: 'portNode',
+                                    details: portItem
+                                }
+                                devChild['children'].push(portChildNode);
+                            });
+                            devChild['label'] = "Ports " + "(" + devChild['children'].length + ")";
+                        } else{
+                            devChild['label'] = "Ports " + "(" + devChild['children'].length + ")";
+                        }
+                        break;
+                    case 'diskParent':
+                        devChild['children']=[];
+
+                        if(device['details'].disks && device['details'].disks.length){
+                            let diskChildNode = {};
+                            _.each(device['details'].disks, function(diskItem){
+
+                                diskItem['displayCapacity'] = Utils.formatBytes(diskItem['capacity']);
+                                diskChildNode = {
+                                    label: diskItem['name'],
+                                    collapsedIcon: 'fa-floppy-o',
+                                    expandedIcon: 'fa-floppy-o',
+                                    styleClass: 'disk-node',
+                                    type: 'diskNode',
+                                    details: diskItem
+                                }
+                                devChild['children'].push(diskChildNode);
+                            });
+                            devChild['label'] = "Disks " + "(" + devChild['children'].length + ")";
+                        } else {
+                            devChild['label'] = "Disks " + "(" + devChild['children'].length + ")";
+                        }
+                        break;
+                        case 'qtreeParent':
+                            devChild['children']=[];
+
+                            if(device['details'].qtrees && device['details'].qtrees.length){
+                                let qtreeChildNode = {};
+                                _.each(device['details'].qtrees, function(qtreeItem){
+
+                                    qtreeChildNode = {
+                                        label: qtreeItem['name'],
+                                        collapsedIcon: 'fa-pie-chart',
+                                        expandedIcon: 'fa-pie-chart',
+                                        styleClass: 'qtree-node',
+                                        type: 'qtreeNode',
+                                        details: qtreeItem
+                                    }
+                                    devChild['children'].push(qtreeChildNode);
+                                });
+                                devChild['label'] = "Qtrees " + "(" + devChild['children'].length + ")";
+                            } else {
+                                devChild['label'] = "Qtrees " + "(" + devChild['children'].length + ")";
                             }
-                            devChild['children'].push(volChildNode);
-                        })
-
-                        //Populate the display values
-                        devChild['details'].totalUsagePercent = Math.ceil((devChild['details'].totalUsedCapacity/devChild['details'].totalUsableCapacity) * 100);
-                        devChild['details'].displayTotal = Utils.formatBytes(devChild['details'].totalUsableCapacity);
-                        devChild['details'].displayFree = Utils.formatBytes(devChild['details'].totalFreeCapacity);
-                        devChild['details'].displayUsed = Utils.formatBytes(devChild['details'].totalUsedCapacity);
-                        devChild['label'] = "Volumes " + "(" + devChild['children'].length + ")";
-                    }
-                } else if(devChild['type']=='poolParent'){
-                    devChild['children'] = [];
-
-                    // If pool parent then iterate through all storage pools and calculate the capacities and stats for 
-                    // each pool parent and pool node
-
-                    if(device['details'].storagePools && device['details'].storagePools.length){
-                        let poolChildNode ={};
-                        _.each(device['details'].storagePools, function(poolItem){
-                            //Calculate the capacities for the Volume
-                            poolItem['capacity'] = {};
-                            let percentUsage = Math.ceil((poolItem['used_capacity']/poolItem['total_capacity']) * 100);
-                            poolItem['capacity'].used = Utils.formatBytes(poolItem['used_capacity']);
-                            poolItem['capacity'].free = Utils.formatBytes(poolItem['free_capacity']);
-                            poolItem['capacity'].total = Utils.formatBytes(poolItem['total_capacity']);
-                            poolItem['capacity'].usage = percentUsage;
-
-                            //Create the capacity stats for each pool group by summing together the capacity of each device
-                            devChild['details'].totalUsableCapacity+=poolItem['total_capacity'];
-                            devChild['details'].totalUsedCapacity+=poolItem['used_capacity'];
-                            devChild['details'].totalFreeCapacity+=poolItem['free_capacity'];
-                            
-                            poolChildNode = {
-                                label : poolItem['name'],
-                                collapsedIcon: 'fa-cubes',
-                                expandedIcon: 'fa-cubes',
-                                styleClass: 'pool-node',
-                                type: 'poolNode',
-                                details: poolItem,
+                            break;
+                        case 'filesystemParent':
+                            devChild['children'] = [];
+    
+                            // If filesystem parent then iterate through all storage filesystems and calculate the capacities and stats for 
+                            // each filesystem parent and filesystem node
+    
+                            if(device['details'].filesystems && device['details'].filesystems.length){
+                                let filesystemChildNode ={};
+                                _.each(device['details'].filesystems, function(filesystemItem){
+                                    //Calculate the capacities for the Volume
+                                    filesystemItem['capacity'] = {};
+                                    let percentUsage = Math.ceil((filesystemItem['used_capacity']/filesystemItem['total_capacity']) * 100);
+                                    filesystemItem['capacity'].used = Utils.formatBytes(filesystemItem['used_capacity']);
+                                    filesystemItem['capacity'].free = Utils.formatBytes(filesystemItem['free_capacity']);
+                                    filesystemItem['capacity'].total = Utils.formatBytes(filesystemItem['total_capacity']);
+                                    filesystemItem['capacity'].usage = percentUsage;
+    
+                                    //Create the capacity stats for each filesystem group by summing together the capacity of each device
+                                    devChild['details'].totalUsableCapacity+=filesystemItem['total_capacity'];
+                                    devChild['details'].totalUsedCapacity+=filesystemItem['used_capacity'];
+                                    devChild['details'].totalFreeCapacity+=filesystemItem['free_capacity'];
+                                    
+                                    filesystemChildNode = {
+                                        label : filesystemItem['name'],
+                                        collapsedIcon: 'fa-files-o',
+                                        expandedIcon: 'fa-files-o',
+                                        styleClass: 'filesystem-node',
+                                        type: 'filesystemNode',
+                                        details: filesystemItem,
+                                    }
+                                    devChild['children'].push(filesystemChildNode);
+                                })
+                                
+                                //Populate the display values
+                                devChild['details'].totalUsagePercent = Math.ceil((devChild['details'].totalUsedCapacity/devChild['details'].totalUsableCapacity) * 100);
+                                devChild['details'].displayTotal = Utils.formatBytes(devChild['details'].totalUsableCapacity);
+                                devChild['details'].displayFree = Utils.formatBytes(devChild['details'].totalFreeCapacity);
+                                devChild['details'].displayUsed = Utils.formatBytes(devChild['details'].totalUsedCapacity);
+                                devChild['label'] = "Filesystems " + "(" + devChild['children'].length + ")";
+                            } else {
+                                devChild['label'] = "Filesystems " + "(" + devChild['children'].length + ")";
                             }
-                            devChild['children'].push(poolChildNode);
-                        })
-                        
-                        //Populate the display values
-                        devChild['details'].totalUsagePercent = Math.ceil((devChild['details'].totalUsedCapacity/devChild['details'].totalUsableCapacity) * 100);
-                        devChild['details'].displayTotal = Utils.formatBytes(devChild['details'].totalUsableCapacity);
-                        devChild['details'].displayFree = Utils.formatBytes(devChild['details'].totalFreeCapacity);
-                        devChild['details'].displayUsed = Utils.formatBytes(devChild['details'].totalUsedCapacity);
-                        devChild['label'] = "Storage Pools " + "(" + devChild['children'].length + ")";
-                    }
-                } else if(devChild['type']=='controllerParent'){
-                    devChild['children']=[];
+                            break;
+                        case 'shareParent':
+                            devChild['children']=[];
 
-                    if(device['details'].controllers && device['details'].controllers.length){
-                        let controllerChildNode = {};
-                        _.each(device['details'].controllers, function(controllerItem){
+                            if(device['details'].shares && device['details'].shares.length){
+                                let shareChildNode = {};
+                                _.each(device['details'].shares, function(shareItem){
 
-                            controllerItem['displayMemory'] = Utils.formatBytes(controllerItem['memory_size']);
-                            controllerChildNode = {
-                                label: controllerItem['name'],
-                                collapsedIcon: 'fa-microchip',
-                                expandedIcon: 'fa-microchip',
-                                styleClass: 'controller-node',
-                                type: 'controllerNode',
-                                details: controllerItem
+                                    shareChildNode = {
+                                        label: shareItem['name'],
+                                        collapsedIcon: 'fa-share-square-o',
+                                        expandedIcon: 'fa-share-square-o',
+                                        styleClass: 'share-node',
+                                        type: 'shareNode',
+                                        details: shareItem
+                                    }
+                                    devChild['children'].push(shareChildNode);
+                                });
+                                devChild['label'] = "Shares " + "(" + devChild['children'].length + ")";
+                            } else {
+                                devChild['label'] = "Shares " + "(" + devChild['children'].length + ")";
                             }
-                            devChild['children'].push(controllerChildNode);
-                        });
-                        devChild['label'] = "Controllers " + "(" + devChild['children'].length + ")";
-                    }
-                } else if(devChild['type']=='portParent'){
-                    devChild['children']=[];
-
-                    if(device['details'].ports && device['details'].ports.length){
-                        let portChildNode = {};
-                        _.each(device['details'].ports, function(portItem){
-
-                            portItem['displayMemory'] = Utils.formatBytes(portItem['memory_size']);
-                            portChildNode = {
-                                label: portItem['name'],
-                                collapsedIcon: 'fa-plug',
-                                expandedIcon: 'fa-plug',
-                                styleClass: 'port-node',
-                                type: 'portNode',
-                                details: portItem
-                            }
-                            devChild['children'].push(portChildNode);
-                        });
-                        devChild['label'] = "Ports " + "(" + devChild['children'].length + ")";
-                    }
-                } else if(devChild['type']=='diskParent'){
-                    devChild['children']=[];
-
-                    if(device['details'].disks && device['details'].disks.length){
-                        let diskChildNode = {};
-                        _.each(device['details'].disks, function(diskItem){
-
-                            diskItem['displayCapacity'] = Utils.formatBytes(diskItem['capacity']);
-                            diskChildNode = {
-                                label: diskItem['name'],
-                                collapsedIcon: 'fa-floppy-o',
-                                expandedIcon: 'fa-floppy-o',
-                                styleClass: 'port-node',
-                                type: 'diskNode',
-                                details: diskItem
-                            }
-                            devChild['children'].push(diskChildNode);
-                        });
-                        devChild['label'] = "Disks " + "(" + devChild['children'].length + ")";
-                    }
+                            break;
+                    default:
+                        break;
                 }
             })
         }
@@ -915,7 +1147,12 @@ export class StoragesComponent implements OnInit {
 
     //Show the overview panel when hovering on device in the tree.
     showOverview(event, node, overlaypanel: OverlayPanel){
-        let deviceOverlaypanel, modelOverlayPanel, volumeParentOverlayPanel, poolParentOverlayPanel, controllerOverlayPanel, portOverlayPanel, diskOverlayPanel, volumeOverlayPanel, poolOverlayPanel;
+        let deviceOverlaypanel, modelOverlayPanel, 
+            volumeParentOverlayPanel, poolParentOverlayPanel, filesystemParentOverlayPanel,
+            controllerOverlayPanel, portOverlayPanel, 
+            diskOverlayPanel, qtreeOverlayPanel, 
+            volumeOverlayPanel, poolOverlayPanel,
+            filesystemOverlayPanel, shareOverlayPanel;
         switch (node.type) {
             case "device":
                 this.storageOverview = node.details;
@@ -938,6 +1175,11 @@ export class StoragesComponent implements OnInit {
                     this.parentOverview = node;
                     poolParentOverlayPanel = overlaypanel;
                     poolParentOverlayPanel.toggle(event);
+                break;
+            case "filesystemParent":
+                    this.parentOverview = node;
+                    filesystemParentOverlayPanel = overlaypanel;
+                    filesystemParentOverlayPanel.toggle(event);
                 break;
             case "volNode":
                     this.volumeOverview = node;
@@ -963,6 +1205,21 @@ export class StoragesComponent implements OnInit {
                     this.diskOverview = node;
                     diskOverlayPanel = overlaypanel;
                     diskOverlayPanel.toggle(event);
+                break;
+            case "qtreeNode":
+                    this.qtreeOverview = node;
+                    qtreeOverlayPanel = overlaypanel;
+                    qtreeOverlayPanel.toggle(event);
+                break;
+            case "filesystemNode":
+                    this.filesystemOverview = node;
+                    filesystemOverlayPanel = overlaypanel;
+                    filesystemOverlayPanel.toggle(event);
+                break;
+            case "shareNode":
+                    this.shareOverview = node;
+                    shareOverlayPanel = overlaypanel;
+                    shareOverlayPanel.toggle(event);
                 break;
             default:
                 this.storageOverview = node;

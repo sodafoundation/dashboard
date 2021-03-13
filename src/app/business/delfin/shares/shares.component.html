@@ -1,0 +1,214 @@
+<div class="table-toolbar">
+    <div class="left">
+    </div>
+    <div class="right">
+        <div  class="ui-inputsearch">
+            <input type="text" #searchAll pInputText placeholder="{{i18n.keyID['sds_block_volume_search']}}">
+            <button pButton type="button" icon="fa-search"></button>
+        </div>
+    </div>
+</div>
+<p-dataTable [value]="sharesArr" [globalFilter]="searchAll"  [lazy]="true" (onLazyLoad)="loadSharesLazy($event)" [expandableRows]="true"  [rows]="10" [paginator]="true" [pageLinks]="3" [rowsPerPageOptions]="[10,20,50,100]" [totalRecords]="totalRecords" #spt>
+    <p-column expander="true" styleClass="col-icon" [style]="{'width': '3%'}"></p-column>
+    <p-column field="name" header="Name">
+        <ng-template pTemplate="body" let-share="rowData">
+            <!-- {{share.name}} -->
+            <a (mouseenter)="showShareOverview($event, share, shareOverviewPanel)" (mouseleave)="showShareOverview($event, share, shareOverviewPanel)">{{share.name}}</a>
+        </ng-template>
+    </p-column>    
+    <p-column field="status" header="Status">
+        <ng-template pTemplate="body" let-share="rowData">
+            <span class="storage-status-icon" [ngClass]="{normal: share.status=='normal', abnormal: share.status=='abnormal' || share.status=='unknown' || share.status=='offline'}"><i class="fa fa-circle"></i></span>
+            <span *ngIf="share.status=='normal'">Normal</span>
+            <span *ngIf="share.status=='abnormal' || share.status=='unknown'">Unknown</span>
+            <span *ngIf="share.status=='offline'">Offline</span>
+        </ng-template>
+    </p-column>
+    <p-column field="created_at" header="Created At">
+        <ng-template pTemplate="body" let-share="rowData">
+            <span>{{share.created_at ? (share.created_at | date:'long') : '--'}}</span>
+        </ng-template>
+    </p-column>
+    <p-column field="updated_at" header="Updated At">
+        <ng-template pTemplate="body" let-share="rowData">
+            <span>{{share.updated_at ? (share.updated_at | date:'long') : '--'}}</span>
+        </ng-template>
+    </p-column>
+    <ng-template let-share pTemplate="rowexpansion">
+        <div class="details-basic-info">
+            <div class="ui-grid ui-grid-responsive ui-grid-pad ui-fluid">
+                <div class="ui-grid-col-12">
+                    <div class="ui-grid-row details-basic-item-class">
+                        <div class="ui-grid-col-2">
+                            {{label.name}}:
+                        </div>
+                        <div class="ui-grid-col-2 details-basic-item-value-color" *ngIf="share">
+                            {{share.name}}
+                        </div>
+                        <div class="ui-grid-col-2">
+                            {{label.status}}:
+                        </div>
+                        <div class="ui-grid-col-2 details-basic-item-value-color" *ngIf="share">
+                            <span class="storage-status-icon" [ngClass]="{normal: share.status=='normal', abnormal: share.status=='abnormal' || share.status=='unknown' || share.status=='offline'}"><i class="fa fa-circle"></i></span>
+                            <span *ngIf="share.status=='normal'">Normal</span>
+                            <span *ngIf="share.status=='abnormal' || share.status=='unknown'">Unknown</span>
+                            <span *ngIf="share.status=='offline'">Offline</span>
+                        </div>
+                        <div class="ui-grid-col-2">
+                            {{label.created_at}}:
+                        </div>
+                        <div class="ui-grid-col-3 details-basic-item-value-color" *ngIf="share">
+                            {{share.created_at ? (share.created_at | date:'long') : '--'}}
+                        </div>
+                    
+                    </div>
+                    <div class="ui-grid-row details-basic-item-class">
+                        <div class="ui-grid-col-2">
+                            {{label.id}}:
+                        </div>
+                        <div class="ui-grid-col-2 details-basic-item-value-color" *ngIf="share">
+                            {{share.id | slice:0:20}}
+                            <a *ngIf="share.id.length > 20" pTooltip="{{share.id}}" tooltipPosition="top">
+                                ...
+                            </a>
+                        </div>
+                        <div class="ui-grid-col-2">
+                            {{label.native_share_id}}:
+                        </div>
+                        <div class="ui-grid-col-2 details-basic-item-value-color" *ngIf="share">
+                            {{share.native_share_id | slice:0:20}}
+                            <a *ngIf="share.native_share_id.length > 20" pTooltip="{{share.native_share_id}}" tooltipPosition="top">
+                                ...
+                            </a>
+                        </div>
+                        <div class="ui-grid-col-2">
+                            {{label.updated_at}}:
+                        </div>
+                        <div class="ui-grid-col-3 details-basic-item-value-color" *ngIf="share">
+                            {{share.updated_at ? (share.updated_at | date:'long') : '--'}}
+                        </div>
+                       
+                        
+                    </div>
+                    <div class="ui-grid-row details-basic-item-class">
+                        <div class="ui-grid-col-2">
+                            {{label.storage_id}}:
+                        </div>
+                        <div class="ui-grid-col-2 details-basic-item-value-color" *ngIf="share">
+                            {{share.storage_id | slice:0:20}}
+                            <a *ngIf="share.storage_id.length > 20" pTooltip="{{share.storage_id}}" tooltipPosition="top">
+                                ...
+                            </a>
+                        </div>
+                        <div class="ui-grid-col-2">
+                            {{label.native_filesystem_id}}:  
+                        </div>
+                        <div class="ui-grid-col-2 details-basic-item-value-color" *ngIf="share">
+                            {{share.native_filesystem_id ? share.native_filesystem_id : '--'}}           
+                        </div>
+                        <div class="ui-grid-col-2">
+                            {{label.protocol}}:
+                        </div>
+                        <div class="ui-grid-col-3 details-basic-item-value-color" *ngIf="share">
+                            {{share.protocol ? share.protocol : '--'}}           
+                        </div>
+                    </div>
+                    <div class="ui-grid-row details-basic-item-class">
+                        <div class="ui-grid-col-2">
+                            {{label.path}}:
+                        </div>
+                        <div class="ui-grid-col-2 details-basic-item-value-color" *ngIf="share">
+                            {{share.path ? share.path : '--'}}   
+                        </div>
+                        <div class="ui-grid-col-2">
+                            {{label.native_qtree_id}}:  
+                        </div>
+                        <div class="ui-grid-col-2 details-basic-item-value-color" *ngIf="share">
+                            {{share.native_qtree_id ? share.native_qtree_id : '--'}}           
+                        </div>
+                        <div class="ui-grid-col-2">
+                            
+                        </div>
+                        <div class="ui-grid-col-3 details-basic-item-value-color" *ngIf="share">
+                            
+                        </div>
+                </div>
+                </div>
+            </div>
+        </div>
+    </ng-template>    
+</p-dataTable>
+
+<p-overlayPanel styleClass="overview-panel" #shareOverviewPanel>
+    <div class="ui-g overview-title">
+        <h4>{{shareOverview && shareOverview.name}}</h4>
+    </div>
+    <div class="ui-g ui-g-nopad overview-item" >
+        <div class="ui-g-6">
+            <span class="overview-item-label">Status: </span>
+        </div>
+        <div *ngIf="shareOverview" class="ui-g-6">
+            <span class="storage-status-icon" [ngClass]="{normal:  shareOverview && shareOverview.status =='normal', abnormal: shareOverview && shareOverview.status =='abnormal' || shareOverview.status =='unknown'}"><i class="fa fa-circle"></i></span>
+            <span *ngIf="shareOverview && shareOverview.status=='normal'">Normal</span>
+            <span *ngIf=" shareOverview && shareOverview.status=='abnormal' || shareOverview.status=='unknown'">Unknown</span>
+            <span *ngIf=" shareOverview && shareOverview.status=='offline'">Offline</span>
+        </div>
+    </div>
+    <div class="ui-g overview-item">
+        <div class="ui-g-6">
+            Vendor / Model
+        </div>
+        <div class="ui-g-6">
+            {{ selectedStorageDetails && selectedStorageDetails.vendor}} {{selectedStorageDetails && selectedStorageDetails.model}}
+        </div>
+    </div>
+    <div class="ui-g overview-item">
+        <div class="ui-g-6">
+            <span class="overview-item-label">
+              Storage ID  
+            </span>
+        </div>
+        <div class="ui-g-6">
+            <span>
+                {{ shareOverview && shareOverview.storage_id}}
+            </span>
+        </div>
+    </div>
+    <div class="ui-g overview-item">
+        <div class="ui-g-6">
+            <span class="overview-item-label">
+              Storage Serial No.  
+            </span>
+        </div>
+        <div class="ui-g-6">
+            <span>
+                {{ selectedStorageDetails && selectedStorageDetails.serial_number}}
+            </span>
+        </div>
+    </div>
+    <div class="ui-g overview-item">
+        <div class="ui-g-6">
+            Protocol
+        </div>
+        <div class="ui-g-6">
+            {{ shareOverview && shareOverview.protocol}}
+        </div>
+    </div>
+    <div class="ui-g overview-item">
+        <div class="ui-g-6">
+            Path
+        </div>
+        <div class="ui-g-6">
+            {{shareOverview && shareOverview.path}}
+        </div>
+    </div>
+    <div class="ui-g overview-item">
+        <div class="ui-g-6">
+            
+        </div>
+        <div class="ui-g-6">
+            
+        </div>
+    </div>
+    <hr />
+</p-overlayPanel>
