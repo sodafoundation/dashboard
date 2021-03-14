@@ -952,7 +952,7 @@ export class LifeCycleComponent implements OnInit {
                     let newTargetBucket1 = value[targetBucket1].name ? value[targetBucket1].name : value[targetBucket1];
                     let newTargetBucket2 = value[targetBucket2].name ? value[targetBucket2].name : value[targetBucket2];
                     let transTrue = newTrans1 && newTrans2 && newTrans1 == newTrans2;
-                    if(transTrue && ((newBackend1 && newBackend2 && newBackend1 == newBackend2) || !newBackend1 || !newBackend2)){
+                    if(transTrue && (((newBackend1 && newBackend2 && newBackend1 == newBackend2) || !newBackend1 || !newBackend2) || ((newTargetBucket1 && newTargetBucket2 && newTargetBucket1 == newTargetBucket2) || !newTargetBucket1 || !newTargetBucket2))){
                         this.sameTransition = true;
                     }else{
                         this.sameTransition = false;
@@ -972,6 +972,11 @@ export class LifeCycleComponent implements OnInit {
         }
     }
     onSubmit(value,dialog?) {
+        if(this.showModifyLifeCycle){
+            dialog = "update";
+        }else if(this.showCreateLifeCycle){
+            dialog = "create";
+        }
         //this dialog here is used to distinguish whether the Enable or disable operation
         if (this.sameTransition || (!dialog && !this.createLifeCycleForm.valid)) {
             for (let i in this.createLifeCycleForm.controls) {
@@ -979,11 +984,7 @@ export class LifeCycleComponent implements OnInit {
             }
             return;
         };
-        if(this.showModifyLifeCycle){
-            dialog = "update";
-        }else if(this.showCreateLifeCycle){
-            dialog = "create";
-        }
+        
         let data;
         if(dialog){
             data = this.getLifeCycleDataArray(value, this.submitObj,dialog);
