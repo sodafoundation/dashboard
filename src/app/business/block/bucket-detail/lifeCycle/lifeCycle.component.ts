@@ -409,27 +409,26 @@ export class LifeCycleComponent implements OnInit {
                                     bucketsArr.push(bucketItem);
                                 }
                             });
-                            if(this.modifyBucket.length > transIndex && this.modifyBucket[transIndex] != ""){
-                                this.modifyBucket.forEach((item,index)=>{
-                                    if(index == transIndex){
-                                        bucketsArr.forEach((it,index)=>{
-                                            let firstItem = bucketsArr[0];
-                                            if(item == it.label){
-                                                bucketsArr[0]= it;
-                                                bucketsArr[index] = firstItem;
-                                            }
-                                        })
-                                    }
-                                    
-                                });
-                            }
                             if(this.allBuckets[transIndex]){
                                 this.allBuckets[transIndex] = bucketsArr;
                             } else{
                                 this.allBuckets.push(bucketsArr);
-                            }
-                            
-                        }                    
+                            }                            
+                        }
+                        if(this.modifyBucket.length > transIndex && this.modifyBucket[transIndex] != ""){
+                            this.modifyBucket.forEach((item,index)=>{
+                                if(index == transIndex){
+                                    bucketsArr.forEach((it,index)=>{
+                                        let firstItem = bucketsArr[0];
+                                        if(item == it.label){
+                                            bucketsArr[0]= it;
+                                            bucketsArr[index] = firstItem;
+                                        }
+                                    })
+                                }
+                                
+                            });
+                        }                      
                     });
                 }
         })
@@ -603,13 +602,17 @@ export class LifeCycleComponent implements OnInit {
             this.getLifeCycleForm();
             //reset lifeCycle
             this.getTransOptions();
-        } else {
-            this.lifeCycleTitle = "Update LifeCycle Rule";
-            this.showCreateLifeCycle = false;
-            this.showModifyLifeCycle = true;
         }
         this.getLifeCycleList(dialog, cycle);
-        this.showRightSidebar = (this.showCreateLifeCycle || this.showModifyLifeCycle) ? true : false;
+        this.showRightSidebar = this.showCreateLifeCycle ? true : false;
+    }
+    showModifyLifecycleDialog(dialog, cycle){
+        this.lifeCycleTitle = "Update LifeCycle Rule";
+        this.showCreateLifeCycle = false;
+        this.showModifyLifeCycle = true;     
+        this.getLifeCycleList(dialog, cycle);
+        this.showRightSidebar = this.showModifyLifeCycle ? true : false;
+        
     }
     getLifeCycleDataArray(value, object?, dialog?) {
         let xmlStr = `<LifecycleConfiguration xmlns=\"http://s3.amazonaws.com/doc/2006-03-01/\">`;
@@ -1089,11 +1092,24 @@ export class LifeCycleComponent implements OnInit {
             let lastTrans;
             if (_.isArray(this.modifyTrans)) {
                 this.modifyTrans.forEach((item, index) => {
+                    let transItem = {
+                        value : {
+                            backendName: item.Backend
+                        }
+                    }
+                    this.getBuckets(transItem, index);
                     this.getModifyTrans(item, index, cycle);
+                    
                 })
                 let lastTransIndex = this.modifyTrans.length -1;
                 lastTrans = this.createLifeCycleForm.value['transId' + lastTransIndex];
             } else {
+                let transItem = {
+                    value : {
+                        backendName: this.modifyTrans['Backend']
+                    }
+                }
+                this.getBuckets(transItem, 0);
                 this.getModifyTrans(this.modifyTrans, 0, cycle);
                 lastTrans = this.createLifeCycleForm.value['transId0'];
             }
@@ -1128,6 +1144,7 @@ export class LifeCycleComponent implements OnInit {
             this.minDays.push(day);
         }
         this.getTransOptions(index, cycle);
+        
     }
     cancelCycle() {
         this.showCreateLifeCycle = false;
