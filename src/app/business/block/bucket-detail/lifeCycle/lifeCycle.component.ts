@@ -85,6 +85,9 @@ export class LifeCycleComponent implements OnInit {
     }
     modifyArr = [];
     msgs: Message[];
+    
+    // List of clouds that support the new bucket CRUD from SODA Multicloud as per multicloud/#1205, multicloud/#1208 and multicloud/#1209
+    lifecycleBucketSupport: any = ['aws-s3', 'azure-blob', 'gcp-s3', 'hw-obs'];
 
     constructor(
         private ActivatedRoute: ActivatedRoute,
@@ -349,22 +352,11 @@ export class LifeCycleComponent implements OnInit {
     }
     //backend change
     backendChange(event, transIndex){
-        switch (event && event.value.backendType) {
-            case 'aws-s3':
-                    this.bucketShow[transIndex] = true;
-                    this.getBuckets(event, transIndex);
-                break;
-            case 'azure-blob':
-                    this.bucketShow[transIndex] = true;
-                    this.getBuckets(event, transIndex);
-                break;
-            case 'gcp-s3':
-                    this.bucketShow[transIndex] = true;
-                    this.getBuckets(event, transIndex);
-                break;
-            default:
-                this.bucketShow[transIndex] = false;
-                break;
+        if((event && event.value.backendType) && _.contains(this.lifecycleBucketSupport, event.value.backendType)){
+            this.bucketShow[transIndex] = true;
+            this.getBuckets(event, transIndex);
+        } else{
+            this.bucketShow[transIndex] = false;
         }
         this.getTransValue(this.createLifeCycleForm.value); 
     }
