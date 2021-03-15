@@ -50,6 +50,14 @@ export class StorageDetailsComponent implements OnInit {
     perfMetricsConfigForm: any;
     showperfMetricsConfigForm: boolean = false;
     performanceMonitorURL: any = "";
+    volumesExist: boolean = false;
+    poolsExist: boolean = false;
+    controllersExist: boolean = false;
+    portsExist: boolean = false;
+    disksExist: boolean = false;
+    qtreesExist: boolean = false;
+    filesystemsExist: boolean = false;
+    sharesExist: boolean = false;
     msgs: Message[];
 
     label = {
@@ -166,22 +174,37 @@ export class StorageDetailsComponent implements OnInit {
     }
 
     getStorageById(id){
-        this.ds.getStorageById(id).subscribe((res)=>{
+        this.ds.getStorageById(id).subscribe((storageRes)=>{
             let storageDevice;
-            storageDevice = res.json();
-            storageDevice['capacity'] = {};
-            let percentUsage = Math.ceil((storageDevice['used_capacity']/storageDevice['total_capacity']) * 100);
-            storageDevice['capacity'].used = Utils.formatBytes(storageDevice['used_capacity']);
-            storageDevice['capacity'].free = Utils.formatBytes(storageDevice['free_capacity']);
-            storageDevice['capacity'].total = Utils.formatBytes(storageDevice['total_capacity']);
-            storageDevice['capacity'].raw = Utils.formatBytes(storageDevice['raw_capacity']);
-            storageDevice['capacity'].subscribed = Utils.formatBytes(storageDevice['subscribed_capacity']);
-            let system_used = Math.ceil((storageDevice['raw_capacity'] - storageDevice['total_capacity']));
-            storageDevice['system_used_capacity'] = system_used;
-            storageDevice['capacity'].system_used = Utils.formatBytes(storageDevice['system_used_capacity']) ;
-            storageDevice['capacity'].usage = percentUsage;
+            storageDevice = storageRes.json();
+            this.ds.getAccessinfoByStorageId(this.selectedStorageId).subscribe((res)=>{
+                let accessInfo = res.json();
+                storageDevice['delfin_model'] = accessInfo['model'];
+                this.volumesExist = _.contains(Consts.STORAGES.resources.volumes, accessInfo['model']);
+                this.poolsExist = _.contains(Consts.STORAGES.resources.pools, accessInfo['model']);
+                this.controllersExist = _.contains(Consts.STORAGES.resources.controllers, accessInfo['model']);
+                this.portsExist = _.contains(Consts.STORAGES.resources.ports, accessInfo['model']);
+                this.disksExist = _.contains(Consts.STORAGES.resources.disks, accessInfo['model']);
+                this.qtreesExist = _.contains(Consts.STORAGES.resources.qtrees, accessInfo['model']);
+                this.filesystemsExist = _.contains(Consts.STORAGES.resources.filesystems, accessInfo['model']);
+                this.sharesExist = _.contains(Consts.STORAGES.resources.shares, accessInfo['model']);
+                storageDevice['capacity'] = {};
+                let percentUsage = Math.ceil((storageDevice['used_capacity']/storageDevice['total_capacity']) * 100);
+                storageDevice['capacity'].used = Utils.formatBytes(storageDevice['used_capacity']);
+                storageDevice['capacity'].free = Utils.formatBytes(storageDevice['free_capacity']);
+                storageDevice['capacity'].total = Utils.formatBytes(storageDevice['total_capacity']);
+                storageDevice['capacity'].raw = Utils.formatBytes(storageDevice['raw_capacity']);
+                storageDevice['capacity'].subscribed = Utils.formatBytes(storageDevice['subscribed_capacity']);
+                let system_used = Math.ceil((storageDevice['raw_capacity'] - storageDevice['total_capacity']));
+                storageDevice['system_used_capacity'] = system_used;
+                storageDevice['capacity'].system_used = Utils.formatBytes(storageDevice['system_used_capacity']) ;
+                storageDevice['capacity'].usage = percentUsage;
 
-            this.selectedStorage = storageDevice;
+                this.selectedStorage = storageDevice;
+            },(error)=>{
+    
+            });
+            
         }, (error)=>{
             console.log("Something went wrong. Could not fetch storage", error);
         })

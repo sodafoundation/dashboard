@@ -7,6 +7,7 @@ import { LifeCycleModule } from './lifeCycle/lifeCycle.module';
 import { AclModule } from './acl/acl.module';
 import { TabViewModule,ButtonModule, DataTableModule, DropMenuModule, DialogModule, FormModule, InputTextModule, InputSwitchModule, InputTextareaModule, 
   ConfirmDialogModule ,ConfirmationService,CheckboxModule,DropdownModule, SplitButtonModule, GrowlModule} from './../../../components/common/api';
+
 import { HttpService } from './../../../shared/service/Http.service';
 import { BucketService } from '../buckets.service';
 import { HttpClientModule } from '@angular/common/http';
@@ -37,7 +38,7 @@ let routers = [{
     HttpClientModule,
     SplitButtonModule,
     GrowlModule,
-    AclModule,
+    AclModule
   ],
   declarations: [
     BucketDetailComponent
