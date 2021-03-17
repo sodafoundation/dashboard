@@ -136,6 +136,7 @@ export const Consts = {
             'qtrees' : 'resource-monitor/qtrees',
             'filesystems' : 'resource-monitor/filesystems',
             'shares' : 'resource-monitor/shares',
+            'quotas' : 'resource-monitor/quotas',
             'alerts' : 'alertmanager/alerts'
         }
     },
@@ -206,7 +207,8 @@ export const Consts = {
             disks : ['oceanstor'],
             qtrees : ['oceanstor'],
             filesystems : ['oceanstor'],
-            shares: ['oceanstor']
+            shares: ['oceanstor'],
+            quotas: ['oceanstor']
         },
         models: {
             'dellemc' : [

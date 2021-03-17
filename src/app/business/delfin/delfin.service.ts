@@ -17,6 +17,7 @@ export class DelfinService {
     delfinQtreesUrl = Consts.API.DELFIN.qtrees;
     delfinFilesystemsUrl = Consts.API.DELFIN.filesystems;
     delfinSharesUrl = Consts.API.DELFIN.shares;
+    delfinQuotasUrl = Consts.API.DELFIN.quotas;
     delfinPortsUrl = Consts.API.DELFIN.ports;
     delfinDisksUrl = Consts.API.DELFIN.disks;
     delfinAlertsUrl = Consts.API.DELFIN.alerts;
@@ -356,6 +357,48 @@ export class DelfinService {
     //get Share details
     getShareDetails(id): Observable<any> {
         return this.http.get(this.delfinSharesUrl+'/'+id);
+    }
+
+    //get all Quotas
+    getAllQuotas(storageId?, nativeFilesystemId?, nativeQtreeId?, securityMode?, id?, name?, status?, limit?, offset?, sort?): Observable<any> {
+        let query = "";
+        if(storageId){
+            query += "?storage_id=" + storageId;
+        }
+        if(nativeFilesystemId){
+            query += "?native_filesystem_id=" + nativeFilesystemId;
+        }
+        if(nativeQtreeId){
+            query += "?native_qtree_id=" + nativeQtreeId;
+        }
+        if(securityMode){
+            query += "?security_mode=" + securityMode;
+        }
+        if(id){
+            query += "?id=" + id;
+        }
+        if(name){
+            query += "?name=" + name;
+        }
+        if(status){
+            query += "?status=" + status;
+        }
+        if(limit){
+            query += "?limit=" + limit;
+        }
+        if(offset){
+            query += "?offset=" + offset;
+        }
+        if(sort){
+            query += "?sort=" + sort;
+        }
+        let url =this.delfinQuotasUrl + query;
+        return this.http.get(url);
+    }
+
+    //get Storage Pool details
+    getQuotaDetails(id): Observable<any> {
+        return this.http.get(this.delfinQuotasUrl+'/'+id);
     }
 
     //get all alert sources
