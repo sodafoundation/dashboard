@@ -2225,7 +2225,8 @@ td.ui-datatable-emptymessage{
 .volume-parent-node ul.ui-treenode-children, .pool-parent-node ul.ui-treenode-children, 
 .controller-parent-node ul.ui-treenode-children, .port-parent-node ul.ui-treenode-children, 
 .disk-parent-node ul.ui-treenode-children, .qtree-parent-node ul.ui-treenode-children, 
-.share-parent-node ul.ui-treenode-children, .filesystem-parent-node ul.ui-treenode-children {
+.share-parent-node ul.ui-treenode-children, .filesystem-parent-node ul.ui-treenode-children,
+.quota-parent-node ul.ui-treenode-children {
     height: 100px;
     overflow-y: scroll;
     width: 50%;

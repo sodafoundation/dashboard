@@ -168,7 +168,7 @@
                     </div>
                 <div class="configuration-tabs">
                     <p-tabView styleClass="ui-tabview-large" (onChange)="changeConfigTab($event)" [activeIndex]="configTabIndex"> 
-                        <p-tabPanel *ngIf="poolsExist" header="Storage pools">
+                        <p-tabPanel *ngIf="poolsExist" header="Storage pools" [selected]="true">
                             <app-delfin-storage-pools [selectedStorage]="selectedStorageId"></app-delfin-storage-pools>
                         </p-tabPanel>
                         <p-tabPanel *ngIf="volumesExist" header="Volumes">
@@ -193,6 +193,9 @@
                         </p-tabPanel>
                         <p-tabPanel *ngIf="sharesExist" header="Shares">
                             <app-delfin-shares [selectedStorage]="selectedStorageId"></app-delfin-shares>
+                        </p-tabPanel>
+                        <p-tabPanel *ngIf="quotasExist" header="Quotas">
+                            <app-delfin-quotas [selectedStorage]="selectedStorageId"></app-delfin-quotas>
                         </p-tabPanel>
                     </p-tabView>
                 </div>
