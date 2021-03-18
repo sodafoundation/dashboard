@@ -69,6 +69,7 @@ export class StoragesComponent implements OnInit {
     qtreeOverview;
     filesystemOverview;
     shareOverview;
+    quotaOverview;
     groupedByVendor;
     totalArrayRawCapacity: any;
     totalArrayUsableCapacity: any;
@@ -83,6 +84,7 @@ export class StoragesComponent implements OnInit {
     qtreesExist: boolean = false;
     filesystemsExist: boolean = false;
     sharesExist: boolean = false;
+    quotasExist: boolean = false;
     msgs: Message[];
 
     label = {
@@ -180,6 +182,7 @@ export class StoragesComponent implements OnInit {
         private ActivatedRoute: ActivatedRoute,
     ) {
         this.msgs = [];
+        this.allResolvedStorages = [];
             this.ActivatedRoute.queryParamMap.subscribe(params => {
                 let message = params.get('message');
                 if(message){
@@ -195,7 +198,8 @@ export class StoragesComponent implements OnInit {
 
     ngOnInit() {
         this.loading = true;
-        this.onPageFirstLoad();
+        this.onPageFirstLoad();            
+        this.refreshAllLists();
         this.getAllActiveAlerts();
         
         this.menuItems = [
@@ -372,6 +376,7 @@ export class StoragesComponent implements OnInit {
                 let qtrees = [];
                 let filesystems = [];
                 let shares = [];
+                let quotas = [];
                 let accessInfo: any;
                 // Get the access info of the device to fetch the Delfin Driver model used
                 this.ds.getAccessinfoByStorageId(element['id']).subscribe((res)=>{                    
@@ -386,6 +391,7 @@ export class StoragesComponent implements OnInit {
                     this.qtreesExist = _.contains(Consts.STORAGES.resources.qtrees, accessInfo['model']);
                     this.filesystemsExist = _.contains(Consts.STORAGES.resources.filesystems, accessInfo['model']);
                     this.sharesExist = _.contains(Consts.STORAGES.resources.shares, accessInfo['model']);
+                    this.quotasExist = _.contains(Consts.STORAGES.resources.quotas, accessInfo['model']);
                     if(this.volumesExist){
                         // Get all the volumes associated with the Storage device
                         this.ds.getAllVolumes(element['id']).subscribe((res)=>{
@@ -394,6 +400,8 @@ export class StoragesComponent implements OnInit {
                         }, (error)=>{
                             console.log("Something went wrong. Could not fetch Volumes.", error)
                         });
+                    } else{
+                        element['volumesExist'] = this.volumesExist;
                     }
 
                     if(this.poolsExist){
@@ -404,6 +412,8 @@ export class StoragesComponent implements OnInit {
                         }, (error)=>{
                             console.log("Something went wrong. Could not fetch Storage Pools.", error)
                         });
+                    } else{
+                        element['poolsExist'] = this.poolsExist;
                     }
                     if(this.controllersExist){
                         // Get all the Controllers associated with the Storage device
@@ -413,6 +423,8 @@ export class StoragesComponent implements OnInit {
                         }, (error)=>{
                             console.log("Something went wrong. Could not fetch Controllers.", error)
                         });
+                    } else{
+                        element['controllersExist'] = this.controllersExist;
                     }
                     if(this.portsExist){
                         
@@ -435,6 +447,8 @@ export class StoragesComponent implements OnInit {
                         }, (error)=>{
                             console.log("Something went wrong. Could not fetch Disks.", error)
                         });
+                    } else{
+                        element['disksExist'] = this.disksExist;
                     }
                     if(this.qtreesExist){
                         // Get all the Qtrees associated with the Storage device
@@ -444,6 +458,8 @@ export class StoragesComponent implements OnInit {
                         }, (error)=>{
                             console.log("Something went wrong. Could not fetch Qtrees.", error)
                         });
+                    } else{
+                        element['qtreesExist'] = this.qtreesExist;
                     }
                     if(this.filesystemsExist){
                         // Get all the Filesystems associated with the Storage device
@@ -453,6 +469,8 @@ export class StoragesComponent implements OnInit {
                         }, (error)=>{
                             console.log("Something went wrong. Could not fetch Filesystems.", error)
                         });
+                    } else{
+                        element['filesystemsExist'] = this.filesystemsExist;
                     }
                     if(this.sharesExist){
                         // Get all the Shares associated with the Storage device
@@ -464,6 +482,17 @@ export class StoragesComponent implements OnInit {
                         });
                     } else{
                         element['sharesExist'] = this.sharesExist;
+                    }
+                    if(this.quotasExist){
+                        // Get all the Quotas associated with the Storage device
+                        this.ds.getAllQuotas(element['id']).subscribe((res)=>{
+                            quotas = res.json().quotas;
+                            element['quotas'] = quotas;
+                        }, (error)=>{
+                            console.log("Something went wrong. Could not fetch Quotas.", error)
+                        });
+                    } else{
+                        element['quotasExist'] = this.quotasExist;
                     }
                 }, (error)=>{
                     console.log("Something went wrong. Could not fetch Access info.", error)
@@ -500,6 +529,7 @@ export class StoragesComponent implements OnInit {
                 element['qtrees'] = qtrees;
                 element['filesystems'] = filesystems;
                 element['shares'] = shares;
+                element['quotas'] = quotas;
             });
 
             // Invoke prepareTree() to prepare the tree structure for the widget
@@ -747,6 +777,20 @@ export class StoragesComponent implements OnInit {
                                 modelTreeNode['children'].push(parentShareNode);
                             }
 
+                            // Create the Quotas parent Node
+                            let parentQuotaNode = {};
+                            if(storageDevice['quotas']){
+                                parentQuotaNode = {
+                                    label : "Quotas",
+                                    collapsedIcon: 'fa-percent',
+                                    expandedIcon: 'fa-percent',
+                                    styleClass: 'quota-parent-node',
+                                    type: 'quotaParent',
+                                    leaf: false
+                                }
+                                modelTreeNode['children'].push(parentQuotaNode);
+                            }
+
                             // Push each storage device as a child of the model node
                             modelGroupNode['children'].push(modelTreeNode);
                         });
@@ -935,96 +979,130 @@ export class StoragesComponent implements OnInit {
                             devChild['label'] = "Disks " + "(" + devChild['children'].length + ")";
                         }
                         break;
-                        case 'qtreeParent':
-                            devChild['children']=[];
+                    case 'qtreeParent':
+                        devChild['children']=[];
 
-                            if(device['details'].qtrees && device['details'].qtrees.length){
-                                let qtreeChildNode = {};
-                                _.each(device['details'].qtrees, function(qtreeItem){
+                        if(device['details'].qtrees && device['details'].qtrees.length){
+                            let qtreeChildNode = {};
+                            _.each(device['details'].qtrees, function(qtreeItem){
 
-                                    qtreeChildNode = {
-                                        label: qtreeItem['name'],
-                                        collapsedIcon: 'fa-pie-chart',
-                                        expandedIcon: 'fa-pie-chart',
-                                        styleClass: 'qtree-node',
-                                        type: 'qtreeNode',
-                                        details: qtreeItem
-                                    }
-                                    devChild['children'].push(qtreeChildNode);
-                                });
-                                devChild['label'] = "Qtrees " + "(" + devChild['children'].length + ")";
-                            } else {
-                                devChild['label'] = "Qtrees " + "(" + devChild['children'].length + ")";
-                            }
-                            break;
-                        case 'filesystemParent':
+                                qtreeChildNode = {
+                                    label: qtreeItem['name'],
+                                    collapsedIcon: 'fa-pie-chart',
+                                    expandedIcon: 'fa-pie-chart',
+                                    styleClass: 'qtree-node',
+                                    type: 'qtreeNode',
+                                    details: qtreeItem
+                                }
+                                devChild['children'].push(qtreeChildNode);
+                            });
+                            devChild['label'] = "Qtrees " + "(" + devChild['children'].length + ")";
+                        } else {
+                            devChild['label'] = "Qtrees " + "(" + devChild['children'].length + ")";
+                        }
+                        break;
+                    case 'filesystemParent':
+                        devChild['children'] = [];
+
+                        // If filesystem parent then iterate through all storage filesystems and calculate the capacities and stats for 
+                        // each filesystem parent and filesystem node
+
+                        if(device['details'].filesystems && device['details'].filesystems.length){
+                            let filesystemChildNode ={};
+                            _.each(device['details'].filesystems, function(filesystemItem){
+                                //Calculate the capacities for the Volume
+                                filesystemItem['capacity'] = {};
+                                let percentUsage = Math.ceil((filesystemItem['used_capacity']/filesystemItem['total_capacity']) * 100);
+                                filesystemItem['capacity'].used = Utils.formatBytes(filesystemItem['used_capacity']);
+                                filesystemItem['capacity'].free = Utils.formatBytes(filesystemItem['free_capacity']);
+                                filesystemItem['capacity'].total = Utils.formatBytes(filesystemItem['total_capacity']);
+                                filesystemItem['capacity'].usage = percentUsage;
+
+                                //Create the capacity stats for each filesystem group by summing together the capacity of each device
+                                devChild['details'].totalUsableCapacity+=filesystemItem['total_capacity'];
+                                devChild['details'].totalUsedCapacity+=filesystemItem['used_capacity'];
+                                devChild['details'].totalFreeCapacity+=filesystemItem['free_capacity'];
+                                
+                                filesystemChildNode = {
+                                    label : filesystemItem['name'],
+                                    collapsedIcon: 'fa-files-o',
+                                    expandedIcon: 'fa-files-o',
+                                    styleClass: 'filesystem-node',
+                                    type: 'filesystemNode',
+                                    details: filesystemItem,
+                                }
+                                devChild['children'].push(filesystemChildNode);
+                            })
+                            
+                            //Populate the display values
+                            devChild['details'].totalUsagePercent = Math.ceil((devChild['details'].totalUsedCapacity/devChild['details'].totalUsableCapacity) * 100);
+                            devChild['details'].displayTotal = Utils.formatBytes(devChild['details'].totalUsableCapacity);
+                            devChild['details'].displayFree = Utils.formatBytes(devChild['details'].totalFreeCapacity);
+                            devChild['details'].displayUsed = Utils.formatBytes(devChild['details'].totalUsedCapacity);
+                            devChild['label'] = "Filesystems " + "(" + devChild['children'].length + ")";
+                        } else {
+                            devChild['label'] = "Filesystems " + "(" + devChild['children'].length + ")";
+                        }
+                        break;
+                    case 'shareParent':
+                        devChild['children']=[];
+
+                        if(device['details'].shares && device['details'].shares.length){
+                            let shareChildNode = {};
+                            _.each(device['details'].shares, function(shareItem){
+
+                                shareChildNode = {
+                                    label: shareItem['name'],
+                                    collapsedIcon: 'fa-share-square-o',
+                                    expandedIcon: 'fa-share-square-o',
+                                    styleClass: 'share-node',
+                                    type: 'shareNode',
+                                    details: shareItem
+                                }
+                                devChild['children'].push(shareChildNode);
+                            });
+                            devChild['label'] = "Shares " + "(" + devChild['children'].length + ")";
+                        } else {
+                            devChild['label'] = "Shares " + "(" + devChild['children'].length + ")";
+                        }
+                        break;
+                    case 'quotaParent':
                             devChild['children'] = [];
     
-                            // If filesystem parent then iterate through all storage filesystems and calculate the capacities and stats for 
-                            // each filesystem parent and filesystem node
+                            // If quota parent then iterate through all storage quotas and calculate the capacities and stats for 
+                            // each quota parent and quota node
     
-                            if(device['details'].filesystems && device['details'].filesystems.length){
-                                let filesystemChildNode ={};
-                                _.each(device['details'].filesystems, function(filesystemItem){
-                                    //Calculate the capacities for the Volume
-                                    filesystemItem['capacity'] = {};
-                                    let percentUsage = Math.ceil((filesystemItem['used_capacity']/filesystemItem['total_capacity']) * 100);
-                                    filesystemItem['capacity'].used = Utils.formatBytes(filesystemItem['used_capacity']);
-                                    filesystemItem['capacity'].free = Utils.formatBytes(filesystemItem['free_capacity']);
-                                    filesystemItem['capacity'].total = Utils.formatBytes(filesystemItem['total_capacity']);
-                                    filesystemItem['capacity'].usage = percentUsage;
-    
-                                    //Create the capacity stats for each filesystem group by summing together the capacity of each device
-                                    devChild['details'].totalUsableCapacity+=filesystemItem['total_capacity'];
-                                    devChild['details'].totalUsedCapacity+=filesystemItem['used_capacity'];
-                                    devChild['details'].totalFreeCapacity+=filesystemItem['free_capacity'];
+                            if(device['details'].quotas && device['details'].quotas.length){
+                                let quotaChildNode ={};
+                                _.each(device['details'].quotas, function(quotaItem){
+                                    quotaItem['capacity'] = {};
+                                    quotaItem['capacity'].display_hard_limit = Utils.formatBytes(quotaItem['capacity_hard_limit']);
+                                    quotaItem['capacity'].display_soft_limit = Utils.formatBytes(quotaItem['capacity_soft_limit']);
+                                    quotaItem['capacity'].display_used = Utils.formatBytes(quotaItem['used_capacity']);
+                                    quotaItem['capacity'].display_free = Utils.formatBytes(quotaItem['capacity_hard_limit'] - quotaItem['used_capacity']);
+                                    let percentUsage = Math.ceil((quotaItem['used_capacity']/quotaItem['capacity_hard_limit']) * 100);
+                                    quotaItem['capacity'].usage = percentUsage;
                                     
-                                    filesystemChildNode = {
-                                        label : filesystemItem['name'],
+                                    quotaChildNode = {
+                                        label : quotaItem['native_quota_id'],
                                         collapsedIcon: 'fa-files-o',
                                         expandedIcon: 'fa-files-o',
-                                        styleClass: 'filesystem-node',
-                                        type: 'filesystemNode',
-                                        details: filesystemItem,
+                                        styleClass: 'quota-node',
+                                        type: 'quotaNode',
+                                        details: quotaItem,
                                     }
-                                    devChild['children'].push(filesystemChildNode);
+                                    devChild['children'].push(quotaChildNode);
                                 })
                                 
-                                //Populate the display values
-                                devChild['details'].totalUsagePercent = Math.ceil((devChild['details'].totalUsedCapacity/devChild['details'].totalUsableCapacity) * 100);
-                                devChild['details'].displayTotal = Utils.formatBytes(devChild['details'].totalUsableCapacity);
-                                devChild['details'].displayFree = Utils.formatBytes(devChild['details'].totalFreeCapacity);
-                                devChild['details'].displayUsed = Utils.formatBytes(devChild['details'].totalUsedCapacity);
-                                devChild['label'] = "Filesystems " + "(" + devChild['children'].length + ")";
+                                devChild['label'] = "Quotas " + "(" + devChild['children'].length + ")";
                             } else {
-                                devChild['label'] = "Filesystems " + "(" + devChild['children'].length + ")";
-                            }
-                            break;
-                        case 'shareParent':
-                            devChild['children']=[];
-
-                            if(device['details'].shares && device['details'].shares.length){
-                                let shareChildNode = {};
-                                _.each(device['details'].shares, function(shareItem){
-
-                                    shareChildNode = {
-                                        label: shareItem['name'],
-                                        collapsedIcon: 'fa-share-square-o',
-                                        expandedIcon: 'fa-share-square-o',
-                                        styleClass: 'share-node',
-                                        type: 'shareNode',
-                                        details: shareItem
-                                    }
-                                    devChild['children'].push(shareChildNode);
-                                });
-                                devChild['label'] = "Shares " + "(" + devChild['children'].length + ")";
-                            } else {
-                                devChild['label'] = "Shares " + "(" + devChild['children'].length + ")";
+                                devChild['label'] = "Quotas " + "(" + devChild['children'].length + ")";
                             }
                             break;
                     default:
                         break;
                 }
+                
             })
         }
     }
@@ -1152,7 +1230,7 @@ export class StoragesComponent implements OnInit {
             controllerOverlayPanel, portOverlayPanel, 
             diskOverlayPanel, qtreeOverlayPanel, 
             volumeOverlayPanel, poolOverlayPanel,
-            filesystemOverlayPanel, shareOverlayPanel;
+            filesystemOverlayPanel, shareOverlayPanel, quotaOverlayPanel;
         switch (node.type) {
             case "device":
                 this.storageOverview = node.details;
@@ -1220,6 +1298,11 @@ export class StoragesComponent implements OnInit {
                     this.shareOverview = node;
                     shareOverlayPanel = overlaypanel;
                     shareOverlayPanel.toggle(event);
+                break;
+            case "quotaNode":
+                    this.quotaOverview = node;
+                    quotaOverlayPanel = overlaypanel;
+                    quotaOverlayPanel.toggle(event);
                 break;
             default:
                 this.storageOverview = node;

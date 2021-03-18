@@ -58,6 +58,7 @@ export class StorageDetailsComponent implements OnInit {
     qtreesExist: boolean = false;
     filesystemsExist: boolean = false;
     sharesExist: boolean = false;
+    quotasExist: boolean = false;
     msgs: Message[];
 
     label = {
@@ -154,6 +155,27 @@ export class StorageDetailsComponent implements OnInit {
             case 1:
                 this.configTabIndex = 1;
                 break;
+            case 2:
+                this.configTabIndex = 2;
+                break;
+            case 3:
+                this.configTabIndex = 3;
+                break;
+            case 4:
+                this.configTabIndex = 4;
+                break;
+            case 5:
+                this.configTabIndex = 5;
+                break;
+            case 6:
+                this.configTabIndex = 6;
+                break;
+            case 7:
+                this.configTabIndex = 7;
+                break;
+            case 8:
+                this.configTabIndex = 8;
+                break;
             default:
                 break;
         }
@@ -188,6 +210,7 @@ export class StorageDetailsComponent implements OnInit {
                 this.qtreesExist = _.contains(Consts.STORAGES.resources.qtrees, accessInfo['model']);
                 this.filesystemsExist = _.contains(Consts.STORAGES.resources.filesystems, accessInfo['model']);
                 this.sharesExist = _.contains(Consts.STORAGES.resources.shares, accessInfo['model']);
+                this.quotasExist = _.contains(Consts.STORAGES.resources.quotas, accessInfo['model']);
                 storageDevice['capacity'] = {};
                 let percentUsage = Math.ceil((storageDevice['used_capacity']/storageDevice['total_capacity']) * 100);
                 storageDevice['capacity'].used = Utils.formatBytes(storageDevice['used_capacity']);

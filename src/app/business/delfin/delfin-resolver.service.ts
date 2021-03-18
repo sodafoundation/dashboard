@@ -17,6 +17,7 @@ export class DelfinResolver implements Resolve<any> {
   delfinQtreesUrl = Consts.API.DELFIN.qtrees;
   delfinFilesystemsUrl = Consts.API.DELFIN.filesystems;
   delfinSharesUrl = Consts.API.DELFIN.shares;
+  delfinQuotasUrl = Consts.API.DELFIN.quotas;
   delfinPortsUrl = Consts.API.DELFIN.ports;
   delfinDisksUrl = Consts.API.DELFIN.disks;
   delfinAlertsUrl = Consts.API.DELFIN.alerts;
@@ -76,10 +77,10 @@ export class DelfinResolver implements Resolve<any> {
                 element['qtreesExist'] = _.contains(Consts.STORAGES.resources.qtrees, accessInfo['model']);
                 element['filesystemsExist'] = _.contains(Consts.STORAGES.resources.filesystems, accessInfo['model']);
                 element['sharesExist'] = _.contains(Consts.STORAGES.resources.shares, accessInfo['model']);
+                element['quotasExist'] = _.contains(Consts.STORAGES.resources.quotas, accessInfo['model']);
                 if(element['volumesExist']){
                     // Get all the volumes associated with the Storage device
                     this.ds.getAllVolumes(element['id']).subscribe((res)=>{
-                        console.log("Volumes fetched")
                         let vols = res.json().volumes;
                         element['volumes'] = vols;
                     }, (error)=>{
@@ -90,7 +91,6 @@ export class DelfinResolver implements Resolve<any> {
                 if(element['poolsExist']){
                     // Get all the Storage pools associated with the Storage device 
                     this.ds.getAllStoragePools(element['id']).subscribe((res)=>{
-                        console.log("pools fetched")
                         let pools = res.json().storage_pools;
                         element['storagePools'] = pools;
                     }, (error)=>{
@@ -100,7 +100,6 @@ export class DelfinResolver implements Resolve<any> {
                 if(element['controllersExist']){
                     // Get all the Controllers associated with the Storage device
                     this.ds.getAllControllers(element['id']).subscribe((res)=>{
-                        console.log("Controllers fetched")
                         let controllers = res.json().controllers;
                         element['controllers'] = controllers;
                     }, (error)=>{
@@ -111,7 +110,6 @@ export class DelfinResolver implements Resolve<any> {
                     
                     // Get all the Ports associated with the Storage device
                     this.ds.getAllPorts(element['id']).subscribe((res)=>{
-                        console.log("Ports fetched")
                         let ports = res.json().ports;
                         element['ports'] = ports;
                     }, (error)=>{
@@ -121,7 +119,6 @@ export class DelfinResolver implements Resolve<any> {
                 if(element['disksExist']){
                     // Get all the Disks associated with the Storage device
                     this.ds.getAllDisks(element['id']).subscribe((res)=>{
-                        console.log("Disks fetched")
                         let disks = res.json().disks;
                         element['disks'] = disks;
                     }, (error)=>{
@@ -131,7 +128,6 @@ export class DelfinResolver implements Resolve<any> {
                 if(element['qtreesExist']){
                     // Get all the Qtrees associated with the Storage device
                     this.ds.getAllQtrees(element['id']).subscribe((res)=>{
-                        console.log("Qtrees fetched")
                         let qtrees = res.json().qtrees;
                         element['qtrees'] = qtrees;
                     }, (error)=>{
@@ -141,7 +137,6 @@ export class DelfinResolver implements Resolve<any> {
                 if(element['filesystemsExist']){
                     // Get all the Filesystems associated with the Storage device
                     this.ds.getAllFilesystems(element['id']).subscribe((res)=>{
-                        console.log("Filesystems fetched")
                         let filesystems = res.json().filesystems;
                         element['filesystems'] = filesystems;
                     }, (error)=>{
@@ -151,11 +146,20 @@ export class DelfinResolver implements Resolve<any> {
                 if(element['sharesExist']){
                     // Get all the Shares associated with the Storage device
                     this.ds.getAllShares(element['id']).subscribe((res)=>{
-                        console.log("Shares fetched")
                         let shares = res.json().shares;
                         element['shares'] = shares;
                     }, (error)=>{
                         console.log("Something went wrong. Could not fetch Shares.", error)
+                    });
+                } 
+                if(element['quotasExist']){
+                    // Get all the Quotas associated with the Storage device
+                    this.ds.getAllQuotas(element['id']).subscribe((res)=>{
+                        console.log("Quotas fetched")
+                        let quotas = res.json().quotas;
+                        element['quotas'] = quotas;
+                    }, (error)=>{
+                        console.log("Something went wrong. Could not fetch Quotas.", error)
                     });
                 } 
             }, (error) =>{
@@ -167,7 +171,6 @@ export class DelfinResolver implements Resolve<any> {
       });
     }
   resolve(): Observable<any> {
-    console.log("All storages in resolver", this.allStorages);
     return this.allStorages;
   }
 }
