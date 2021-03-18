@@ -84,7 +84,7 @@ export class HomeComponent implements OnInit {
             type: 'text',
             name: 'bucket',
             formControlName: 'bucket',
-            arr:['hw-obs','fusionstorage-object','ceph-s3','ibm-cos', 'alibaba-oss']
+            arr:['fusionstorage-object','ceph-s3','ibm-cos', 'alibaba-oss']
         },
         {
             label: 'Access Key',
