@@ -68,6 +68,7 @@ export class BucketDetailComponent implements OnInit {
   msgs: Message[];
   allBackends: any[];
   archivalEnabled: any = {};
+  isPasting: boolean = false;
   errorMessage = {
     "backend_type": { required: "Type is required." },
     "backend": { required: "Backend is required." },
@@ -232,6 +233,8 @@ export class BucketDetailComponent implements OnInit {
   }
   //paste object
   pasteObject() {
+    this.isPasting = true;
+    this.msgs = [];
     this.copySelectedDir.forEach(item=>{
       let key = this.folderId != "" ? this.folderId + item.Key : item.Key;
       let copySource = item.folderId != "" ? item.source + '/' + item.folderId + item.Key : 
@@ -266,14 +269,19 @@ export class BucketDetailComponent implements OnInit {
             //Copy in the same bucket
             options.headers.set('X-Amz-Metadata-Directive', 'REPLACE');
           }
-          
+          let pastedObjectTitle = key + ' pasted.';
+          let pastedObjectMessage = key + ' will be available in the destination bucket shortly.';
+          this.msgs.push({severity: 'success', summary: pastedObjectTitle, detail: pastedObjectMessage});
           this.BucketService.copyObject(this.bucketId + '/' + key, '', options).subscribe((res) => {
             this.isReadyPast = true;
             window.sessionStorage['searchIndex'] = "";
             this.getAlldir();
-            res
+            this.isPasting = false;
           }, (error)=>{
             window.sessionStorage['searchIndex'] = "";
+            this.isPasting = false;
+            let pastedObjectMessage = 'Object' + key + 'could not be pasted. ' + error._body;
+            this.msgs.push({severity: 'error', summary: 'Error', detail: pastedObjectMessage});
           });
       })
     })
