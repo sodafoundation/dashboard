@@ -1463,6 +1463,13 @@ export class StoragesComponent implements OnInit {
         this.v2cFields = false;
         this.v3Fields = false;
         this.showRegisterAlertSourceForm = false;
+        this.registerAlertSourceForm.reset(
+            {
+                'retry_num' : 1, 
+                'expiration' : 2, 
+                'port' : 161
+            }
+        );
     }
     
 
@@ -1585,10 +1592,24 @@ export class StoragesComponent implements OnInit {
             this.showRegisterAlertSourceForm=false;
             this.msgs = [];
             this.msgs.push({severity: 'success', summary: 'Success', detail: 'Alert source registered successfully.'});
+            this.registerAlertSourceForm.reset(
+                {
+                    'retry_num' : 1, 
+                    'expiration' : 2, 
+                    'port' : 161
+                }
+            );
         }, (error) =>{
             this.msgs = [];
             this.msgs.push({severity: 'error', summary: "Error", detail:"Something went wrong. Alert source could not be registered. \n" + error.json().error_msg});
             console.log("Something went wrong. Alert source could not be registered.", error.json().error_msg);
+            this.registerAlertSourceForm.reset(
+                {
+                    'retry_num' : 1, 
+                    'expiration' : 2, 
+                    'port' : 161
+                }
+            );
         })
     }
 
@@ -1610,7 +1631,13 @@ export class StoragesComponent implements OnInit {
         this.ds.deleteAlertSource(storageId).subscribe((res)=>{
             this.msgs = [];
             this.msgs.push({severity: 'success', summary: 'Success', detail: 'Alert source deleted successfully.'});
-            this.registerAlertSourceForm.reset();
+            this.registerAlertSourceForm.reset(
+                {
+                    'retry_num' : 1, 
+                    'expiration' : 2, 
+                    'port' : 161
+                }
+            );
             this.selectedAuthProtocol = '';
         }, (error)=>{
             this.msgs = [];
