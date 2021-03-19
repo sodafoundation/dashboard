@@ -200,8 +200,8 @@ export const Consts = {
             }
         ],
         resources:{
-            volumes : ['vmax', 'unity', 'vnx', 'oceanstor', '3par', 'vsp', 'storwize_svc'],
-            pools : ['vmax', 'unity', 'vnx', 'oceanstor', '3par', 'vsp', 'storwize_svc'],
+            volumes : ['vmax', 'unity', 'vnx_block', 'vplex', 'oceanstor', '3par', 'vsp', 'storwize_svc'],
+            pools : ['vmax', 'unity', 'vnx_block', 'vplex', 'oceanstor', '3par', 'vsp', 'storwize_svc'],
             controllers : ['oceanstor'],
             ports : ['oceanstor'],
             disks : ['oceanstor'],
@@ -227,6 +227,28 @@ export const Consts = {
                     label: "Unity",
                     value: {
                         name: 'unity',
+                        rest: true,
+                        ssh: false,
+                        cli: false,
+                        smis: false,
+                        extra: false
+                    }
+                },
+                {
+                    label: "VNX",
+                    value: {
+                        name: 'vnx_block',
+                        rest: false,
+                        ssh: false,
+                        cli: true,
+                        smis: false,
+                        extra: false
+                    }
+                },
+                {
+                    label: "VPLEX",
+                    value: {
+                        name: 'vplex',
                         rest: true,
                         ssh: false,
                         cli: false,
