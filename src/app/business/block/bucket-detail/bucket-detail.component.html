@@ -114,3 +114,7 @@
         </p-tabPanel> 
     </p-tabView>
 </div>
+<p-dialog [(visible)]="isPasting" [showHeader]="false" [closable]="false" [width]="450" [modal]="true" [height]="50">
+    <p class="align-center">Object paste initiated. Please check back after sometime.</p>
+    <p-progressBar mode="indeterminate" [style]="{'height': '10px'}"></p-progressBar>
+</p-dialog>
