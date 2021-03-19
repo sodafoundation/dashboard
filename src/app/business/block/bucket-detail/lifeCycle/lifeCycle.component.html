@@ -3,9 +3,7 @@
     <div class="table-toolbar">
         <div class="left">
             <button class="ui-button-secondary" [disabled]="false" pButton type="button" label="Create" (click)="createLifeCycle('create')"></button>
-            <!-- <button pButton type="button" [disabled]="disableCycle == enableCycle || disableCycle"  label="Enable" (click)="enableLifeCycle(selectedLifeCycle)" ></button>
-            <button pButton type="button" [disabled]="disableCycle == enableCycle || enableCycle" label="Disable" (click)="disableLifeCycle(selectedLifeCycle)"></button> -->
-            <button pButton type="button" [disabled]="selectedLifeCycle.length == 0" (click)="bathDelete(selectedLifeCycle)" label="{{i18n.keyID['sds_block_volume_delete']}}"></button>
+            <button pButton type="button" [disabled]="selectedLifeCycle.length == 0" (click)="batchDelete(selectedLifeCycle)" label="{{i18n.keyID['sds_block_volume_delete']}}"></button>
         </div>
         <div class="right">
             <div class="ui-inputsearch">
@@ -31,14 +29,14 @@
         </p-column>
         <p-column header="{{i18n.keyID['sds_block_volume_operation']}}" [style]="{'width': '200px'}">
             <ng-template pTemplate="body" let-cycle="rowData" let-i="rowIndex">
-                <a (click)="createLifeCycle('update',cycle)" [innerHtml]="i18n.keyID['sds_lifeCycle_edit']"></a>
+                <a (click)="showModifyLifecycleDialog('update', cycle)" [innerHtml]="i18n.keyID['sds_lifeCycle_edit']"></a>
                 <a *ngIf="cycle.Status == 'Disabled'" (click)="enableLifeCycle(cycle)" [innerHtml]="i18n.keyID['sds_profile_enable']"></a>
                 <a *ngIf="cycle.Status == 'Enabled'" (click)="disableLifeCycle(cycle)" [innerHtml]="i18n.keyID['sds_block_volume_replication_disable']"></a>
-                <a [ngClass]="{'a-rep-disabled':cycle['Disabled']}" (click)="bathDelete(cycle)" [innerHtml]="i18n.keyID['sds_block_volume_delete']"></a>
+                <a [ngClass]="{'a-rep-disabled':cycle['Disabled']}" (click)="batchDelete(cycle)" [innerHtml]="i18n.keyID['sds_block_volume_delete']"></a>
             </ng-template>
         </p-column>
     </p-dataTable>
-    <p-sidebar [(visible)]="showRightSidebar" (onHide)="closeSidebar()" position="right" styleClass="home-sidebar-panel ui-sidebar-lg" [autoZIndex]="true" [baseZIndex]="1000">
+    <p-sidebar [(visible)]="showRightSidebar" (onHide)="closeSidebar()" position="right" styleClass="lifecycle-sidebar-panel ui-sidebar-lg" [autoZIndex]="true" [baseZIndex]="1000">
         <div class="right-sidebar-content-wrapper">
             <div class="right-sidebar-header">
                 <h1 style="font-weight:normal">{{lifeCycleTitle}}</h1>
@@ -75,18 +73,21 @@
                     </div>
                     <div class="ui-grid ui-grid-responsive ui-grid-pad ui-fluid volume-item" *ngIf="transChecked && transOptions.length !=0">
                         <div class="ui-grid-row">
-                            <div class="ui-grid-col-4">
+                            <div class="ui-grid-col-3">
                                 <span style="color:#cd0a0a;padding-right: 0.03rem;">*</span><span class="label-rules" [innerHtml]="label.trans"></span>
                             </div>
-                            <div class="ui-grid-col-4">
+                            <div class="ui-grid-col-3">
                                 <span style="color:#cd0a0a;padding-right: 0.03rem;">*</span><span class="label-rules" [innerHtml]="label.days"></span>
                             </div>
                             <div class="ui-grid-col-3">
                                 <span class="label-rules" [innerHtml]="label.backend"></span>
                             </div>
+                            <div class="ui-grid-col-3">
+                                <span class="label-rules" [innerHtml]="label.targetBucket"></span>
+                            </div>
                         </div>
                         <div class="ui-grid-row volume-item" *ngFor="let lifeCycleItem of lifeCycleItems;index as i">
-                            <div class="ui-grid-col-4">
+                            <div class="ui-grid-col-3">
                                 <p-dropdown *ngIf="!modifyTrans ||modifyTrans.length == 0" [style]="{'width':'180px'}"  [options]="transOptions[i]" formControlName="{{'transId'+i}}" placeholder="please select" (onChange)="typeChange($event, i)"></p-dropdown>
                                 <p-dropdown *ngIf="modifyTrans && modifyTrans.length !=0" [style]="{'width':'180px'}" [options]="transOptions[i]" formControlName="{{'transId'+i}}" (onChange)="typeChange($event, i)"></p-dropdown>
                                 <div class="ui-message-container" *ngIf="createLifeCycleForm.controls['transId'+i] && !createLifeCycleForm.controls['transId'+i].valid &&(createLifeCycleForm.controls['transId'+i].dirty || createLifeCycleForm.controls['transId'+i].touched)">
@@ -98,7 +99,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="ui-grid-col-4" *ngIf="backendShow[i]" >
+                            <div class="ui-grid-col-3" *ngIf="backendShow[i]" >
                                 <p-spinner formControlName="{{'days'+i}}" [style]="{'width':'134px'}" [min]="minDays[i]" [(ngModel)]="transDaysArr[i]" (onBlur)="transDaysChange(i)"></p-spinner>
                                 <div class="ui-message-container" *ngIf="createLifeCycleForm.controls['days'+i] && !createLifeCycleForm.controls['days'+i].valid &&(createLifeCycleForm.controls['days'+i].dirty || createLifeCycleForm.controls['days'+i].touched)">
                                     <div class="ui-message ui-message-error ui-corner-all">
@@ -110,8 +111,12 @@
                                 </div>
                             </div>
                             <div class="ui-grid-col-3" *ngIf="backendShow[i]">
-                                <p-dropdown *ngIf="modifyBakend.length <= i || modifyBakend[i] ==''" [style]="{'width':'180px'}" [options]="backends[i]" formControlName="{{'backendId'+i}}" placeholder="please select" (onChange)="backendChange()"></p-dropdown>
-                                <p-dropdown *ngIf="modifyBakend.length > i && modifyBakend[i] !=''" [style]="{'width':'180px'}" [options]="backends[i]" formControlName="{{'backendId'+i}}"  (onChange)="backendChange()"></p-dropdown>
+                                <p-dropdown *ngIf="modifyBackend.length <= i || modifyBackend[i] ==''" [style]="{'width':'180px'}" [options]="backends[i]" formControlName="{{'backendId'+i}}" placeholder="please select" (onChange)="backendChange($event, i)"></p-dropdown>
+                                <p-dropdown *ngIf="modifyBackend.length > i && modifyBackend[i] !=''" [style]="{'width':'180px'}" [options]="backends[i]" formControlName="{{'backendId'+i}}"  (onChange)="backendChange($event, i)"></p-dropdown>
+                            </div>
+                            <div class="ui-grid-col-3" *ngIf="bucketShow[i]">
+                                <p-dropdown *ngIf="modifyBucket.length <= i || modifyBucket[i] ==''" [style]="{'width':'180px'}" [options]="allBuckets[i]" formControlName="{{'targetBucket'+i}}" placeholder="please select"></p-dropdown>
+                                <p-dropdown *ngIf="modifyBucket.length > i && modifyBucket[i] !=''" [style]="{'width':'180px'}" [options]="allBuckets[i]" formControlName="{{'targetBucket'+i}}"></p-dropdown>
                             </div>
                             <div class="ui-grid-col-1">
                                 <div class="create-profile-img " (click)="deleteTransRules(i)">
@@ -180,6 +185,5 @@
         </div>
         
     </p-sidebar>
-        
     <p-confirmDialog></p-confirmDialog> 
 </div>
