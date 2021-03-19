@@ -233,14 +233,6 @@ export class StoragesComponent implements OnInit {
                 },
                 disabled:false
             },
-	    {
-                "label": "Configure Metric Collection",
-
-                command: () => {
-                    this.showPerfConfigDialog(this.selectStorage);
-                },
-                disabled:false
-            },
             {
                 "label": this.i18n.keyID['sds_block_volume_delete'],
                 command: () => {
@@ -1138,14 +1130,6 @@ export class StoragesComponent implements OnInit {
                     "label": "Sync Storage Device",
                     command: () => {
                         this.syncStorage(node['details'].id);
-                    },
-                    disabled:false
-                },
-                {
-                    "label": "Configure Metric Collection",
-    
-                    command: () => {
-                        this.showPerfConfigDialog(node['details']);
                     },
                     disabled:false
                 },
