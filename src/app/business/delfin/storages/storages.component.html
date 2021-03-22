@@ -1363,6 +1363,55 @@
         </div>
     </div>
 </p-overlayPanel>
+<p-overlayPanel styleClass="overview-panel" #shareOverviewPanel>
+    <div class="ui-g overview-title">
+        <h4>{{shareOverview && shareOverview.details.name}}</h4>
+    </div>
+    <div class="ui-g overview-item">
+        <div class="ui-g-6">
+            Vendor / Model
+        </div>
+        <div class="ui-g-6">
+            {{ selectedStorageDetails && selectedStorageDetails.vendor}} {{selectedStorageDetails && selectedStorageDetails.model}}
+        </div>
+    </div>
+    <div class="ui-g overview-item">
+        <div class="ui-g-6">
+            <span class="overview-item-label">
+              Storage ID  
+            </span>
+        </div>
+        <div class="ui-g-6">
+            <span>
+                {{ shareOverview && shareOverview.details.storage_id}}
+            </span>
+        </div>
+    </div>
+    <div class="ui-g overview-item">
+        <div class="ui-g-6">
+            Protocol
+        </div>
+        <div class="ui-g-6">
+            {{ shareOverview && shareOverview.details.protocol}}
+        </div>
+    </div>
+    <div class="ui-g overview-item">
+        <div class="ui-g-6">
+            Path
+        </div>
+        <div class="ui-g-6">
+            {{shareOverview && shareOverview.details.path}}
+        </div>
+    </div>
+    <div class="ui-g overview-item">
+        <div class="ui-g-6">
+            
+        </div>
+        <div class="ui-g-6">
+            
+        </div>
+    </div>
+</p-overlayPanel>
 <p-overlayPanel styleClass="overview-panel" #quotaOverviewPanel>
     <div class="ui-g overview-title">
         <h4>{{quotaOverview && quotaOverview.details.native_quota_id}}</h4>

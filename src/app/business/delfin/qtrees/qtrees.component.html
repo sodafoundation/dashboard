@@ -16,12 +16,14 @@
             <a (mouseenter)="showQtreeOverview($event, qtree, qtreeOverviewPanel)" (mouseleave)="showQtreeOverview($event, qtree, qtreeOverviewPanel)">{{qtree.name}}</a>
         </ng-template>
     </p-column>    
-    <p-column field="status" header="Status">
+    <p-column field="security_mode" header="Security Mode">
         <ng-template pTemplate="body" let-qtree="rowData">
-            <span class="storage-status-icon" [ngClass]="{normal: qtree.status=='normal', abnormal: qtree.status=='abnormal' || qtree.status=='unknown' || qtree.status=='offline'}"><i class="fa fa-circle"></i></span>
-            <span *ngIf="qtree.status=='normal'">Normal</span>
-            <span *ngIf="qtree.status=='abnormal' || qtree.status=='unknown'">Unknown</span>
-            <span *ngIf="qtree.status=='offline'">Offline</span>
+            <span>{{qtree.security_mode ? qtree.security_mode : '--'}}</span>
+        </ng-template>
+    </p-column>
+    <p-column field="native_filesystem_id" header="Native Filesystem ID">
+        <ng-template pTemplate="body" let-qtree="rowData">
+            <span>{{qtree.native_filesystem_id ? qtree.native_filesystem_id : '--'}}           </span>
         </ng-template>
     </p-column>
     <p-column field="created_at" header="Created At">
@@ -46,13 +48,10 @@
                             {{qtree.name}}
                         </div>
                         <div class="ui-grid-col-2">
-                            {{label.status}}:
+                            {{label.security_mode}}:
                         </div>
                         <div class="ui-grid-col-2 details-basic-item-value-color" *ngIf="qtree">
-                            <span class="storage-status-icon" [ngClass]="{normal: qtree.status=='normal', abnormal: qtree.status=='abnormal' || qtree.status=='unknown' || qtree.status=='offline'}"><i class="fa fa-circle"></i></span>
-                            <span *ngIf="qtree.status=='normal'">Normal</span>
-                            <span *ngIf="qtree.status=='abnormal' || qtree.status=='unknown'">Unknown</span>
-                            <span *ngIf="qtree.status=='offline'">Offline</span>
+                            {{qtree.security_mode ? qtree.security_mode : '--'}}  
                         </div>
                         <div class="ui-grid-col-2">
                             {{label.created_at}}:
@@ -101,24 +100,22 @@
                             </a>
                         </div>
                         <div class="ui-grid-col-2">
-                            {{label.native_filesystem_id}}:  
+                            {{label.native_filesystem_id}}:
                         </div>
                         <div class="ui-grid-col-2 details-basic-item-value-color" *ngIf="qtree">
-                            {{qtree.native_filesystem_id ? qtree.native_filesystem_id : '--'}}           
+                            {{qtree.native_filesystem_id ? qtree.native_filesystem_id : '--'}}
                         </div>
                         <div class="ui-grid-col-2">
-                            {{label.security_mode}}:
+                            {{label.path}}:
                         </div>
                         <div class="ui-grid-col-3 details-basic-item-value-color" *ngIf="qtree">
-                            {{qtree.security_mode ? qtree.security_mode : '--'}}           
+                            {{qtree.path ? qtree.path : '--'}}
                         </div>
                     </div>
                     <div class="ui-grid-row details-basic-item-class">
                         <div class="ui-grid-col-2">
-                            {{label.path}}:
                         </div>
                         <div class="ui-grid-col-2 details-basic-item-value-color" *ngIf="qtree">
-                            {{qtree.path ? qtree.path : '--'}}   
                         </div>
                         <div class="ui-grid-col-2">
 
