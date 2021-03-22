@@ -1244,15 +1244,16 @@
     <div class="ui-g overview-title">
         <h4>{{qtreeOverview && qtreeOverview.details.name}}</h4>
     </div>
-    <div class="ui-g ui-g-nopad overview-item" >
+    <div class="ui-g overview-item">
         <div class="ui-g-6">
-            <span class="overview-item-label">Status: </span>
+            <span class="overview-item-label">
+              Storage ID  
+            </span>
         </div>
-        <div *ngIf="qtreeOverview" class="ui-g-6">
-            <span class="storage-status-icon" [ngClass]="{normal:  qtreeOverview && qtreeOverview.details.status =='normal', abnormal: qtreeOverview && qtreeOverview.details.status =='abnormal' || qtreeOverview.details.status =='unknown'}"><i class="fa fa-circle"></i></span>
-            <span *ngIf="qtreeOverview && qtreeOverview.details.status=='normal'">Normal</span>
-            <span *ngIf=" qtreeOverview && qtreeOverview.details.status=='abnormal' || qtreeOverview.details.status=='unknown'">Unknown</span>
-            <span *ngIf=" qtreeOverview && qtreeOverview.details.status=='offline'">Offline</span>
+        <div class="ui-g-6">
+            <span>
+                {{ qtreeOverview && qtreeOverview.details.storage_id}}
+            </span>
         </div>
     </div>
     <div class="ui-g overview-item">

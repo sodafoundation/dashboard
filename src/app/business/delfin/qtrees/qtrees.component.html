@@ -12,7 +12,6 @@
     <p-column expander="true" styleClass="col-icon" [style]="{'width': '3%'}"></p-column>
     <p-column field="name" header="Name">
         <ng-template pTemplate="body" let-qtree="rowData">
-            <!-- {{qtree.name}} -->
             <a (mouseenter)="showQtreeOverview($event, qtree, qtreeOverviewPanel)" (mouseleave)="showQtreeOverview($event, qtree, qtreeOverviewPanel)">{{qtree.name}}</a>
         </ng-template>
     </p-column>    
@@ -139,17 +138,6 @@
 <p-overlayPanel styleClass="overview-panel" #qtreeOverviewPanel>
     <div class="ui-g overview-title">
         <h4>{{qtreeOverview && qtreeOverview.name}}</h4>
-    </div>
-    <div class="ui-g ui-g-nopad overview-item" >
-        <div class="ui-g-6">
-            <span class="overview-item-label">Status: </span>
-        </div>
-        <div *ngIf="qtreeOverview" class="ui-g-6">
-            <span class="storage-status-icon" [ngClass]="{normal:  qtreeOverview && qtreeOverview.status =='normal', abnormal: qtreeOverview && qtreeOverview.status =='abnormal' || qtreeOverview.status =='unknown'}"><i class="fa fa-circle"></i></span>
-            <span *ngIf="qtreeOverview && qtreeOverview.status=='normal'">Normal</span>
-            <span *ngIf=" qtreeOverview && qtreeOverview.status=='abnormal' || qtreeOverview.status=='unknown'">Unknown</span>
-            <span *ngIf=" qtreeOverview && qtreeOverview.status=='offline'">Offline</span>
-        </div>
     </div>
     <div class="ui-g overview-item">
         <div class="ui-g-6">
