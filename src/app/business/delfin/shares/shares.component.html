@@ -12,16 +12,12 @@
     <p-column expander="true" styleClass="col-icon" [style]="{'width': '3%'}"></p-column>
     <p-column field="name" header="Name">
         <ng-template pTemplate="body" let-share="rowData">
-            <!-- {{share.name}} -->
             <a (mouseenter)="showShareOverview($event, share, shareOverviewPanel)" (mouseleave)="showShareOverview($event, share, shareOverviewPanel)">{{share.name}}</a>
         </ng-template>
     </p-column>    
-    <p-column field="status" header="Status">
+    <p-column field="protocol" header="Protocol">
         <ng-template pTemplate="body" let-share="rowData">
-            <span class="storage-status-icon" [ngClass]="{normal: share.status=='normal', abnormal: share.status=='abnormal' || share.status=='unknown' || share.status=='offline'}"><i class="fa fa-circle"></i></span>
-            <span *ngIf="share.status=='normal'">Normal</span>
-            <span *ngIf="share.status=='abnormal' || share.status=='unknown'">Unknown</span>
-            <span *ngIf="share.status=='offline'">Offline</span>
+            {{share.protocol ? share.protocol : '--'}}
         </ng-template>
     </p-column>
     <p-column field="created_at" header="Created At">
@@ -46,13 +42,10 @@
                             {{share.name}}
                         </div>
                         <div class="ui-grid-col-2">
-                            {{label.status}}:
+                            {{label.protocol}}:
                         </div>
                         <div class="ui-grid-col-2 details-basic-item-value-color" *ngIf="share">
-                            <span class="storage-status-icon" [ngClass]="{normal: share.status=='normal', abnormal: share.status=='abnormal' || share.status=='unknown' || share.status=='offline'}"><i class="fa fa-circle"></i></span>
-                            <span *ngIf="share.status=='normal'">Normal</span>
-                            <span *ngIf="share.status=='abnormal' || share.status=='unknown'">Unknown</span>
-                            <span *ngIf="share.status=='offline'">Offline</span>
+                            {{share.protocol ? share.protocol : '--'}}
                         </div>
                         <div class="ui-grid-col-2">
                             {{label.created_at}}:
@@ -107,24 +100,24 @@
                             {{share.native_filesystem_id ? share.native_filesystem_id : '--'}}           
                         </div>
                         <div class="ui-grid-col-2">
-                            {{label.protocol}}:
+                            {{label.path}}:
                         </div>
                         <div class="ui-grid-col-3 details-basic-item-value-color" *ngIf="share">
-                            {{share.protocol ? share.protocol : '--'}}           
+                            {{share.path ? share.path : '--'}}
                         </div>
                     </div>
                     <div class="ui-grid-row details-basic-item-class">
                         <div class="ui-grid-col-2">
-                            {{label.path}}:
+                            {{label.native_qtree_id}}:
                         </div>
                         <div class="ui-grid-col-2 details-basic-item-value-color" *ngIf="share">
-                            {{share.path ? share.path : '--'}}   
+                            {{share.native_qtree_id ? share.native_qtree_id : '--'}}
                         </div>
                         <div class="ui-grid-col-2">
-                            {{label.native_qtree_id}}:  
+                              
                         </div>
                         <div class="ui-grid-col-2 details-basic-item-value-color" *ngIf="share">
-                            {{share.native_qtree_id ? share.native_qtree_id : '--'}}           
+                            
                         </div>
                         <div class="ui-grid-col-2">
                             
@@ -142,17 +135,6 @@
 <p-overlayPanel styleClass="overview-panel" #shareOverviewPanel>
     <div class="ui-g overview-title">
         <h4>{{shareOverview && shareOverview.name}}</h4>
-    </div>
-    <div class="ui-g ui-g-nopad overview-item" >
-        <div class="ui-g-6">
-            <span class="overview-item-label">Status: </span>
-        </div>
-        <div *ngIf="shareOverview" class="ui-g-6">
-            <span class="storage-status-icon" [ngClass]="{normal:  shareOverview && shareOverview.status =='normal', abnormal: shareOverview && shareOverview.status =='abnormal' || shareOverview.status =='unknown'}"><i class="fa fa-circle"></i></span>
-            <span *ngIf="shareOverview && shareOverview.status=='normal'">Normal</span>
-            <span *ngIf=" shareOverview && shareOverview.status=='abnormal' || shareOverview.status=='unknown'">Unknown</span>
-            <span *ngIf=" shareOverview && shareOverview.status=='offline'">Offline</span>
-        </div>
     </div>
     <div class="ui-g overview-item">
         <div class="ui-g-6">
