@@ -823,11 +823,17 @@ export class BucketDetailComponent implements OnInit {
                         options = this.BucketService.getSignatureOptions(requestOptions, options);
                         this.BucketService.deleteFile(`${this.bucketId}/${objectKey}`,options).subscribe((res) => {
                           this.getAlldir();
+                          this.msgs = [];
+                          this.msgs.push({severity: 'success', summary: 'Success', detail: file.Key + ' has been deleted successfully.'});
+                        }, (error)=>{
+                          this.msgs = [];
+                          this.msgs.push({severity: 'error', summary: "Error deleting " + file.Key, detail: error._body});
                         });
                     })
                     
                     break;
                   case "deleteMilti":
+                    this.msgs = [];
                    file.forEach(element => {
                       let objectKey = element.Key;
                       //If you want to delete files from a folder, you must include the name of the folder
@@ -844,8 +850,11 @@ export class BucketDetailComponent implements OnInit {
                         options['headers'] = new Headers();
                         options = this.BucketService.getSignatureOptions(requestOptions, options);
                           this.BucketService.deleteFile(`${this.bucketId}/${objectKey}`,options).subscribe((res) => {
-                            this.getAlldir();
-                          });
+                          this.getAlldir();
+                          this.msgs.push({severity: 'success', summary: 'Success', detail: element.Key + ' has been deleted successfully.'});
+                        }, (error)=>{
+                          this.msgs.push({severity: 'error', summary: "Error deleting " + element.Key, detail: error._body});
+                        });
                       })
                    });
                     break;
