@@ -119,8 +119,8 @@ export const Consts = {
                 value: "Hot"
             },
             {
-                label: "Cold",
-                value: "Cold"
+                label: "Cool",
+                value: "Cool"
             }
         ]
     },
