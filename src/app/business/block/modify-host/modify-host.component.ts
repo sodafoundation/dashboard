@@ -81,7 +81,8 @@ export class ModifyHostComponent implements OnInit {
     "hostName": {
         required: "Host Name is required.",
         maxlength: "Maximum 28 characters",
-        minlength: "Minimum 2 characters"
+        minlength: "Minimum 2 characters",
+        pattern: "Invalid Host Name"
     },
     "initiators": {
       portName: {
@@ -90,7 +91,8 @@ export class ModifyHostComponent implements OnInit {
     }
   };
   validRule = {
-    'validIp': '([0-9]{1,3})[.]([0-9]{1,3})[.]([0-9]{1,3})[.]([0-9]{1,3})'
+    'validIp': '([0-9]{1,3})[.]([0-9]{1,3})[.]([0-9]{1,3})[.]([0-9]{1,3})',
+    'validHostName' : '^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\-]*[A-Za-z0-9])$'
   };
   
   constructor(
@@ -193,7 +195,7 @@ export class ModifyHostComponent implements OnInit {
       });
     this.modifyHostform = this.fb.group({
         'availabilityZones': new FormControl('', Validators.required),
-        'hostName': new FormControl(this.selectedHost['hostName'], {validators: [Validators.required, Validators.maxLength(28), Validators.minLength(2)]}),
+        'hostName': new FormControl(this.selectedHost['hostName'], {validators: [Validators.required,Validators.pattern(this.validRule.validHostName), Validators.maxLength(28), Validators.minLength(2)]}),
         'accessMode': new FormControl('', Validators.required),
         'osType': new FormControl('', Validators.required),
         'ip': new FormControl(this.selectedHost['ip'], {validators:[Validators.required, Validators.pattern(this.validRule.validIp)]}),
@@ -256,7 +258,7 @@ export class ModifyHostComponent implements OnInit {
         this.router.navigate(['/block',"fromHosts"]);
     }, (error) =>{
         this.msgs = [];
-        this.msgs.push({severity: 'error', summary: 'Error', detail: error.message});
+        this.msgs.push({severity: 'error', summary: 'Error', detail: error.json().message});
     });
   }
 
