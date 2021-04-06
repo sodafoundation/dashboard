@@ -156,9 +156,9 @@ export class UserListComponent implements OnInit, AfterViewChecked {
             this.myFormGroup.controls['form_isModifyPsw'].value = false;
 
             this.myFormGroup.controls['form_username'].clearValidators();
+            this.myFormGroup.controls['form_tenant'].clearValidators();
             this.myFormGroup.controls['form_psw'].clearValidators();
             this.myFormGroup.controls['form_pswConfirm'].clearValidators();
-
 
         }else{
             this.isEditUser = false;
