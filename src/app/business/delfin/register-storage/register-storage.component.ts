@@ -6,7 +6,7 @@ import { AppService } from 'app/app.service';
 import { I18nPluralPipe } from '@angular/common';
 import { trigger, state, style, transition, animate } from '@angular/animations';
 import { Message, MenuItem ,ConfirmationService} from '../../../components/common/api';
-import { DelfinService } from '../../delfin/delfin.service';
+import { DelfinService } from '../delfin.service';
 
 let _ = require("underscore");
 @Component({
@@ -30,7 +30,8 @@ export class RegisterStorageComponent implements OnInit {
     showExtraAttribs: boolean = false;
     showSsh: boolean = false;
     showRest: boolean = false;
-
+    showCli: boolean = false;
+    showSmis: boolean = false;
     label = {
         vendor: "Vendor",
         model: "Model",
@@ -44,6 +45,15 @@ export class RegisterStorageComponent implements OnInit {
         sshPassword: "Password",
         sshPubKey: "Pub Key",
         sshPubKeyType: "Pub Key Type",
+        cliHost: "Host IP",
+        cliPort: "Port",
+        cliUsername: "Username",
+        cliPassword: "Password",
+        smisHost: "Host IP",
+        smisPort: "Port",
+        smisUsername: "Username",
+        smisPassword: "Password",
+        smisNamespace: "Namespace",
         extra_attributes: "Extra Attributes"
     };
 
@@ -80,11 +90,34 @@ export class RegisterStorageComponent implements OnInit {
         "sshPassword" : {
             required: "Password is required"
         },
-        "sshPubKey" : {
-            required: "Public Key is required"
+        "cliHost" : {
+            required: "Host IP address is required",
+            pattern: "Enter valid IPv4 address"
         },
-        "sshPubKeyType" : {
-            required: "Public Key type is required"
+        "cliPort" : {
+            required: "Port is required"
+        },
+        "cliUsername" : {
+            required: "Username is required"
+        },
+        "cliPassword" : {
+            required: "Password is required"
+        },
+        "smisHost" : {
+            required: "Host IP address is required",
+            pattern: "Enter valid IPv4 address"
+        },
+        "smisPort" : {
+            required: "Port is required"
+        },
+        "smisUsername" : {
+            required: "Username is required"
+        },
+        "smisPassword" : {
+            required: "Password is required"
+        },
+        "smisNamespace" : {
+            required: "Namespace is required"
         },
     };
     /* Validates IPv4 address */
@@ -129,8 +162,6 @@ export class RegisterStorageComponent implements OnInit {
         this.registerStorageForm = this.fb.group({
             'vendor': new FormControl('', Validators.required),
             'model': new FormControl('', Validators.required),
-            "enable_rest": [this.showRest, { updateOn: 'change' }],
-            "enable_ssh": [this.showSsh, { updateOn: 'change' }],
             "enable_extra_attribs": [this.showExtraAttribs, { updateOn: 'change' }]
         });
        
@@ -138,12 +169,6 @@ export class RegisterStorageComponent implements OnInit {
 
     extraAttribsControl(){
         this.showExtraAttribs = this.registerStorageForm.get('enable_extra_attribs').value;
-    }
-    showSshControl(){
-        this.showSsh = this.registerStorageForm.get('enable_ssh').value;
-    }
-    showRestControl(){
-        this.showRest = this.registerStorageForm.get('enable_rest').value;
     }
     getAllStorages(){
         this.ds.getAllStorages().subscribe((res)=>{
@@ -159,13 +184,9 @@ export class RegisterStorageComponent implements OnInit {
         this.selectedModel = {};
         this.showRest = false;
         this.showSsh = false;
+        this.showCli = false;
+        this.showSmis = false;
         this.showExtraAttribs = false;
-        this.registerStorageForm.patchValue({
-            'enable_rest' : false
-        });
-        this.registerStorageForm.patchValue({
-            'enable_ssh' : false
-        });
         this.registerStorageForm.patchValue({
             'enable_extra_attribs' : false
         });
@@ -193,9 +214,6 @@ export class RegisterStorageComponent implements OnInit {
             this.registerStorageForm.addControl('restPort', this.fb.control('', [Validators.required]));
             this.registerStorageForm.addControl('restUsername', this.fb.control('', [Validators.required]));
             this.registerStorageForm.addControl('restPassword', this.fb.control('', [Validators.required]));
-            this.registerStorageForm.patchValue({
-                'enable_rest' : true
-            });
             this.registerStorageForm.updateValueAndValidity();
         } else{
             this.showRest = false;
@@ -203,9 +221,6 @@ export class RegisterStorageComponent implements OnInit {
             this.registerStorageForm.removeControl('restPort');
             this.registerStorageForm.removeControl('restUsername');
             this.registerStorageForm.removeControl('restPassword');
-            this.registerStorageForm.patchValue({
-                'enable_rest' : false
-            });
             this.registerStorageForm.updateValueAndValidity();
         }
         if(this.selectedModel && this.selectedModel.ssh){
@@ -216,9 +231,6 @@ export class RegisterStorageComponent implements OnInit {
             this.registerStorageForm.addControl('sshPassword', this.fb.control('', [Validators.required]));
             this.registerStorageForm.addControl('sshPubKey', this.fb.control('', [Validators.required]));
             this.registerStorageForm.addControl('sshPubKeyType', this.fb.control('', [Validators.required]));
-            this.registerStorageForm.patchValue({
-                'enable_ssh' : true
-            });
             this.registerStorageForm.updateValueAndValidity();
         } else {
             this.showSsh = false;
@@ -228,9 +240,38 @@ export class RegisterStorageComponent implements OnInit {
             this.registerStorageForm.removeControl('sshPassword');
             this.registerStorageForm.removeControl('sshPubKey');
             this.registerStorageForm.removeControl('sshPubKeyType');
-            this.registerStorageForm.patchValue({
-                'enable_ssh' : false
-            });
+            this.registerStorageForm.updateValueAndValidity();
+        }
+        if(this.selectedModel && this.selectedModel.cli){
+            this.showCli = true;
+            this.registerStorageForm.addControl('cliHost', this.fb.control('', [Validators.required, Validators.pattern(this.validRule.validIp)]));
+            this.registerStorageForm.addControl('cliPort', this.fb.control('', [Validators.required]));
+            this.registerStorageForm.addControl('cliUsername', this.fb.control('', [Validators.required]));
+            this.registerStorageForm.addControl('cliPassword', this.fb.control('', [Validators.required]));
+            this.registerStorageForm.updateValueAndValidity();
+        } else{
+            this.showCli = false;
+            this.registerStorageForm.removeControl('cliHost');
+            this.registerStorageForm.removeControl('cliPort');
+            this.registerStorageForm.removeControl('cliUsername');
+            this.registerStorageForm.removeControl('cliPassword');
+            this.registerStorageForm.updateValueAndValidity();
+        }
+        if(this.selectedModel && this.selectedModel.smis){
+            this.showSmis = true;
+            this.registerStorageForm.addControl('smisHost', this.fb.control('', [Validators.required, Validators.pattern(this.validRule.validIp)]));
+            this.registerStorageForm.addControl('smisPort', this.fb.control('', [Validators.required]));
+            this.registerStorageForm.addControl('smisUsername', this.fb.control('', [Validators.required]));
+            this.registerStorageForm.addControl('smisPassword', this.fb.control('', [Validators.required]));
+            this.registerStorageForm.addControl('smisNamespace', this.fb.control('', [Validators.required]));
+            this.registerStorageForm.updateValueAndValidity();
+        } else{
+            this.showSmis = false;
+            this.registerStorageForm.removeControl('smisHost');
+            this.registerStorageForm.removeControl('smisPort');
+            this.registerStorageForm.removeControl('smisUsername');
+            this.registerStorageForm.removeControl('smisPassword');
+            this.registerStorageForm.removeControl('smisNamespace');
             this.registerStorageForm.updateValueAndValidity();
         }
         if(this.selectedModel && this.selectedModel.extra){
@@ -289,10 +330,33 @@ export class RegisterStorageComponent implements OnInit {
                 port: Number(value['sshPort']),
                 username: value['sshUsername'],
                 password: value['sshPassword'],
-                pub_key: value['sshPubKey'],
-                pub_key_type: value['sshPubKeyType'],
+            }
+            if(value['sshPubKey']){
+                Object.assign(sshConfig, {pub_key: value['sshPubKey']})
+            }
+            if(value['sshPubKeyType']){
+                Object.assign(sshConfig, {pub_key_type: value['sshPubKeyType']})
             }
             dataArr['ssh'] = sshConfig;
+        }
+        if(this.showCli){
+            let cli = {
+                host: value['cliHost'],
+                port: Number(value['cliPort']),
+                username: value['cliUsername'],
+                password: value['cliPassword'],
+            }
+            dataArr['cli'] = cli;
+        }
+        if(this.showSmis){
+            let smis = {
+                host: value['smisHost'],
+                port: Number(value['smisPort']),
+                username: value['smisUsername'],
+                password: value['smisPassword'],
+                namespace: value['smisNamespace'],
+            }
+            dataArr['smis'] = smis;
         }
         if(this.showExtraAttribs){
             let meta = {};
@@ -332,9 +396,6 @@ export class RegisterStorageComponent implements OnInit {
         this.registerStorageForm.removeControl('restPort');
         this.registerStorageForm.removeControl('restUsername');
         this.registerStorageForm.removeControl('restPassword');
-        this.registerStorageForm.patchValue({
-            'enable_rest' : false
-        });
         this.showSsh = false;
         this.registerStorageForm.removeControl('sshHost');
         this.registerStorageForm.removeControl('sshPort');
@@ -342,9 +403,17 @@ export class RegisterStorageComponent implements OnInit {
         this.registerStorageForm.removeControl('sshPassword');
         this.registerStorageForm.removeControl('sshPubKey');
         this.registerStorageForm.removeControl('sshPubKeyType');
-        this.registerStorageForm.patchValue({
-            'enable_ssh' : false
-        });
+        this.showCli = false;
+        this.registerStorageForm.removeControl('cliHost');
+        this.registerStorageForm.removeControl('cliPort');
+        this.registerStorageForm.removeControl('cliUsername');
+        this.registerStorageForm.removeControl('cliPassword');
+        this.showSmis = false;
+        this.registerStorageForm.removeControl('smisHost');
+        this.registerStorageForm.removeControl('smisPort');
+        this.registerStorageForm.removeControl('smisUsername');
+        this.registerStorageForm.removeControl('smisPassword');
+        this.registerStorageForm.removeControl('smisNamespace');
         this.showExtraAttribs = false;
         this.registerStorageForm.removeControl('extra_attributes');
         this.registerStorageForm.patchValue({

@@ -33,7 +33,8 @@ export class ModifyStorageComponent implements OnInit {
     showExtraAttribs: boolean = false;
     showSsh: boolean = false;
     showRest: boolean = false;
-
+    showCli: boolean = false;
+    showSmis: boolean = false;
     label = {
         vendor: "Vendor",
         model: "Model",
@@ -47,6 +48,15 @@ export class ModifyStorageComponent implements OnInit {
         sshPassword: "Password",
         sshPubKey: "Pub Key",
         sshPubKeyType: "Pub Key Type",
+        cliHost: "Host IP",
+        cliPort: "Port",
+        cliUsername: "Username",
+        cliPassword: "Password",
+        smisHost: "Host IP",
+        smisPort: "Port",
+        smisUsername: "Username",
+        smisPassword: "Password",
+        smisNamespace: "Namespace",
         extra_attributes: "Extra Attributes"
     };
 
@@ -89,6 +99,35 @@ export class ModifyStorageComponent implements OnInit {
         "sshPubKeyType" : {
             required: "Public Key type is required"
         },
+	    "cliHost" : {
+            required: "Host IP address is required",
+            pattern: "Enter valid IPv4 address"
+        },
+        "cliPort" : {
+            required: "Port is required"
+        },
+        "cliUsername" : {
+            required: "Username is required"
+        },
+        "cliPassword" : {
+            required: "Password is required"
+        },
+        "smisHost" : {
+            required: "Host IP address is required",
+            pattern: "Enter valid IPv4 address"
+        },
+        "smisPort" : {
+            required: "Port is required"
+        },
+        "smisUsername" : {
+            required: "Username is required"
+        },
+        "smisPassword" : {
+            required: "Password is required"
+        },
+        "smisNamespace" : {
+            required: "Namespace is required"
+        }
     };
     /* Validates IPv4 address */
     validRule= {
@@ -122,11 +161,12 @@ export class ModifyStorageComponent implements OnInit {
             },
 
         ];
-        //All Supported vendors
+        //All Supported storage vendors
         this.vendorOptions = Consts.STORAGES.vendors;
-        //All Supported models
+        //All supported storage models based on vendors
         this.allStorageModels = Consts.STORAGES.models;
-        //All Supported pubkey type options
+        //All supported public key type options
+        //["ssh-ed25519", "ecdsa-sha2-nistp256", "ecdsa-sha2-nistp384", "ecdsa-sha2-nistp521", "ssh-rsa", "ssh-dss"]
         this.pubKeyTypeOptions = Consts.STORAGES.pubKeyTypeOptions;
 
         this.ds.getStorageById(this.selectedStorageId).subscribe((res)=>{
@@ -152,19 +192,26 @@ export class ModifyStorageComponent implements OnInit {
                     this.showSsh = true;
                 }
 
+                if(this.selectedAccessInfo && this.selectedAccessInfo['cli']){
+                    this.showCli = true;
+                }
+
+                if(this.selectedAccessInfo && this.selectedAccessInfo['smis']){
+                    this.showSmis = true;
+                }
                 if(this.selectedAccessInfo && this.selectedAccessInfo['extra_attributes']){
                     this.showExtraAttribs = true;
                 }
                 
                 //Populate the Modify Form.
                 this.modifyStorageForm = this.fb.group({
-                    "enable_rest": [this.showRest, { updateOn: 'change' }],
-                    "enable_ssh": [this.showSsh, { updateOn: 'change' }],
                     "enable_extra_attribs": [this.showExtraAttribs, { updateOn: 'change' }]
                 });
 
                 this.checkRestParams();
                 this.checkSshParams();
+                this.checkCliParams();
+                this.checkSmisParams();
                 this.checkExtraAttributesParams();
             }, (error)=>{
                 console.log("Something wente wrong. Could not fetch the access info.", error);
@@ -200,16 +247,6 @@ export class ModifyStorageComponent implements OnInit {
         this.showExtraAttribs = this.modifyStorageForm.get('enable_extra_attribs').value;
         this.checkExtraAttributesParams();
     }
-    showSshControl(){
-        this.showSsh = this.modifyStorageForm.get('enable_ssh').value;
-        this.checkRestParams();
-        this.checkSshParams();
-    }
-    showRestControl(){
-        this.showRest = this.modifyStorageForm.get('enable_rest').value;
-        this.checkRestParams();
-        this.checkSshParams();
-    }
     getAllStorages(){
         this.ds.getAllStorages().subscribe((res)=>{
             this.allStorages = res.json().storages;
@@ -238,9 +275,6 @@ export class ModifyStorageComponent implements OnInit {
             this.modifyStorageForm.removeControl('restPort');
             this.modifyStorageForm.removeControl('restUsername');
             this.modifyStorageForm.removeControl('restPassword');
-            this.modifyStorageForm.patchValue({
-                'enable_rest' : false
-            });
             this.modifyStorageForm.updateValueAndValidity();
         }
     }
@@ -263,9 +297,38 @@ export class ModifyStorageComponent implements OnInit {
             this.modifyStorageForm.removeControl('sshPassword');
             this.modifyStorageForm.removeControl('sshPubKey');
             this.modifyStorageForm.removeControl('sshPubKeyType');
-            this.modifyStorageForm.patchValue({
-                'enable_ssh' : false
-            });
+            this.modifyStorageForm.updateValueAndValidity();
+        }
+    }
+
+    checkCliParams(){
+        if(this.showRest){
+            this.modifyStorageForm.addControl('cliHost', this.fb.control(this.selectedAccessInfo && this.selectedAccessInfo['cli'].host ? this.selectedAccessInfo['cli'].host : '', [Validators.required, Validators.pattern(this.validRule.validIp)]));
+            this.modifyStorageForm.addControl('cliPort', this.fb.control(this.selectedAccessInfo && this.selectedAccessInfo['cli'].port ? this.selectedAccessInfo['cli'].port : '', [Validators.required]));
+            this.modifyStorageForm.addControl('cliUsername', this.fb.control(this.selectedAccessInfo && this.selectedAccessInfo['cli'].username ? this.selectedAccessInfo['cli'].username : '', [Validators.required]));
+            this.modifyStorageForm.addControl('cliPassword', this.fb.control(this.selectedAccessInfo && this.selectedAccessInfo['cli'].password ? this.selectedAccessInfo['cli'].password : '', [Validators.required]));
+        } else{
+            this.modifyStorageForm.removeControl('cliHost');
+            this.modifyStorageForm.removeControl('cliPort');
+            this.modifyStorageForm.removeControl('cliUsername');
+            this.modifyStorageForm.removeControl('cliPassword');
+            this.modifyStorageForm.updateValueAndValidity();
+        }
+    }
+
+    checkSmisParams(){
+        if(this.showRest){
+            this.modifyStorageForm.addControl('smisHost', this.fb.control(this.selectedAccessInfo && this.selectedAccessInfo['smis'].host ? this.selectedAccessInfo['smis'].host : '', [Validators.required, Validators.pattern(this.validRule.validIp)]));
+            this.modifyStorageForm.addControl('smisPort', this.fb.control(this.selectedAccessInfo && this.selectedAccessInfo['smis'].port ? this.selectedAccessInfo['smis'].port : '', [Validators.required]));
+            this.modifyStorageForm.addControl('smisUsername', this.fb.control(this.selectedAccessInfo && this.selectedAccessInfo['smis'].username ? this.selectedAccessInfo['smis'].username : '', [Validators.required]));
+            this.modifyStorageForm.addControl('smisPassword', this.fb.control(this.selectedAccessInfo && this.selectedAccessInfo['smis'].password ? this.selectedAccessInfo['smis'].password : '', [Validators.required]));
+            this.modifyStorageForm.addControl('smisNamespace', this.fb.control(this.selectedAccessInfo && this.selectedAccessInfo['smis'].namespace ? this.selectedAccessInfo['smis'].namespace : '', [Validators.required]));
+        } else{
+            this.modifyStorageForm.removeControl('smisHost');
+            this.modifyStorageForm.removeControl('smisPort');
+            this.modifyStorageForm.removeControl('smisUsername');
+            this.modifyStorageForm.removeControl('smisPassword');
+            this.modifyStorageForm.removeControl('smisNamespace');
             this.modifyStorageForm.updateValueAndValidity();
         }
     }
@@ -327,6 +390,25 @@ export class ModifyStorageComponent implements OnInit {
                 pub_key_type: value['sshPubKeyType'],
             }
             dataArr['ssh'] = sshConfig;
+        }
+        if(this.showCli){
+            let cli = {
+                host: value['cliHost'],
+                port: Number(value['cliPort']),
+                username: value['cliUsername'],
+                password: value['cliPassword'],
+            }
+            dataArr['cli'] = cli;
+        }
+        if(this.showSmis){
+            let smis = {
+                host: value['smisHost'],
+                port: Number(value['smisPort']),
+                username: value['smisUsername'],
+                password: value['smisPassword'],
+                namespace: value['smisNamespace'],
+            }
+            dataArr['smis'] = smis;
         }
         if(this.showExtraAttribs){
             let meta = {};

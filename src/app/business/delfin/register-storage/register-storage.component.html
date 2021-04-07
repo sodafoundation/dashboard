@@ -22,9 +22,6 @@
                 <p-dropdown [style]="{'min-width':'150px','width':'220px'}" placeholder="Please select" [options]="modelOptions" (onChange)="onStorageModelSelect(selectedModel)" name='selectedModel' [(ngModel)]='selectedModel' formControlName="model"></p-dropdown>
             </form-item>
         </p-fieldset>
-        <form-item *ngIf="selectedModel && selectedModel.rest" label="Configure REST Connection details?" >
-            <p-inputSwitch [disabled]="showRest && !showSsh" formControlName="enable_rest" onLabel="Yes" offLabel="No" (onChange)="showRestControl()"></p-inputSwitch>
-        </form-item>
         <p-fieldset *ngIf="showRest" styleClass="register-storage-param-group" legend="REST Parameters">
             <form-item [required]="true" label="{{label.restHost}}">
                 <input formControlName="restHost" type="text" size="30" pInputText> 
@@ -39,9 +36,6 @@
                 <input formControlName="restPassword" type="password" size="30" pInputText> 
             </form-item>
         </p-fieldset>
-        <form-item *ngIf="selectedModel && selectedModel.ssh" label="Configure SSH Connection details?" >
-            <p-inputSwitch [disabled]="showSsh && !showRest" formControlName="enable_ssh" onLabel="Yes" offLabel="No" (onChange)="showSshControl()"></p-inputSwitch>
-        </form-item>
         <p-fieldset *ngIf="showSsh" styleClass="register-storage-param-group" legend="SSH Parameters">
             <form-item [required]="true" label="{{label.sshHost}}">
                 <input formControlName="sshHost" type="text" size="30" pInputText> 
@@ -61,6 +55,37 @@
             <form-item [required]="true" label="{{label.sshPubKey}}">
                 
                 <textarea pInputTextarea formControlName="sshPubKey" [rows]="5" [cols]="32" autoResize="true"></textarea>
+            </form-item>
+        </p-fieldset>
+        <p-fieldset *ngIf="showCli" styleClass="register-storage-param-group" legend="CLI Parameters">
+            <form-item [required]="true" label="{{label.cliHost}}">
+                <input formControlName="cliHost" type="text" size="30" pInputText> 
+            </form-item>
+            <form-item [required]="true" label="{{label.cliPort}}">
+                <input formControlName="cliPort" type="text" size="30" pInputText> 
+            </form-item>
+            <form-item [required]="true" label="{{label.cliUsername}}">
+                <input formControlName="cliUsername" type="text" size="30" pInputText> 
+            </form-item>
+            <form-item [required]="true" label="{{label.cliPassword}}">
+                <input formControlName="cliPassword" type="password" size="30" pInputText> 
+            </form-item>
+        </p-fieldset>
+        <p-fieldset *ngIf="showSmis" styleClass="register-storage-param-group" legend="SMI-S Parameters">
+            <form-item [required]="true" label="{{label.smisHost}}">
+                <input formControlName="smisHost" type="text" size="30" pInputText> 
+            </form-item>
+            <form-item [required]="true" label="{{label.smisPort}}">
+                <input formControlName="smisPort" type="text" size="30" pInputText> 
+            </form-item>
+            <form-item [required]="true" label="{{label.smisUsername}}">
+                <input formControlName="smisUsername" type="text" size="30" pInputText> 
+            </form-item>
+            <form-item [required]="true" label="{{label.smisPassword}}">
+                <input formControlName="smisPassword" type="password" size="30" pInputText> 
+            </form-item>
+            <form-item [required]="true" label="{{label.smisNamespace}}">
+                <input formControlName="smisNamespace" type="text" size="30" pInputText> 
             </form-item>
         </p-fieldset>
         <form-item *ngIf="selectedModel && selectedModel.extra" label="Extra Attributes?" >

@@ -57,7 +57,7 @@ export class BucketDetailComponent implements OnInit {
   archiveTierOptions: any[];
   restoreObjectForm: FormGroup;
   restoreDisplay = false;
-  restoreOptions: any;
+  restoreOptions: any = [];
   selectRestoreOptions: any;
   showErrorMsg = false;
   isReadyCopy = true;
@@ -68,6 +68,7 @@ export class BucketDetailComponent implements OnInit {
   msgs: Message[];
   allBackends: any[];
   archivalEnabled: any = {};
+  isPasting: boolean = false;
   errorMessage = {
     "backend_type": { required: "Type is required." },
     "backend": { required: "Backend is required." },
@@ -91,7 +92,8 @@ export class BucketDetailComponent implements OnInit {
 
   restoreObjectFormLabel = {
     "days" : "Days",
-    "tier" : "Retrieval Tier"
+    "tier" : "Retrieval Tier",
+    "storageClass" : "Storage Class"
   }
 
   restoreObjectErrorMsg = {
@@ -100,9 +102,45 @@ export class BucketDetailComponent implements OnInit {
     },
     "tier":{
       required: "Retrieval tier is required"
+    },
+    "storageClass":{
+      required: "Storage Class is required"
     }
   };
-
+  restoreFormItemsCopy = [];
+  restoreFormItems = [
+    {
+      label: 'Days',
+      required: 'true',
+      id: 'days',
+      type: 'number',
+      options: [],
+      name: 'days',
+      formControlName: 'days',
+      value: 1,
+      arr:['aws-s3']
+    },
+    {
+      label: 'Tier',
+      required: 'true',
+      id: 'tier',
+      type: 'select',
+      options: [],
+      name: 'tier',
+      formControlName: 'tier',
+      arr:['aws-s3']
+    },
+    {
+      label: 'Storage Class',
+      required: 'true',
+      id: 'storage-class',
+      type: 'select',
+      options: [],
+      name: 'storage-class',
+      formControlName: 'storageClass',
+      arr:['azure-blob']
+    }
+  ];
   constructor(
     private ActivatedRoute: ActivatedRoute,
     public I18N:I18NService,
@@ -121,8 +159,9 @@ export class BucketDetailComponent implements OnInit {
         "archive_tier":[""]
     });
     this.restoreObjectForm = this.fb.group({
-      "days":[1,{validators:[Validators.required], updateOn:'change'}],
-      "tier":["",{validators:[Validators.required], updateOn:'change'}],
+      "days":new FormControl([]),
+      "tier":new FormControl([]),
+      "storageClass": new FormControl([])
   });
   }
 
@@ -130,7 +169,6 @@ export class BucketDetailComponent implements OnInit {
     this.ActivatedRoute.params.subscribe((params) => {
       this.bucketId = params.bucketId;
       this.bucketBackend = params.bucketBackend;
-      
       this.items.push({
         label: this.bucketId,
         url: ["/" + this.bucketId],
@@ -151,15 +189,15 @@ export class BucketDetailComponent implements OnInit {
         this.allBackends.forEach(element => {
             if(element['name'] == this.bucketBackend){
               this.bucketBackendType = element['type'];
-              if(this.bucketBackendType=='aws-s3'){
+              if(Consts.STORAGE_CLASSES[this.bucketBackendType]){
                 this.archivalEnabled[this.bucketBackendType] = true;
+                this.restoreOptions = Consts.RETRIEVAL_OPTIONS[this.bucketBackendType];
               }
             }
         });
     });
-    
-    this.restoreOptions = Consts.RETRIEVAL_OPTIONS;
   }
+
   clickOperate(){
     if(this.selectedDir.length >0){
       this.isReadyCopy = false;
@@ -195,6 +233,8 @@ export class BucketDetailComponent implements OnInit {
   }
   //paste object
   pasteObject() {
+    this.isPasting = true;
+    this.msgs = [];
     this.copySelectedDir.forEach(item=>{
       let key = this.folderId != "" ? this.folderId + item.Key : item.Key;
       let copySource = item.folderId != "" ? item.source + '/' + item.folderId + item.Key : 
@@ -229,14 +269,19 @@ export class BucketDetailComponent implements OnInit {
             //Copy in the same bucket
             options.headers.set('X-Amz-Metadata-Directive', 'REPLACE');
           }
-          
+          let pastedObjectTitle = key + ' pasted.';
+          let pastedObjectMessage = key + ' will be available in the destination bucket shortly.';
+          this.msgs.push({severity: 'success', summary: pastedObjectTitle, detail: pastedObjectMessage});
           this.BucketService.copyObject(this.bucketId + '/' + key, '', options).subscribe((res) => {
             this.isReadyPast = true;
             window.sessionStorage['searchIndex'] = "";
             this.getAlldir();
-            res
+            this.isPasting = false;
           }, (error)=>{
             window.sessionStorage['searchIndex'] = "";
+            this.isPasting = false;
+            let pastedObjectMessage = 'Object' + key + 'could not be pasted. ' + error._body;
+            this.msgs.push({severity: 'error', summary: 'Error', detail: pastedObjectMessage});
           });
       })
     })
@@ -451,20 +496,62 @@ export class BucketDetailComponent implements OnInit {
   //Show Restore Form
   showRestoreObject(file){
     this.restoreDisplay = true;
+    this.restoreFormCreate(this.bucketBackendType);
     this.selectFileName = file.Key;
   }
 
+  restoreFormCreate(type){
+    this.restoreFormItemsCopy = []
+    this.restoreFormItems.forEach((item)=>{
+      if(item.type=='select'){
+        item.options = this.restoreOptions;
+      }
+      item.arr.forEach((it)=>{
+          if(it == type){
+              this.restoreFormItemsCopy.push(item)
+              this.restoreObjectForm.controls[`${item.formControlName}`].setValidators(Validators.required);
+          }else{
+              this.restoreObjectForm.controls[`${item.formControlName}`].setValidators([]);
+          }
+      })
+    })
+    this.restoreObjectForm.updateValueAndValidity();
+  }
   cancelRestore(){
     this.restoreDisplay = false;
-    this.restoreObjectForm.reset({
-      "days" : 1
-    });
+    switch (this.bucketBackendType) {
+      case 'aws-s3':
+          this.restoreObjectForm.reset({
+            "days" : 1
+          });  
+          break;
+      case 'azure-blob':
+          this.restoreObjectForm.reset(); 
+          break;
+      default:
+        break;
+    }
+    
   }
+  
   restoreObject(value){
-    let params = {
-      "days" : value.days,
-      "tier" : value.tier
-    };
+    let params = {};
+    switch (this.bucketBackendType) {
+      case 'aws-s3':
+        params = {
+          "days" : value.days,
+          "tier" : value.tier
+        };  
+        break;
+      case 'azure-blob':
+        params = {
+          "storageClass" : value.storageClass
+        };
+        break;
+      default:
+        break;
+    }
+      
     window['getAkSkList'](()=>{
       let requestMethod = "POST";
       let url = '/' + this.bucketId + '/' + this.selectFileName + '?restore';
@@ -736,11 +823,17 @@ export class BucketDetailComponent implements OnInit {
                         options = this.BucketService.getSignatureOptions(requestOptions, options);
                         this.BucketService.deleteFile(`${this.bucketId}/${objectKey}`,options).subscribe((res) => {
                           this.getAlldir();
+                          this.msgs = [];
+                          this.msgs.push({severity: 'success', summary: 'Success', detail: file.Key + ' has been deleted successfully.'});
+                        }, (error)=>{
+                          this.msgs = [];
+                          this.msgs.push({severity: 'error', summary: "Error deleting " + file.Key, detail: error._body});
                         });
                     })
                     
                     break;
                   case "deleteMilti":
+                    this.msgs = [];
                    file.forEach(element => {
                       let objectKey = element.Key;
                       //If you want to delete files from a folder, you must include the name of the folder
@@ -757,8 +850,11 @@ export class BucketDetailComponent implements OnInit {
                         options['headers'] = new Headers();
                         options = this.BucketService.getSignatureOptions(requestOptions, options);
                           this.BucketService.deleteFile(`${this.bucketId}/${objectKey}`,options).subscribe((res) => {
-                            this.getAlldir();
-                          });
+                          this.getAlldir();
+                          this.msgs.push({severity: 'success', summary: 'Success', detail: element.Key + ' has been deleted successfully.'});
+                        }, (error)=>{
+                          this.msgs.push({severity: 'error', summary: "Error deleting " + element.Key, detail: error._body});
+                        });
                       })
                    });
                     break;

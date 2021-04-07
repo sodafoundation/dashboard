@@ -84,22 +84,46 @@ export const Consts = {
                 label: 'S3 GLACIER',
                 value: 'GLACIER'
             }
+        ],
+        'azure-blob' : [
+            {
+                label: 'Archive',
+                value: 'Archive'
+            }
+        ],
+        'gcp-s3' : [
+            {
+                label: 'Archive',
+                value: 'Archive'
+            }
         ]
     },
-    RETRIEVAL_OPTIONS: [
-        {
-            label: "Expedited",
-            value: "Expedited"
-        },
-        {
-            label: "Standard",
-            value: "Standard"
-        },
-        {
-            label: "Bulk",
-            value: "Bulk"
-        }
-    ],
+    RETRIEVAL_OPTIONS: {
+        'aws-s3' : [
+            {
+                label: "Expedited",
+                value: "Expedited"
+            },
+            {
+                label: "Standard",
+                value: "Standard"
+            },
+            {
+                label: "Bulk",
+                value: "Bulk"
+            }
+        ],
+        'azure-blob' : [
+            {
+                label: "Hot",
+                value: "Hot"
+            },
+            {
+                label: "Cool",
+                value: "Cool"
+            }
+        ]
+    },
     API: {
 
         DELFIN : {
@@ -109,6 +133,10 @@ export const Consts = {
             'controllers' : 'resource-monitor/controllers',
             'ports' : 'resource-monitor/ports',
             'disks' : 'resource-monitor/disks',
+            'qtrees' : 'resource-monitor/qtrees',
+            'filesystems' : 'resource-monitor/filesystems',
+            'shares' : 'resource-monitor/shares',
+            'quotas' : 'resource-monitor/quotas',
             'alerts' : 'alertmanager/alerts'
         }
     },
@@ -171,6 +199,17 @@ export const Consts = {
                 value: 'ibm'
             }
         ],
+        resources:{
+            volumes : ['vmax', 'unity', 'vnx_block', 'vplex', 'oceanstor', '3par', 'vsp', 'storwize_svc'],
+            pools : ['vmax', 'unity', 'vnx_block', 'vplex', 'oceanstor', '3par', 'vsp', 'storwize_svc'],
+            controllers : ['oceanstor'],
+            ports : ['oceanstor'],
+            disks : ['oceanstor'],
+            qtrees : ['oceanstor'],
+            filesystems : ['oceanstor'],
+            shares: ['oceanstor'],
+            quotas: ['oceanstor']
+        },
         models: {
             'dellemc' : [
                 {
@@ -179,6 +218,8 @@ export const Consts = {
                         name: 'vmax',
                         rest: true,
                         ssh: false,
+                        cli: false,
+                        smis: false,
                         extra: true
                     }
                 },
@@ -188,6 +229,30 @@ export const Consts = {
                         name: 'unity',
                         rest: true,
                         ssh: false,
+                        cli: false,
+                        smis: false,
+                        extra: false
+                    }
+                },
+                {
+                    label: "VNX",
+                    value: {
+                        name: 'vnx_block',
+                        rest: false,
+                        ssh: false,
+                        cli: true,
+                        smis: false,
+                        extra: false
+                    }
+                },
+                {
+                    label: "VPLEX",
+                    value: {
+                        name: 'vplex',
+                        rest: true,
+                        ssh: false,
+                        cli: false,
+                        smis: false,
                         extra: false
                     }
                 }
@@ -199,6 +264,8 @@ export const Consts = {
                         name: 'oceanstor',
                         rest: true,
                         ssh: false,
+                        cli: false,
+                        smis: false,
                         extra: false
                     }
                 }
@@ -210,6 +277,8 @@ export const Consts = {
                         name: '3par',
                         rest: true,
                         ssh: true,
+                        cli: false,
+                        smis: false,
                         extra: false
                     }
                 }
@@ -221,6 +290,8 @@ export const Consts = {
                         name: 'vsp',
                         rest: true,
                         ssh: false,
+                        cli: false,
+                        smis: false,
                         extra: false
                     }
                 }
@@ -232,6 +303,8 @@ export const Consts = {
                         name: 'storwize_svc',
                         rest: false,
                         ssh: true,
+                        cli: false,
+                        smis: false,
                         extra: false
                     }
                 }

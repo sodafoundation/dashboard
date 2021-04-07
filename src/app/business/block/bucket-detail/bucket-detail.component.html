@@ -47,7 +47,7 @@
                     <p-column header="{{I18N.keyID['sds_block_volume_operation']}}" [style]="{'width': '200px'}">
                         <ng-template pTemplate="body" let-file="rowData" let-i="rowIndex">
                             <a (click)="downloadFile(file)" *ngIf="!file.newFolder">Download</a>
-                            <a (click)="showRestoreObject(file)" [ngClass]="{'a-rep-disabled':file.StorageClass!='GLACIER'}">Restore</a>
+                            <a (click)="showRestoreObject(file)" *ngIf="bucketBackendType!='gcp-s3'" [ngClass]="{'a-rep-disabled':file.StorageClass!='GLACIER'}">Restore</a>
                             <a [ngClass]="{'a-rep-disabled':file['disabled']}" (click)="deleteFile(file)">Delete</a>
                         </ng-template>
                     </p-column>
@@ -82,15 +82,13 @@
                 </p-dialog>
                 <p-dialog styleClass="restore-dialog" header="Restore" [(visible)]="restoreDisplay" [width]="600" [height]="280" modal="modal">
                     <form [grid]="{label: 'ui-g-3', content:'ui-g-20'}" [formGroup]="restoreObjectForm" [errorMessage]="restoreObjectErrorMsg">
-                        <form-item label="{{restoreObjectFormLabel.days}}" [required]="true">
-                            <input id="restore-days" type="number" pInputText formControlName="days"/>
-                        </form-item>
-                        <form-item label="{{restoreObjectFormLabel.tier}}" [required]="true">
-                            <p-dropdown [style]="{'min-width':'150px','width':'220px'}" placeholder="Please select" [options]="restoreOptions" name='selectRestoreOptions' [(ngModel)]='selectRestoreOptions' formControlName="tier"></p-dropdown>
+                        <form-item *ngFor="let item of restoreFormItemsCopy" [label]="item.label" [required]="item.required">
+                            <input *ngIf="item.type=='number'" [id]="item.id" type="number" min="1" [(ngModel)]="item.value" [name]="item.name"  [formControlName]="item.formControlName"  pInputText />
+                            <p-dropdown *ngIf="item.type=='select'" [style]="{'min-width':'150px','width':'220px'}" placeholder="Please select" [options]="item.options" [name]="item.name" [(ngModel)]='selectRestoreOptions' [formControlName]="item.formControlName"></p-dropdown>
                         </form-item>
                     </form>
                     <p-footer>
-                        <button type="submit" class="ui-button-secondary" pButton (click)="restoreObject(restoreObjectForm.value)" label="{{I18N.keyID['ok']}}"></button>
+                        <button type="submit" [disabled]="restoreObjectForm.invalid" class="ui-button-secondary" pButton (click)="restoreObject(restoreObjectForm.value)" label="{{I18N.keyID['ok']}}"></button>
                         <button type="button" pButton (click)="cancelRestore()"  label="{{I18N.keyID['cancel']}}"></button>
                     </p-footer>
                 </p-dialog>
@@ -116,3 +114,7 @@
         </p-tabPanel> 
     </p-tabView>
 </div>
+<p-dialog [(visible)]="isPasting" [showHeader]="false" [closable]="false" [width]="450" [modal]="true" [height]="50">
+    <p class="align-center">Object paste initiated. Please check back after sometime.</p>
+    <p-progressBar mode="indeterminate" [style]="{'height': '10px'}"></p-progressBar>
+</p-dialog>

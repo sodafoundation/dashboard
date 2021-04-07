@@ -7,7 +7,7 @@
     <div class="table-toolbar">
         <div class="left">
             <button class="ui-button-secondary" pButton type="button" label="Register" [routerLink]="['/registerStorage']"></button>
-            <button [disabled]="!allStorages.length" pButton type="button" (click)="syncAllStorageDevices()" icon="fa-exchange" label="Sync All Devices"></button>
+            <button [disabled]="allStorages && !allStorages.length" pButton type="button" (click)="syncAllStorageDevices()" icon="fa-exchange" label="Sync All Devices"></button>
             <button *ngIf="showListView" pButton type="button" label="{{i18n.keyID['sds_block_volume_delete']}}" [disabled]="selectedStorages.length == 0" (click)="batchDeleteStorages(selectedStorages)"></button></div>
         <div class="right">
             <div [ngStyle]="{'visibility': showListView ? 'visible' : 'hidden'}" class="ui-inputsearch">
@@ -28,7 +28,7 @@
                         <div class="ui-g-row summary-card-header-container" >
                             <div class="ui-g-6 left-items" style="padding-left: 0.2rem;">
                                 <div class="ui-card-title">Storage Arrays</div>
-                                <div class="ui-card-subtitle">Total Number of Arrays: {{allStorages.length}}</div>
+                                <div class="ui-card-subtitle">Total Number of Arrays: {{allStorages && allStorages.length ? allStorages.length : 0}}</div>
                             </div>
                             <div class="ui-g-offset-4 ui-g-2">
                                 <a  (click)="toggleView()">Show all devices</a>
@@ -41,39 +41,63 @@
                                 <ng-template #modelTreeItem let-model pTemplate="modelGroup">
                                     <a (mouseenter)="showOverview($event, model, modelOverviewPanel)" (mouseleave)="showOverview($event, model, modelOverviewPanel)">{{model.label}}</a>
                                 </ng-template>
-                                <ng-template #deviceTreeItem let-node pTemplate="device">
-                                    <a [routerLink]="['/storageDetails/' + node.details.id]" (contextmenu)="deviceNodeMenu($event, node, deviceOverviewPanel)"  (mouseenter)="showOverview($event, node, deviceOverviewPanel)" (mouseleave)="deviceOverviewPanel.hide()">{{node.label}}</a>
-                                    <i *ngIf="node.details.sync_status=='SYNCING'" title="Device is syncing" class="fa fa-spinner fa-spin fa-3x fa-fw"></i>
+                                <ng-template #deviceTreeItem let-deviceNode pTemplate="device">
+                                    <a [routerLink]="['/storageDetails/' + deviceNode.details.id]" (contextmenu)="deviceNodeMenu($event, deviceNode, deviceOverviewPanel)"  (mouseenter)="showOverview($event, deviceNode, deviceOverviewPanel)" (mouseleave)="deviceOverviewPanel.hide()">{{deviceNode.label}}</a>
+                                    <i *ngIf="deviceNode.details.sync_status=='SYNCING'" title="Device is syncing" class="fa fa-spinner fa-spin fa-3x fa-fw"></i>
                                 </ng-template>
-                                <ng-template #volumeParentTreeItem let-node pTemplate="volParent">
-                                    <a (mouseenter)="showOverview($event, node, parentOverviewPanel)" (mouseleave)="parentOverviewPanel.hide()">{{node.label}}</a>
+                                <ng-template #poolParentTreeItem let-poolParent pTemplate="poolParent">
+                                    <a (mouseenter)="showOverview($event, poolParent, parentOverviewPanel)" (mouseleave)="parentOverviewPanel.hide()">{{poolParent.label}}</a>
                                 </ng-template>
-                                <ng-template #poolParentTreeItem let-node pTemplate="poolParent">
-                                    <a (mouseenter)="showOverview($event, node, parentOverviewPanel)" (mouseleave)="parentOverviewPanel.hide()">{{node.label}}</a>
+                                <ng-template #volumeParentTreeItem let-volParent pTemplate="volParent">
+                                    <a (mouseenter)="showOverview($event, volParent, parentOverviewPanel)" (mouseleave)="parentOverviewPanel.hide()">{{volParent.label}}</a>
                                 </ng-template>
-                                <ng-template #controllerParentTreeItem let-node pTemplate="controllerParent">
-                                    {{node.label}}
+                                <ng-template #controllerParentTreeItem let-controllerParent pTemplate="controllerParent">
+                                    {{controllerParent.label}}
                                 </ng-template>
-                                <ng-template #portParentTreeItem let-node pTemplate="portParent">
-                                    {{node.label}}
+                                <ng-template #portParentTreeItem let-portParent pTemplate="portParent">
+                                    {{portParent.label}}
                                 </ng-template>
-                                <ng-template #diskParentTreeItem let-node pTemplate="diskParent">
-                                    {{node.label}}
+                                <ng-template #diskParentTreeItem let-diskParent pTemplate="diskParent">
+                                    {{diskParent.label}}
                                 </ng-template>
-                                <ng-template #volumeTreeItem let-node pTemplate="volNode">
-                                    <a (mouseenter)="showOverview($event, node, volumeOverviewPanel)" (mouseleave)="volumeOverviewPanel.hide()">{{node.label}}</a>
+                                <ng-template #qtreeParentTreeItem let-qtreeParent pTemplate="qtreeParent">
+                                    {{qtreeParent.label}}
                                 </ng-template>
-                                <ng-template #poolTreeItem let-node pTemplate="poolNode">
-                                    <a (mouseenter)="showOverview($event, node, poolOverviewPanel)" (mouseleave)="poolOverviewPanel.hide()">{{node.label}}</a>
+                                <ng-template #filesystemParentTreeItem let-filesystemParent pTemplate="filesystemParent">
+                                    <a (mouseenter)="showOverview($event, filesystemParent, parentOverviewPanel)" (mouseleave)="parentOverviewPanel.hide()">{{filesystemParent.label}}</a>
                                 </ng-template>
-                                <ng-template #controllerTreeItem let-node pTemplate="controllerNode">
-                                    <a (mouseenter)="showOverview($event, node, controllerOverviewPanel)" (mouseleave)="controllerOverviewPanel.hide()">{{node.label}}</a>
+                                <ng-template #shareParentTreeItem let-shareParent pTemplate="shareParent">
+                                    {{shareParent.label}}
                                 </ng-template>
-                                <ng-template #portTreeItem let-node pTemplate="portNode">
-                                    <a (mouseenter)="showOverview($event, node, portOverviewPanel)" (mouseleave)="portOverviewPanel.hide()">{{node.label}}</a>
+                                <ng-template #quotaParentTreeItem let-quotaParent pTemplate="quotaParent">
+                                    {{quotaParent.label}}
                                 </ng-template>
-                                <ng-template #diskTreeItem let-node pTemplate="diskNode">
-                                    <a (mouseenter)="showOverview($event, node, diskOverviewPanel)" (mouseleave)="diskOverviewPanel.hide()">{{node.label}}</a>
+                                <ng-template #poolTreeItem let-poolNode pTemplate="poolNode">
+                                    <a (mouseenter)="showOverview($event, poolNode, poolOverviewPanel)" (mouseleave)="poolOverviewPanel.hide()">{{poolNode.label}}</a>
+                                </ng-template>
+                                <ng-template #volumeTreeItem let-volNode pTemplate="volNode">
+                                    <a (mouseenter)="showOverview($event, volNode, volumeOverviewPanel)" (mouseleave)="volumeOverviewPanel.hide()">{{volNode.label}}</a>
+                                </ng-template>
+                                <ng-template #controllerTreeItem let-controllerNode pTemplate="controllerNode">
+                                    <a (mouseenter)="showOverview($event, controllerNode, controllerOverviewPanel)" (mouseleave)="controllerOverviewPanel.hide()">{{controllerNode.label}}</a>
+                                </ng-template>
+                                <ng-template #portTreeItem let-portNode pTemplate="portNode">
+                                    <a (mouseenter)="showOverview($event, portNode, portOverviewPanel)" (mouseleave)="portOverviewPanel.hide()">{{portNode.label}}</a>
+                                </ng-template>
+                                <ng-template #diskTreeItem let-diskNode pTemplate="diskNode">
+                                    <a (mouseenter)="showOverview($event, diskNode, diskOverviewPanel)" (mouseleave)="diskOverviewPanel.hide()">{{diskNode.label}}</a>
+                                </ng-template>
+                                <ng-template #qtreeTreeItem let-qtreeNode pTemplate="qtreeNode">
+                                    <a (mouseenter)="showOverview($event, qtreeNode, qtreeOverviewPanel)" (mouseleave)="qtreeOverviewPanel.hide()">{{qtreeNode.label}}</a>
+                                </ng-template>
+                                <ng-template #filesystemTreeItem let-filesystemNode pTemplate="filesystemNode">
+                                    <a (mouseenter)="showOverview($event, filesystemNode, filesystemOverviewPanel)" (mouseleave)="filesystemOverviewPanel.hide()">{{filesystemNode.label}}</a>
+                                </ng-template>
+                                <ng-template #shareTreeItem let-shareNode pTemplate="shareNode">
+                                    <a (mouseenter)="showOverview($event, shareNode, shareOverviewPanel)" (mouseleave)="shareOverviewPanel.hide()">{{shareNode.label}}</a>
+                                </ng-template>
+                                <ng-template #quotaTreeItem let-quotaNode pTemplate="quotaNode">
+                                    <a (mouseenter)="showOverview($event, quotaNode, quotaOverviewPanel)" (mouseleave)="quotaOverviewPanel.hide()">{{quotaNode.label}}</a>
                                 </ng-template>
                             </p-tree>
                             <p-contextMenu #cm appendTo="body" [model]="contextMenuItems"></p-contextMenu>
@@ -176,7 +200,7 @@
                                         'capacity-usage-full' : device.capacity.usage > 95 }" [value]="device.capacity.usage" unit="% used"></p-progressBar>
                                 </div>
                             </div>
-                            <div *ngIf="!allStorages.length" class="no-records-found">
+                            <div *ngIf="allStorages && !allStorages.length" class="no-records-found">
                                 <span>No records found.</span>
                             </div>
                         </p-scrollPanel>
@@ -225,7 +249,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div *ngIf="!allStorages.length" class="no-records-found">
+                            <div *ngIf="allStorages && !allStorages.length" class="no-records-found">
                                 <span>No records found.</span>
                             </div>
                         </p-scrollPanel>
@@ -243,7 +267,7 @@
     <div *ngIf="showListView">
         <div id="storage-devices-table" class="ui-g">
             <p-card  styleClass="ui-card-shadow">
-                <p-dataTable [value]="allStorages" [globalFilter]="searchAll" [lazy]="false" [(selection)]="selectedStorages" [expandableRows]="true" [showHeaderCheckbox]="true" [rows]="10" [paginator]="true" [pageLinks]="3" [rowsPerPageOptions]="[10,20,50,100]" #st>
+                <p-dataTable [value]="allStorages ? allStorages : []" [globalFilter]="searchAll" [lazy]="false" [(selection)]="selectedStorages" [expandableRows]="true" [showHeaderCheckbox]="true" [rows]="10" [paginator]="true" [pageLinks]="3" [rowsPerPageOptions]="[10,20,50,100]" #st>
                     <p-column expander="true" styleClass="col-icon" [style]="{'width': '3%'}"></p-column>
                     <p-column selectionMode="multiple" [style]="{'width': '3%'}"></p-column>
                     <p-column field="name" header="Name" [style]="{'width': '15%'}" [sortable]="true">
@@ -886,7 +910,9 @@
     <div class="ui-g overview-item">
         <div class="ui-g-6">
             <span class="overview-item-label">
-                Number of {{parentOverview && parentOverview.type=='volParent' ? 'Volumes' : 'Pools'}} 
+                Number of <span *ngIf="parentOverview && parentOverview.type=='volParent'">Volumes</span>
+                <span *ngIf="parentOverview && parentOverview.type=='poolParent'">Pools</span>
+                <span *ngIf="parentOverview && parentOverview.type=='filesystemParent'">Filesystem</span>
             </span>
         </div>
         <div class="ui-g-4 ui-g-offset-2">
@@ -1210,6 +1236,270 @@
             <span>
                 {{ diskOverview && diskOverview.details.health_score}}
             </span>
+        </div>
+    </div>
+</p-overlayPanel>
+
+<p-overlayPanel styleClass="overview-panel" #qtreeOverviewPanel>
+    <div class="ui-g overview-title">
+        <h4>{{qtreeOverview && qtreeOverview.details.name}}</h4>
+    </div>
+    <div class="ui-g overview-item">
+        <div class="ui-g-6">
+            <span class="overview-item-label">
+              Storage ID  
+            </span>
+        </div>
+        <div class="ui-g-6">
+            <span>
+                {{ qtreeOverview && qtreeOverview.details.storage_id}}
+            </span>
+        </div>
+    </div>
+    <div class="ui-g overview-item">
+        <div class="ui-g-6">
+            Security Mode
+        </div>
+        <div class="ui-g-6">
+            {{ qtreeOverview && qtreeOverview.details.security_mode}}
+        </div>
+    </div>
+    <div class="ui-g overview-item">
+        <div class="ui-g-6">
+            Path
+        </div>
+        <div class="ui-g-6">
+            {{qtreeOverview && qtreeOverview.details.path}}
+        </div>
+    </div>
+</p-overlayPanel>
+<p-overlayPanel styleClass="overview-panel" #filesystemOverviewPanel>
+    <div class="ui-g overview-title">
+        <h4>{{filesystemOverview && filesystemOverview.details.name}}</h4>
+    </div>
+    <div class="ui-g ui-g-nopad overview-item" >
+        <div class="ui-g-6">
+            <span class="overview-item-label">Status: </span>
+        </div>
+        <div class="ui-g-6">
+            <span class="storage-status-icon" [ngClass]="{normal:  filesystemOverview && filesystemOverview.details.status =='normal', abnormal: filesystemOverview && filesystemOverview.details.status =='faulty'}"><i class="fa fa-circle"></i></span>
+            <span *ngIf="filesystemOverview && filesystemOverview.details.status=='normal'">Normal</span>
+            <span *ngIf=" filesystemOverview && filesystemOverview.details.status=='faulty'">Faulty</span>
+            <span *ngIf=" filesystemOverview && filesystemOverview.details.status=='offline'">Offline</span>
+        </div>
+    </div>
+    <div class="ui-g overview-item">
+        <div class="ui-g-6">
+            <span class="overview-item-label">
+              Storage ID  
+            </span>
+        </div>
+        <div class="ui-g-6">
+            <span>
+                {{ filesystemOverview && filesystemOverview.details.storage_id}}
+            </span>
+        </div>
+    </div>
+    <div class="ui-g overview-item">
+        <div class="ui-g-6">
+            Type
+        </div>
+        <div class="ui-g-6">
+            {{ filesystemOverview && filesystemOverview.details.type}}
+        </div>
+    </div>
+    <div class="ui-g overview-item">
+        <div class="ui-g-6">
+            Compressed
+        </div>
+        <div class="ui-g-6">
+            {{ filesystemOverview && filesystemOverview.details.compressed ? "Yes" : "No"}}
+        </div>
+    </div>
+    <div class="ui-g overview-item">
+        <div class="ui-g-6">
+            Deduplicated
+        </div>
+        <div class="ui-g-6">
+            {{ filesystemOverview && filesystemOverview.details.deduplicated ? "Yes" : "No"}}
+        </div>
+    </div>
+    <div class="ui-g overview-item">
+        <div class="ui-g-6">
+            <span class="overview-item-label">
+              Security Mode
+            </span>
+        </div>
+        <div class="ui-g-6">
+            <span>
+                {{ filesystemOverview && filesystemOverview.details.security_mode}}
+            </span>
+        </div>
+    </div>
+    <hr />
+    <div class="ui-g overview-item">
+        <div class="ui-g-12">
+            <span class="overview-item-label">Usable Capacity Summary</span>
+        </div>
+    </div>
+    <div class="ui-g overview-item">
+        <div *ngIf="filesystemOverview && filesystemOverview.details.capacity" class="capacity-stats-bar">
+            <table class="capacity-table" *ngIf="filesystemOverview && filesystemOverview.details.capacity">
+                <thead>
+                    <th class="capacity-header">Free</th>
+                    <th class="capacity-header">Used</th>
+                    <th class="capacity-header">Total</th>
+                </thead>
+                <tbody>
+                    <td class="capacity-field"><span class="free-storage">{{filesystemOverview.details.capacity && filesystemOverview.details.capacity.free ? filesystemOverview.details.capacity.free : '-'}} </span></td>
+                    <td class="capacity-field"><span class="used-storage">{{filesystemOverview.details.capacity && filesystemOverview.details.capacity.used ? filesystemOverview.details.capacity.used : '-'}} </span></td>
+                    <td class="capacity-field"><span class="total-storage">{{filesystemOverview.details.capacity && filesystemOverview.details.capacity.total ? filesystemOverview.details.capacity.total : '-'}} </span></td>
+                </tbody>
+            </table>
+            <div class="storage-usage-bar" >
+                <p-progressBar [ngClass]="{'capacity-usage-zero': filesystemOverview.details.capacity.usage == 0, 'capacity-usage-normal': filesystemOverview.details.capacity.usage > 0 && filesystemOverview.details.capacity.usage < 75, 
+                    'capacity-usage-warning': filesystemOverview.details.capacity.usage > 75 && filesystemOverview.details.capacity.usage < 95, 
+                    'capacity-usage-full' : filesystemOverview.details.capacity.usage > 95 }" [value]="filesystemOverview.details.capacity.usage" unit="% used"></p-progressBar>
+            </div>
+        </div>
+    </div>
+</p-overlayPanel>
+<p-overlayPanel styleClass="overview-panel" #shareOverviewPanel>
+    <div class="ui-g overview-title">
+        <h4>{{shareOverview && shareOverview.details.name}}</h4>
+    </div>
+    <div class="ui-g overview-item">
+        <div class="ui-g-6">
+            <span class="overview-item-label">
+              Storage ID  
+            </span>
+        </div>
+        <div class="ui-g-6">
+            <span>
+                {{ shareOverview && shareOverview.details.storage_id}}
+            </span>
+        </div>
+    </div>
+    <div class="ui-g overview-item">
+        <div class="ui-g-6">
+            Protocol
+        </div>
+        <div class="ui-g-6">
+            {{ shareOverview && shareOverview.details.protocol}}
+        </div>
+    </div>
+    <div class="ui-g overview-item">
+        <div class="ui-g-6">
+            Path
+        </div>
+        <div class="ui-g-6">
+            {{shareOverview && shareOverview.details.path}}
+        </div>
+    </div>
+    <div class="ui-g overview-item">
+        <div class="ui-g-6">
+            
+        </div>
+        <div class="ui-g-6">
+            
+        </div>
+    </div>
+</p-overlayPanel>
+<p-overlayPanel styleClass="overview-panel" #quotaOverviewPanel>
+    <div class="ui-g overview-title">
+        <h4>{{quotaOverview && quotaOverview.details.native_quota_id}}</h4>
+    </div>
+    <div class="ui-g ui-g-nopad overview-item" >
+        <div class="ui-g-6">
+            <span class="overview-item-label">
+              Storage ID  
+            </span>
+        </div>
+        <div class="ui-g-6">
+            <span>
+                {{ quotaOverview && quotaOverview.details.storage_id}}
+            </span>
+        </div>
+    </div>
+    <div class="ui-g overview-item">
+        <div class="ui-g-6">
+            <span class="overview-item-label">
+              Native Filesystem ID  
+            </span>
+        </div>
+        <div class="ui-g-6">
+            <span>
+                {{ quotaOverview && quotaOverview.details.native_filesystem_id}}
+            </span>
+        </div>
+    </div>
+    <div class="ui-g ui-g-nopad overview-item" >
+        <div class="ui-g-6">
+            <span class="overview-item-label">
+              Type
+            </span>
+        </div>
+        <div class="ui-g-6">
+            <span>
+                {{ quotaOverview && quotaOverview.details.type}}
+            </span>
+        </div>
+    </div>
+    <div class="ui-g overview-item">
+        <div class="ui-g-6">
+            User Group Name
+        </div>
+        <div class="ui-g-6">
+            {{ quotaOverview && quotaOverview.details.user_group_name ? quotaOverview.details.user_group_name : '--'}}
+        </div>
+    </div>
+    <hr />
+    <div class="ui-g overview-item">
+        <div class="ui-g-12">
+            <span class="overview-item-label">Files Summary</span>
+        </div>
+    </div>
+    <div class="ui-g overview-item">
+        <div *ngIf="quotaOverview && quotaOverview.details.file_hard_limit" class="capacity-stats-bar">
+            <table class="capacity-table" *ngIf="quotaOverview && quotaOverview.details.file_hard_limit">
+                <thead>
+                    <th class="capacity-header">Hard limit</th>
+                    <th class="capacity-header">Soft Limit</th>
+                    <th class="capacity-header">File Count</th>
+                </thead>
+                <tbody>
+                    <td class="capacity-field"><span class="free-storage">{{quotaOverview && quotaOverview.details.file_hard_limit ? quotaOverview.details.file_hard_limit : '-'}} </span></td>
+                    <td class="capacity-field"><span class="free-storage">{{quotaOverview && quotaOverview.details.file_soft_limit ? quotaOverview.details.file_soft_limit : '-'}} </span></td>
+                    <td class="capacity-field"><span class="used-storage">{{quotaOverview && quotaOverview.details.file_count ? quotaOverview.details.file_count : '-'}} </span></td>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <hr />
+    <div class="ui-g overview-item">
+        <div class="ui-g-12">
+            <span class="overview-item-label">Capacity Summary</span>
+        </div>
+    </div>
+    <div class="ui-g overview-item">
+        <div *ngIf="quotaOverview && quotaOverview.details.capacity" class="capacity-stats-bar">
+            <table class="capacity-table" *ngIf="quotaOverview && quotaOverview.details.capacity">
+                <thead>
+                    <th class="capacity-header">Hard limit</th>
+                    <th class="capacity-header">Soft Limit</th>
+                    <th class="capacity-header">Used</th>
+                </thead>
+                <tbody>
+                    <td class="capacity-field"><span class="free-storage">{{quotaOverview.details.capacity && quotaOverview.details.capacity.display_hard_limit ? quotaOverview.details.capacity.display_hard_limit : '-'}} </span></td>
+                    <td class="capacity-field"><span class="free-storage">{{quotaOverview.details.capacity && quotaOverview.details.capacity.display_soft_limit ? quotaOverview.details.capacity.display_soft_limit : '-'}} </span></td>
+                    <td class="capacity-field"><span class="used-storage">{{quotaOverview.details.capacity && quotaOverview.details.capacity.display_used ? quotaOverview.details.capacity.display_used : '-'}} </span></td>
+                </tbody>
+            </table>
+            <div class="storage-usage-bar" >
+                <p-progressBar [ngClass]="{'capacity-usage-zero': quotaOverview.details.capacity.usage == 0, 'capacity-usage-normal': quotaOverview.details.capacity.usage > 0 && quotaOverview.details.capacity.usage < 75, 
+                    'capacity-usage-warning': quotaOverview.details.capacity.usage > 75 && quotaOverview.details.capacity.usage < 95, 
+                    'capacity-usage-full' : quotaOverview.details.capacity.usage > 95 }" [value]="quotaOverview.details.capacity.usage" unit="% used"></p-progressBar>
+            </div>
         </div>
     </div>
 </p-overlayPanel>

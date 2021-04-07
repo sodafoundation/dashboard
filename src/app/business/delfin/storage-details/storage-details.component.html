@@ -12,7 +12,6 @@
             
         </div>
         <div class="right">
-            <button pButton type="button" (click)="showPerfConfigDialog()" icon="fa-cog" label="Configure Metric Collection"></button>
             <button pButton type="button" (click)="syncStorage(selectedStorageId)" icon="fa-exchange" label="Sync Storage"></button>
             <button class="" title="Refresh" label="Refresh" pButton type="button" (click)="getStorageById(selectedStorageId)" icon="fa-refresh"></button>
         </div>
@@ -168,22 +167,34 @@
                     </div>
                 <div class="configuration-tabs">
                     <p-tabView styleClass="ui-tabview-large" (onChange)="changeConfigTab($event)" [activeIndex]="configTabIndex"> 
-                        <p-tabPanel header="Volumes">
+                        <p-tabPanel *ngIf="poolsExist" header="Storage pools" [selected]="true">
+                            <app-delfin-storage-pools [selectedStorage]="selectedStorageId"></app-delfin-storage-pools>
+                        </p-tabPanel>
+                        <p-tabPanel *ngIf="volumesExist" header="Volumes">
                             <ng-template pTemplate="content">
                                 <app-delfin-volumes [selectedStorage]="selectedStorageId"></app-delfin-volumes>
                             </ng-template>
                         </p-tabPanel>
-                        <p-tabPanel header="Storage pools">
-                            <app-delfin-storage-pools [selectedStorage]="selectedStorageId"></app-delfin-storage-pools>
-                        </p-tabPanel>
-                        <p-tabPanel header="Controllers">
+                        <p-tabPanel *ngIf="controllersExist" header="Controllers">
                             <app-delfin-controllers [selectedStorage]="selectedStorageId"></app-delfin-controllers>
                         </p-tabPanel>
-                        <p-tabPanel header="Ports">
+                        <p-tabPanel *ngIf="portsExist" header="Ports">
                             <app-delfin-ports [selectedStorage]="selectedStorageId"></app-delfin-ports>
                         </p-tabPanel>
-                        <p-tabPanel header="Disks">
+                        <p-tabPanel *ngIf="disksExist" header="Disks">
                             <app-delfin-disks [selectedStorage]="selectedStorageId"></app-delfin-disks>
+                        </p-tabPanel>
+                        <p-tabPanel *ngIf="qtreesExist" header="Qtrees">
+                            <app-delfin-qtrees [selectedStorage]="selectedStorageId"></app-delfin-qtrees>
+                        </p-tabPanel>
+                        <p-tabPanel *ngIf="filesystemsExist" header="Filesystems">
+                            <app-delfin-filesystems [selectedStorage]="selectedStorageId"></app-delfin-filesystems>
+                        </p-tabPanel>
+                        <p-tabPanel *ngIf="sharesExist" header="Shares">
+                            <app-delfin-shares [selectedStorage]="selectedStorageId"></app-delfin-shares>
+                        </p-tabPanel>
+                        <p-tabPanel *ngIf="quotasExist" header="Quotas">
+                            <app-delfin-quotas [selectedStorage]="selectedStorageId"></app-delfin-quotas>
                         </p-tabPanel>
                     </p-tabView>
                 </div>
