@@ -6,7 +6,7 @@ import { trigger, state, style, transition, animate } from '@angular/animations'
 import { I18nPluralPipe } from '@angular/common';
 import { HttpService } from './../../../shared/api';
 import { FormControl, FormGroup, FormBuilder, Validators, ValidatorFn, AbstractControl } from '@angular/forms';
-
+import { ClipboardService } from 'ngx-clipboard';
 import { ButtonModule ,ConfirmationService, Message} from './../../../components/common/api';
 import { ProfileService } from './../profile.service';
 
@@ -72,7 +72,7 @@ export class ProfileCardComponent implements OnInit {
             if(data['snapshotProperties'].retention && Object.keys(data['snapshotProperties'].retention).length !== 0){
                 this.policys.push("Snapshot");
             }
-            if(data['replicationProperties'] && data['replicationProperties'].dataProtection && Object.keys(data['replicationProperties'].dataProtection).length !== 0){
+            if(data['replicationProperties'] && data['replicationProperties'].dataProtection && data['replicationProperties'].dataProtection.replicaType){
                 this.policys.push("Replication");
             }
             if(data['provisioningProperties'].dataStorage.storageAccessCapability){
@@ -105,27 +105,32 @@ export class ProfileCardComponent implements OnInit {
         private fb: FormBuilder,
         private ProfileService: ProfileService,
         private paramStor: ParamStorService,
-        private confirmationService:ConfirmationService
+        private confirmationService:ConfirmationService,
+        private clipboardService: ClipboardService
     ) { }
     option = {};
     ngOnInit() {
         this.option = {
-            cutoutPercentage: 80,
+            cutoutPercentage: 70,
             // rotation: (0.5 * Math.PI),
             // circumference: (Math.PI),
             title: {
-                display: false,
-                text: 'My Title',
+                display: true,
+                text: 'Capacity Usage',
+                position: 'top',
                 fontSize: 12
             },
             legend: {
                 labels: {
-                    boxWidth: 12
+                    boxWidth: 10,
+                    boxHeight: 2,
+                    textAlign: 'left'
                 },
-                display: false,
+                display: true,
                 width: '5px',
                 position: 'right',
-                fontSize: 12
+                fontSize: 12,
+                maxWidth: 10
             }
         };
         this.dropMenuItems = [
@@ -189,6 +194,18 @@ export class ProfileCardComponent implements OnInit {
             "descript":  [policyId.description, Validators.maxLength(200)]
         })
         
+    }
+
+    copyProfileSuccess(id){
+        this.msgs = [];
+        this.msgs.push({severity: 'success', summary: "Profile ID copied!", detail: 'The profile ID <strong>' + id + '</strong> has been copied successfully.'});
+        this.checkParam.emit(this.msgs);
+    }
+    copyProfileError(id){
+        console.log("Profile ID could not be copied");
+        this.msgs = [];
+        this.msgs.push({severity: 'error', summary: "Error copying profile ID!", detail: 'Profile ID ' + id +' could not be copied.'});
+        this.checkParam.emit(this.msgs);
     }
 
     submitPorfile(value){
