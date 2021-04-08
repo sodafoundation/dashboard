@@ -72,7 +72,7 @@ export class ProfileCardComponent implements OnInit {
             if(data['snapshotProperties'].retention && Object.keys(data['snapshotProperties'].retention).length !== 0){
                 this.policys.push("Snapshot");
             }
-            if(data['replicationProperties'] && data['replicationProperties'].dataProtection && Object.keys(data['replicationProperties'].dataProtection).length !== 0){
+            if(data['replicationProperties'] && data['replicationProperties'].dataProtection && data['replicationProperties'].dataProtection.replicaType){
                 this.policys.push("Replication");
             }
             if(data['provisioningProperties'].dataStorage.storageAccessCapability){
@@ -110,22 +110,26 @@ export class ProfileCardComponent implements OnInit {
     option = {};
     ngOnInit() {
         this.option = {
-            cutoutPercentage: 80,
+            cutoutPercentage: 70,
             // rotation: (0.5 * Math.PI),
             // circumference: (Math.PI),
             title: {
-                display: false,
-                text: 'My Title',
+                display: true,
+                text: 'Capacity Usage',
+                position: 'top',
                 fontSize: 12
             },
             legend: {
                 labels: {
-                    boxWidth: 12
+                    boxWidth: 10,
+                    boxHeight: 2,
+                    textAlign: 'left'
                 },
-                display: false,
+                display: true,
                 width: '5px',
                 position: 'right',
-                fontSize: 12
+                fontSize: 12,
+                maxWidth: 10
             }
         };
         this.dropMenuItems = [
