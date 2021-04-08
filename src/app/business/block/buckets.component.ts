@@ -73,6 +73,7 @@ export class BucketsComponent implements OnInit{
     };
     selectType;
     allBucketNameForCheck=[];
+    allMigrationsName=[];
     showCreateBucket = false;
     akSkRouterLink = "/akSkManagement";
     enableVersion: boolean;
@@ -100,7 +101,7 @@ export class BucketsComponent implements OnInit{
         this.errorMessage = {
             "name": { 
                 required: "Name is required.", 
-                isExisted:"Name is existing",
+                isExisted:"This name already exists.",
                 minlength: "The bucket name should have minimum 3 characters.",
                 maxlength: "The bucket name can have maximum 63 characters.",
                 pattern: "Please enter valid bucket name."
@@ -122,7 +123,7 @@ export class BucketsComponent implements OnInit{
             "sse":["",{}],
         });
         this.migrationForm = this.fb.group({
-            "name": ['',{validators:[Validators.required], updateOn:'change'}],
+            "name": ['',{validators:[Validators.required, Utils.isExisted(this.allMigrationsName)], updateOn:'change'}],
             "destBucket":['',{validators:[Validators.required], updateOn:'change'}],
             "rule":[''],
             "deleteSrcObject":[false],
@@ -158,6 +159,7 @@ export class BucketsComponent implements OnInit{
         }];
         this.allBackends = [];
         this.getBuckets();
+        this.getMigrations();
         this.sseTypes = [
             {
                 label: "SSE",
@@ -175,14 +177,7 @@ export class BucketsComponent implements OnInit{
         this.availbucketOption = [];
         this.createMigrateShow=true;
         this.selectedBucket = bucket;
-        this.migrationForm.reset(
-            {
-            'name':'',
-            "deleteSrcObject":false,
-            "excuteTime":new Date(),
-            "excute":true
-            }
-        );
+        this.migrationForm.controls['name'].setValidators([Validators.required,Utils.isExisted(this.allMigrationsName)]);
         this.selectTime = true;
         this.bucketOption.forEach((value,index)=>{
             if(Consts.BUCKET_BACKND.get(value.label) !== Consts.BUCKET_BACKND.get(bucket.name)){
@@ -283,7 +278,20 @@ export class BucketsComponent implements OnInit{
             });
         });
     }
+
+    getMigrations(){
+        this.allMigrationsName = [];
+        this.MigrationService.getMigrations().subscribe((res)=>{
+            let migrations = res.json().plans;
+            migrations.forEach(element => {
+                this.allMigrationsName.push(element.name);
+            });
+        },(error)=>{
+            console.log("Something went wrong. Could not fetch migrations.")
+        });
+    }
     createMigration(){
+        this.msgs = [];
         if(!this.migrationForm.valid){
             for(let i in this.migrationForm.controls){
                 this.migrationForm.controls[i].markAsTouched();
@@ -307,9 +315,15 @@ export class BucketsComponent implements OnInit{
         }
         if(this.migrationForm.value.excute){
             this.MigrationService.createMigration(param).subscribe((res) => {
-                this.createMigrateShow = false;
                 let planId = res.json().plan.id;
                 this.http.post(`v1/{project_id}/plans/${planId}/run`,{}).subscribe((res)=>{});
+                this.msgs.push({severity: 'success', summary: 'Migration initiated successfully', detail: 'Please check the dataflow section for migration progress.'});
+                this.resetMigrateForm();
+                
+            },(error)=>{
+                let errorMsg = "There was an error while initiating the migration. <br />Details: " + error.json().detail; 
+                this.msgs.push({severity: 'error', summary: "Error initiating migration", detail: errorMsg});
+                this.resetMigrateForm();
             });
         }else{
             let date = new Date(this.migrationForm.value.excuteTime);
@@ -327,10 +341,26 @@ export class BucketsComponent implements OnInit{
                 param['policyId'] = res.json().policy.id;
                 param['policyEnabled'] = true;
                 this.MigrationService.createMigration(param).subscribe((res) => {
-                    this.createMigrateShow = false;
-                });
+                    this.msgs.push({severity: 'success', summary: 'Migration scheduled successfully!', detail: 'Please check the dataflow section for migration progress.'});
+                    this.resetMigrateForm();
+                },(error)=>{
+                    let errorMsg = "There was an error while scheduling the migration. <br />Details: " + error.json().detail; 
+                    this.msgs.push({severity: 'error', summary: "Error scheduling migration", detail: errorMsg});
+                    this.resetMigrateForm();
+                }); 
             })
         }    
+    }
+    resetMigrateForm(){
+        this.createMigrateShow = false;
+        this.migrationForm.reset(
+            {
+            'name':'',
+            "deleteSrcObject":false,
+            "excuteTime":new Date(),
+            "excute":true
+            }
+        );
     }
     getBackendsByTypeId() {
         this.backendsOption = [];

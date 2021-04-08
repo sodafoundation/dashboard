@@ -87,8 +87,8 @@
     </form>
     
     <p-footer>
-        <button type="button" class="ui-button-secondary" pButton (click)="createMigration()" label="{{I18N.keyID['ok']}}" ></button>
-        <button type="button" pButton (click)="createMigrateShow=false" label="{{I18N.keyID['cancel']}}"></button>
+        <button type="button" [disabled]="createMigrationForm.invalid" class="ui-button-secondary" pButton (click)="createMigration()" label="{{I18N.keyID['ok']}}" ></button>
+        <button type="button" pButton (click)="resetMigrateForm()" label="{{I18N.keyID['cancel']}}"></button>
     </p-footer>
 </p-dialog>
 <p-confirmDialog></p-confirmDialog>
