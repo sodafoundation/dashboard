@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { MigrationListComponent } from './migration.component';
 import { ButtonModule, DataTableModule, DropMenuModule, DialogModule, FormModule, InputTextModule, InputTextareaModule, DropdownModule
-   ,ConfirmationService,ConfirmDialogModule,CheckboxModule,CalendarModule} from '../../components/common/api';
+   ,ConfirmationService,ConfirmDialogModule,CheckboxModule,CalendarModule, GrowlModule} from '../../components/common/api';
 
 import { HttpService } from './../../shared/service/Http.service';
 import { RouterModule } from '@angular/router';
@@ -29,7 +29,8 @@ import { BucketService } from './../block/buckets.service';
     RouterModule,
     MigrationDetailModule,
     CheckboxModule,
-    CalendarModule
+    CalendarModule,
+    GrowlModule
   ],
   exports: [ MigrationListComponent ],
   providers: [

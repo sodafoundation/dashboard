@@ -215,7 +215,7 @@ export class MigrationListComponent implements OnInit {
                 let planId = res.json().plan.id;
                 this.http.post(`v1/{project_id}/plans/${planId}/run`,{}).subscribe((res)=>{});
                 this.getMigrations();
-                this.msgs.push({severity: 'success', summary: 'Migration initiated successfully', detail: 'Please check the dataflow section for migration progress.'});
+                this.msgs.push({severity: 'success', summary: 'Migration initiated successfully', detail: 'Please expand the migration to check migration progress.'});
                 this.resetMigrateForm();
                 
             },(error)=>{
@@ -240,7 +240,7 @@ export class MigrationListComponent implements OnInit {
                 param['policyEnabled'] = true;
                 this.MigrationService.createMigration(param).subscribe((res) => {
                     this.getMigrations();
-                    this.msgs.push({severity: 'success', summary: 'Migration scheduled successfully!', detail: 'Please check the dataflow section for migration progress.'});
+                    this.msgs.push({severity: 'success', summary: 'Migration scheduled successfully!', detail: 'Please expand the migration to check migration progress.'});
                     this.resetMigrateForm();
                 },(error)=>{
                     let errorMsg = "There was an error while scheduling the migration. <br />Details: " + error.json().detail; 
