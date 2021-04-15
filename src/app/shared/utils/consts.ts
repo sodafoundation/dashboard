@@ -35,7 +35,7 @@ export const Consts = {
     BYTES_PER_CHUNK : 1024 * 1024 * 5,
     TIMEOUT: 30 * 60 * 1000,
 
-    CLOUD_TYPE:['aws-s3', 'aws-file', 'aws-block', 'azure-blob', 'azure-file','hw-obs','hw-file', 'hw-block', 'fusionstorage-object','ceph-s3','ibm-cos','gcp-s3', 'gcp-file', 'yig', 'alibaba-oss'],
+    CLOUD_TYPE:['aws-s3', 'aws-file', 'aws-block', 'azure-blob', 'azure-file','hw-obs','hw-file', 'hw-block', 'fusionstorage-object','ceph-s3','ibm-cos','gcp-s3', 'gcp-file', 'yig', 'alibaba-oss','sony-oda'],
 
     TYPE_SVG:{
         "aws-s3":'aws.svg',
@@ -53,7 +53,7 @@ export const Consts = {
         "gcp-file" : 'google.svg',
         "yig": "yig.png",
         'alibaba-oss': 'alibaba.svg',
-        
+
     },
     CLOUD_TYPE_NAME: {
         'aws-s3': 'AWS S3',
@@ -70,14 +70,15 @@ export const Consts = {
         'gcp-file' : 'GCP File Storage',
         'ibm-cos': "IBM COS",
         'yig': "YIG Ceph",
-        'alibaba-oss' : "Alibaba Object Storage"
+        'alibaba-oss' : "Alibaba Object Storage",
+        'sony-oda':"Sony ODA"
     },
-    SODA_HOST_IP: '',
+    SODA_HOST_IP: '192.168.200.169',
     SODA_GRAFANA_PORT: '',
     SODA_ALERTMANAGER_PORT: '',
     SODA_PROMETHEUS_PORT: '',
-    S3_HOST_IP: '',
-    S3_HOST_PORT: '',
+    S3_HOST_IP: '192.168.200.169',
+    S3_HOST_PORT: '8090',
     STORAGE_CLASSES: {
         'aws-s3' : [
             {
@@ -385,7 +386,7 @@ export const Consts = {
                 label: "HMCSHA2512",
                 value: "HMCSHA2512"
             }
-        
+
         ],
         privacyProtocolOptions: [
             {
@@ -408,8 +409,8 @@ export const Consts = {
                 label: "3DES",
                 value: "3DES"
             },
-            
-            
+
+
         ]
     },
 }
