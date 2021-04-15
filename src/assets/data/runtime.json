@@ -1,7 +1,5 @@
 {
-    "hostIP": "${OPENSDS_S3_HOST}",
-    "hostPort": "${OPENSDS_S3_PORT}",
-    "prometheusPort": "${SODA_PROMETHEUS_PORT}",
-    "alertmanagerPort": "${SODA_ALERTMANAGER_PORT}",
-    "grafanaPort":"${SODA_GRAFANA_PORT}"
+    "hostIP": "192.168.200.169",
+    "hostPort": "8090"
+
 }
