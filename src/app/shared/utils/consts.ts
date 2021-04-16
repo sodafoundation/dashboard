@@ -71,7 +71,7 @@ export const Consts = {
         'ibm-cos': "IBM COS",
         'yig': "YIG Ceph",
         'alibaba-oss' : "Alibaba Object Storage",
-        'sony-oda':"Sony ODA"
+        'sony-oda':"Sony Optical Disc Archive"
     },
     SODA_HOST_IP: '',
     SODA_GRAFANA_PORT: '',
