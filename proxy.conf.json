@@ -1,11 +1,11 @@
 {
     "/v1beta": {
-        "target": "http://192.168.200.169:50040",
+        "target": "http://192.168.56.102:50040",
         "secure": false,
         "logLevel": "debug"
     },
     "/orch": {
-        "target": "http://192.168.200.169:5000",
+        "target": "http://192.168.56.102:5000",
         "secure": false,
         "logLevel": "debug",
         "changeOrigin": true,
@@ -14,12 +14,12 @@
         }
     },
     "/v1": {
-        "target": "http://192.168.200.169:8089",
+        "target": "http://192.168.56.102:8089",
         "secure": false,
         "logLevel": "debug"
     },
     "/resource-monitor": {
-        "target": "http://192.168.200.169:8190",
+        "target": "http://192.168.56.107:8190",
         "secure": false,
         "logLevel": "debug",
         "changeOrigin": true,
@@ -28,7 +28,7 @@
         }
     },
     "/s3": {
-        "target": "http://192.168.200.169:8090",
+        "target": "http://192.168.56.102:8090",
         "secure": false,
         "logLevel": "debug",
         "changeOrigin": true,
@@ -37,17 +37,8 @@
         }
     },
     "/v3": {
-        "target": "http://192.168.200.169/identity",
+        "target": "http://192.168.56.102/identity",
         "secure": false,
         "logLevel": "debug"
-    },
-    "/alertmanager": {
-        "target": "http://192.168.200.169:9093",
-        "secure": false,
-        "logLevel": "debug",
-        "changeOrigin": true,
-        "pathRewrite": {
-            "^/alertmanager/": "/api/v1/"
-        }
     }
 }
