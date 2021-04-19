@@ -3,7 +3,7 @@ import { NgModule, APP_INITIALIZER } from '@angular/core';
 
 import { TableModule } from './../../../components/common/api';
 import { HttpService } from './../../../shared/api';
-import { PoolService } from './../profile.service';
+import { PoolService } from './../pool.service';
 
 import { StoragePoolsTableComponent } from './storage-pools-table.component';
 

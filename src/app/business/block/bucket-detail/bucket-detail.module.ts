@@ -5,8 +5,9 @@ import { RouterModule } from '@angular/router';
 import { BucketDetailComponent } from './bucket-detail.component';
 import { LifeCycleModule } from './lifeCycle/lifeCycle.module';
 import { AclModule } from './acl/acl.module';
-import { TabViewModule,ButtonModule, DataTableModule, DropMenuModule, DialogModule, FormModule, InputTextModule, InputTextareaModule, 
-  ConfirmDialogModule ,ConfirmationService,CheckboxModule,DropdownModule, SplitButtonModule} from './../../../components/common/api';
+import { TabViewModule,ButtonModule, DataTableModule, DropMenuModule, DialogModule, FormModule, InputTextModule, InputSwitchModule, InputTextareaModule, 
+  ConfirmDialogModule ,ConfirmationService,CheckboxModule,DropdownModule, SplitButtonModule, GrowlModule} from './../../../components/common/api';
+  import { ProgressBarModule } from '../../../components/progressbar/progressbar';
 import { HttpService } from './../../../shared/service/Http.service';
 import { BucketService } from '../buckets.service';
 import { HttpClientModule } from '@angular/common/http';
@@ -22,6 +23,7 @@ let routers = [{
     ReactiveFormsModule,
     FormsModule,
     InputTextModule,
+    InputSwitchModule,
     InputTextareaModule,
     RouterModule.forChild(routers),
     TabViewModule,
@@ -35,7 +37,9 @@ let routers = [{
     LifeCycleModule,
     HttpClientModule,
     SplitButtonModule,
-    AclModule,
+    GrowlModule,
+    ProgressBarModule,
+    AclModule
   ],
   declarations: [
     BucketDetailComponent

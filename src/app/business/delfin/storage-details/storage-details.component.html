@@ -5,6 +5,7 @@
           <a [ngClass]="{'font-color-class': i===0}" [routerLink]="[item.url]">{{item.label}}</a>
           <span *ngIf="(i+1) !== items.length">></span>
         </span>
+        <span> > {{selectedStorage && selectedStorage.name ? selectedStorage.name : selectedStorageId}}</span>
     </div>
     <div class="table-toolbar">
         <div class="left">
@@ -166,15 +167,35 @@
                     </div>
                 <div class="configuration-tabs">
                     <p-tabView styleClass="ui-tabview-large" (onChange)="changeConfigTab($event)" [activeIndex]="configTabIndex"> 
-                        <p-tabPanel header="Volumes">
+                        <p-tabPanel *ngIf="poolsExist" header="Storage pools" [selected]="true">
+                            <app-delfin-storage-pools [selectedStorage]="selectedStorageId"></app-delfin-storage-pools>
+                        </p-tabPanel>
+                        <p-tabPanel *ngIf="volumesExist" header="Volumes">
                             <ng-template pTemplate="content">
                                 <app-delfin-volumes [selectedStorage]="selectedStorageId"></app-delfin-volumes>
                             </ng-template>
                         </p-tabPanel>
-                        <p-tabPanel header="Storage pools">
-                            <app-delfin-storage-pools [selectedStorage]="selectedStorageId"></app-delfin-storage-pools>
+                        <p-tabPanel *ngIf="controllersExist" header="Controllers">
+                            <app-delfin-controllers [selectedStorage]="selectedStorageId"></app-delfin-controllers>
                         </p-tabPanel>
-                        
+                        <p-tabPanel *ngIf="portsExist" header="Ports">
+                            <app-delfin-ports [selectedStorage]="selectedStorageId"></app-delfin-ports>
+                        </p-tabPanel>
+                        <p-tabPanel *ngIf="disksExist" header="Disks">
+                            <app-delfin-disks [selectedStorage]="selectedStorageId"></app-delfin-disks>
+                        </p-tabPanel>
+                        <p-tabPanel *ngIf="qtreesExist" header="Qtrees">
+                            <app-delfin-qtrees [selectedStorage]="selectedStorageId"></app-delfin-qtrees>
+                        </p-tabPanel>
+                        <p-tabPanel *ngIf="filesystemsExist" header="Filesystems">
+                            <app-delfin-filesystems [selectedStorage]="selectedStorageId"></app-delfin-filesystems>
+                        </p-tabPanel>
+                        <p-tabPanel *ngIf="sharesExist" header="Shares">
+                            <app-delfin-shares [selectedStorage]="selectedStorageId"></app-delfin-shares>
+                        </p-tabPanel>
+                        <p-tabPanel *ngIf="quotasExist" header="Quotas">
+                            <app-delfin-quotas [selectedStorage]="selectedStorageId"></app-delfin-quotas>
+                        </p-tabPanel>
                     </p-tabView>
                 </div>
             </p-tabPanel>
@@ -340,7 +361,7 @@
                                 <button class="" title="Refresh list" pButton type="button" (click)="getAllActiveAlerts(selectedStorageId)" icon="fa-refresh"></button>
                             </div>
                         </div>
-                        <p-dataTable [value]="allActiveAlerts" [globalFilter]="searchAll" [rows]="10" [expandableRows]="true" [paginator]="true" [pageLinks]="3" [rowsPerPageOptions]="[10,20,50,100]" [totalRecords]="totalRecords" #at>
+                        <p-dataTable *ngIf="allActiveAlerts" [value]="allActiveAlerts" [immutable]="false" [globalFilter]="searchAll" [rows]="10" [expandableRows]="true" [paginator]="true" [pageLinks]="3" [rowsPerPageOptions]="[10,20,50,100]" [totalRecords]="totalRecords" #at>
                             <p-column expander="true" styleClass="col-icon" [style]="{'width': '3%'}"></p-column>
                             <p-column field="alert_name" header="Name" #alertName>
                                 <ng-template pTemplate="body" let-alert="rowData">
@@ -350,10 +371,10 @@
                             <p-column field="severity" header="Severity">
                                 <ng-template pTemplate="body" let-alert="rowData">
                                     <div class="severity-icon">
-                                        <i *ngIf="alert.severity=='Major'" class="fa fa-exclamation major"></i>
-                                        <i *ngIf="alert.severity=='Critical'" class="fa fa-exclamation-triangle critical"></i>
-                                        <i *ngIf="alert.severity=='Fatal'" class="fa fa-times-circle fatal"></i>
-                                        <i *ngIf="alert.severity=='Informational'" class="fa fa-info-circle informational"></i>
+                                        <i *ngIf="alert.severity.toLowerCase()=='major' || alert.severity.toLowerCase()=='warning'" class="fa fa-exclamation major"></i>
+                                        <i *ngIf="alert.severity.toLowerCase()=='critical'" class="fa fa-exclamation-triangle critical"></i>
+                                        <i *ngIf="alert.severity.toLowerCase()=='fatal'" class="fa fa-times-circle fatal"></i>
+                                        <i *ngIf="alert.severity.toLowerCase()=='informational'" class="fa fa-info-circle informational"></i>
                                     </div>
                                     <div class="severity-label">
                                         {{alert.severity}}
@@ -363,7 +384,7 @@
                             <p-column field="description" header="Description" [sortable]="true" [style]="{'width': '40%'}"></p-column>
                             <p-column field="occur_time" header="Occured At">
                                 <ng-template pTemplate="body" let-alert="rowData">
-                                    <span>{{alert.created_at ? (alert.created_at | date:'long') : '--'}}</span>
+                                    <span>{{alert.occur_time ? (alert.occur_time | date:'long') : '--'}}</span>
                                 </ng-template>
                             </p-column>
                             <ng-template let-alert pTemplate="rowexpansion">
@@ -445,9 +466,45 @@
                     </div>
                 </ng-template>
             </p-tabPanel>
+            <p-tabPanel header="Performance Monitoring">
+                <iframe [src]="performanceMonitorURL | safe"
+                width="100%" height="750" frameborder="0"></iframe>
+            </p-tabPanel>
         </p-tabView>
     </div>
     
     
 </div>
+<p-dialog styleClass="perf-metrics-config-dialog"  header="Configure Performance Metrics Collection" [(visible)]="showperfMetricsConfigForm" [width]="700" modal="modal">
+    <form *ngIf="showperfMetricsConfigForm" [formGroup]="perfMetricsConfigForm" [grid]="{label: 'ui-g-5', content:'ui-g-7'}" [errorMessage]="errorMessage">
+       
+        <div class="ui-g">
+            <div class="ui-g-12">
+                <form-item label="{{perfMetricsConfigFormLabel.perf_collection}}" >
+                    <p-inputSwitch formControlName="perf_collection" onLabel="Yes" offLabel="No"></p-inputSwitch>
+                </form-item>
+            </div>
+        </div>
+        <div class="ui-g">
+            <div class="ui-g-12">
+                <form-item label="{{perfMetricsConfigFormLabel.interval}}">
+                    <input formControlName="interval" value="10" type="number" size="30" pInputText> 
+                </form-item>
+            </div>
+        </div>
+        <div class="ui-g">
+            <div class="ui-g-12">
+                <form-item label="{{perfMetricsConfigFormLabel.is_historic}}" >
+                    <p-inputSwitch formControlName="is_historic" onLabel="Yes" offLabel="No"></p-inputSwitch>
+                    <span><i pTooltip="If backend supports historic collection, enabling this will collect data periodically." tooltipPosition="right" class="fa fa-question-circle"></i></span>
+                </form-item>
+                
+            </div>
+        </div>
+    </form>
+    <p-footer>
+        <button type="submit" class="ui-button-secondary" pButton [disabled]="perfMetricsConfigForm.invalid" (click)="configurePerformanceMetrics(perfMetricsConfigForm.value)"  label="{{i18n.keyID['ok']}}"></button>
+        <button type="button" pButton (click)="closePerfConfigDialog()"  label="{{i18n.keyID['cancel']}}"></button>
+    </p-footer>
 
+</p-dialog>

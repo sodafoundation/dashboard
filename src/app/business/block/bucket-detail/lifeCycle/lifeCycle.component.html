@@ -1,10 +1,9 @@
+<p-growl [value]="msgs" [sticky]="false" [life]="6000"></p-growl>
 <div>
     <div class="table-toolbar">
         <div class="left">
             <button class="ui-button-secondary" [disabled]="false" pButton type="button" label="Create" (click)="createLifeCycle('create')"></button>
-            <!-- <button pButton type="button" [disabled]="disableCycle == enableCycle || disableCycle"  label="Enable" (click)="enableLifeCycle(selectedLifeCycle)" ></button>
-            <button pButton type="button" [disabled]="disableCycle == enableCycle || enableCycle" label="Disable" (click)="disableLifeCycle(selectedLifeCycle)"></button> -->
-            <button pButton type="button" [disabled]="selectedLifeCycle.length == 0" (click)="bathDelete(selectedLifeCycle)" label="{{i18n.keyID['sds_block_volume_delete']}}"></button>
+            <button pButton type="button" [disabled]="selectedLifeCycle.length == 0" (click)="batchDelete(selectedLifeCycle)" label="{{i18n.keyID['sds_block_volume_delete']}}"></button>
         </div>
         <div class="right">
             <div class="ui-inputsearch">
@@ -30,144 +29,161 @@
         </p-column>
         <p-column header="{{i18n.keyID['sds_block_volume_operation']}}" [style]="{'width': '200px'}">
             <ng-template pTemplate="body" let-cycle="rowData" let-i="rowIndex">
-                <a (click)="createLifeCycle('update',cycle)" [innerHtml]="i18n.keyID['sds_lifeCycle_edit']"></a>
+                <a (click)="showModifyLifecycleDialog('update', cycle)" [innerHtml]="i18n.keyID['sds_lifeCycle_edit']"></a>
                 <a *ngIf="cycle.Status == 'Disabled'" (click)="enableLifeCycle(cycle)" [innerHtml]="i18n.keyID['sds_profile_enable']"></a>
                 <a *ngIf="cycle.Status == 'Enabled'" (click)="disableLifeCycle(cycle)" [innerHtml]="i18n.keyID['sds_block_volume_replication_disable']"></a>
-                <a [ngClass]="{'a-rep-disabled':cycle['Disabled']}" (click)="bathDelete(cycle)" [innerHtml]="i18n.keyID['sds_block_volume_delete']"></a>
+                <a [ngClass]="{'a-rep-disabled':cycle['Disabled']}" (click)="batchDelete(cycle)" [innerHtml]="i18n.keyID['sds_block_volume_delete']"></a>
             </ng-template>
         </p-column>
     </p-dataTable>
-
-    <p-dialog styleClass="upload-dialog" header="{{lifeCycleTitle}}" [(visible)]="liceCycleDialog" [width]="650" modal="modal" [height]="400">
-        <form [grid]="{label: 'ui-g-4', content:'ui-g-20'}" [formGroup]="createLifeCycleForm" (ngSubmit)="onSubmit(createLifeCycleForm.value)" [errorMessage]="errorMessage">
-            <div class="volume-item" [innerHtml]="label.header"></div>
-            <form-item label="Name" [required]="true">
-                <input id="lifeCycle" type="text" pInputText formControlName="name"/>
-                <div class="ui-message-container" *ngIf="createLifeCycleForm.controls['name'] && !createLifeCycleForm.controls['name'].valid&&createLifeCycleForm.controls['name'].dirty">
-                    <div class="ui-message ui-message-error ui-corner-all">
-                        <i class="fa fa-exclamation-circle"></i>
-                        <span class="ui-message-error-text">
-                            {{getErrorMessage(createLifeCycleForm.controls['name'],"name")}}
-                        </span>
-                    </div>
-                </div>
-            </form-item>
-            <form-item label="Prefix">
-                <input type="text" pInputText formControlName="prefix"/> 
-            </form-item>
-            <form-item label="Rules">
-                <p-inputSwitch formControlName="enabled" (onChange)="ruleSwitch()"></p-inputSwitch>
-            </form-item>
-            <form-item label="Storage class transition" *ngIf="ruleChecked">
-                <p-checkbox class="text-only" formControlName="transEnabled" (onChange)="transClick()" name="transChecke" value="trans"></p-checkbox>
-            </form-item>
-            <div class="ui-grid-row volume-item" *ngIf="ruleChecked && transChecked" [ngClass]="{'a-rep-disabled': !showAddTransRule}">
-                <a class="create-profile-img" (click)="addTransRules()">
-                    <img style="vertical-align:middle;" src="assets/business/images/profile/u2987.png">
-                    <span [innerHtml]="label.addRule"></span>
-                </a>
+    <p-sidebar [(visible)]="showRightSidebar" (onHide)="closeSidebar()" position="right" styleClass="lifecycle-sidebar-panel ui-sidebar-lg" [autoZIndex]="true" [baseZIndex]="1000">
+        <div class="right-sidebar-content-wrapper">
+            <div class="right-sidebar-header">
+                <h1 style="font-weight:normal">{{lifeCycleTitle}}</h1>
+                <div class="sidebar-sub-header" [innerHtml]="label.header"></div>
             </div>
-            <div class="ui-grid ui-grid-responsive ui-grid-pad ui-fluid volume-item" *ngIf="transChecked && transOptions.length !=0">
-                <div class="ui-grid-row">
-                    <div class="ui-grid-col-4">
-                        <span style="color:#cd0a0a;padding-right: 0.03rem;">*</span><span [innerHtml]="label.trans"></span>
-                    </div>
-                    <div class="ui-grid-col-4">
-                        <span style="color:#cd0a0a;padding-right: 0.03rem;">*</span><span [innerHtml]="label.days"></span>
-                    </div>
-                    <div class="ui-grid-col-3">
-                        <span [innerHtml]="label.backend"></span>
-                    </div>
-                </div>
-                <div class="ui-grid-row volume-item" *ngFor="let lifeCycleItem of lifeCycleItems;index as i">
-                    <div class="ui-grid-col-4">
-                        <p-dropdown *ngIf="!modifyTrans ||modifyTrans.length == 0" [style]="{'width':'166px'}" [options]="transOptions[i]" formControlName="{{'transId'+i}}" placeholder="please select" (onChange)="typeChange($event, i)"></p-dropdown>
-                        <p-dropdown *ngIf="modifyTrans && modifyTrans.length !=0" [style]="{'width':'166px'}" [options]="transOptions[i]" formControlName="{{'transId'+i}}" (onChange)="typeChange($event, i)"></p-dropdown>
-                        <div class="ui-message-container" *ngIf="createLifeCycleForm.controls['transId'+i] && !createLifeCycleForm.controls['transId'+i].valid &&(createLifeCycleForm.controls['transId'+i].dirty || createLifeCycleForm.controls['transId'+i].touched)">
+            <div class="right-sidebar-body">
+                <form [grid]="{label: 'ui-g-4', content:'ui-g-20'}" [formGroup]="createLifeCycleForm" (ngSubmit)="onSubmit(createLifeCycleForm.value)" [errorMessage]="errorMessage">
+                    
+                    <form-item label="Name" [required]="true">
+                        <input id="lifeCycle" type="text" pInputText formControlName="name"/>
+                        <div class="ui-message-container" *ngIf="createLifeCycleForm.controls['name'] && !createLifeCycleForm.controls['name'].valid&&createLifeCycleForm.controls['name'].dirty">
                             <div class="ui-message ui-message-error ui-corner-all">
                                 <i class="fa fa-exclamation-circle"></i>
                                 <span class="ui-message-error-text">
-                                {{getErrorMessage(createLifeCycleForm.controls['transId'+i],"transition")}}
+                                    {{getErrorMessage(createLifeCycleForm.controls['name'],"name")}}
                                 </span>
                             </div>
                         </div>
+                    </form-item>
+                    <form-item label="Prefix">
+                        <input type="text" pInputText formControlName="prefix"/> 
+                    </form-item>
+                    <form-item label="Rules">
+                        <p-inputSwitch formControlName="enabled" (onChange)="ruleSwitch()"></p-inputSwitch>
+                    </form-item>
+                    <form-item label="Storage class transition" *ngIf="ruleChecked">
+                        <p-checkbox class="text-only" formControlName="transEnabled" (onChange)="transClick()" name="transChecke" value="trans"></p-checkbox>
+                    </form-item>
+                    <div class="ui-grid-row volume-item" *ngIf="ruleChecked && transChecked" [ngClass]="{'a-rep-disabled': !showAddTransRule}">
+                        <a class="create-profile-img" (click)="addTransRules()">
+                            <img style="vertical-align:middle;" src="assets/business/images/profile/u2987.png">
+                            <span [innerHtml]="label.addRule"></span>
+                        </a>
                     </div>
-                    <div class="ui-grid-col-4" *ngIf="backendShow[i]" >
-                        <p-spinner formControlName="{{'days'+i}}" [min]="minDays[i]" [(ngModel)]="transDaysArr[i]" (onBlur)="transDaysChange(i)"></p-spinner>
-                        <div class="ui-message-container" *ngIf="createLifeCycleForm.controls['days'+i] && !createLifeCycleForm.controls['days'+i].valid &&(createLifeCycleForm.controls['days'+i].dirty || createLifeCycleForm.controls['days'+i].touched)">
-                            <div class="ui-message ui-message-error ui-corner-all">
-                                <i class="fa fa-exclamation-circle"></i>
-                                <span class="ui-message-error-text">
-                                {{getErrorMessage(createLifeCycleForm.controls['days'+i],"days")}}
-                                </span>
+                    <div class="ui-grid ui-grid-responsive ui-grid-pad ui-fluid volume-item" *ngIf="transChecked && transOptions.length !=0">
+                        <div class="ui-grid-row">
+                            <div class="ui-grid-col-3">
+                                <span style="color:#cd0a0a;padding-right: 0.03rem;">*</span><span class="label-rules" [innerHtml]="label.trans"></span>
+                            </div>
+                            <div class="ui-grid-col-3">
+                                <span style="color:#cd0a0a;padding-right: 0.03rem;">*</span><span class="label-rules" [innerHtml]="label.days"></span>
+                            </div>
+                            <div class="ui-grid-col-3">
+                                <span class="label-rules" [innerHtml]="label.backend"></span>
+                            </div>
+                            <div class="ui-grid-col-3">
+                                <span class="label-rules" [innerHtml]="label.targetBucket"></span>
                             </div>
                         </div>
-                    </div>
-                    <div class="ui-grid-col-3" *ngIf="backendShow[i]">
-                        <p-dropdown *ngIf="modifyBakend.length <= i || modifyBakend[i] ==''" [style]="{'width':'134px'}" [options]="backends[i]" formControlName="{{'backendId'+i}}" placeholder="please select" (onChange)="backendChange()"></p-dropdown>
-                        <p-dropdown *ngIf="modifyBakend.length > i && modifyBakend[i] !=''" [style]="{'width':'134px'}" [options]="backends[i]" formControlName="{{'backendId'+i}}"  (onChange)="backendChange()"></p-dropdown>
-                    </div>
-                    <div class="ui-grid-col-1">
-                        <div class="create-profile-img " (click)="deleteTransRules(i)">
-                            <img style="vertical-align:middle; margin-left: 40px;" src="assets/business/images/profile/u1065.png">
-                        </div>
-                    </div>
-                </div>
-                <div *ngIf="sameTransition" class="ui-message-container">
-                    <div class="ui-message ui-message-error ui-corner-all">
-                        <i class="fa fa-exclamation-circle"></i>
-                        <span class="ui-message-error-text">
-                            Setting up the same transitions and backend at the same time is not recommended
-                        </span>
-                    </div>
-                </div>
-            </div>
-            <div *ngIf="ruleChecked && transChecked && transOptions.length ==0 && transDaysArr.length ==0">You don’t have any transitions set up for current version of objects.</div>
-            <form-item label="Configure expiration" *ngIf="ruleChecked">
-                <p-checkbox class="text-only" formControlName="expirEnabled" name="expirChecke" value="expir" (onChange)="checkExpir()"></p-checkbox>
-            </form-item>
-            <div class="ui-grid-row volume-item" *ngIf="expirChecked">
-                <div class="ui-grid-col-5">
-                    <p-spinner formControlName="expirDays" [(ngModel)]="newExpirDays" [min]="minExpirDays"></p-spinner>
-                    <div class="ui-message-container" *ngIf="createLifeCycleForm.controls['expirDays'] && !createLifeCycleForm.controls['expirDays'].valid &&(createLifeCycleForm.controls['expirDays'].dirty || createLifeCycleForm.controls['expirDays'].touched)">
-                        <div class="ui-message ui-message-error ui-corner-all">
-                            <i class="fa fa-exclamation-circle"></i>
-                            <span class="ui-message-error-text">
-                            {{getErrorMessage(createLifeCycleForm.controls['expirDays'],"expirDays")}}
-                            </span>
-                        </div>
-                    </div>
-                </div>
-                <div class="ui-grid-col-6" [innerHtml]="label.expirDelete"></div>
-            </div>
-            <div *ngIf="ruleChecked">
-                <div class="volume-item">
-                    <p-checkbox formControlName="expirCleanUp" value="cleanUp"
-                        label="{{i18n.keyID['sds_lifeCycle_expiration_cleanUp']}}" (onChange)="checkCleanUp()"></p-checkbox>
-                </div>
-                <div class="ui-grid ui-grid-responsive ui-grid-pad ui-fluid volume-item">
-                    <div class="ui-grid-row volume-item" *ngIf="expirCleanUp">
-                        <span class="ui-grid-col-2">Elapsed time</span>
-                        <div class="ui-grid-col-4" style="display: inline-block;margin-top: -10px;">
-                            <p-spinner formControlName="cleanDays" [min]="1"></p-spinner>
-                            <div class="ui-message-container" *ngIf="createLifeCycleForm.controls['cleanDays'] && !createLifeCycleForm.controls['cleanDays'].valid &&(createLifeCycleForm.controls['cleanDays'].dirty || createLifeCycleForm.controls['cleanDays'].touched)">
+                        <div class="ui-grid-row volume-item" *ngFor="let lifeCycleItem of lifeCycleItems;index as i">
+                            <div class="ui-grid-col-3">
+                                <p-dropdown *ngIf="!modifyTrans ||modifyTrans.length == 0" [style]="{'width':'180px'}"  [options]="transOptions[i]" formControlName="{{'transId'+i}}" placeholder="please select" (onChange)="typeChange($event, i)"></p-dropdown>
+                                <p-dropdown *ngIf="modifyTrans && modifyTrans.length !=0" [style]="{'width':'180px'}" [options]="transOptions[i]" formControlName="{{'transId'+i}}" (onChange)="typeChange($event, i)"></p-dropdown>
+                                <div class="ui-message-container" *ngIf="createLifeCycleForm.controls['transId'+i] && !createLifeCycleForm.controls['transId'+i].valid &&(createLifeCycleForm.controls['transId'+i].dirty || createLifeCycleForm.controls['transId'+i].touched)">
                                     <div class="ui-message ui-message-error ui-corner-all">
                                         <i class="fa fa-exclamation-circle"></i>
                                         <span class="ui-message-error-text">
-                                        {{getErrorMessage(createLifeCycleForm.controls['cleanDays'],"cleanDays")}}
+                                        {{getErrorMessage(createLifeCycleForm.controls['transId'+i],"transition")}}
                                         </span>
                                     </div>
                                 </div>
+                            </div>
+                            <div class="ui-grid-col-3" *ngIf="backendShow[i]" >
+                                <p-spinner formControlName="{{'days'+i}}" [style]="{'width':'134px'}" [min]="minDays[i]" [(ngModel)]="transDaysArr[i]" (onBlur)="transDaysChange(i)"></p-spinner>
+                                <div class="ui-message-container" *ngIf="createLifeCycleForm.controls['days'+i] && !createLifeCycleForm.controls['days'+i].valid &&(createLifeCycleForm.controls['days'+i].dirty || createLifeCycleForm.controls['days'+i].touched)">
+                                    <div class="ui-message ui-message-error ui-corner-all">
+                                        <i class="fa fa-exclamation-circle"></i>
+                                        <span class="ui-message-error-text">
+                                        {{getErrorMessage(createLifeCycleForm.controls['days'+i],"days")}}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="ui-grid-col-3" *ngIf="backendShow[i]">
+                                <p-dropdown *ngIf="modifyBackend.length <= i || modifyBackend[i] ==''" [style]="{'width':'180px'}" [options]="backends[i]" formControlName="{{'backendId'+i}}" placeholder="please select" (onChange)="backendChange($event, i)"></p-dropdown>
+                                <p-dropdown *ngIf="modifyBackend.length > i && modifyBackend[i] !=''" [style]="{'width':'180px'}" [options]="backends[i]" formControlName="{{'backendId'+i}}"  (onChange)="backendChange($event, i)"></p-dropdown>
+                            </div>
+                            <div class="ui-grid-col-3" *ngIf="bucketShow[i]">
+                                <p-dropdown *ngIf="modifyBucket.length <= i || modifyBucket[i] ==''" [style]="{'width':'180px'}" [options]="allBuckets[i]" formControlName="{{'targetBucket'+i}}" placeholder="please select"></p-dropdown>
+                                <p-dropdown *ngIf="modifyBucket.length > i && modifyBucket[i] !=''" [style]="{'width':'180px'}" [options]="allBuckets[i]" formControlName="{{'targetBucket'+i}}"></p-dropdown>
+                            </div>
+                            <div class="ui-grid-col-1">
+                                <div class="create-profile-img " (click)="deleteTransRules(i)">
+                                    <img style="vertical-align:middle; margin-left: 40px;" src="assets/business/images/profile/u1065.png">
+                                </div>
+                            </div>
                         </div>
-                        <span class="ui-grid-col-6">From the very beginning of uploading</span>
+                        <div *ngIf="sameTransition" class="ui-message-container">
+                            <div class="ui-message ui-message-error ui-corner-all">
+                                <i class="fa fa-exclamation-circle"></i>
+                                <span class="ui-message-error-text">
+                                    Setting up the same transitions and backend at the same time is not recommended
+                                </span>
+                            </div>
+                        </div>
                     </div>
+                    <div *ngIf="ruleChecked && transChecked && transOptions.length ==0 && transDaysArr.length ==0">You don’t have any transitions set up for current version of objects.</div>
+                    <form-item label="Configure expiration" *ngIf="ruleChecked">
+                        <p-checkbox class="text-only" formControlName="expirEnabled" name="expirChecke" value="expir" (onChange)="checkExpir()"></p-checkbox>
+                    </form-item>
+                    <div class="ui-grid-row volume-item" *ngIf="expirChecked">
+                        <div class="ui-grid-col-5">
+                            <p-spinner formControlName="expirDays" [(ngModel)]="newExpirDays" [min]="minExpirDays"></p-spinner>
+                            <div class="ui-message-container" *ngIf="createLifeCycleForm.controls['expirDays'] && !createLifeCycleForm.controls['expirDays'].valid &&(createLifeCycleForm.controls['expirDays'].dirty || createLifeCycleForm.controls['expirDays'].touched)">
+                                <div class="ui-message ui-message-error ui-corner-all">
+                                    <i class="fa fa-exclamation-circle"></i>
+                                    <span class="ui-message-error-text">
+                                    {{getErrorMessage(createLifeCycleForm.controls['expirDays'],"expirDays")}}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="ui-grid-col-6 expiration-delete" [innerHtml]="label.expirDelete"></div>
+                    </div>
+                    <div *ngIf="ruleChecked">
+                        <div class="volume-item">
+                            <p-checkbox formControlName="expirCleanUp" value="cleanUp"
+                                label="{{i18n.keyID['sds_lifeCycle_expiration_cleanUp']}}" (onChange)="checkCleanUp()"></p-checkbox>
+                        </div>
+                        <div class="ui-grid ui-grid-responsive ui-grid-pad ui-fluid volume-item">
+                            <div class="ui-grid-row volume-item" *ngIf="expirCleanUp">
+                                <span class="ui-grid-col-2 label-rules">Elapsed time</span>
+                                <div class="ui-grid-col-4" style="display: inline-block;margin-top: -10px;">
+                                    <p-spinner formControlName="cleanDays" [min]="1"></p-spinner>
+                                    <div class="ui-message-container" *ngIf="createLifeCycleForm.controls['cleanDays'] && !createLifeCycleForm.controls['cleanDays'].valid &&(createLifeCycleForm.controls['cleanDays'].dirty || createLifeCycleForm.controls['cleanDays'].touched)">
+                                            <div class="ui-message ui-message-error ui-corner-all">
+                                                <i class="fa fa-exclamation-circle"></i>
+                                                <span class="ui-message-error-text">
+                                                {{getErrorMessage(createLifeCycleForm.controls['cleanDays'],"cleanDays")}}
+                                                </span>
+                                            </div>
+                                        </div>
+                                </div>
+                                <span class="ui-grid-col-6 label-rules">From the very beginning of uploading</span>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="right-sidebar-footer">
+                <div style="margin-top:100px;">
+                    <button type="submit" class="ui-button-secondary" pButton label="{{i18n.keyID['ok']}}" (click)="onSubmit(createLifeCycleForm.value)"></button>
+                    <button type="button" pButton (click)="cancelCycle()"  label="{{i18n.keyID['cancel']}}"></button>
                 </div>
             </div>
-        </form>
-        <p-footer>
-            <button type="submit" class="ui-button-secondary" pButton label="{{i18n.keyID['ok']}}" (click)="onSubmit(createLifeCycleForm.value)"></button>
-            <button type="button" pButton (click)="cancelCycle()"  label="{{i18n.keyID['cancel']}}"></button>
-        </p-footer>
-    </p-dialog>
+        </div>
+        
+    </p-sidebar>
     <p-confirmDialog></p-confirmDialog> 
 </div>

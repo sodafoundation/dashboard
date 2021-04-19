@@ -5,7 +5,8 @@ import { RouterModule } from '@angular/router';
 import { BreadcrumbModule,ChartModule,ButtonModule } from './../../../components/common/api';
 
 import { HttpService } from './../../../shared/api';
-import { ProfileService,PoolService } from './../profile.service';
+import { ProfileService } from './../profile.service';
+import { PoolService } from './../pool.service';
 import { PoolModule } from './../storage-pools-table/storage-pools-table.module';
 
 let routers = [{

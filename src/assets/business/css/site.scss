@@ -1111,6 +1111,25 @@ a {
 
 /* profile css start */
 
+.new-card-class {
+    border: none !important;
+    border-radius: 12px;
+    height: 250px;
+    max-height: 250px;
+
+    
+}
+.profile-name-tooltip, .profile-desc-tooltip{
+    max-width: none;
+    font-size: 1.2em;
+}
+.delete-profile-name {
+    max-width: 300px;
+    overflow-wrap: break-word;
+    font-weight: 600;
+    font-style: italic;
+    font-size: 1.1em;
+}
 .relative-class {
     padding-right: 0.40rem;
     position: relative;
@@ -1907,6 +1926,10 @@ a {
 .register-backend-dialog .ui-dialog-content{
     min-height: 400px;
 }
+.lifecycle-sidebar-panel.ui-sidebar-lg{
+    background-color: #2C3F61;
+    width: 70em;
+}
 .home-sidebar-panel.ui-sidebar-lg{
     background-color: #2C3F61;
 }
@@ -1918,12 +1941,24 @@ a {
     .right-sidebar-header{
         margin-bottom: 30px;
     }
+    .sidebar-sub-header{
+        color: #ccc !important;
+        padding: 15px 0 10px 0;
+    }
     .ui-dropdown-items-wrapper{
-        max-height: 325px !important;
+        max-height: 350px !important;
     }
 
     label {
         font-weight: 700;
+    }
+    .expiration-delete{
+        font-weight: 700;
+        color: #ccc !important;
+    }
+    .label-rules{
+        font-weight: 700;
+        color: #ccc !important;
     }
 }
 /* custom breadcrumb end */
@@ -1934,7 +1969,7 @@ a {
 
 .upload-dialog{
     .ui-dialog-content{
-        height: 295px;
+        height: 250px;
     }
 }
 .create-bucket-dialog{
@@ -1952,6 +1987,10 @@ a {
         width: 180px;
     }
 }
+
+.lifecyle-days-spinner{
+    width: 80px !important;
+}
 .create-cloud-volume-dialog{
     .ui-dialog-content{
         height: 550px;
@@ -1962,6 +2001,11 @@ a {
 .create-migrate-dialog{
     .ui-dialog-content{
         height: 420px;
+    }
+}
+.restore-dialog{
+    .ui-dialog-content{
+        height: 200px;
     }
 }
 .a-upload {
@@ -2064,8 +2108,11 @@ a {
     color: #ffffff;
 }
 .ui-datatable tbody .ui-cell-data{
-    overflow: inherit !important;
+    overflow: hide !important;
     height: auto !important;
+}
+.ui-button.ui-button-icon-only{
+    padding: 0 0.12rem !important;
 }
 /* Common Overides end */
 /* Services Page Css */
@@ -2195,7 +2242,11 @@ td.ui-datatable-emptymessage{
         padding-top: 1.5rem;
     }
 }
-.volume-parent-node ul.ui-treenode-children, .pool-parent-node ul.ui-treenode-children{
+.volume-parent-node ul.ui-treenode-children, .pool-parent-node ul.ui-treenode-children, 
+.controller-parent-node ul.ui-treenode-children, .port-parent-node ul.ui-treenode-children, 
+.disk-parent-node ul.ui-treenode-children, .qtree-parent-node ul.ui-treenode-children, 
+.share-parent-node ul.ui-treenode-children, .filesystem-parent-node ul.ui-treenode-children,
+.quota-parent-node ul.ui-treenode-children {
     height: 100px;
     overflow-y: scroll;
     width: 50%;

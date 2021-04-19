@@ -5,7 +5,8 @@ import { AppService } from 'app/app.service';
 import { trigger, state, style, transition, animate } from '@angular/animations';
 import { I18nPluralPipe } from '@angular/common';
 
-import { ProfileService, PoolService} from './../profile.service';
+import { ProfileService } from './../profile.service';
+import { PoolService } from './../pool.service';
 
 @Component({
     templateUrl: './modifyProfile.component.html',
@@ -89,27 +90,7 @@ export class modifyProfileComponent implements OnInit {
                 fontSize: 12
             }
         };
-        // this.data = {
-        //     "id": "5d8c3732-a248-50ed-bebc-539a6ffd25c1",
-        //     "name": "Gold",
-        //     "protocol": "FC",
-        //     "type": "Thin",
-        //     "policys": [
-        //         "Qos",
-        //         "Snapshot",
-        //         "Replication"
-        //     ],
-        //     "description": "provide gold storage service",
-        //     "extras": {
-        //         "key1": "value1",
-        //         "key2": {
-        //             "subKey1": "subValue1",
-        //             "subKey2": "subValue2"
-        //         },
-        //         "key3": "value3"
-        //     }
-        // };
-
+        
     }
     getPools() {
         this.poolService.getPools().subscribe((res) => {
@@ -125,11 +106,7 @@ export class modifyProfileComponent implements OnInit {
                             "rgba(224, 224, 224, 1)",
                             "#438bd3"
                         ]
-                        // hoverBackgroundColor: [
-                        //     "#FF6384",
-                        //     "#36A2EB",
-                        //     "#FFCE56"
-                        // ]
+                        
                     }]
             };
         });

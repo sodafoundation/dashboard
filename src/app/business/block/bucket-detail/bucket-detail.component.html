@@ -1,3 +1,4 @@
+<p-growl [value]="msgs" [sticky]="false" [life]="6000"></p-growl>
 <div>
     <div class="custom-breadcrumb">
         <span *ngFor="let item of items; index as i">
@@ -11,7 +12,7 @@
             <div class="content-header">
                 <div class="table-toolbar">
                     <div class="left">
-                        <button class="ui-button-secondary" [disabled]="isUpload" pButton type="button" label="Upload" (click)="configUpload('upload')"></button>
+                        <button class="ui-button-secondary" [disabled]="isUpload" pButton type="button" label="Upload / Archive" (click)="configUpload('upload')"></button>
                         <button pButton type="button" [disabled]="false"  label="Create Folder" (click)="configUpload('fromFolder')" ></button>
                         <button pButton type="button" [disabled]="selectedDir.length === 0" (click)="deleteMultiDir()" label="{{I18N.keyID['sds_block_volume_delete']}}"></button>
                         <p-splitButton label="More" [model]="moreItems" (click)="clickOperate()"></p-splitButton>
@@ -26,7 +27,7 @@
                 </div>
                 <p-dataTable [value]="allDir" [globalFilter]="searchByName" [(selection)]="selectedDir"  [showHeaderCheckbox]="true" resizableColumns="true" [rows]="10" [paginator]="true" [pageLinks]="3" [rowsPerPageOptions]="[10,20,50,100]">
                     <p-column selectionMode="multiple" [style]="{'width': '60px'}"></p-column>
-                    <p-column field="Key" header="{{I18N.keyID['sds_block_volume_name']}}" [style]="{'width': '170px'}" >
+                    <p-column field="Key" header="{{I18N.keyID['sds_block_volume_name']}}" [style]="{'width': '200px'}" >
                         <ng-template pTemplate="body" let-file="rowData" let-i="rowIndex">
                             <a *ngIf="file.newFolder" title="{{file.objectName}}" (click)="folderLink(file)">
                                 <img style="vertical-align: middle;" src="assets/business/images/volume/icon_folder.png">
@@ -37,20 +38,21 @@
                     </p-column>
                     <p-column field="size" header="Size" [style]="{'width': '120px'}"></p-column>
                     <p-column field="Location" header="Location" [style]="{'width': '120px'}" ></p-column>
-                    <p-column field="Tier" header="Tier" ></p-column>
-                    <p-column field="lastModified" header="Last Modified">
+                    <p-column field="Tier" header="Tier" [style]="{'width': '180px'}"></p-column>
+                    <p-column field="lastModified" header="Last Modified" [style]="{'width': '250px'}">
                         <ng-template pTemplate="body" let-obj="rowData" let-i="rowIndex">
                             {{obj.lastModified ? (obj.lastModified | date:'long') : '--'}}
                         </ng-template>
                     </p-column>
-                    <p-column header="{{I18N.keyID['sds_block_volume_operation']}}" [style]="{'width': '180px'}">
+                    <p-column header="{{I18N.keyID['sds_block_volume_operation']}}" [style]="{'width': '200px'}">
                         <ng-template pTemplate="body" let-file="rowData" let-i="rowIndex">
                             <a (click)="downloadFile(file)" *ngIf="!file.newFolder">Download</a>
+                            <a (click)="showRestoreObject(file)" *ngIf="bucketBackendType!='gcp-s3'" [ngClass]="{'a-rep-disabled':file.StorageClass!='GLACIER'}">Restore</a>
                             <a [ngClass]="{'a-rep-disabled':file['disabled']}" (click)="deleteFile(file)">Delete</a>
                         </ng-template>
                     </p-column>
                 </p-dataTable>
-                <p-dialog styleClass="upload-dialog"  header="Upload" [(visible)]="uploadDisplay" [width]="600" modal="modal">
+                <p-dialog styleClass="upload-dialog"  header="Upload" [(visible)]="uploadDisplay" [width]="700" [height]="350" modal="modal">
                     <div class="a-upload">
                         <input type="file" placeholder="Select File" (change)="selectedFileOnChanged($event)" />
                         <span>Select File</span>
@@ -64,21 +66,30 @@
                                 </span>
                             </div>
                         </div>
-                    <div style="padding:20px 0">
-                        <p-checkbox (onChange)="showDetail()" name="specify"  value="true" [(ngModel)]="selectedSpecify" label="Specify the location of data storage. If not specified, store it to default backend."></p-checkbox>
+                    <div *ngIf="archivalEnabled && archivalEnabled[bucketBackendType]" style="padding: 20px 0;">
+                        <label>Archive object?</label>
+                        <p-inputSwitch [(ngModel)]="enableArchival" onLabel="Yes" offLabel="No" (onChange)="archivalControl($event)"></p-inputSwitch>
                     </div>
-                    <form *ngIf="showBackend" [grid]="{label: 'ui-g-3', content:'ui-g-20'}" [formGroup]="uploadForm" [errorMessage]="errorMessage">
-                        <form-item label="type" [required]="true">
-                            <p-dropdown [style]="{'min-width':'220px'}" placeholder="Please select" [options]="allTypes" name='selectType' formControlName="backend_type" (onChange)="getBackendsByTypeId()"></p-dropdown>
+                    <form *ngIf="archivalEnabled && archivalEnabled[bucketBackendType] && enableArchival" [grid]="{label: 'ui-g-3', content:'ui-g-20'}" [formGroup]="uploadForm" [errorMessage]="errorMessage">
+                        <form-item label="Tier" [required]="true">
+                            <p-dropdown [style]="{'min-width':'220px'}" placeholder="Please select" [options]="archiveTierOptions" name='selectArchiveTier' formControlName="archive_tier"></p-dropdown>
                         </form-item>
-                        <form-item label="Backend" [required]="true">
-                            <p-dropdown [style]="{'min-width':'220px'}" placeholder="Please select" [options]="backendsOption" name='selectBackend' formControlName="backend"></p-dropdown>
-                        </form-item>
-                
                     </form>
                     <p-footer>
-                        <button type="submit" class="ui-button-secondary" pButton (click)="uploadFile()" label="{{I18N.keyID['ok']}}"></button>
-                        <button type="button" pButton (click)="uploadDisplay=false"  label="{{I18N.keyID['cancel']}}"></button>
+                        <button type="submit" [disabled]="uploadForm.invalid" class="ui-button-secondary" pButton (click)="uploadFile()" label="{{I18N.keyID['ok']}}"></button>
+                        <button type="button" pButton (click)="cancelUpload()"  label="{{I18N.keyID['cancel']}}"></button>
+                    </p-footer>
+                </p-dialog>
+                <p-dialog styleClass="restore-dialog" header="Restore" [(visible)]="restoreDisplay" [width]="600" [height]="280" modal="modal">
+                    <form [grid]="{label: 'ui-g-3', content:'ui-g-20'}" [formGroup]="restoreObjectForm" [errorMessage]="restoreObjectErrorMsg">
+                        <form-item *ngFor="let item of restoreFormItemsCopy" [label]="item.label" [required]="item.required">
+                            <input *ngIf="item.type=='number'" [id]="item.id" type="number" min="1" [(ngModel)]="item.value" [name]="item.name"  [formControlName]="item.formControlName"  pInputText />
+                            <p-dropdown *ngIf="item.type=='select'" [style]="{'min-width':'150px','width':'220px'}" placeholder="Please select" [options]="item.options" [name]="item.name" [(ngModel)]='selectRestoreOptions' [formControlName]="item.formControlName"></p-dropdown>
+                        </form-item>
+                    </form>
+                    <p-footer>
+                        <button type="submit" [disabled]="restoreObjectForm.invalid" class="ui-button-secondary" pButton (click)="restoreObject(restoreObjectForm.value)" label="{{I18N.keyID['ok']}}"></button>
+                        <button type="button" pButton (click)="cancelRestore()"  label="{{I18N.keyID['cancel']}}"></button>
                     </p-footer>
                 </p-dialog>
                 <p-dialog  header="Create Folder" [(visible)]="showCreateFolder" [width]="600" modal="modal">
@@ -103,3 +114,7 @@
         </p-tabPanel> 
     </p-tabView>
 </div>
+<p-dialog [(visible)]="isPasting" [showHeader]="false" [closable]="false" [width]="450" [modal]="true" [height]="50">
+    <p class="align-center">Object paste initiated. Please check back after sometime.</p>
+    <p-progressBar mode="indeterminate" [style]="{'height': '10px'}"></p-progressBar>
+</p-dialog>

@@ -6,7 +6,9 @@ import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 
 import { ProfileCardComponent } from './profileCard/profile-card.component';
 import { ButtonModule,CardModule,ChartModule,MessageModule,OverlayPanelModule,DialogModule ,ConfirmationService,ConfirmDialogModule, FormModule, DropMenuModule, GrowlModule} from '../../components/common/api';
-import { ProfileService, PoolService } from './profile.service';
+import { TooltipModule } from '../../components/tooltip/tooltip';
+import { ProfileService } from './profile.service';
+import { PoolService } from './pool.service';
 import { HttpService } from '../../shared/api';
 import { SuspensionFrameComponent } from './profileCard/suspension-frame/suspension-frame.component';
 
@@ -35,7 +37,8 @@ let routers = [{
     ConfirmDialogModule,
     FormModule,
     DropMenuModule,
-    GrowlModule
+    GrowlModule,
+    TooltipModule
   ],
   providers: [
     HttpService,

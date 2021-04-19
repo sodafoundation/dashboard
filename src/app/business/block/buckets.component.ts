@@ -600,7 +600,7 @@ export class BucketsComponent implements OnInit{
             accept: ()=>{
                 try {
                     switch (func) {
-                        case "delete":  console.log("Delete Confirm");
+                        case "delete":  
                                         let name = bucket.name;
                                         if(plans){
                                             plans.forEach(element => {

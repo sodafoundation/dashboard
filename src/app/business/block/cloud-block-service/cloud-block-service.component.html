@@ -19,7 +19,7 @@
         <p-column field="name" header="Name"></p-column>
         <p-column field="size" header="Size">
             <ng-template pTemplate="body" let-volume="rowData">
-                {{volume.displaySize}}
+                {{volume.displaySize ? volume.displaySize : '--'}}
             </ng-template>
         </p-column>
         <p-column field="iops" header="IOPS">

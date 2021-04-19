@@ -2,6 +2,8 @@ import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 import { HostsResolver } from './business/block/modify-host/host-resolver.service';
 import { AzResolver } from './business/block/modify-host/az-resolver.service';
+import { DelfinResolver } from './business/delfin/delfin-resolver.service';
+import { DelfinService } from './business/delfin/delfin.service';
 
 const routes: Routes = [
     {path: '', redirectTo: '/home', pathMatch: 'full'},
@@ -12,7 +14,7 @@ const routes: Routes = [
     {path: 'createCloudVolume', loadChildren: './business/block/cloud-block-service/create/cloud-volume-create.module#CloudVolumeCreateModule'},
     {path: 'modifyCloudVolume/:volumeId', loadChildren: './business/block/cloud-block-service/modify/cloud-volume-modify.module#CloudVolumeModifyModule'},
     {path: 'volumeDetails/:volumeId', loadChildren: './business/block/volume-detail/volume-detail.module#VolumeDetailModule'},
-    {path: 'createHost', loadChildren: './business/block/create-host/create-host.module#CreateHostModule'},
+    {path: 'registerHost', loadChildren: './business/block/create-host/create-host.module#CreateHostModule'},
     {path: 'modifyHost/:hostId', loadChildren: './business/block/modify-host/modify-host.module#ModifyHostModule',
         resolve: {
             host: HostsResolver,
@@ -38,7 +40,12 @@ const routes: Routes = [
     {path: 'modifyCloudFileShare/:fileShareId', loadChildren: './business/block/cloud-file-share/modify/cloud-file-share-modify.module#CloudFileShareModifyModule'},
     {path: 'fileShareDetail/:fileShareId', loadChildren: './business/block/file-share-detail/file-share-detail.module#FileShareDetailModule'},
     {path: 'services', loadChildren: './business/services/services.module#ServicesModule'},
-    {path: 'resource-monitor', loadChildren: './business/delfin/delfin.module#DelfinModule'},
+    {path: 'resource-monitor', loadChildren: './business/delfin/delfin.module#DelfinModule',
+        resolve: {
+            storages: DelfinResolver
+        }
+    },
+    {path: 'performance-monitor', loadChildren: './business/delfin/performance-monitor/performance-monitor.module#PerformanceMonitorModule'},
     {path: 'registerStorage', loadChildren: './business/delfin/register-storage/register-storage.module#RegisterStorageModule'},
     {path: 'storageDetails/:storageId', loadChildren: './business/delfin/storage-details/storage-details.module#StorageDetailsModule'},
     {path: 'modifyStorage/:storageId', loadChildren: './business/delfin/modify-storage/modify-storage.module#ModifyStorageModule'}
@@ -49,7 +56,9 @@ const routes: Routes = [
     exports: [RouterModule],
     providers: [
         HostsResolver,
-        AzResolver
+        AzResolver,
+        DelfinService,
+        DelfinResolver
     ]
 })
 export class AppRoutingModule {}
