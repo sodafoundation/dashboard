@@ -14,6 +14,10 @@ export class DelfinService {
     delfinStoragePoolsUrl = Consts.API.DELFIN.storagePools;
     delfinVolumesUrl = Consts.API.DELFIN.volumes;
     delfinControllersUrl = Consts.API.DELFIN.controllers;
+    delfinQtreesUrl = Consts.API.DELFIN.qtrees;
+    delfinFilesystemsUrl = Consts.API.DELFIN.filesystems;
+    delfinSharesUrl = Consts.API.DELFIN.shares;
+    delfinQuotasUrl = Consts.API.DELFIN.quotas;
     delfinPortsUrl = Consts.API.DELFIN.ports;
     delfinDisksUrl = Consts.API.DELFIN.disks;
     delfinAlertsUrl = Consts.API.DELFIN.alerts;
@@ -234,7 +238,169 @@ export class DelfinService {
     getDiskDetails(id): Observable<any> {
         return this.http.get(this.delfinDisksUrl +'/'+id);
     }
-  
+
+    //get all Qtrees
+    getAllQtrees(storageId?, qtreeId?, nativeFilesystemId?, id?, name?, status?, limit?, offset?, sort?): Observable<any> {
+        let query = "";
+        if(storageId){
+            query += "?storage_id=" + storageId;
+        }
+        if(qtreeId){
+            query += "?native_qtree_id=" + qtreeId;
+        }
+        if(nativeFilesystemId){
+            query += "?native_filesystem_id=" + nativeFilesystemId;
+        }
+        if(name){
+            query += "?name=" + name;
+        }
+        if(id){
+            query += "?id=" + id;
+        }
+        if(status){
+            query += "?status=" + status;
+        }
+        if(limit){
+            query += "?limit=" + limit;
+        }
+        if(offset){
+            query += "?offset=" + offset;
+        }
+        if(sort){
+            query += "?sort=" + sort;
+        }
+        let url =this.delfinQtreesUrl + query;
+        return this.http.get(url);
+    }
+
+    //get Qtree details
+    getQtreeDetails(id): Observable<any> {
+        return this.http.get(this.delfinQtreesUrl+'/'+id);
+    }
+
+    //get all Filesystems
+    getAllFilesystems(storageId?, nativeFilesystemId?, nativePoolId?, securityMode?, id?, name?, status?, limit?, offset?, sort?): Observable<any> {
+        let query = "";
+        if(storageId){
+            query += "?storage_id=" + storageId;
+        }
+        if(nativeFilesystemId){
+            query += "?native_filesystem_id=" + nativeFilesystemId;
+        }
+        if(nativePoolId){
+            query += "?native_pool_id=" + nativePoolId;
+        }
+        if(securityMode){
+            query += "?security_mode=" + securityMode;
+        }
+        if(id){
+            query += "?id=" + id;
+        }
+        if(name){
+            query += "?name=" + name;
+        }
+        if(status){
+            query += "?status=" + status;
+        }
+        if(limit){
+            query += "?limit=" + limit;
+        }
+        if(offset){
+            query += "?offset=" + offset;
+        }
+        if(sort){
+            query += "?sort=" + sort;
+        }
+        let url =this.delfinFilesystemsUrl + query;
+        return this.http.get(url);
+    }
+
+    //get Storage Pool details
+    getFilesystemDetails(id): Observable<any> {
+        return this.http.get(this.delfinFilesystemsUrl+'/'+id);
+    }
+
+    //get all Shares
+    getAllShares(storageId?, shareId?, nativeFilesystemId?, qtreeId?, protocol?, name?, limit?, offset?, sort?): Observable<any> {
+        let query = "";
+        if(storageId){
+            query += "?storage_id=" + storageId;
+        }
+        if(shareId){
+            query += "?native_share_id=" + shareId;
+        }
+        if(nativeFilesystemId){
+            query += "?native_filesystem_id=" + nativeFilesystemId;
+        }
+        if(qtreeId){
+            query += "?qtree_id=" + qtreeId;
+        }
+        if(protocol){
+            query += "?protocol=" + protocol;
+        }
+        if(name){
+            query += "?name=" + name;
+        }
+        if(limit){
+            query += "?limit=" + limit;
+        }
+        if(offset){
+            query += "?offset=" + offset;
+        }
+        if(sort){
+            query += "?sort=" + sort;
+        }
+        let url =this.delfinSharesUrl + query;
+        return this.http.get(url);
+    }
+
+    //get Share details
+    getShareDetails(id): Observable<any> {
+        return this.http.get(this.delfinSharesUrl+'/'+id);
+    }
+
+    //get all Quotas
+    getAllQuotas(storageId?, nativeFilesystemId?, nativeQtreeId?, securityMode?, id?, name?, status?, limit?, offset?, sort?): Observable<any> {
+        let query = "";
+        if(storageId){
+            query += "?storage_id=" + storageId;
+        }
+        if(nativeFilesystemId){
+            query += "?native_filesystem_id=" + nativeFilesystemId;
+        }
+        if(nativeQtreeId){
+            query += "?native_qtree_id=" + nativeQtreeId;
+        }
+        if(securityMode){
+            query += "?security_mode=" + securityMode;
+        }
+        if(id){
+            query += "?id=" + id;
+        }
+        if(name){
+            query += "?name=" + name;
+        }
+        if(status){
+            query += "?status=" + status;
+        }
+        if(limit){
+            query += "?limit=" + limit;
+        }
+        if(offset){
+            query += "?offset=" + offset;
+        }
+        if(sort){
+            query += "?sort=" + sort;
+        }
+        let url =this.delfinQuotasUrl + query;
+        return this.http.get(url);
+    }
+
+    //get Storage Pool details
+    getQuotaDetails(id): Observable<any> {
+        return this.http.get(this.delfinQuotasUrl+'/'+id);
+    }
+
     //get all alert sources
     getAlertSource(id): Observable<any>{
         return this.http.get(this.delfinStoragesUrl + '/' + id + '/alert-source')

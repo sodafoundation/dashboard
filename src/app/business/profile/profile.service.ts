@@ -36,13 +36,3 @@ export class ProfileService {
         });
     }
 }
-
-@Injectable()
-export class PoolService{
-    url = 'v1beta/{project_id}/pools';
-    constructor(private http: HttpService) { }
-    
-    getPools(): Observable<any> {
-        return this.http.get(this.url);
-    }
-}

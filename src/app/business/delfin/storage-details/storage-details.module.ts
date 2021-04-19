@@ -9,6 +9,10 @@ import { StoragePoolsComponent } from '../storage-pools/storage-pools.component'
 import { ControllersComponent } from '../controllers/controllers.component';
 import { PortsComponent } from '../ports/ports.component';
 import { DisksComponent } from '../disks/disks.component';
+import { QtreesComponent } from '../qtrees/qtrees.component';
+import { FilesystemsComponent } from '../filesystems/filesystems.component';
+import { SharesComponent } from '../shares/shares.component';
+import { QuotasComponent } from '../quotas/quotas.component';
 import { HttpService } from '../../../shared/api';
 import { ProfileService } from '../../profile/profile.service';
 import { AvailabilityZonesService } from '../../resource/resource.service';
@@ -47,7 +51,18 @@ let routers = [{
     TooltipModule,
     ProgressBarModule
   ],
-  declarations: [ StorageDetailsComponent, StorageVolumesComponent, StoragePoolsComponent, ControllersComponent, PortsComponent, DisksComponent, SafePipe  ],
+  declarations: [ 
+    StorageDetailsComponent, 
+    StorageVolumesComponent, 
+    StoragePoolsComponent, 
+    ControllersComponent, 
+    PortsComponent, 
+    DisksComponent, 
+    QtreesComponent, 
+    FilesystemsComponent,
+    SharesComponent,
+    QuotasComponent,
+    SafePipe  ],
   providers: [
     HttpService,
     ProfileService,
