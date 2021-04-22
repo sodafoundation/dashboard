@@ -53,7 +53,7 @@ export const Consts = {
         "gcp-file" : 'google.svg',
         "yig": "yig.png",
         'alibaba-oss': 'alibaba.svg',
-        'sony-oda':'sonyoda.svg'
+        'sony-oda':'sonyoda.svg',
 
     },
     CLOUD_TYPE_NAME: {
