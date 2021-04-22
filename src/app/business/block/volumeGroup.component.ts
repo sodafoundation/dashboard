@@ -8,7 +8,7 @@ import { FormControl, FormGroup, FormBuilder, Validators, ValidatorFn, AbstractC
 import { VolumeService ,VolumeGroupService} from './volume.service';
 import { ProfileService } from './../profile/profile.service';
 import { AvailabilityZonesService } from './../resource/resource.service';
-import { ConfirmationService,ConfirmDialogModule} from '../../components/common/api';
+import { ConfirmationService,ConfirmDialogModule, Message} from '../../components/common/api';
 import { Router } from '@angular/router';
 
 @Component({
@@ -31,6 +31,7 @@ export class VolumeGroupComponent implements OnInit{
     showModifyGroup :boolean = false;
     volumeGroupForm:any;
     modifyGroupForm:any;
+    msgs: Message[];
     validRule= {
         'name':'^[a-zA-Z]{1}([a-zA-Z0-9]|[_]){0,127}$'
     };
@@ -194,15 +195,26 @@ export class VolumeGroupComponent implements OnInit{
             isWarning: warming,
             accept: ()=>{
                 try {
+                    this.msgs = [];
                     if(func === "delete"){
                         this.volumeGroupService.deleteVolumeGroup(this.currentGroup.id).subscribe((res) => {
                             this.getVolumeGroups();
-                        })
+                            let successMesg = "Volume group " + this.currentGroup.name  +" has been deleted successfully.";
+                            this.msgs.push({severity: 'success', summary: 'Success', detail: successMesg});
+                        }, (error) =>{
+                            let errorMesgTitle = "Error Deleting " + this.currentGroup.name;
+                            this.msgs.push({severity: 'error', summary: errorMesgTitle, detail: error.json().message});
+                        });
                     }else if(func === "multiDelete"){
                         this.selectedVolumeGroups.forEach(item=>{
                             this.volumeGroupService.deleteVolumeGroup(item.id).subscribe((res) => {
                                 this.getVolumeGroups();
-                            })
+                                let successMesg = "Volume group " + item.name  +" has been deleted successfully.";
+                                this.msgs.push({severity: 'success', summary: 'Success', detail: successMesg});
+                            }, (error) =>{
+                                let errorMesgTitle = "Error Deleting " + item.name;
+                                this.msgs.push({severity: 'error', summary: errorMesgTitle, detail: error.json().message});
+                            });
                         });
                         this.selectedVolumeGroups = [];
                     }
