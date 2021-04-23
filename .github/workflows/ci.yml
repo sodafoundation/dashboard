@@ -1,9 +1,8 @@
 # This is a the GitHub Action to run the CI for SODA Dashboard
-
 name: SODA Dashboard CI
 # Triggers the workflow on push or pull request events but only for the main branch
 # Allows you to run this workflow manually from the Actions tab
-on: [push, pull_request, workflow_dispatch]
+on: [push, pull_request]
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
