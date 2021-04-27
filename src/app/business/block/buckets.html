@@ -138,7 +138,7 @@
             <form [grid]="{label: 'ui-g-3', content:'ui-g-20'}" [formGroup]="migrationForm" [errorMessage]="errorMessage">
                 <div style="margin-bottom: 18px;"><span style="font-size: 16px;font-style: normal">Basic Information</span></div>
                 <form-item label="Plan Name" >
-                    <input type="text" name="migrationName" pInputText style="width: 150px;" formControlName="name" />
+                    <input type="text" name="name" pInputText style="width: 150px;" formControlName="name" />
                 </form-item>
                 <form-item label="Source Bucket" >
                     <input type="text" name="" disabled="true" pInputText style="width: 150px;" value="{{selectedBucket.name}}" />
@@ -146,7 +146,7 @@
                 <form-item label="Destination Bucket" >
                     <p-dropdown [style]="{'min-width':'220px'}" placeholder="Please select" [options]="availbucketOption" name="destBucket" formControlName="destBucket"  ></p-dropdown>
                 </form-item>
-                <form-item label="Excuting Time" >
+                <form-item label="Execution Time" >
                     <p-calendar [disabled]="selectTime" [showTime]="true" name="excutingTime" formControlName="excuteTime" ></p-calendar>
                     <p-checkbox (onChange)="showcalendar()" name="excuteTime"  value="true" binary="true" label="Immediately" formControlName="excute"></p-checkbox>
                 </form-item>
@@ -177,8 +177,8 @@
                 </div>
             </form>
             <p-footer>
-                <button type="button" class="ui-button-secondary" pButton (click)="createMigration()" label="{{I18N.keyID['ok']}}" ></button>
-                <button type="button" pButton (click)="createMigrateShow=false" label="{{I18N.keyID['cancel']}}"></button>
+                <button type="button" [disabled]="migrationForm.invalid" class="ui-button-secondary" pButton (click)="createMigration()" label="{{I18N.keyID['ok']}}" ></button>
+                <button type="button" pButton (click)="resetMigrateForm()" label="{{I18N.keyID['cancel']}}"></button>
             </p-footer>
         </p-dialog>
     <p-confirmDialog></p-confirmDialog>
