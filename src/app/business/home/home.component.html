@@ -145,7 +145,7 @@
                     <input id="name" type="text" name="name" formControlName="name"  pInputText />
                 </form-item>
                 <form-item label="Type" [required]="true">
-                    <p-dropdown [style]="{'min-width':'220px'}" (onChange)="selectOption()" placeholder="Please select" formControlName="type" [options]="allTypes"  ></p-dropdown>
+                    <p-dropdown [style]="{'min-width':'220px'}" (onChange)="selectOption()" placeholder="Please select" formControlName="type" [options]="allTypes" filter="true"  ></p-dropdown>
                 </form-item>
                 <form-item *ngFor="let item of formItemCopy" [label]="item.label" [required]="item.required">
                     <input [id]="item.id" [type]="item.type" [name]="item.name"  [formControlName]="item.formControlName"  pInputText />
