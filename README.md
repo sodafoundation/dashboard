@@ -2,7 +2,7 @@
 
 [![Releases](https://img.shields.io/github/release/sodafoundation/dashboard/all.svg?style=flat-square)](https://github.com/sodafoundation/dashboard/releases)
 [![LICENSE](https://img.shields.io/github/license/sodafoundation/dashboard.svg?style=flat-square)](https://github.com/sodafoundation/dashboard/blob/master/LICENSE)
-
+[![SODA Dashboard CI](https://github.com/sodafoundation/dashboard/actions/workflows/ci.yml/badge.svg)](https://github.com/sodafoundation/dashboard/actions/workflows/ci.yml)
 <img src="https://sodafoundation.io/wp-content/uploads/2020/01/SODA_logo_outline_color_800x800.png" width="200" height="200">
 
 ## Introduction
