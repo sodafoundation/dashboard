@@ -152,7 +152,7 @@ export class ProfileCardComponent implements OnInit {
             this.isAdministrator = false;
         }
         this.chartDatas = {
-            labels: ['Unused Capacity', 'Used Capacity'],
+            labels: ['Unused Capacity (GB)', 'Used Capacity (GB)'],
             datasets: [
                 {
                     data: [this.data.totalFreeCapacity,this.data.totalCapacity-this.data.totalFreeCapacity],
