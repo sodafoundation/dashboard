@@ -1,6 +1,6 @@
 # This is a the GitHub Action to run the CI for SODA Dashboard
 name: SODA Dashboard CI
-# Triggers the workflow on push or pull request events but only for the main branch
+# Triggers the workflow on pull request events but only for the main branch
 
 on: 
   pull_request: 
