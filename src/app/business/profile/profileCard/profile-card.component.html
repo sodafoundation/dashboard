@@ -16,6 +16,19 @@
             </div>
         </div>
         <div class="padding-class"style="clear:both;">
+            <span class="label-class">Profile ID:</span>
+            <span title="{{data && data.id ?data.id :'--'}}">{{ data.id ? (data.id | slice:0:25) : '--' }} 
+                <span  *ngIf="data.id && data.id.length > 20" pTooltip="{{data.id}}" tooltipPosition="top" tooltipStyleClass="profile-desc-tooltip">
+                    ...
+                </span>
+            </span>
+            <button pButton ngxClipboard 
+                [cbContent]="data.id"
+                (cbOnSuccess)="copyProfileSuccess(data.id)"
+                (cbOnError)="copyProfileError(data.id)"
+                type="button" icon="fa fa-copy" iconPos="right"></button>
+        </div>
+        <div class="padding-class"style="clear:both;">
             <span class="label-class">Storage Type:</span>
             <span>{{data.storageType? data.storageType : "--"}}</span>
         </div>

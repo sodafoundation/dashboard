@@ -6,7 +6,7 @@ import { trigger, state, style, transition, animate } from '@angular/animations'
 import { I18nPluralPipe } from '@angular/common';
 import { HttpService } from './../../../shared/api';
 import { FormControl, FormGroup, FormBuilder, Validators, ValidatorFn, AbstractControl } from '@angular/forms';
-
+import { ClipboardService } from 'ngx-clipboard';
 import { ButtonModule ,ConfirmationService, Message} from './../../../components/common/api';
 import { ProfileService } from './../profile.service';
 
@@ -105,7 +105,8 @@ export class ProfileCardComponent implements OnInit {
         private fb: FormBuilder,
         private ProfileService: ProfileService,
         private paramStor: ParamStorService,
-        private confirmationService:ConfirmationService
+        private confirmationService:ConfirmationService,
+        private clipboardService: ClipboardService
     ) { }
     option = {};
     ngOnInit() {
@@ -193,6 +194,18 @@ export class ProfileCardComponent implements OnInit {
             "descript":  [policyId.description, Validators.maxLength(200)]
         })
         
+    }
+
+    copyProfileSuccess(id){
+        this.msgs = [];
+        this.msgs.push({severity: 'success', summary: "Profile ID copied!", detail: 'The profile ID <strong>' + id + '</strong> has been copied successfully.'});
+        this.checkParam.emit(this.msgs);
+    }
+    copyProfileError(id){
+        console.log("Profile ID could not be copied");
+        this.msgs = [];
+        this.msgs.push({severity: 'error', summary: "Error copying profile ID!", detail: 'Profile ID ' + id +' could not be copied.'});
+        this.checkParam.emit(this.msgs);
     }
 
     submitPorfile(value){
