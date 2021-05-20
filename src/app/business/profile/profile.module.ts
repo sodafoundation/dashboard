@@ -7,6 +7,7 @@ import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { ProfileCardComponent } from './profileCard/profile-card.component';
 import { ButtonModule,CardModule,ChartModule,MessageModule,OverlayPanelModule,DialogModule ,ConfirmationService,ConfirmDialogModule, FormModule, DropMenuModule, GrowlModule} from '../../components/common/api';
 import { TooltipModule } from '../../components/tooltip/tooltip';
+import { ClipboardModule } from 'ngx-clipboard';
 import { ProfileService } from './profile.service';
 import { PoolService } from './pool.service';
 import { HttpService } from '../../shared/api';
@@ -38,7 +39,8 @@ let routers = [{
     FormModule,
     DropMenuModule,
     GrowlModule,
-    TooltipModule
+    TooltipModule,
+    ClipboardModule
   ],
   providers: [
     HttpService,
