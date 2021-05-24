@@ -1,3 +1,4 @@
+<p-growl [value]="msgs" [sticky]="false" [life]="6000"></p-growl>
 <div class="table-toolbar">
     <div class="left">
         <button class="ui-button-secondary" [disabled] = "showAKSKWarning" pButton type="button" label="{{I18N.keyID['sds_block_volume_create']}}" (click)="configCreateMigration()" ></button>
@@ -87,8 +88,8 @@
     </form>
     
     <p-footer>
-        <button type="button" class="ui-button-secondary" pButton (click)="createMigration()" label="{{I18N.keyID['ok']}}" ></button>
-        <button type="button" pButton (click)="createMigrateShow=false" label="{{I18N.keyID['cancel']}}"></button>
+        <button type="button" [disabled]="createMigrationForm.invalid" class="ui-button-secondary" pButton (click)="createMigration()" label="{{I18N.keyID['ok']}}" ></button>
+        <button type="button" pButton (click)="resetMigrateForm()" label="{{I18N.keyID['cancel']}}"></button>
     </p-footer>
 </p-dialog>
 <p-confirmDialog></p-confirmDialog>

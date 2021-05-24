@@ -57,7 +57,7 @@ export class HomeComponent implements OnInit {
             type: 'text',
             name: 'region',
             formControlName: 'region',
-            arr:['aws-s3','azure-blob','hw-obs','fusionstorage-object', 'gcp-s3','ibm-cos', 'alibaba-oss', 'aws-file', 'aws-block', 'azure-file', 'hw-file', 'hw-block']
+            arr:['aws-s3','azure-blob','hw-obs','fusionstorage-object', 'gcp-s3','ibm-cos', 'alibaba-oss', 'aws-file', 'aws-block', 'azure-file', 'hw-file', 'hw-block','sony-oda']
         },
         {
             label: 'Project',
@@ -75,7 +75,7 @@ export class HomeComponent implements OnInit {
             type: 'text',
             name: 'endpoint',
             formControlName: 'endpoint',
-            arr:['aws-s3','azure-blob','hw-obs','fusionstorage-object','ceph-s3','gcp-s3','ibm-cos','yig', 'alibaba-oss']
+            arr:['aws-s3','azure-blob','hw-obs','fusionstorage-object','ceph-s3','gcp-s3','ibm-cos','yig', 'alibaba-oss','sony-oda']
         },
         {
             label: 'Bucket',
@@ -93,7 +93,7 @@ export class HomeComponent implements OnInit {
             type: 'text',
             name: 'accessKey',
             formControlName: 'ak',
-            arr:['aws-s3','azure-blob','hw-obs','fusionstorage-object','ceph-s3','gcp-s3','ibm-cos', 'alibaba-oss', 'aws-file', 'aws-block', 'azure-file', 'gcp-file', 'hw-file', 'hw-block']
+            arr:['aws-s3','azure-blob','hw-obs','fusionstorage-object','ceph-s3','gcp-s3','ibm-cos', 'alibaba-oss', 'aws-file', 'aws-block', 'azure-file', 'gcp-file', 'hw-file', 'hw-block','sony-oda']
         },
         {
             label: 'Secret Key',
@@ -102,7 +102,7 @@ export class HomeComponent implements OnInit {
             type: 'password',
             name: 'secretKey',
             formControlName: 'sk',
-            arr:['aws-s3','azure-blob','hw-obs','fusionstorage-object','ceph-s3','gcp-s3','ibm-cos','alibaba-oss', 'aws-file', 'aws-block', 'azure-file', 'gcp-file', 'hw-file', 'hw-block']
+            arr:['aws-s3','azure-blob','hw-obs','fusionstorage-object','ceph-s3','gcp-s3','ibm-cos','alibaba-oss', 'aws-file', 'aws-block', 'azure-file', 'gcp-file', 'hw-file', 'hw-block','sony-oda']
         },
 
     ]

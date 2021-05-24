@@ -5,7 +5,7 @@ import { FormControl, FormGroup, FormBuilder, Validators, ValidatorFn, AbstractC
 import { AppService } from 'app/app.service';
 import { I18nPluralPipe } from '@angular/common';
 import { trigger, state, style, transition, animate } from '@angular/animations';
-import { MenuItem ,ConfirmationService} from '../../components/common/api';
+import { MenuItem ,ConfirmationService, Message} from '../../components/common/api';
 import { identifierModuleUrl } from '@angular/compiler';
 import { MigrationService } from './migration.service';
 import { BucketService } from './../block/buckets.service';
@@ -48,6 +48,7 @@ export class MigrationListComponent implements OnInit {
     errorMessage:Object;
     allMigrationForCheck=[];
     showAKSKWarning: boolean;
+    msgs: Message[];
     constructor(
         public I18N: I18NService,
         private router: Router,
@@ -60,7 +61,7 @@ export class MigrationListComponent implements OnInit {
     ) {
         this.showAKSKWarning = window['akskWarning'];
         this.errorMessage = {
-            "name": { required: "Name is required.",isExisted:"Name is existing" },
+            "name": { required: "Name is required.",isExisted:"This name already exists." },
             "srcBucket": { required: "Source Bucket is required." },
             "destBucket":{ required: "Destination Bucket is required." },
         };
@@ -187,6 +188,7 @@ export class MigrationListComponent implements OnInit {
     }
 
     createMigration() {
+        this.msgs = [];
         if(!this.createMigrationForm.valid){
             for(let i in this.createMigrationForm.controls){
                 this.createMigrationForm.controls[i].markAsTouched();
@@ -210,10 +212,16 @@ export class MigrationListComponent implements OnInit {
         }
         if(this.createMigrationForm.value.excute){
             this.MigrationService.createMigration(param).subscribe((res) => {
-                this.createMigrateShow = false;
                 let planId = res.json().plan.id;
                 this.http.post(`v1/{project_id}/plans/${planId}/run`,{}).subscribe((res)=>{});
                 this.getMigrations();
+                this.msgs.push({severity: 'success', summary: 'Migration initiated successfully', detail: 'Please expand the migration to check migration progress.'});
+                this.resetMigrateForm();
+                
+            },(error)=>{
+                let errorMsg = "There was an error while initiating the migration. <br />Details: " + error.json().detail; 
+                this.msgs.push({severity: 'error', summary: "Error initiating migration", detail: errorMsg});
+                this.resetMigrateForm();
             });
         }else{
             let date = new Date(this.createMigrationForm.value.excuteTime);
@@ -231,11 +239,28 @@ export class MigrationListComponent implements OnInit {
                 param['policyId'] = res.json().policy.id;
                 param['policyEnabled'] = true;
                 this.MigrationService.createMigration(param).subscribe((res) => {
-                    this.createMigrateShow = false;
                     this.getMigrations();
-                });
+                    this.msgs.push({severity: 'success', summary: 'Migration scheduled successfully!', detail: 'Please expand the migration to check migration progress.'});
+                    this.resetMigrateForm();
+                },(error)=>{
+                    let errorMsg = "There was an error while scheduling the migration. <br />Details: " + error.json().detail; 
+                    this.msgs.push({severity: 'error', summary: "Error scheduling migration", detail: errorMsg});
+                    this.resetMigrateForm();
+                }); 
             })
         }        
+    }
+
+    resetMigrateForm(){
+        this.createMigrateShow = false;
+        this.createMigrationForm.reset(
+            {
+            'name':'',
+            "deleteSrcObject":false,
+            "excuteTime":new Date(),
+            "excute":true
+            }
+        );
     }
 
     onRowExpand(evt) {
