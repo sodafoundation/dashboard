@@ -1,7 +1,6 @@
-import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
-import { ReactiveFormsModule, FormsModule } from '@angular/forms';
+import { NgModule, APP_INITIALIZER } from '@angular/core';
+import { RouterModule, Routes } from '@angular/router';
+import { SharedModule } from '../../../shared/shared.module';
 
 import { RegisterStorageComponent } from './register-storage.component';
 
@@ -9,8 +8,6 @@ import { HttpService } from './../../../shared/api';
 import { ProfileService } from './../../profile/profile.service';
 import { AvailabilityZonesService } from './../../resource/resource.service';
 import { DelfinService } from '../delfin.service';
-import { InputTextModule, InputSwitchModule, CheckboxModule, ButtonModule, DropdownModule, MultiSelectModule, DialogModule, Message, GrowlModule, SpinnerModule, FormModule } from './../../../components/common/api';
-import { FieldsetModule } from '../../../components/fieldset/fieldset';
 
 let routers = [{
   path: '',
@@ -20,20 +17,7 @@ let routers = [{
 @NgModule({
   imports: [
     RouterModule.forChild(routers),
-    ReactiveFormsModule,
-    FormsModule,
-    FieldsetModule,
-    CommonModule,
-    InputTextModule,
-    InputSwitchModule,
-    CheckboxModule,
-    ButtonModule,
-    DropdownModule,
-    MultiSelectModule,
-    DialogModule,
-    GrowlModule,
-    SpinnerModule,
-    FormModule
+    SharedModule
   ],
   declarations: [ RegisterStorageComponent ],
   providers: [

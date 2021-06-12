@@ -1,9 +1,50 @@
 import { NgModule, ModuleWithProviders, APP_INITIALIZER, Injector } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { CommonModule } from '@angular/common';
 import { ExceptionService, MsgBoxService, I18NService, HttpService, ParamStorService } from './api';
 import { SharedConfig } from './shared.config';
-import { I18N, MsgBoxModule } from '../components/common/api';
+import { 
+    ButtonModule, 
+    DataTableModule, 
+    PanelModule, 
+    OverlayPanelModule,  
+    ChartModule, 
+    CardModule, 
+    TabViewModule, 
+    InputTextModule, 
+    InputSwitchModule, 
+    DropMenuModule, 
+    DialogModule, 
+    FormModule,
+    MultiSelectModule, 
+    GrowlModule ,
+    DropdownModule,
+    InputTextareaModule, 
+    I18N, 
+    MsgBoxModule,
+    ConfirmDialogModule,
+    CheckboxModule, 
+    SplitButtonModule, 
+    SpinnerModule,
+    MessageModule,
+    ConfirmationService,
+    RadioButtonModule,
+    SelectButtonModule,
+    BreadcrumbModule,
+    HomeDialogModule,
+} from '../components/common/api';
+import { TooltipModule } from '../components/tooltip/tooltip';
+import { SidebarModule } from '../components/sidebar/sidebar';
+import { ScrollPanelModule } from '../components/scrollpanel/scrollpanel';
+import { DataScrollerModule } from '../components/datascroller/datascroller';
+import { TreeModule } from '../components/tree/tree';
+import { ProgressBarModule } from '../components/progressbar/progressbar';
+import { ContextMenuModule } from '../components/contextmenu/contextmenu';
+import { TableModule } from '../components/table/table';
+import { DataViewModule } from '../components/dataview/dataview';
+import { FieldsetModule } from '../components/fieldset/fieldset'
 import { XHRBackend, RequestOptions, Http } from '@angular/http';
+import { ClipboardModule } from 'ngx-clipboard';
 
 export function httpFactory(backend: XHRBackend, options: RequestOptions, injector: Injector){
     options.headers.set("contentType", "application/json; charset=UTF-8");
@@ -17,7 +58,48 @@ export function httpFactory(backend: XHRBackend, options: RequestOptions, inject
 
 @NgModule({
     imports:[MsgBoxModule],
-    exports:[FormsModule, MsgBoxModule]
+    exports:[
+        CommonModule,
+        FormsModule, 
+        ReactiveFormsModule,
+        MsgBoxModule,
+        ButtonModule, 
+        DataTableModule, 
+        PanelModule, 
+        OverlayPanelModule,  
+        ChartModule, 
+        CardModule, 
+        TabViewModule, 
+        InputTextModule, 
+        InputSwitchModule, 
+        DropMenuModule, 
+        DialogModule, 
+        FormModule,
+        MultiSelectModule, 
+        GrowlModule ,
+        DropdownModule,
+        InputTextareaModule,
+        TooltipModule,
+        TableModule,
+        FieldsetModule,
+        DataViewModule,
+        ScrollPanelModule,
+        DataScrollerModule,
+        TreeModule,
+        ProgressBarModule,
+        ContextMenuModule,
+        ConfirmDialogModule,
+        CheckboxModule, 
+        SplitButtonModule, 
+        SpinnerModule,
+        MessageModule,
+        ClipboardModule,
+        RadioButtonModule,
+        SelectButtonModule,
+        BreadcrumbModule,
+        HomeDialogModule,
+        SidebarModule,
+    ]
 })
 
 export class SharedModule {
@@ -28,6 +110,7 @@ export class SharedModule {
                 MsgBoxService,
                 I18NService,
                 ParamStorService,
+                ConfirmationService,
                 ExceptionService,
                 {
                     provide: Http,
