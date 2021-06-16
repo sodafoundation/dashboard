@@ -32,7 +32,14 @@ import {
     SelectButtonModule,
     BreadcrumbModule,
     HomeDialogModule,
+    CalendarModule,
+    BadgeModule,
+    PasswordModule
 } from '../components/common/api';
+import { AccordionModule } from '../components/accordion/accordion';
+import { DeferModule } from '../components/defer/defer';
+import { InplaceModule } from '../components/inplace/inplace';
+import { ChipsModule } from '../components/chips/chips';
 import { TooltipModule } from '../components/tooltip/tooltip';
 import { SidebarModule } from '../components/sidebar/sidebar';
 import { ScrollPanelModule } from '../components/scrollpanel/scrollpanel';
@@ -99,6 +106,13 @@ export function httpFactory(backend: XHRBackend, options: RequestOptions, inject
         BreadcrumbModule,
         HomeDialogModule,
         SidebarModule,
+        CalendarModule,
+        InplaceModule,
+        ChipsModule,
+        DeferModule,
+        AccordionModule,
+        BadgeModule,
+        PasswordModule
     ]
 })
 

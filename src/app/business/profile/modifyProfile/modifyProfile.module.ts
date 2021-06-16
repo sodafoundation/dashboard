@@ -1,6 +1,6 @@
 import { Component, NgModule, APP_INITIALIZER } from '@angular/core';
-import { modifyProfileComponent } from './modifyProfile.component';
 import { RouterModule } from '@angular/router';
+import { modifyProfileComponent } from './modifyProfile.component';
 import { HttpService } from './../../../shared/api';
 import { ProfileService } from './../profile.service';
 import { PoolService } from './../pool.service';

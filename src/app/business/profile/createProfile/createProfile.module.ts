@@ -1,6 +1,5 @@
 import { Component, NgModule, APP_INITIALIZER } from '@angular/core';
 import { SharedModule } from '../../../shared/shared.module';
-
 import { CreateProfileComponent } from './createProfile.component';
 import { RouterModule } from '@angular/router';
 import { HttpService } from './../../../shared/api';

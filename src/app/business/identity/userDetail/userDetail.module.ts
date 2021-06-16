@@ -1,11 +1,13 @@
 import { NgModule, APP_INITIALIZER } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { SharedModule } from 'app/shared/shared.module';
 import { userDetailComponent } from './userDetail.component';
-import { ButtonModule, DataTableModule, DropMenuModule } from '../../../components/common/api';
+
 
 @NgModule({
   declarations: [ userDetailComponent ],
-  imports: [ CommonModule, ButtonModule, DataTableModule, DropMenuModule ],
+  imports: [ 
+    SharedModule
+  ],
   exports: [ userDetailComponent ],
   providers: []
 })

@@ -1,7 +1,6 @@
 import { NgModule, APP_INITIALIZER } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-
-
+import { SharedModule } from '../../shared/shared.module';
 import { HttpService } from './../../shared/service/Http.service';
 import { DelfinComponent } from './delfin.component';
 import { DelfinService } from './delfin.service';
@@ -11,7 +10,7 @@ import { StoragesComponent } from './storages/storages.component';
 import { StorageVolumesComponent } from './volumes/volumes.component';
 import { StoragePoolsComponent } from './storage-pools/storage-pools.component';
 
-import { SharedModule } from '../../shared/shared.module';
+
 
 
 
