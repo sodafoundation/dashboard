@@ -69,7 +69,7 @@ export class BucketDetailComponent implements OnInit {
   allBackends: any[];
   archivalEnabled: any = {};
   isPasting: boolean = false;
-  servicePlansEnabled: boolean;
+  servicePlansEnabled: any;
   errorMessage = {
     "backend_type": { required: "Type is required." },
     "backend": { required: "Backend is required." },

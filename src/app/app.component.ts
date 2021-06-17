@@ -22,7 +22,7 @@ let _ = require("underscore");
     styleUrls: []
 })
 export class AppComponent implements OnInit, AfterViewInit {
-    servicePlansEnabled: boolean = Consts.STORAGE_SERVICE_PLAN_ENABLED;
+    servicePlansEnabled: any = Consts.STORAGE_SERVICE_PLAN_ENABLED;
     selectFileName: string;
 
     progressValue: number = 0;

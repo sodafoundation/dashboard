@@ -91,7 +91,7 @@ export class BucketsComponent implements OnInit{
     isSSEC: boolean = false;
     msgs: Message[];
     showAKSKWarning: boolean;
-    servicePlansEnabled: boolean;
+    servicePlansEnabled: any;
     isAdmin: boolean;
     isUser: boolean;
     constructor(
