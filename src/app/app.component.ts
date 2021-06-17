@@ -22,6 +22,7 @@ let _ = require("underscore");
     styleUrls: []
 })
 export class AppComponent implements OnInit, AfterViewInit {
+    servicePlansEnabled: boolean = Consts.STORAGE_SERVICE_PLAN_ENABLED;
     selectFileName: string;
 
     progressValue: number = 0;
@@ -65,6 +66,7 @@ export class AppComponent implements OnInit, AfterViewInit {
     userId;
     SignatureKey = {};
     akSkRouterLink = "/akSkManagement";
+    servicePlanRouterLink = "/servicePlanManagement";
     Signature = "";
     kDate = "";
     stringToSign = "";
@@ -269,6 +271,7 @@ export class AppComponent implements OnInit, AfterViewInit {
         private readonly joyrideService: JoyrideService
     ) { 
         window['akskWarning'] = false;
+        window['servicePlansEnabled'] = Consts.STORAGE_SERVICE_PLAN_ENABLED;
     }
 
     // Wave params
@@ -768,6 +771,9 @@ export class AppComponent implements OnInit, AfterViewInit {
             if(headers && headers['X-Amz-Storage-Class']){
                 requestOptions.headers['X-Amz-Storage-Class'] = headers['X-Amz-Storage-Class'];
             }
+            if(headers && headers['tier']){
+                requestOptions.headers['tier'] = headers['tier'];
+            }
             
             if(headers && headers['X-Amz-Content-Sha256'] == 'UNSIGNED-PAYLOAD'){
                 requestOptions.headers['X-Amz-Content-Sha256'] = 'UNSIGNED-PAYLOAD';
@@ -900,6 +906,8 @@ export class AppComponent implements OnInit, AfterViewInit {
 
             this.http.post("/v3/auth/tokens", req).subscribe((r) => {
                 this.paramStor.AUTH_TOKEN(r.headers.get('x-subject-token'));
+            }, (error)=>{
+                console.log("Something went wrong. Could not fetch token.", error);
             });
         },
             error => {
@@ -1029,6 +1037,11 @@ export class AppComponent implements OnInit, AfterViewInit {
             }
 
             this.http.post("/v3/auth/tokens", req).subscribe((r) => {
+                let scopedToken = r.json().token
+                let roles = scopedToken['roles'];
+                window['isAdmin'] = (_.where(roles, {'name': "admin"})).length > 0;
+                window['isUser'] = (_.where(roles, {'name': "Member"})).length > 0;
+
                 this.paramStor.AUTH_TOKEN(r.headers.get('x-subject-token'));
                 this.paramStor.CURRENT_TENANT(project.name + "|" + project.id);
                 this.paramStor.CURRENT_USER(user.name + "|" + user.id);
@@ -1036,7 +1049,7 @@ export class AppComponent implements OnInit, AfterViewInit {
                 this.username = this.paramStor.CURRENT_USER().split("|")[0];
                 this.currentTenant = this.paramStor.CURRENT_TENANT().split("|")[0];
 
-                if (this.username == "admin") {
+                if (window['isAdmin']) {
                     this.menuItems = this.menuItems_admin;
                     this.tourSteps = this.tourSteps_admin;
                     this.dropMenuItems = [
@@ -1055,6 +1068,15 @@ export class AppComponent implements OnInit, AfterViewInit {
                             command: () => { this.logout() }
                         }
                     ];
+                    if(window['servicePlansEnabled']){
+                        this.dropMenuItems.splice(2, 0, {
+                            label: "Storage Service Plans",
+                            routerLink: this.servicePlanRouterLink,
+                            command: ()=>{
+                                this.isHomePage = false;
+                            }
+                        })
+                    }
                 } else {
                     this.menuItems = this.menuItems_tenant;
                     this.tourSteps = this.tourSteps_tenant;
@@ -1129,7 +1151,7 @@ export class AppComponent implements OnInit, AfterViewInit {
             this.showPrompt = false;
             window['isUpload'] = false;
         }, 500);
-
+        this.router.navigate(['/']);
     }
 
     onKeyDown(e) {

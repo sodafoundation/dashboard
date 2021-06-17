@@ -22,10 +22,11 @@
     <p-dataTable [value]="allBuckets" [globalFilter]="searchByName" [(selection)]="selectedBuckets"  [showHeaderCheckbox]="true" resizableColumns="true" [rows]="10" [paginator]="true" [pageLinks]="3" [rowsPerPageOptions]="[10,20,50,100]">
         <p-column field="name" header="{{I18N.keyID['sds_block_volume_name']}}" >
             <ng-template pTemplate="body" let-bucket="rowData">
-                <a [routerLink]="['/bucketDetail/' + bucket.name, {bucketBackend: bucket.LocationConstraint}]"  title="{{bucket.name}}">{{bucket.name}}</a>
+                <a [routerLink]="['/bucketDetail/' + bucket.name, {bucketLocation: bucket.LocationConstraint}]"  title="{{bucket.name}}">{{bucket.name}}</a>
             </ng-template>
         </p-column>
-        <p-column field="LocationConstraint" header="Default Backend" ></p-column>
+        <p-column *ngIf="servicePlansEnabled" field="LocationConstraint" header="Tier" ></p-column>
+        <p-column *ngIf="!servicePlansEnabled" field="LocationConstraint" header="Default Backend" ></p-column>
         <p-column field="CreationDate" header="Created At">
             <ng-template pTemplate="body" let-obj="rowData" let-i="rowIndex">
                 {{obj.CreationDate ? (obj.CreationDate | date:'long') : '--'}}
@@ -45,141 +46,101 @@
         </p-column>
     </p-dataTable>
     
-    <p-dialog styleClass="create-bucket-dialog"  header="Create Bucket" [(visible)]="createBucketDisplay" [width]="900" modal="modal" [height]="700">
-        <form [grid]="{label: 'ui-g-3', content:'ui-g-20'}" [formGroup]="createBucketForm" [errorMessage]="errorMessage">
-            <form-item label="Name" [required]="true">
-                <input type="text" pInputText formControlName="name" />
-            </form-item>
-            <div style="margin-bottom: 10px;"><span style="font-size: 16px;font-style: normal">Default Backend</span></div>
-            <span style="display:inline-block;color: rgb(136, 147, 166);margin-bottom: 10px;">Objects will be stored by default to the specified backend.</span>
-            <form-item label="type" [required]="true">
-                <p-dropdown [style]="{'min-width':'150px','width':'220px'}" placeholder="Please select" [options]="allTypes" (onChange)="getBackendsByTypeId()" name='selectType' [(ngModel)]='selectType' formControlName="backend_type"></p-dropdown>
-            </form-item>
-            <form-item label="Backend" [required]="true">
-                <p-dropdown [style]="{'min-width':'150px','width':'220px'}" placeholder="Please select" [options]="backendsOption" (onChange)="setRegion()" formControlName="backend"></p-dropdown>
-            </form-item>
-           
-            <form-item label="Enable Encryption?" >
-                <p-inputSwitch formControlName="encryption" onLabel="Yes" offLabel="No" (onChange)="encryptionControl()"></p-inputSwitch>
-            </form-item>
-            <form-item label="Encryption Type">
-                <p-dropdown [style]="{'min-width':'150px','width':'220px'}" placeholder="Please select" [options]="sseTypes" [(disabled)]="!enableEncryption" [(ngModel)]='selectedSse' formControlName="sse"></p-dropdown>
-            </form-item>
-            
-        </form>
-        <p-footer>
-            <button type="submit" class="ui-button-secondary" pButton (click)="creatBucket()"  label="{{I18N.keyID['ok']}}"></button>
-            <button type="button" pButton (click)="createBucketDisplay=false"  label="{{I18N.keyID['cancel']}}"></button>
-        </p-footer>
-    
-    </p-dialog>
-    <p-dialog  header="Configure Lifecycle" [(visible)]="showLife" [width]="800" modal="modal">
-            <div style="border-top:1px solid #ccc;width:100%;padding:8px;">
-                <div class="ui-grid ui-grid-responsive ui-grid-pad ui-fluid">
-                    <div class="ui-grid-row">
-                        <div class="ui-grid-col-3 ">
-                            More than<input type="text" value="30" style="display: inline-block;width:44px;" pInputText  /> Days,
-                        </div>
-                        <div class="ui-grid-col-4">
-                            <p-dropdown [style]="{'width':'100px','display': 'inline-block'}" [options]="lifeOperation"></p-dropdown> &nbsp; to backend
-                        </div>
-                        <div class="ui-grid-col-4">
-                            <p-dropdown [style]="{'width':'150px','display': 'inline-block'}" [options]="allBackends"></p-dropdown> &nbsp;&nbsp;&nbsp;
-                            <img style="vertical-align: middle;" src="assets/business/images/profile/u1065.png">
-                        </div>
-                    </div>
-                </div>
+    <p-sidebar [(visible)]="showRightSidebar" (onHide)="closeSidebar()" position="right" styleClass="details-sidebar-panel ui-sidebar-lg" [autoZIndex]="true" [baseZIndex]="1000">
+        <div *ngIf="createBucketDisplay" class="right-sidebar-content-wrapper">
+            <div class="right-sidebar-header">
+                <h1 style="font-weight:normal">Create Bucket</h1>
             </div>
-            <div style="border-top:1px solid #ccc;width:100%;padding:8px;">
-                <div class="ui-grid ui-grid-responsive ui-grid-pad ui-fluid">
-                    <div class="ui-grid-row">
-                        <div class="ui-grid-col-3 ">
-                            More than<input type="text" value="90" style="display: inline-block;width:44px;" pInputText  /> Days,
-                        </div>
-                        <div class="ui-grid-col-4">
-                            <p-dropdown [style]="{'width':'100px','display': 'inline-block'}" [options]="lifeOperation"></p-dropdown> &nbsp; to backend
-                        </div>
-                        <div class="ui-grid-col-4">
-                            <p-dropdown [style]="{'width':'150px','display': 'inline-block'}" [options]="allBackends"></p-dropdown> &nbsp;&nbsp;&nbsp;
-                            <img style="vertical-align: middle;" src="assets/business/images/profile/u1065.png">
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div style="border-top:1px solid #ccc;border-bottom:1px solid #ccc;width:100%;padding:8px;">
-                <div class="ui-grid ui-grid-responsive ui-grid-pad ui-fluid">
-                    <div class="ui-grid-row">
-                        <div class="ui-grid-col-3 ">
-                            More than<input type="text" value="1" style="display: inline-block;width:44px;" pInputText  /> Year,
-                        </div>
-                        <div class="ui-grid-col-4">
-                            <p-dropdown [style]="{'width':'100px','display': 'inline-block'}" [options]="lifeOperation1"></p-dropdown> 
-                        </div>
-                        <div class="ui-grid-col-4">
-                            <p-dropdown [style]="{'width':'150px','display': 'inline-block','visibility': 'hidden'}" [options]="lifeOperation"></p-dropdown> &nbsp;&nbsp;&nbsp;
-                            <img style="vertical-align: middle;" src="assets/business/images/profile/u1065.png">
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="volume-item" *ngIf="true">
-                <a class="item-flex">
-                    <img width="24" height="24" src="assets/business/images/volume/u937.png" >
-                    <span class="margin-between-img-text">Add Rules</span>
-                </a>
-            </div>
-            <p-footer>
-                <button type="submit" disabled="true" pButton  label="{{I18N.keyID['ok']}}"></button>
-                <button type="button" pButton (click)="showLife=false"  label="{{I18N.keyID['cancel']}}"></button>
-            </p-footer>
-        
-        </p-dialog>
-        <p-dialog header="Migrate" [(visible)]="createMigrateShow" [width]="650" modal="modal">
-            <form [grid]="{label: 'ui-g-3', content:'ui-g-20'}" [formGroup]="migrationForm" [errorMessage]="errorMessage">
-                <div style="margin-bottom: 18px;"><span style="font-size: 16px;font-style: normal">Basic Information</span></div>
-                <form-item label="Plan Name" >
-                    <input type="text" name="name" pInputText style="width: 150px;" formControlName="name" />
-                </form-item>
-                <form-item label="Source Bucket" >
-                    <input type="text" name="" disabled="true" pInputText style="width: 150px;" value="{{selectedBucket.name}}" />
-                </form-item>
-                <form-item label="Destination Bucket" >
-                    <p-dropdown [style]="{'min-width':'220px'}" placeholder="Please select" [options]="availbucketOption" name="destBucket" formControlName="destBucket"  ></p-dropdown>
-                </form-item>
-                <form-item label="Execution Time" >
-                    <p-calendar [disabled]="selectTime" [showTime]="true" name="excutingTime" formControlName="excuteTime" ></p-calendar>
-                    <p-checkbox (onChange)="showcalendar()" name="excuteTime"  value="true" binary="true" label="Immediately" formControlName="excute"></p-checkbox>
-                </form-item>
-                <div *ngIf="false" style="margin-bottom: 10px;"><span style="font-size: 16px;font-style: normal">Rule</span></div>
-                <span *ngIf="false" style="display:inline-block;margin-bottom: 10px;color: rgb(136, 147, 166);">Without rules, all of them are migrated, otherwise only migrate objects with this rule.</span>
-                <textarea *ngIf="false" [rows]="2" [cols]="78" pInputTextarea name="rule" formControlName="rule"></textarea>
-                <div *ngIf="false" style="margin:10px 0">
-                    <p-checkbox (onChange)="showDetail()" name="analysis"  formControlName="anaShow" value="true" label="Config Data analysis"></p-checkbox>
-                </div>
-                <form *ngIf="false" [grid]="{label: 'ui-g-3', content:'ui-g-20'}" [formGroup]="analysisForm"  >
-                    <form-item label="Analysis Cluster" >
-                        <input type="text" name="analysisCluster" pInputText formControlName="analysisCluster"  />
+            <div class="right-sidebar-body">
+                <form [grid]="{label: 'ui-g-3', content:'ui-g-20'}" [formGroup]="createBucketForm" [errorMessage]="errorMessage">
+                    <form-item label="Name" [required]="true">
+                        <input type="text" pInputText formControlName="name" />
                     </form-item>
-                    <form-item label="AK" [style]="{'display':'inline-block'}" >
-                        <input type="text" name="ak" pInputText formControlName="ak"  />
+                    <div *ngIf="!servicePlansEnabled" style="margin-bottom: 10px;"><span style="font-size: 16px;font-style: normal">Default Backend</span></div>
+                    <span *ngIf="!servicePlansEnabled" style="display:inline-block;color: rgb(136, 147, 166);margin-bottom: 10px;">Objects will be stored by default to the specified backend.</span>
+                    <form-item *ngIf="!servicePlansEnabled" label="type" [required]="true">
+                        <p-dropdown *ngIf="!servicePlansEnabled" [style]="{'min-width':'150px','width':'220px'}" placeholder="Please select" [options]="allTypes" (onChange)="getBackendsByTypeId()" name='selectType' [(ngModel)]='selectType' formControlName="backend_type"></p-dropdown>
                     </form-item>
-                    <form-item label="SK" [style]="{'display':'inline-block'}">
-                        <input type="text" name="sk" pInputText formControlName="sk"  />
+                    <form-item *ngIf="!servicePlansEnabled" label="Backend" [required]="true">
+                        <p-dropdown *ngIf="!servicePlansEnabled" [style]="{'min-width':'150px','width':'220px'}" placeholder="Please select" [options]="backendsOption" (onChange)="setRegion()" formControlName="backend"></p-dropdown>
                     </form-item>
-                    <form-item label="Analysis Engine" [style]="{'display':'inline-block'}">
-                        <p-dropdown [style]="{'min-width':'220px'}" [options]="engineOption" placeholder="Please select" formControlName="jar" name="jar" ></p-dropdown>
+                    <form-item *ngIf="servicePlansEnabled" label="Tier" [required]="true">
+                        <p-dropdown *ngIf="servicePlansEnabled" [style]="{'min-width':'150px','width':'220px'}" placeholder="Please select" [disabled]="tierOptions && tierOptions<1" [options]="tierOptions"  name='selectTier' [(ngModel)]='selectTier' formControlName="tier"></p-dropdown>
+                        <a class="add-plan-link" *ngIf="isAdmin && (tierOptions && tierOptions<1)" [routerLink]="'/servicePlanManagement'">Add Service Plans</a>
                     </form-item>
-                    <div style="margin-bottom: 10px;"><span style="font-size: 16px;font-style: normal">Analysis Param</span></div>
-                    <textarea [rows]="2" [cols]="78" pInputTextarea name="anaParam" formControlName="anaparam"></textarea>
+                    <form-item label="Enable Encryption?" >
+                        <p-inputSwitch formControlName="encryption" onLabel="Yes" offLabel="No" (onChange)="encryptionControl()"></p-inputSwitch>
+                    </form-item>
+                    <form-item label="Encryption Type">
+                        <p-dropdown [style]="{'min-width':'150px','width':'220px'}" placeholder="Please select" [options]="sseTypes" [(disabled)]="!enableEncryption" [(ngModel)]='selectedSse' formControlName="sse"></p-dropdown>
+                    </form-item>
+                    
                 </form>
-                <div style="margin-top:10px;">
-                    <p-checkbox binary="true" name="deleteSrcObject"  value="true" formControlName="deleteSrcObject"  label="Delete the source objects after the migration is completed."></p-checkbox>
+            </div>
+            <div class="right-sidebar-footer">
+                <div style="margin-top:100px;">
+                    <button type="submit" class="ui-button-secondary" pButton (click)="creatBucket()"  label="{{I18N.keyID['ok']}}"></button>
+                    <button type="button" pButton (click)="closeSidebar()"  label="{{I18N.keyID['cancel']}}"></button>
                 </div>
-            </form>
-            <p-footer>
-                <button type="button" [disabled]="migrationForm.invalid" class="ui-button-secondary" pButton (click)="createMigration()" label="{{I18N.keyID['ok']}}" ></button>
-                <button type="button" pButton (click)="resetMigrateForm()" label="{{I18N.keyID['cancel']}}"></button>
-            </p-footer>
-        </p-dialog>
+            </div>
+        </div>
+    
+        <div *ngIf="createMigrateShow"  class="right-sidebar-content-wrapper">
+            <div class="right-sidebar-header">
+                <h1 style="font-weight:normal">Create Migration Plan</h1>
+            </div>
+            <div class="right-sidebar-body">
+                <form [grid]="{label: 'ui-g-3', content:'ui-g-20'}" [formGroup]="migrationForm" [errorMessage]="errorMessage">
+                    <div style="margin-bottom: 18px;"><span style="font-size: 16px;font-style: normal">Basic Information</span></div>
+                    <form-item label="Plan Name" >
+                        <input type="text" name="name" pInputText style="width: 150px;" formControlName="name" />
+                    </form-item>
+                    <form-item label="Source Bucket" >
+                        <input type="text" name="" disabled="true" pInputText style="width: 150px;" value="{{selectedBucket.name}}" />
+                    </form-item>
+                    <form-item label="Destination Bucket" >
+                        <p-dropdown [style]="{'min-width':'220px'}" placeholder="Please select" [options]="availbucketOption" name="destBucket" formControlName="destBucket"  ></p-dropdown>
+                    </form-item>
+                    <form-item label="Execution Time" >
+                        <p-calendar [disabled]="selectTime" [showTime]="true" name="excutingTime" formControlName="excuteTime" ></p-calendar>
+                        <p-checkbox (onChange)="showcalendar()" name="excuteTime"  value="true" binary="true" label="Immediately" formControlName="excute"></p-checkbox>
+                    </form-item>
+                    <div *ngIf="false" style="margin-bottom: 10px;"><span style="font-size: 16px;font-style: normal">Rule</span></div>
+                    <span *ngIf="false" style="display:inline-block;margin-bottom: 10px;color: rgb(136, 147, 166);">Without rules, all of them are migrated, otherwise only migrate objects with this rule.</span>
+                    <textarea *ngIf="false" [rows]="2" [cols]="78" pInputTextarea name="rule" formControlName="rule"></textarea>
+                    <div *ngIf="false" style="margin:10px 0">
+                        <p-checkbox (onChange)="showDetail()" name="analysis"  formControlName="anaShow" value="true" label="Config Data analysis"></p-checkbox>
+                    </div>
+                    <form *ngIf="false" [grid]="{label: 'ui-g-3', content:'ui-g-20'}" [formGroup]="analysisForm"  >
+                        <form-item label="Analysis Cluster" >
+                            <input type="text" name="analysisCluster" pInputText formControlName="analysisCluster"  />
+                        </form-item>
+                        <form-item label="AK" [style]="{'display':'inline-block'}" >
+                            <input type="text" name="ak" pInputText formControlName="ak"  />
+                        </form-item>
+                        <form-item label="SK" [style]="{'display':'inline-block'}">
+                            <input type="text" name="sk" pInputText formControlName="sk"  />
+                        </form-item>
+                        <form-item label="Analysis Engine" [style]="{'display':'inline-block'}">
+                            <p-dropdown [style]="{'min-width':'220px'}" [options]="engineOption" placeholder="Please select" formControlName="jar" name="jar" ></p-dropdown>
+                        </form-item>
+                        <div style="margin-bottom: 10px;"><span style="font-size: 16px;font-style: normal">Analysis Param</span></div>
+                        <textarea [rows]="2" [cols]="78" pInputTextarea name="anaParam" formControlName="anaparam"></textarea>
+                    </form>
+                    <div style="margin-top:10px;">
+                        <p-checkbox binary="true" name="deleteSrcObject"  value="true" formControlName="deleteSrcObject"  label="Delete the source objects after the migration is completed."></p-checkbox>
+                    </div>
+                </form>
+            </div>
+            <div class="right-sidebar-footer">
+                <div style="margin-top:100px;">
+                    <button type="button" [disabled]="migrationForm.invalid" class="ui-button-secondary" pButton (click)="createMigration()" label="{{I18N.keyID['ok']}}" ></button>
+                <button type="button" pButton (click)="closeSidebar()" label="{{I18N.keyID['cancel']}}"></button>
+                </div>
+            </div>
+        </div>
+        
+    </p-sidebar>
+
     <p-confirmDialog></p-confirmDialog>
 </div>

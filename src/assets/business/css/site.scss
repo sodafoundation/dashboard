@@ -1934,8 +1934,33 @@ a {
     background-color: #2C3F61;
     width: 70em;
 }
+.host-sidebar-panel.ui-sidebar-lg{
+    width: 70em;
+}
 .home-sidebar-panel.ui-sidebar-lg{
     background-color: #2C3F61;
+}
+.details-sidebar-panel.ui-sidebar-lg{
+    background-color: #2C3F61;
+    width: 70em;
+    .ui-tabview{
+        background: none;
+        margin-top: 30px;
+    }
+    .ui-tabview.ui-tabview-top > .ui-tabview-nav > li.ui-state-active a{
+        color: #ccc;
+    }
+    .ui-tabview.ui-tabview-top > .ui-tabview-nav > li:not(.ui-state-active):not(.ui-state-disabled):hover a {
+        color: #fff;
+    }
+    a.add-plan-link{
+        color: #fff;
+        padding-left: 20px;
+        text-decoration: underline;
+    }
+    .show-selected-backends{
+        color: #fff;
+    }
 }
 .right-sidebar-content-wrapper{
     margin: 2em;
@@ -1964,6 +1989,11 @@ a {
         font-weight: 700;
         color: #ccc !important;
     }
+}
+.show-selected-backends{
+    margin-top: 10px;
+    font-size: 14px;
+    max-width: 300px;
 }
 /* custom breadcrumb end */
 .uploading-title, .downloading-title{
