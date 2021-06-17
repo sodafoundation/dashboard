@@ -4,5 +4,5 @@
     "prometheusPort": "${SODA_PROMETHEUS_PORT}",
     "alertmanagerPort": "${SODA_ALERTMANAGER_PORT}",
     "grafanaPort":"${SODA_GRAFANA_PORT}",
-    "servicePlansEnabled" : ""
+    "servicePlansEnabled" : false
 }
