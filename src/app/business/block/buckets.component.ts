@@ -121,7 +121,7 @@ export class BucketsComponent implements OnInit{
             "backend_type": { required: "Type is required." },
             "backend":{ required: "Backend is required." },
             "destBucket":{ required: "Destination Bucket is required." },
-            "tier" : { required: "Tier is required." }
+            "tier" : { required: "Service Plan is required." }
         };
         this.validRule = {
             'validName' : '^[a-z0-9][a-z0-9\.\-]{1,61}[a-z0-9]$'
@@ -196,14 +196,26 @@ export class BucketsComponent implements OnInit{
         this.selectedBucket = bucket;
         this.migrationForm.controls['name'].setValidators([Validators.required,Utils.isExisted(this.allMigrationsName)]);
         this.selectTime = true;
-        this.bucketOption.forEach((value,index)=>{
-            if(Consts.BUCKET_BACKND.get(value.label) !== Consts.BUCKET_BACKND.get(bucket.name)){
-                this.availbucketOption.push({
-                    label:value.label,
-                    value:value.value
-                });
-            }
-        });
+        if(!this.servicePlansEnabled){
+            this.bucketOption.forEach((value,index)=>{
+                if(Consts.BUCKET_BACKND.get(value.label) !== Consts.BUCKET_BACKND.get(bucket.name)){
+                    this.availbucketOption.push({
+                        label:value.label,
+                        value:value.value
+                    });
+                }
+            });
+        } else{
+            this.bucketOption.forEach((value,index)=>{
+                if(bucket.name != value.label){
+                    this.availbucketOption.push({
+                        label:value.label,
+                        value:value.value
+                    });
+                }
+            });
+        }
+        
     }
     getBuckets() {
         this.allBuckets = [];
@@ -359,11 +371,12 @@ export class BucketsComponent implements OnInit{
                 this.http.post(`v1/{project_id}/plans/${planId}/run`,{}).subscribe((res)=>{});
                 this.msgs.push({severity: 'success', summary: 'Migration initiated successfully', detail: 'Please check the dataflow section for migration progress.'});
                 this.resetMigrateForm();
-                
+                this.showRightSidebar = false;
             },(error)=>{
                 let errorMsg = "There was an error while initiating the migration. <br />Details: " + error.json().detail; 
                 this.msgs.push({severity: 'error', summary: "Error initiating migration", detail: errorMsg});
                 this.resetMigrateForm();
+                this.showRightSidebar = false;
             });
         }else{
             let date = new Date(this.migrationForm.value.excuteTime);

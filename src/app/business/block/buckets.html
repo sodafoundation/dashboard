@@ -25,7 +25,7 @@
                 <a [routerLink]="['/bucketDetail/' + bucket.name, {bucketLocation: bucket.LocationConstraint}]"  title="{{bucket.name}}">{{bucket.name}}</a>
             </ng-template>
         </p-column>
-        <p-column *ngIf="servicePlansEnabled" field="LocationConstraint" header="Tier" ></p-column>
+        <p-column *ngIf="servicePlansEnabled" field="LocationConstraint" header="Service Plan" ></p-column>
         <p-column *ngIf="!servicePlansEnabled" field="LocationConstraint" header="Default Backend" ></p-column>
         <p-column field="CreationDate" header="Created At">
             <ng-template pTemplate="body" let-obj="rowData" let-i="rowIndex">
@@ -64,7 +64,7 @@
                     <form-item *ngIf="!servicePlansEnabled" label="Backend" [required]="true">
                         <p-dropdown *ngIf="!servicePlansEnabled" [style]="{'min-width':'150px','width':'220px'}" placeholder="Please select" [options]="backendsOption" (onChange)="setRegion()" formControlName="backend"></p-dropdown>
                     </form-item>
-                    <form-item *ngIf="servicePlansEnabled" label="Tier" [required]="true">
+                    <form-item *ngIf="servicePlansEnabled" label="Service Plan" [required]="true">
                         <p-dropdown *ngIf="servicePlansEnabled" [style]="{'min-width':'150px','width':'220px'}" placeholder="Please select" [disabled]="tierOptions && tierOptions<1" [options]="tierOptions"  name='selectTier' [(ngModel)]='selectTier' formControlName="tier"></p-dropdown>
                         <a class="add-plan-link" *ngIf="isAdmin && (tierOptions && tierOptions<1)" [routerLink]="'/servicePlanManagement'">Add Service Plans</a>
                     </form-item>
@@ -135,7 +135,7 @@
             <div class="right-sidebar-footer">
                 <div style="margin-top:100px;">
                     <button type="button" [disabled]="migrationForm.invalid" class="ui-button-secondary" pButton (click)="createMigration()" label="{{I18N.keyID['ok']}}" ></button>
-                <button type="button" pButton (click)="closeSidebar()" label="{{I18N.keyID['cancel']}}"></button>
+                    <button type="button" pButton (click)="closeSidebar()" label="{{I18N.keyID['cancel']}}"></button>
                 </div>
             </div>
         </div>
