@@ -504,8 +504,6 @@ export class BucketDetailComponent implements OnInit {
 
   //Show Restore Form
   showRestoreObject(file){
-    this.restoreDisplay = true;
-    this.restoreFormCreate(this.bucketBackendType);
     this.selectFileName = file.Key;
     if(!this.servicePlansEnabled){
       this.restoreDisplay = true;
