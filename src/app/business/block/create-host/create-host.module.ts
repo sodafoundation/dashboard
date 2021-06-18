@@ -1,16 +1,13 @@
-import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { NgModule, APP_INITIALIZER } from '@angular/core';
 import { RouterModule } from '@angular/router';
-import { ReactiveFormsModule, FormsModule } from '@angular/forms';
-
+import { SharedModule } from 'app/shared/shared.module';
 import { CreateHostComponent } from './create-host.component';
-
 import { HttpService } from './../../../shared/api';
 import { VolumeService,ReplicationService } from './../volume.service';
 import { ProfileService } from './../../profile/profile.service';
 import { AvailabilityZonesService } from './../../resource/resource.service';
 import { HostsService } from '../hosts.service';
-import { InputTextModule, CheckboxModule, ButtonModule, DropdownModule, MultiSelectModule, DialogModule, Message, GrowlModule, SpinnerModule, FormModule } from './../../../components/common/api';
+
 
 let routers = [{
   path: '',
@@ -20,18 +17,7 @@ let routers = [{
 @NgModule({
   imports: [
     RouterModule.forChild(routers),
-    ReactiveFormsModule,
-    FormsModule,
-    CommonModule,
-    InputTextModule,
-    CheckboxModule,
-    ButtonModule,
-    DropdownModule,
-    MultiSelectModule,
-    DialogModule,
-    GrowlModule,
-    SpinnerModule,
-    FormModule
+    SharedModule
   ],
   declarations: [
     CreateHostComponent

@@ -1,11 +1,7 @@
-import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule, FormsModule } from '@angular/forms';
+import { NgModule, APP_INITIALIZER } from '@angular/core';
 import { RouterModule } from '@angular/router';
+import { SharedModule } from 'app/shared/shared.module';
 import { VolumeDetailComponent } from './volume-detail.component';
-import { DeferModule } from '../../../components/defer/defer';
-import { TabViewModule,ButtonModule, DataTableModule,DropdownModule, DropMenuModule, DialogModule, FormModule, GrowlModule, InputTextModule, InputTextareaModule, ConfirmDialogModule ,ConfirmationService,CheckboxModule} from './../../../components/common/api';
-import { TooltipModule } from '../../../components/tooltip/tooltip';
 import { HttpService } from './../../../shared/service/Http.service';
 import { VolumeService,SnapshotService ,ReplicationService} from './../volume.service';
 import { SnapshotListComponent } from './snapshot-list/snapshot-list.component';
@@ -22,24 +18,8 @@ let routers = [{
 
 @NgModule({
   imports: [
-    CommonModule,
-    ReactiveFormsModule,
-    FormsModule,
-    InputTextModule,
-    InputTextareaModule,
     RouterModule.forChild(routers),
-    TabViewModule,
-    ButtonModule,
-    DataTableModule,
-    DialogModule,
-    FormModule,
-    GrowlModule,
-    ConfirmDialogModule,
-    DropdownModule,
-    CheckboxModule,
-    TooltipModule,
-    DropMenuModule,
-    DeferModule
+    SharedModule
   ],
   declarations: [
     VolumeDetailComponent,
@@ -51,7 +31,6 @@ let routers = [{
     HttpService,
     VolumeService,
     SnapshotService,
-    ConfirmationService,
     ProfileService,
     ReplicationService,
     HostsService,

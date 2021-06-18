@@ -1,9 +1,7 @@
 import { NgModule, APP_INITIALIZER } from '@angular/core';
 import { RouterModule } from '@angular/router';
-import { CommonModule } from '@angular/common';
+import { SharedModule } from 'app/shared/shared.module';
 import { HelpComponent } from './help.component';
-import { TabViewModule, ButtonModule, DataTableModule, InputTextModule, CardModule, BreadcrumbModule } from './../../components/common/api';
-import {AccordionModule} from '../../components/accordion/accordion';
 import { HttpService } from './../../shared/service/Http.service';
 import { HelpHomeComponent } from './home/home-section.component';
 import { HelpResourceComponent } from './resource/resource-section.component';
@@ -38,14 +36,7 @@ let routers = [
   ],
   imports: [
     RouterModule.forChild(routers),
-    CommonModule,
-    TabViewModule,
-    ButtonModule,
-    DataTableModule,
-    InputTextModule,
-    AccordionModule,
-    CardModule,
-    BreadcrumbModule
+    SharedModule
   ],
   providers: [HttpService,]
 })
