@@ -1,13 +1,7 @@
 import { NgModule, APP_INITIALIZER } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule, FormsModule } from '@angular/forms';
-
-import { CreateFileShareComponent } from './create-file-share.component';
-
 import { RouterModule } from '@angular/router';
-import {DataTableModule, DropMenuModule, DialogModule, FormModule, InputTextModule, InputTextareaModule, 
-  DropdownModule ,ConfirmationService,ConfirmDialogModule,CalendarModule,CheckboxModule, InputSwitchModule, 
-  TableModule,TabViewModule, ButtonModule, SpinnerModule } from '../../../components/common/api';
+import { SharedModule } from 'app/shared/shared.module';
+import { CreateFileShareComponent } from './create-file-share.component';
 import { HttpService } from '../../../shared/service/Http.service';
 import { AvailabilityZonesService } from './../../resource/resource.service';
 import { ProfileService } from './../../profile/profile.service';
@@ -24,31 +18,11 @@ let routers = [{
   ],
   imports: [
     RouterModule.forChild(routers),
-    TabViewModule,
-    ButtonModule,
-    CommonModule,
-    ReactiveFormsModule,
-    FormsModule,
-    ButtonModule,
-    InputTextModule,
-    InputTextareaModule,
-    DataTableModule,
-    DropdownModule,
-    DropMenuModule,
-    DialogModule,
-    FormModule,
-    ConfirmDialogModule,
-    RouterModule,
-    CalendarModule,
-    CheckboxModule,
-    InputSwitchModule,
-    TableModule,
-    SpinnerModule
+    SharedModule
   ],
   exports: [ CreateFileShareComponent ],
   providers: [
     HttpService,
-    ConfirmationService,
     AvailabilityZonesService,
     ProfileService,
     FileShareService

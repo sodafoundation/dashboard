@@ -1,8 +1,7 @@
 import { NgModule, APP_INITIALIZER } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { ResourceComponent } from './resource.component';
 import { RouterModule } from '@angular/router';
-import { TabViewModule, ButtonModule, DataTableModule, InputTextModule } from './../../components/common/api';
+import { SharedModule } from 'app/shared/shared.module';
 import { HttpService } from './../../shared/service/Http.service';
 import { AvailabilityZonesService } from './resource.service';
 
@@ -17,11 +16,7 @@ let routers = [{
   ],
   imports: [
     RouterModule.forChild(routers),
-    CommonModule,
-    TabViewModule,
-    ButtonModule,
-    DataTableModule,
-    InputTextModule,
+    SharedModule
   ],
   providers: [HttpService,AvailabilityZonesService]
 })

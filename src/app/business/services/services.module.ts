@@ -1,17 +1,7 @@
 import { NgModule, APP_INITIALIZER } from '@angular/core';
-import { CommonModule } from "@angular/common";
+import { SharedModule } from 'app/shared/shared.module';
 import { ServicesComponent } from './services.component';
 import { ServicesRoutingModule } from './services-routing.module';
-import { ReactiveFormsModule, FormsModule } from '@angular/forms';
-import { TabViewModule, ButtonModule, SplitButtonModule, 
-  ConfirmDialogModule , DialogModule, PanelModule, MessageModule,
-  DataTableModule, OverlayPanelModule, InputTextModule,
-  InputTextareaModule, CheckboxModule, FormModule,
-  DropdownModule, RadioButtonModule,
-  SelectButtonModule, ConfirmationService, SpinnerModule} from '../../components/common/api';
-import {CardModule} from '../../components/card/card';
-import {GrowlModule} from '../../components/growl/growl';
-import {TooltipModule} from '../../components/tooltip/tooltip';
 import { RouterModule } from '@angular/router';
 import { InstanceListComponent } from './instance-list/instance-list.component';
 import { ServicesListComponent } from './services-list/services-list.component';
@@ -32,32 +22,12 @@ import { DynamicFormComponent } from './dynamic-form/dynamic-form.component';
     DynamicFormComponent,
     CreateClusterComponent
   ],
-  imports: [CommonModule,
-    ReactiveFormsModule,
-    FormsModule,
-    InputTextModule,
-    InputTextareaModule,
-    CheckboxModule,
-    FormModule,
-    DropdownModule,
-    RadioButtonModule,
-    SelectButtonModule,
+  imports: [
+    SharedModule,
     ServicesRoutingModule,
-    TabViewModule,
-    ButtonModule,
-    SplitButtonModule,
-    ConfirmDialogModule,
-    DialogModule,
-    CardModule,
-    GrowlModule,
-    PanelModule,
-    MessageModule,
-    TooltipModule,
-    DataTableModule,
-    OverlayPanelModule,
     HttpClientModule,
-    SpinnerModule],
+  ],
   exports: [ServicesRoutingModule],
-  providers: [WorkflowService, ProfileService, HostsService, ConfirmationService]
+  providers: [WorkflowService, ProfileService, HostsService]
 })
 export class ServicesModule { }
