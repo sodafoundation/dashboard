@@ -8,7 +8,8 @@ import { MenuItem ,ConfirmationService,ConfirmDialogModule, Message} from '../..
 import { Router } from '@angular/router';
 import { Headers } from '@angular/http';
 import { BucketService} from '../block/buckets.service';
-import _ = require('underscore');
+
+let _ = require("underscore");
 
 declare let X2JS:any;
 @Component({
