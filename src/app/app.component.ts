@@ -95,7 +95,30 @@ export class AppComponent implements OnInit, AfterViewInit {
             "description": "Volumes / Buckets / File Share / Hosts",
             "routerLink": "/block",
             "joyrideStep" : "menuResource",
-            "text" : "View and manage Buckets, Volumes, Volume Groups, File shares and Hosts that have been manually created or applied for through service templates."
+            "text" : "View and manage Buckets, Volumes, Volume Groups, File shares and Hosts that have been manually created or applied for through service templates.",
+            "group" : true,
+            "children" : [
+                {
+                    "title" : "Buckets",
+                    "routerLink": "/block"
+                },
+                {
+                    "title" : "Volumes",
+                    "routerLink": "/block/fromVolume"
+                },
+                {
+                    "title" : "Volume Group",
+                    "routerLink": "/block/fromGroup"
+                },
+                {
+                    "title" : "File Share",
+                    "routerLink": "/block/fromFileShare"
+                },
+                {
+                    "title" : "Hosts",
+                    "routerLink": "/block/fromHosts"
+                },
+            ]
         },
         {
             "title": "Dataflow",
@@ -657,8 +680,15 @@ export class AppComponent implements OnInit, AfterViewInit {
                 let response = res.json();
                 if(!response.credentials.length){
                     window['akskWarning']=true;
-                    
+                } 
+                // Check if the user has generated AK/Sk and stored in credentials. 
+                
+                if(response.credentials.length && !(_.where(response.credentials, {'user_id':window['userId']})).length){
+                    window['akskWarning']=true;
                 }
+
+                //Display a warning if AK/SK is not generated and user tries to access bucket management or migration.
+
                 if(window['akskWarning'] && (this.router.url == '/block' || this.router.url == '/dataflow')){
                     let msg = "SODA Dashboard requires AK/SK authentication for all multi-cloud operations. The current system does not have an AK/SK. Click below to go to AK/SK management and add one."
                     let header = "AK/SK Not Found!";
@@ -765,12 +795,15 @@ export class AppComponent implements OnInit, AfterViewInit {
             if(headers && headers['X-Amz-Metadata-Directive']){
                 requestOptions.headers['X-Amz-Metadata-Directive'] = headers['X-Amz-Metadata-Directive'];
             }
+            //Header used for copy/paste object
             if(headers && headers['x-amz-copy-source']){
                 requestOptions.headers['x-amz-copy-source'] = headers['x-amz-copy-source'];
             }
+            // Header needed for archive
             if(headers && headers['X-Amz-Storage-Class']){
                 requestOptions.headers['X-Amz-Storage-Class'] = headers['X-Amz-Storage-Class'];
-            }
+            }            
+            // Header used to specify Service plans in create bucket.
             if(headers && headers['tier']){
                 requestOptions.headers['tier'] = headers['tier'];
             }
@@ -971,8 +1004,9 @@ export class AppComponent implements OnInit, AfterViewInit {
             this.AuthWithTokenScoped(user);
             this.showErrorMsg = false;
         },
-            error => {
-                switch (error.status) {
+            (error) => {
+                console.log("Error logging in", error.json());
+                switch (Number(error.json().error.code)) {
                     case 401:
                         this.errorMsg = this.I18N.keyID['sds_login_error_msg_401'];
                         break;
@@ -1123,9 +1157,21 @@ export class AppComponent implements OnInit, AfterViewInit {
                 }, refreshTime);
             })
         },
-            error => {
-                this.logout();
-            })
+        (error) => {
+            console.log("Error logging in scoped token", error);
+            switch (Number(error.json().error.code)) {
+                case 401:
+                    this.errorMsg = this.I18N.keyID['sds_login_error_msg_401'];
+                    break;
+                case 503:
+                    this.errorMsg = this.I18N.keyID['sds_login_error_msg_503'];
+                    break;
+                default:
+                    this.errorMsg = this.I18N.keyID['sds_login_error_msg_default'];
+            }
+            this.showErrorMsg = true;
+            this.logout();
+        })
     }
 
     logout() {
