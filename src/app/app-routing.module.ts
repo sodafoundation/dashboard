@@ -48,7 +48,8 @@ const routes: Routes = [
     {path: 'performance-monitor', loadChildren: './business/delfin/performance-monitor/performance-monitor.module#PerformanceMonitorModule'},
     {path: 'registerStorage', loadChildren: './business/delfin/register-storage/register-storage.module#RegisterStorageModule'},
     {path: 'storageDetails/:storageId', loadChildren: './business/delfin/storage-details/storage-details.module#StorageDetailsModule'},
-    {path: 'modifyStorage/:storageId', loadChildren: './business/delfin/modify-storage/modify-storage.module#ModifyStorageModule'}
+    {path: 'modifyStorage/:storageId', loadChildren: './business/delfin/modify-storage/modify-storage.module#ModifyStorageModule'},
+    {path: 'masking-views', loadChildren: './business/delfin/masking-views/masking-views.module#MaskingViewsModule'},
 ];
 
 @NgModule({
