@@ -225,9 +225,8 @@ export class HomeComponent implements OnInit {
                 item.style.display = "block";
             })
         });
-        if(!this.servicePlansEnabled){
+        
             this.initBucket2backendAnd2Type();
-        } 
     }
     selectOption(){
         this.formItemCopy = []

@@ -748,9 +748,15 @@ export class BucketsComponent implements OnInit{
                                                 options = this.BucketService.getSignatureOptions(requestOptions, options);
                                                 this.BucketService.deleteBucket(name,options).subscribe((res) => {
                                                     this.getBuckets();
-                                                },
-                                                error=>{
-                                                    this.getBuckets();
+                                                    this.msgs = [];
+                                                    this.msgs.push({severity: 'success', summary: 'Bucket deleted!', detail: 'Bucket ' + name + ' has been deleted successfully.'});
+                                                }, (error)=>{
+                                                    let str = error['_body'];
+                                                    let x2js = new X2JS();
+                                                    let jsonObj = x2js.xml_str2json(str);
+                                                    console.log("Something went wrong. Could not delete bucket.", jsonObj);
+                                                    this.msgs = [];
+                                                    this.msgs.push({severity: 'error', summary: "Error ", detail: 'Bucket ' + name + ' could not be deleted.' + '<br />' + 'Details: ' + jsonObj.Error.Message});
                                                 });
                                         })
                                         break;
