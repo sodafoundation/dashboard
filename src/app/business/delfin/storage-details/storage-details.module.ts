@@ -12,10 +12,12 @@ import { QtreesComponent } from '../qtrees/qtrees.component';
 import { FilesystemsComponent } from '../filesystems/filesystems.component';
 import { SharesComponent } from '../shares/shares.component';
 import { QuotasComponent } from '../quotas/quotas.component';
+import { MaskingViewsComponent } from '../masking-views/masking-views.component';
 import { HttpService } from '../../../shared/api';
 import { ProfileService } from '../../profile/profile.service';
 import { AvailabilityZonesService } from '../../resource/resource.service';
 import { DelfinService } from '../delfin.service';
+
 
 let routers = [{
   path: '',
@@ -38,7 +40,19 @@ let routers = [{
     FilesystemsComponent,
     SharesComponent,
     QuotasComponent,
+    MaskingViewsComponent,
     SafePipe  ],
+  exports:[
+    StorageVolumesComponent, 
+    StoragePoolsComponent, 
+    ControllersComponent, 
+    PortsComponent, 
+    DisksComponent, 
+    QtreesComponent, 
+    FilesystemsComponent,
+    SharesComponent,
+    QuotasComponent,
+  ],
   providers: [
     HttpService,
     ProfileService,

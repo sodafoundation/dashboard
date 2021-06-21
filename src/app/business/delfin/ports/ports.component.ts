@@ -20,6 +20,7 @@ let _ = require("underscore");
 })
 export class PortsComponent implements OnInit {
     @Input() selectedStorage;
+    @Input() selectedPorts?: any;
     portsArr = [];
     allPools: any = [];
     allStorages: any = [];
@@ -69,7 +70,18 @@ export class PortsComponent implements OnInit {
     ngOnInit() {
         this.getStorageById(this.selectedStorage);
         this.ds.getAllPorts(this.selectedStorage).subscribe((res)=>{
-            this.dataSource = res.json().ports;
+            let datasrc = res.json().ports;
+            if(this.selectedPorts && this.selectedPorts.length){
+                this.selectedPorts.forEach(element => {
+                    datasrc.forEach(portElement => {
+                        if(element == portElement['native_port_id']){
+                            this.dataSource.push(portElement);
+                        }
+                    });
+                });
+            } else{
+                this.dataSource = datasrc;
+            }
             
             this.dataSource.forEach((element, index) => {
                 //element['displayMemory'] = Utils.formatBytes(element['memory_size']);

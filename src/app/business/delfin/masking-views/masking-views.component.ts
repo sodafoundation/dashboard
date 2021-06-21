@@ -10,28 +10,46 @@ import { Message, MenuItem ,ConfirmationService} from '../../../components/commo
 import { DelfinService } from '../delfin.service';
 
 
+
 let _ = require("underscore");
 
 
 @Component({
     selector: "app-delfin-masking-views",
-    template: `<router-outlet></router-outlet>`,
+    templateUrl: "masking-views.component.html",
     providers: [ConfirmationService],
     styleUrls: [],
     animations: [],
 })
 export class MaskingViewsComponent implements OnInit {
     @Input() selectedStorage;
+
+    selectedStorageId: any;
     showRightSidebar: boolean = false;
     showDetails: boolean = false;
     selectedMaskingView: any;
     allMaskingViews: any;
-
+    msgs: Message[];
+    detailsLabels = {
+        heading: ""
+    }
+    detailSource: any;
+    detailsObj: any;
     label = {
-      name: "Name",
-      description: "Description",
-      createdAt: "Created At",
-      updatedAt: "Updated At",
+        name: "Name",
+        description: "Description",
+        createdAt: "Created At",
+        updatedAt: "Updated At",
+        hostName: "Name",
+        ip: "IP Address",
+        port: "Port",
+        status: "Status",
+        osType: "OS",
+        accessMode: "Access Mode",
+        availabilityZones: "Availability Zones",
+        initiators: "Initiators",
+        storage_id: "Storage ID",
+        native_storage_host_id: "Native Storage Host ID"
   };
 
     constructor(
@@ -44,7 +62,7 @@ export class MaskingViewsComponent implements OnInit {
     ) {}
 
     ngOnInit() {
-        // this.showGraph();
+        this.selectedStorageId = this.selectedStorage;
         this.getAllMaskingViews(this.selectedStorage);
     }
 
@@ -56,11 +74,19 @@ export class MaskingViewsComponent implements OnInit {
             allViews.forEach(view => {
                 view['storageHostInitiatorsCount'] = 0;
                 view['volumesCount'] = 0;
+                view['storageHost'] = {};
                 if(view['native_storage_host_group_id']){
                     console.log("Native Host Group ID exists: ", view['native_storage_host_group_id']);
                     console.log("Fetch ")
                 } else if(view['native_storage_host_id']){
                     console.log("Native Storage Host ID exists: ", view['native_storage_host_id']);
+                    this.ds.getAllStorageHosts(storageId, view['native_storage_host_id']).subscribe((res)=>{
+                        let storageHost = res.json().storage_hosts;
+                        view['storageHost'] = storageHost[0];
+                        console.log("Storage Host Details:", storageHost);
+                    }, (error)=>{
+                        console.log("Something went wrong. Could not fetch storage host.")
+                    })
                 } else if(view['storage_host_initiators'] && view['storage_host_initiators'].length){
                     console.log("Storage Host Initiators List: ", view['storage_host_initiators']);
                     view['storageHostInitiatorsCount'] = view['storage_host_initiators'].length;
@@ -95,15 +121,38 @@ export class MaskingViewsComponent implements OnInit {
         this.getAllMaskingViews(this.selectedStorage);
     }
 
-    showMaskingViewDetails(maskingView){
-      console.log("Masking View Details:", maskingView);
+    showDetailsView(item, src?){
+      console.log("Masking View Details:", item);
+      switch (src) {
+            case 'maskingView': this.detailsLabels.heading = "Masking View Details";
+              
+              break;
+            case 'storageHost': this.detailsLabels.heading = "Storage Host Details";
+              
+              break;
+            case 'volumesList': this.detailsLabels.heading = "Volumes List";
+              
+              break;
+            case 'portsList': this.detailsLabels.heading = "Ports List";
+              
+              break;
+            case 'initiatorsList': this.detailsLabels.heading = "Initiators List";
+              
+              break;
+              
+      
+          default:
+              break;
+      }
+      this.detailSource=src;
       this.showDetails = true;
-      this.selectedMaskingView = maskingView;
+      this.selectedMaskingView = item;
+      this.detailsObj = item;
       this.showRightSidebar = true;
     }
     closeSidebar(){
       this.showDetails = false;
-      
+      this.detailsObj = [];
       this.showRightSidebar = false;
     }
     

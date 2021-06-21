@@ -1,1 +1,194 @@
-<router-outlet></router-outlet>
+<p-growl [value]="msgs" [sticky]="false" [life]="6000"></p-growl>
+<div class="delfin-masking-views-page">
+    <div class="table-toolbar">
+        <div class="left">
+            
+        </div>
+        <div class="right">
+            <div class="ui-inputsearch">
+                <input type="text" #searchAll pInputText placeholder="{{i18n.keyID['sds_block_volume_search']}}">
+                <button pButton type="button" icon="fa-search"></button>
+            </div>
+            <button class="" title="Refresh lists" pButton type="button" (click)="refreshAllLists()" icon="fa-refresh"></button>
+        </div>
+    </div>
+    <div class="ui-grid-row">
+        <p-dataTable  
+            [value]="allMaskingViews" 
+            [immutable]="false" 
+            [globalFilter]="searchAll" 
+            [rows]="10" 
+            [expandableRows]="true" 
+            [paginator]="true" 
+            [pageLinks]="3" 
+            [rowsPerPageOptions]="[10,20,50,100]" 
+            #at>
+            <p-column expander="true" styleClass="col-icon" [style]="{'width': '3%'}"></p-column>
+            <p-column field="name" header="Masking View Name"  [sortable]="true" [style]="{'width': '15%'}">
+                <ng-template pTemplate="body" let-maskingView="rowData">
+                    <a [routerLink]="" (click)="showDetailsView(maskingView, 'maskingView')" title="{{maskingView.name}}">{{maskingView.name}}</a>
+                </ng-template>
+            </p-column>
+            <p-column header="Storage Host Group" [style]="{'width': '10%'}">
+                <ng-template pTemplate="body" let-maskingView="rowData">
+                    {{ maskingView.native_storage_host_group_id && maskingView.native_storage_host_group_id ? maskingView.native_storage_host_group_id : '--'}}
+                </ng-template>
+            </p-column>
+            <p-column header="Port Group" [style]="{'width': '10%'}">
+                <ng-template pTemplate="body" let-maskingView="rowData">
+                    {{ maskingView.native_port_group_id && maskingView.native_port_group_id ? maskingView.native_port_group_id : '--'}}
+                </ng-template>
+            </p-column>
+            <p-column header="Volume Group" [style]="{'width': '10%'}">
+                <ng-template pTemplate="body" let-maskingView="rowData">
+                    {{ maskingView.native_volume_group_id && maskingView.native_volume_group_id ? maskingView.native_volume_group_id : '--'}}
+                </ng-template>
+            </p-column>
+            <p-column header="Storage Host" [style]="{'width': '10%'}">
+                <ng-template pTemplate="body" let-maskingView="rowData">
+                    <a [routerLink]="" (click)="showDetailsView(maskingView.storageHost, 'storageHost')"> {{ maskingView.storageHost && maskingView.storageHost.name ? maskingView.storageHost.name : '--'}} </a>
+                </ng-template>
+            </p-column>
+            <p-column header="Volumes" [style]="{'width': '10%'}">
+                <ng-template pTemplate="body" let-maskingView="rowData">
+                    <a [routerLink]="" (click)="showDetailsView(maskingView.volumes, 'volumesList')"> View </a>
+                </ng-template>
+            </p-column>
+            <p-column header="Ports" [style]="{'width': '10%'}">
+                <ng-template pTemplate="body" let-maskingView="rowData">
+                    <a [routerLink]="" (click)="showDetailsView(maskingView.ports, 'portsList')"> View </a>
+                </ng-template>
+            </p-column>
+            <p-column header="Initiators" [style]="{'width': '10%'}">
+                <ng-template pTemplate="body" let-maskingView="rowData">
+                    <a [routerLink]="" (click)="showDetailsView(maskingView.storage_host_initiators, 'initiatorsList')"> View </a>
+                </ng-template>
+            </p-column>
+            <!-- <p-column header="LUN Count" [style]="{'width': '8%'}" #LUNCount>
+                <ng-template pTemplate="body" let-maskingView="rowData">
+                    {{maskingView.volumesCount ? maskingView.volumesCount : 0}}
+                </ng-template>
+            </p-column> 
+            <p-column header="Inititator Count" [style]="{'width': '8%'}">
+                <ng-template pTemplate="body" let-maskingView="rowData">
+                    {{maskingView.storageHostInitiatorsCount ? maskingView.storageHostInitiatorsCount : 0}}
+                </ng-template>
+            </p-column>  
+            <p-column header="Ports Count" [style]="{'width': '8%'}">
+                <ng-template pTemplate="body" let-maskingView="rowData">
+                    {{maskingView.portsCount ? maskingView.portsCount : 0}}
+                </ng-template>
+            </p-column>    -->
+            <!-- <p-column header="Details">
+                <ng-template pTemplate="body" let-maskingView="rowData" let-i="rowIndex">
+                    <a [routerLink]="['/maskiDetails/' + maskingView.name]" >View Details</a>                    
+                    <a [routerLink]="" (click)="showDetailsView(maskingView.volumes, 'volumesList')"> View </a>
+                    <a [routerLink]="" (click)="showDetailsView(maskingView.ports, 'portsList')"> View Ports </a>
+                </ng-template>
+            </p-column> -->
+        </p-dataTable>
+    </div>
+</div>
+<p-sidebar [(visible)]="showRightSidebar" (onHide)="closeSidebar()" position="right" styleClass="details-sidebar-panel ui-sidebar-lg" [autoZIndex]="true" [baseZIndex]="1000">
+    <div class="right-sidebar-content-wrapper">
+        <div class="right-sidebar-header">
+            <h1 *ngIf="showDetails" style="font-weight:normal">{{ detailsLabels.heading }}</h1>
+        </div>
+        <div class="right-sidebar-body">
+            <!-- Show Volumes List -->
+            <div *ngIf="detailSource=='volumesList'">
+                <app-delfin-volumes [selectedStorage]="selectedStorageId" [selectedVolumes]="detailsObj"></app-delfin-volumes>
+            </div>            
+            
+            <!-- Show Ports List -->
+            <div *ngIf="detailSource=='portsList'">
+                <app-delfin-ports  [selectedStorage]="selectedStorageId" [selectedPorts]="detailsObj"></app-delfin-ports>
+            </div>            
+
+            <!-- Show Storage Host Details -->
+            <div *ngIf="detailSource=='storageHost'" class="ui-grid ui-grid-responsive ui-grid-pad ui-fluid">
+                <div class="ui-grid-row volume-basic-item-class">
+                    <div class="ui-grid-col-2 details-sidebar-label">
+                        {{label.name}}:
+                    </div>
+                    <div class="ui-grid-col-2 details-sidebar-value">
+                        {{detailsObj && detailsObj.name}}
+                    </div>
+                    <div class="ui-grid-col-2 details-sidebar-label">
+                        {{label.status}}:
+                    </div>
+                    <div class="ui-grid-col-2 details-sidebar-value">
+                        {{detailsObj && detailsObj.status? detailsObj.status : '--'}}
+                    </div>
+                    <div class="ui-grid-col-2 details-sidebar-label">
+                        {{label.createdAt}}:
+                    </div>
+                    <div class="ui-grid-col-3 details-sidebar-value">
+                        {{detailsObj && detailsObj.createdAt ? (detailsObj.createdAt | date:'long') : '--'}}
+                    </div>
+                        
+                </div>
+                <div class="ui-grid-row volume-basic-item-class">
+                    <div class="ui-grid-col-2 details-sidebar-label">
+                        {{label.ip}}:
+                    </div>
+                    <div class="ui-grid-col-2 details-sidebar-value">
+                        {{detailsObj && detailsObj.ip_address}}
+                    </div>
+                    <div class="ui-grid-col-2 details-sidebar-label">
+                        {{label.storage_id}}:
+                    </div>
+                    <div class="ui-grid-col-2 details-sidebar-value">
+                        {{detailsObj && detailsObj.storage_id}}
+                    </div>
+                    <div class="ui-grid-col-2 details-sidebar-label">
+                        {{label.updatedAt}}:
+                    </div>
+                    <div class="ui-grid-col-3 details-sidebar-value">
+                        {{detailsObj && detailsObj.updatedAt ? (detailsObj.updatedAt | date:'long') : '--'}}
+                    </div>
+                    
+                </div>
+                <div class="ui-grid-row volume-basic-item-class">
+                    <div class="ui-grid-col-2 details-sidebar-label">
+                        {{label.description}}:
+                    </div>
+                    <div class="ui-grid-col-2 details-sidebar-value">
+                        {{detailsObj && detailsObj.description ? detailsObj.description : '--'}}
+                    </div>
+                    <div class="ui-grid-col-2 details-sidebar-label">
+                        {{label.native_storage_host_id}}:
+                    </div>
+                    <div class="ui-grid-col-2 details-sidebar-value">
+                        {{detailsObj && detailsObj.native_storage_host_id}}
+                    </div>
+                    
+                    <div class="ui-grid-col-2 details-sidebar-label">
+                        {{label.osType}}:
+                    </div>
+                    <div class="ui-grid-col-3 details-sidebar-value">
+                        {{detailsObj &&detailsObj.os_type}}
+                    </div>
+                </div>
+            </div>
+            <!-- <p-tabView *ngIf="showDetails" styleClass="ui-tabview-large">
+                <p-tabPanel header="Volumes">
+                    <p-dataTable [value]="detailsObj && detailsObj.volumes">
+                        <p-column field="name" header="Volume Name"></p-column>
+                    </p-dataTable>
+                </p-tabPanel>
+                <p-tabPanel header="Initiators">
+                    <p-dataTable [value]="detailsObj && detailsObj.initiators">
+                        <p-column field="portName" header="Port Name"></p-column>
+                        <p-column field="protocol" header="Protocol"></p-column>
+                    </p-dataTable>
+                </p-tabPanel>
+            </p-tabView> -->
+        </div>
+        <div class="right-sidebar-footer">
+            <div style="margin-top:100px;">
+                <button type="button" pButton (click)="closeSidebar()"  label="Close"></button>
+            </div> 
+        </div>
+    </div>
+</p-sidebar>

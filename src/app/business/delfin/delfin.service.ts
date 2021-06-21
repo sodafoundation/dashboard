@@ -471,15 +471,15 @@ export class DelfinService {
             query += "?sort=" + sort;
         }
         let url =this.delfinStoragesUrl + '/' + storageId + '/masking-views' + query;
-        //return this.http.get(url);
-        return this.http.get('http://localhost:4200/assets/data/masking-views.json');
+        return this.http.get(url);
+        //return this.http.get('http://localhost:4200/assets/data/masking-views.json');
     }
 
     //get Masking View Details
     getMaskingViewDetails(storageId, maskingViewId): Observable<any> {
         let url =this.delfinStoragesUrl + '/' + storageId + '/masking-views/' + maskingViewId;
-        //return this.http.get(url);
-        return this.http.get('http://localhost:4200/assets/data/masking-views.json');
+        return this.http.get(url);
+        //return this.http.get('http://localhost:4200/assets/data/masking-views.json');
     }
 
     getAllStorageHostGroups(storageId, nativeStorageHostGroupId?, name?, limit?, offset?, sort?): Observable<any> {
@@ -527,9 +527,9 @@ export class DelfinService {
         if(sort){
             query += "?sort=" + sort;
         }
-        let url =this.delfinStoragesUrl + '/' + storageId + '/storage-hosts/' + query;
-        //return this.http.get(url);
-        return this.http.get('http://localhost:4200/assets/data/masking-views.json');
+        let url =this.delfinStoragesUrl + '/' + storageId + '/storage-hosts' + query;
+        return this.http.get(url);
+        //return this.http.get('http://localhost:4200/assets/data/masking-views.json');
     }
 
     getAllStorageHostInitiators(storageId, native_storage_host_initiator_id?, name?, limit?, offset?, sort?): Observable<any> {
