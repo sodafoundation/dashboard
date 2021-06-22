@@ -19,9 +19,8 @@ export class ServicePlanService{
         return this.http.get(detailsUrl);
     }
 
-    createTier(tenantId, param,options?){
-        let createUrl = "/v1/" + tenantId + "/tiers"
-        return this.http.post(createUrl , param);
+    createTier(param,options?){
+        return this.http.post(this.url , param);
     }
 
     deleteTier(id,options?): Observable<any>{
