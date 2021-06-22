@@ -4,7 +4,7 @@ import { Router } from '@angular/router';
 import { I18NService, Consts, ParamStorService, MsgBoxService, Utils, HttpService } from 'app/shared/api';
 import { Button } from 'app/components/button/button';
 import { I18nPluralPipe } from '@angular/common';
-import { MenuItem, ConfirmationService, SelectItem} from './components/common/api';
+import { MenuItem, ConfirmationService, SelectItem, Message} from './components/common/api';
 import { akSkService } from './business/ak-sk/ak-sk.service';
 import { BucketService } from './business/block/buckets.service';
 import * as aws4 from "ngx-aws4";
@@ -75,6 +75,8 @@ export class AppComponent implements OnInit, AfterViewInit {
     menuItems = [];
     tourSteps = [];
 
+    msgs: Message[];
+        
     menuItems_tenant = [
         {
             "title": "Home",
@@ -277,8 +279,6 @@ export class AppComponent implements OnInit, AfterViewInit {
     ];
     activeItem: any;
 
-    private msgs: any = [{ severity: 'warn', summary: 'Warn Message', detail: 'There are unsaved changes' }];
-
     constructor(
         private el: ElementRef,
         private viewContainerRef: ViewContainerRef,
@@ -311,6 +311,7 @@ export class AppComponent implements OnInit, AfterViewInit {
             window.sessionStorage['folderId'] = ""
             window.sessionStorage['headerTag'] = ""
         }
+        
         // Global upload function
         window['uploadPartArr'] = [];
         window['isUpload'] = false;
@@ -1039,6 +1040,7 @@ export class AppComponent implements OnInit, AfterViewInit {
             this.tenantItems = [];
             window['userId'] = this.userId;
             window['projectItemId'] = this.projectItemId;
+            // Create the menu items for Swtich tenant.
             projects.map(item => {
                 let tenantItemObj = {};
                 tenantItemObj["label"] = item.name;
@@ -1046,6 +1048,9 @@ export class AppComponent implements OnInit, AfterViewInit {
                     let username = this.paramStor.CURRENT_USER().split("|")[0];
                     let userid = this.paramStor.CURRENT_USER().split("|")[1];
                     this.AuthWithTokenScoped({ 'name': username, 'id': userid }, item);
+                    this.isHomePage = true;
+                    this.msgs = [];
+                    this.msgs.push({severity: 'success', summary: 'Success', detail: 'Switched to tenant: ' + item.name });
                 };
                 this.tenantItems.push(tenantItemObj);
             })
@@ -1073,7 +1078,10 @@ export class AppComponent implements OnInit, AfterViewInit {
             this.http.post("/v3/auth/tokens", req).subscribe((r) => {
                 let scopedToken = r.json().token
                 let roles = scopedToken['roles'];
+                // Check if the user is admin and assign to a window variable
                 window['isAdmin'] = (_.where(roles, {'name': "admin"})).length > 0;
+
+                // check if the user is a regular user of type Member and assign to window variable
                 window['isUser'] = (_.where(roles, {'name': "Member"})).length > 0;
 
                 this.paramStor.AUTH_TOKEN(r.headers.get('x-subject-token'));
@@ -1102,6 +1110,8 @@ export class AppComponent implements OnInit, AfterViewInit {
                             command: () => { this.logout() }
                         }
                     ];
+
+                    // Add link to service plan management in admin menu if servicePlansEnabled
                     if(window['servicePlansEnabled']){
                         this.dropMenuItems.splice(2, 0, {
                             label: "Storage Service Plans",
@@ -1138,8 +1148,10 @@ export class AppComponent implements OnInit, AfterViewInit {
                 }
 
                 this.isLogin = true;
+                
                 this.router.navigateByUrl("/home");
                 this.activeItem = this.menuItems[0];
+                
 
                 // annimation for after login
                 this.showLoginAnimation = true;
@@ -1158,7 +1170,6 @@ export class AppComponent implements OnInit, AfterViewInit {
             })
         },
         (error) => {
-            console.log("Error logging in scoped token", error);
             switch (Number(error.json().error.code)) {
                 case 401:
                     this.errorMsg = this.I18N.keyID['sds_login_error_msg_401'];
