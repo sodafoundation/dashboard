@@ -199,18 +199,22 @@ export const Consts = {
             {
                 label: "IBM",
                 value: 'ibm'
+            },
+            {
+                label: "NetApp",
+                value: 'netapp'
             }
         ],
         resources:{
-            volumes : ['vmax', 'unity', 'vnx_block', 'vplex', 'oceanstor', '3par', 'vsp', 'storwize_svc'],
-            pools : ['vmax', 'unity', 'vnx_block', 'vplex', 'oceanstor', '3par', 'vsp', 'storwize_svc'],
-            controllers : ['oceanstor'],
-            ports : ['oceanstor'],
-            disks : ['oceanstor'],
-            qtrees : ['oceanstor'],
-            filesystems : ['oceanstor'],
-            shares: ['oceanstor'],
-            quotas: ['oceanstor']
+            volumes : ['vmax', 'unity', 'vnx_block', 'vplex', 'oceanstor', '3par', 'vsp', 'storwize_svc', 'cmode'],
+            pools : ['vmax', 'unity', 'vnx_block', 'vplex', 'oceanstor', '3par', 'vsp', 'storwize_svc', 'cmode'],
+            controllers : ['oceanstor', 'unity', 'vnx_block', 'vplex', '3par', 'vsp', 'storwize_svc', 'cmode'],
+            ports : ['oceanstor', 'unity', 'vnx_block', 'vplex', '3par', 'vsp', 'storwize_svc', 'cmode'],
+            disks : ['oceanstor', 'unity', 'vnx_block', '3par', 'vsp', 'storwize_svc', 'cmode'],
+            qtrees : ['oceanstor', 'unity', 'cmode'],
+            filesystems : ['oceanstor', 'unity', 'cmode'],
+            shares: ['oceanstor', 'unity', 'cmode'],
+            quotas: ['oceanstor', 'unity', 'cmode']
         },
         models: {
             'dellemc' : [
@@ -310,7 +314,20 @@ export const Consts = {
                         extra: false
                     }
                 }
-            ]
+            ],
+            'netapp' : [
+                {
+                    label: "Cluster Mode",
+                    value: {
+                        name: 'cmode',
+                        rest: false,
+                        ssh: true,
+                        cli: false,
+                        smis: false,
+                        extra: false
+                    }
+                }
+            ],
         },
         pubKeyTypeOptions: [
             {
