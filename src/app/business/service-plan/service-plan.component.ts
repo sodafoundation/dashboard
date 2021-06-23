@@ -93,7 +93,7 @@ export class ServicePlanComponent implements OnInit{
                 /* Utils.isExisted(this.allTierNameForCheck) */], updateOn:'change'}],
             "backend":["",{updateOn:'change'}],
             "backend_type": ["",{updateOn:'change'}],
-            "tenant":["",{validators:[Validators.required], updateOn:'change'}],
+            "tenant":["",{updateOn:'change'}],
         });
     }
 
