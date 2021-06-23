@@ -497,7 +497,7 @@ export class DelfinService {
             query += "?sort=" + sort;
         }
         let url =this.delfinStoragesUrl + '/' + storageId + '/storage-host-groups' + query;
-        // return this.http.get('http://localhost:4200/assets/data/masking-views.json');
+        return this.http.get(url);
     }
 
     getAllStorageHosts(storageId, nativeStorageHostId?, name?, limit?, offset?, sort?): Observable<any> {
