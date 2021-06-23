@@ -26,7 +26,7 @@
             <p-column expander="true" styleClass="col-icon" [style]="{'width': '3%'}"></p-column>
             <p-column field="name" header="Masking View Name"  [sortable]="true" [style]="{'width': '15%'}">
                 <ng-template pTemplate="body" let-maskingView="rowData">
-                    <a [routerLink]="" (click)="showDetailsView(maskingView, 'maskingView')" title="{{maskingView.name}}">{{maskingView.name}}</a>
+                    {{maskingView.name}}
                 </ng-template>
             </p-column>
             <p-column header="Storage Host Group" [style]="{'width': '10%'}">
@@ -64,28 +64,6 @@
                     <a [routerLink]="" (click)="showDetailsView(maskingView.storage_host_initiators, 'initiatorsList')"> View </a>
                 </ng-template>
             </p-column>
-            <!-- <p-column header="LUN Count" [style]="{'width': '8%'}" #LUNCount>
-                <ng-template pTemplate="body" let-maskingView="rowData">
-                    {{maskingView.volumesCount ? maskingView.volumesCount : 0}}
-                </ng-template>
-            </p-column> 
-            <p-column header="Inititator Count" [style]="{'width': '8%'}">
-                <ng-template pTemplate="body" let-maskingView="rowData">
-                    {{maskingView.storageHostInitiatorsCount ? maskingView.storageHostInitiatorsCount : 0}}
-                </ng-template>
-            </p-column>  
-            <p-column header="Ports Count" [style]="{'width': '8%'}">
-                <ng-template pTemplate="body" let-maskingView="rowData">
-                    {{maskingView.portsCount ? maskingView.portsCount : 0}}
-                </ng-template>
-            </p-column>    -->
-            <!-- <p-column header="Details">
-                <ng-template pTemplate="body" let-maskingView="rowData" let-i="rowIndex">
-                    <a [routerLink]="['/maskiDetails/' + maskingView.name]" >View Details</a>                    
-                    <a [routerLink]="" (click)="showDetailsView(maskingView.volumes, 'volumesList')"> View </a>
-                    <a [routerLink]="" (click)="showDetailsView(maskingView.ports, 'portsList')"> View Ports </a>
-                </ng-template>
-            </p-column> -->
         </p-dataTable>
     </div>
 </div>
@@ -171,19 +149,6 @@
                     </div>
                 </div>
             </div>
-            <!-- <p-tabView *ngIf="showDetails" styleClass="ui-tabview-large">
-                <p-tabPanel header="Volumes">
-                    <p-dataTable [value]="detailsObj && detailsObj.volumes">
-                        <p-column field="name" header="Volume Name"></p-column>
-                    </p-dataTable>
-                </p-tabPanel>
-                <p-tabPanel header="Initiators">
-                    <p-dataTable [value]="detailsObj && detailsObj.initiators">
-                        <p-column field="portName" header="Port Name"></p-column>
-                        <p-column field="protocol" header="Protocol"></p-column>
-                    </p-dataTable>
-                </p-tabPanel>
-            </p-tabView> -->
         </div>
         <div class="right-sidebar-footer">
             <div style="margin-top:100px;">

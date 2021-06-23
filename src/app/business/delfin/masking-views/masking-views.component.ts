@@ -76,40 +76,28 @@ export class MaskingViewsComponent implements OnInit {
                 view['volumesCount'] = 0;
                 view['storageHost'] = {};
                 if(view['native_storage_host_group_id']){
-                    console.log("Native Host Group ID exists: ", view['native_storage_host_group_id']);
-                    console.log("Fetch ")
                 } else if(view['native_storage_host_id']){
-                    console.log("Native Storage Host ID exists: ", view['native_storage_host_id']);
                     this.ds.getAllStorageHosts(storageId, view['native_storage_host_id']).subscribe((res)=>{
                         let storageHost = res.json().storage_hosts;
                         view['storageHost'] = storageHost[0];
-                        console.log("Storage Host Details:", storageHost);
                     }, (error)=>{
                         console.log("Something went wrong. Could not fetch storage host.")
                     })
                 } else if(view['storage_host_initiators'] && view['storage_host_initiators'].length){
-                    console.log("Storage Host Initiators List: ", view['storage_host_initiators']);
                     view['storageHostInitiatorsCount'] = view['storage_host_initiators'].length;
                 }
 
 
                 if(view['native_volume_group_id']){
-                    console.log("Native Volume Group ID exists: ", view['native_volume_group_id']);
-                    console.log("Fetch ")
                 } else if(view['volumes'] && view['volumes'].length){
-                    console.log("Volumes List: ", view['volumes']);
                     view['volumesCount'] = view['volumes'].length;
                 }
 
                 if(view['native_port_group_id']){
-                    console.log("Native Port Group ID exists: ", view['native_port_group_id']);
-                    console.log("Fetch ")
                 } else if(view['ports'] && view['ports'].length){
-                    console.log("Ports List: ", view['ports']);
                     view['portsCount'] = view['ports'].length;
                 }
             });
-            console.log("All Masking views", allViews);
             this.allMaskingViews = allViews;
             
         }, (error)=>{
@@ -122,7 +110,6 @@ export class MaskingViewsComponent implements OnInit {
     }
 
     showDetailsView(item, src?){
-      console.log("Masking View Details:", item);
       switch (src) {
             case 'maskingView': this.detailsLabels.heading = "Masking View Details";
               

@@ -440,9 +440,7 @@ export class DelfinService {
     
     getAllMaskingViews(storageId, nativeMaskingViewId?, nativeStorageHostId?, nativeStorageHostGroupId?, nativeStorageVolumeGroupId?, nativeStoragePortGroupId?, name?, limit?, offset?, sort?): Observable<any> {
         let query = "";
-        /* if(storageId){
-            query += "?storage_id=" + storageId;
-        } */
+        
         if(nativeMaskingViewId){
             query += "?native_masking_view_id=" + nativeMaskingViewId;
         }
@@ -472,21 +470,17 @@ export class DelfinService {
         }
         let url =this.delfinStoragesUrl + '/' + storageId + '/masking-views' + query;
         return this.http.get(url);
-        //return this.http.get('http://localhost:4200/assets/data/masking-views.json');
     }
 
     //get Masking View Details
     getMaskingViewDetails(storageId, maskingViewId): Observable<any> {
         let url =this.delfinStoragesUrl + '/' + storageId + '/masking-views/' + maskingViewId;
         return this.http.get(url);
-        //return this.http.get('http://localhost:4200/assets/data/masking-views.json');
     }
 
     getAllStorageHostGroups(storageId, nativeStorageHostGroupId?, name?, limit?, offset?, sort?): Observable<any> {
         let query = "";
-        /* if(storageId){
-            query += "?storage_id=" + storageId;
-        } */
+        
         if(nativeStorageHostGroupId){
             query += "?native_storage_host_group_id=" + nativeStorageHostGroupId;
         }
@@ -503,15 +497,12 @@ export class DelfinService {
             query += "?sort=" + sort;
         }
         let url =this.delfinStoragesUrl + '/' + storageId + '/storage-host-groups' + query;
-        //return this.http.get(url);
-        return this.http.get('http://localhost:4200/assets/data/masking-views.json');
+        // return this.http.get('http://localhost:4200/assets/data/masking-views.json');
     }
 
     getAllStorageHosts(storageId, nativeStorageHostId?, name?, limit?, offset?, sort?): Observable<any> {
         let query = "";
-        /* if(storageId){
-            query += "?storage_id=" + storageId;
-        } */
+        
         if(nativeStorageHostId){
             query += "?native_storage_host_id=" + nativeStorageHostId;
         }
@@ -529,14 +520,11 @@ export class DelfinService {
         }
         let url =this.delfinStoragesUrl + '/' + storageId + '/storage-hosts' + query;
         return this.http.get(url);
-        //return this.http.get('http://localhost:4200/assets/data/masking-views.json');
     }
 
     getAllStorageHostInitiators(storageId, native_storage_host_initiator_id?, name?, limit?, offset?, sort?): Observable<any> {
         let query = "";
-        /* if(storageId){
-            query += "?storage_id=" + storageId;
-        } */
+       
         if(native_storage_host_initiator_id){
             query += "?native_storage_host_initiator_id=" + native_storage_host_initiator_id;
         }
@@ -553,8 +541,7 @@ export class DelfinService {
             query += "?sort=" + sort;
         }
         let url =this.delfinStoragesUrl + '/' + storageId + '/storage-initiators/' + query;
-        //return this.http.get(url);
-        return this.http.get('http://localhost:4200/assets/data/masking-views.json');
+        return this.http.get(url);
     }
 
 }
