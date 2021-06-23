@@ -474,8 +474,8 @@ export class BucketsComponent implements OnInit{
         } else if(this.servicePlansEnabled){
             param = {
                 name:this.createBucketForm.value.name,
-                tier:(this.createBucketForm.value.tier).toLowerCase(),
-                locationConstraintValue: (this.createBucketForm.value.tier).toLowerCase()
+                tier:(this.createBucketForm.value.tier),
+                locationConstraintValue: (this.createBucketForm.value.tier)
             };
         }
         
