@@ -76,7 +76,7 @@
                         <p-inputSwitch [(ngModel)]="enableArchival" onLabel="Yes" offLabel="No" (onChange)="archivalControl($event)"></p-inputSwitch>
                     </div>
                     <form *ngIf="archivalEnabled && archivalEnabled[bucketBackendType] && enableArchival && !servicePlansEnabled" [grid]="{label: 'ui-g-3', content:'ui-g-20'}" [formGroup]="uploadForm" [errorMessage]="errorMessage">
-                        <form-item label="Tier" [required]="true">
+                        <form-item label="Archive Tier" [required]="true">
                             <p-dropdown [style]="{'min-width':'220px'}" placeholder="Please select" [options]="archiveTierOptions" name='selectArchiveTier' formControlName="archive_tier"></p-dropdown>
                         </form-item>
                     </form>

@@ -322,7 +322,7 @@ export class BucketsComponent implements OnInit{
                 })
             })
         }, (error)=>{
-            console.log("Something went wrong. Tiers could not be fetched.");
+            console.log("Something went wrong. Service Plans could not be fetched.");
         })
         
         

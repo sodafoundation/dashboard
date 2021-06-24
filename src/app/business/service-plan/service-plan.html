@@ -2,7 +2,7 @@
 <div class="content-header">
     <div class="ui-g">
         <div class="ui-g-8">
-            <div style="font-size: 0.3rem;line-height: 50px;color: #657D95;">Storage Service Plan Management</div>
+            <div style="font-size: 0.3rem;line-height: 50px;color: #657D95;">Storage Service Plans</div>
             <div style="color: #657D95;line-height: 20px;">Create custom storage service plans and Add / Remove backends and tenants.</div>
         </div>
     </div>
@@ -53,7 +53,7 @@
     <p-sidebar [(visible)]="showRightSidebar" (onHide)="closeSidebar()" position="right" styleClass="details-sidebar-panel ui-sidebar-lg" [autoZIndex]="true">
         <div *ngIf="createTierShow" class="right-sidebar-content-wrapper">
             <div class="right-sidebar-header">
-                <h1 style="font-weight:normal">Create Tier</h1>
+                <h1 style="font-weight:normal">Create Service Plan</h1>
             </div>
             <div class="right-sidebar-body">
                 <form [grid]="{label: 'ui-g-3', content:'ui-g-20'}" [formGroup]="createTierForm" [errorMessage]="errorMessage">
@@ -94,18 +94,10 @@
                 <div class="ui-grid ui-grid-responsive ui-grid-pad ui-fluid">
                     <div class="ui-grid-row volume-basic-item-class">
                         <div class="ui-md-3">
-                            Tier Name: 
+                            Service Plan Name: 
                         </div>
                         <div class="ui-md-3">
                             {{ currentTier && currentTier.name }}
-                        </div>
-                    </div>
-                    <div class="ui-grid-row volume-basic-item-class">
-                        <div class="ui-md-3">
-                            Tier Tenants:
-                        </div>
-                        <div class="ui-md-3">
-                            {{ currentTier &&  currentTier.tenantName }}
                         </div>
                     </div>
                 </div>
@@ -167,10 +159,7 @@
         <form [grid]="{label: 'ui-g-3', content:'ui-g-20'}" [formGroup]="createTierForm" [errorMessage]="errorMessage">
             <form-item label="Name" >
                 <span>{{ currentTier && currentTier.name}}</span>
-            </form-item>
-            <form-item label="Tenant">
-                {{ currentTier && currentTier.tenantName}}
-            </form-item>                  
+            </form-item>                
             <form-item label="Backend Type" [required]="true">
                 <p-dropdown [style]="{'min-width':'150px','width':'280px'}" placeholder="Please select" [options]="allTypes" (onChange)="getBackendsByTypeId()" name='selectedBackendType' [(ngModel)]='selectedBackendType' formControlName="backend_type"></p-dropdown>
             </form-item>
@@ -192,9 +181,6 @@
         <form [grid]="{label: 'ui-g-3', content:'ui-g-20'}" [formGroup]="createTierForm" [errorMessage]="errorMessage">
             <form-item label="Name" >
                 <span>{{ currentTier && currentTier.name}}</span>
-            </form-item>
-            <form-item label="Tenant">
-                {{ currentTier && currentTier.tenantName}}
             </form-item>
             <form-item label="Tenant" [required]="true">
                 <p-multiSelect [style]="{'min-width':'150px','width':'280px'}" [(ngModel)]="selectedTenants" displaySelectedLabel="false" [options]="tenantLists" formControlName="tenant"></p-multiSelect>

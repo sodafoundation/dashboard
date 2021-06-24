@@ -605,7 +605,7 @@ export class ServicePlanComponent implements OnInit{
         this.confirmDialog([msg,header,acceptLabel,warming,"removeTenant"], arr, this.currentTier)
     }
 
-    
+
     confirmDialog([msg,header,acceptLabel,warming=true,func], param, tier?){
         this.confirmationService.confirm({
             message: msg,

@@ -1958,7 +1958,14 @@ a {
         padding-left: 20px;
         text-decoration: underline;
     }
-    .show-selected-backends{
+    .show-selected-backends, .show-selected-tenants{
+        color: #fff;
+    }
+    .details-sidebar-labels{
+        color: #aaa;
+        font-weight: 600;
+    }
+    .details-sidebar-value{
         color: #fff;
     }
 }
