@@ -117,13 +117,13 @@ export class MaskingViewsComponent implements OnInit {
             case 'storageHost': this.detailsLabels.heading = "Storage Host Details";
               
               break;
-            case 'volumesList': this.detailsLabels.heading = "Volumes List";
+            case 'volumesList': this.detailsLabels.heading = "Volumes";
               
               break;
-            case 'portsList': this.detailsLabels.heading = "Ports List";
+            case 'portsList': this.detailsLabels.heading = "Ports";
               
               break;
-            case 'initiatorsList': this.detailsLabels.heading = "Initiators List";
+            case 'initiatorsList': this.detailsLabels.heading = "Storage Host Initiators";
               
               break;
               
