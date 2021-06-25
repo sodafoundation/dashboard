@@ -21,6 +21,7 @@ declare let X2JS:any;
     animations: []
 })
 export class MigrationListComponent implements OnInit {
+    showRightSidebar: boolean = false;
     allMigrations = [];
     selectedMigrations = [];
     createMigrateShow = false;
@@ -49,6 +50,7 @@ export class MigrationListComponent implements OnInit {
     allMigrationForCheck=[];
     showAKSKWarning: boolean;
     msgs: Message[];
+    servicePlansEnabled: boolean;
     constructor(
         public I18N: I18NService,
         private router: Router,
@@ -60,8 +62,9 @@ export class MigrationListComponent implements OnInit {
         private http: Http
     ) {
         this.showAKSKWarning = window['akskWarning'];
+        this.servicePlansEnabled = Consts.STORAGE_SERVICE_PLAN_ENABLED;
         this.errorMessage = {
-            "name": { required: "Name is required.",isExisted:"This name already exists." },
+            "name": { required: "Name is required.",isExisted:"Migration plan with same name already exists." },
             "srcBucket": { required: "Source Bucket is required." },
             "destBucket":{ required: "Destination Bucket is required." },
         };
@@ -93,6 +96,7 @@ export class MigrationListComponent implements OnInit {
             }
         );
         this.createMigrationForm.controls['name'].setValidators([Validators.required,Utils.isExisted(this.allMigrationForCheck)]);
+        this.showRightSidebar = true;
     }
 
     getBuckets() {
@@ -116,32 +120,43 @@ export class MigrationListComponent implements OnInit {
                 }else if(Object.prototype.toString.call(buckets) === "[object Object]"){
                     allBuckets = [buckets];
                 }
-                if(Consts.BUCKET_BACKND.size > 0 && Consts.BUCKET_TYPE.size > 0 ){
-                    allBuckets.forEach(item=>{
-                        this.bucketOption.push({
+                if(!this.servicePlansEnabled){
+                    if(Consts.BUCKET_BACKND.size > 0 && Consts.BUCKET_TYPE.size > 0 ){
+                        allBuckets.forEach(item=>{
+                            this.bucketOption.push({
+                                        label:item.Name,
+                                        value:item.Name
+                                    });
+                        });
+                        this.getMigrations();
+                    }else{
+                        this.http.get('v1/{project_id}/backends').subscribe((res)=>{
+                            let backends = res.json().backends ? res.json().backends :[];
+                            let backendsObj = {};
+                            backends.forEach(element => {
+                                backendsObj[element.name]= element.type;
+                            });
+                            allBuckets.forEach(item=>{
+                                Consts.BUCKET_BACKND.set(item.Name,item.LocationConstraint);
+                                Consts.BUCKET_TYPE.set(item.Name,backendsObj[item.LocationConstraint]);
+                                this.bucketOption.push({
                                     label:item.Name,
                                     value:item.Name
                                 });
+                            });
+                            this.getMigrations();
+                        });
+                    }
+                } else{
+                    allBuckets.forEach(item=>{
+                        this.bucketOption.push({
+                            label:item.Name,
+                            value:item.Name
+                        });
                     });
                     this.getMigrations();
-                }else{
-                    this.http.get('v1/{project_id}/backends').subscribe((res)=>{
-                        let backends = res.json().backends ? res.json().backends :[];
-                        let backendsObj = {};
-                        backends.forEach(element => {
-                            backendsObj[element.name]= element.type;
-                        });
-                        allBuckets.forEach(item=>{
-                            Consts.BUCKET_BACKND.set(item.Name,item.LocationConstraint);
-                            Consts.BUCKET_TYPE.set(item.Name,backendsObj[item.LocationConstraint]);
-                            this.bucketOption.push({
-                                label:item.Name,
-                                value:item.Name
-                            });
-                        });
-                        this.getMigrations();
-                    });
                 }
+                
             }); 
             
         })
@@ -150,21 +165,31 @@ export class MigrationListComponent implements OnInit {
     changeSrcBucket(){
         this.destBuckets = [];
         this.engineOption = [];
-        this.bucketOption.forEach((value,index)=>{
-            if(Consts.BUCKET_BACKND.get(value.label) !== Consts.BUCKET_BACKND.get(this.createMigrationForm.value.srcBucket)){ 
-                this.destBuckets.push({
-                    label:value.label,
-                    value:value.value
+            if(!this.servicePlansEnabled){
+                this.bucketOption.forEach((value,index)=>{
+                    if(Consts.BUCKET_BACKND.get(value.label) !== Consts.BUCKET_BACKND.get(this.createMigrationForm.value.srcBucket.name)){
+                        this.destBuckets.push({
+                            label:value.label,
+                            value:value.value
+                        });
+                    }
+                });
+                // Bucket migration from CEPH to HW is not supported
+                if(Consts.BUCKET_TYPE.get(this.createMigrationForm.value.srcBucket) == "ceph-s3"){
+                    this.destBuckets = this.destBuckets.filter( value => {
+                        return Consts.BUCKET_TYPE.get(value.label) != "hw-obs" && Consts.BUCKET_TYPE.get(value.label) != "fusionstorage-object";
+                    })
+                }
+            } else{
+                this.bucketOption.forEach((value,index)=>{
+                    if(this.createMigrationForm.value.srcBucket != value.label){
+                        this.destBuckets.push({
+                            label:value.label,
+                            value:value.value
+                        });
+                    }
                 });
             }
-        });
-
-        // Bucket migration from CEPH to HW is not supported
-        if(Consts.BUCKET_TYPE.get(this.createMigrationForm.value.srcBucket) == "ceph-s3"){
-            this.destBuckets = this.destBuckets.filter( value => {
-                return Consts.BUCKET_TYPE.get(value.label) != "hw-obs" && Consts.BUCKET_TYPE.get(value.label) != "fusionstorage-object";
-            })
-        }
         
     }
 
@@ -176,8 +201,10 @@ export class MigrationListComponent implements OnInit {
             this.changeNumber.emit(AllMigrations.length);
             let newMigrations = []; 
             AllMigrations.forEach((item,index)=>{
-                item.srctype = Consts.TYPE_SVG[Consts.BUCKET_TYPE.get(item.sourceConn.bucketName)];
-                item.desttype = Consts.TYPE_SVG[Consts.BUCKET_TYPE.get(item.destConn.bucketName)];
+                if(!this.servicePlansEnabled){
+                    item.srctype = Consts.TYPE_SVG[Consts.BUCKET_TYPE.get(item.sourceConn.bucketName)];
+                    item.desttype = Consts.TYPE_SVG[Consts.BUCKET_TYPE.get(item.destConn.bucketName)];
+                }                
                 item.srcBucket = item.sourceConn.bucketName;
                 item.destBucket = item.destConn.bucketName;
                 this.allMigrationForCheck.push(item.name);
@@ -217,11 +244,12 @@ export class MigrationListComponent implements OnInit {
                 this.getMigrations();
                 this.msgs.push({severity: 'success', summary: 'Migration initiated successfully', detail: 'Please expand the migration to check migration progress.'});
                 this.resetMigrateForm();
-                
+                this.showRightSidebar = false;
             },(error)=>{
                 let errorMsg = "There was an error while initiating the migration. <br />Details: " + error.json().detail; 
                 this.msgs.push({severity: 'error', summary: "Error initiating migration", detail: errorMsg});
                 this.resetMigrateForm();
+                this.showRightSidebar = false;
             });
         }else{
             let date = new Date(this.createMigrationForm.value.excuteTime);
@@ -242,15 +270,21 @@ export class MigrationListComponent implements OnInit {
                     this.getMigrations();
                     this.msgs.push({severity: 'success', summary: 'Migration scheduled successfully!', detail: 'Please expand the migration to check migration progress.'});
                     this.resetMigrateForm();
+                    this.showRightSidebar = false;
                 },(error)=>{
                     let errorMsg = "There was an error while scheduling the migration. <br />Details: " + error.json().detail; 
                     this.msgs.push({severity: 'error', summary: "Error scheduling migration", detail: errorMsg});
                     this.resetMigrateForm();
+                    this.showRightSidebar = false;
                 }); 
             })
         }        
     }
 
+    closeSidebar(){
+        this.showRightSidebar = false;
+        this.resetMigrateForm();        
+    }
     resetMigrateForm(){
         this.createMigrateShow = false;
         this.createMigrationForm.reset(

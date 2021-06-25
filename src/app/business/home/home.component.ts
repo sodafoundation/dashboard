@@ -9,6 +9,8 @@ import { Router } from '@angular/router';
 import { Headers } from '@angular/http';
 import { BucketService} from '../block/buckets.service';
 
+let _ = require("underscore");
+
 declare let X2JS:any;
 @Component({
     templateUrl: './home.component.html',
@@ -49,6 +51,9 @@ export class HomeComponent implements OnInit {
     allBackendNameForCheck=[];
     formItemCopy = [];
     msgs: Message[];
+    servicePlansEnabled: boolean;
+    isAdmin;
+    isUser;
     formItems = [
         {
             label: 'Region',
@@ -84,7 +89,7 @@ export class HomeComponent implements OnInit {
             type: 'text',
             name: 'bucket',
             formControlName: 'bucket',
-            arr:['fusionstorage-object','ceph-s3','ibm-cos', 'alibaba-oss']
+            arr:['fusionstorage-object','ibm-cos', 'alibaba-oss']
         },
         {
             label: 'Access Key',
@@ -106,7 +111,7 @@ export class HomeComponent implements OnInit {
         },
 
     ]
-
+    fileOrBlockBackendTypes = ['aws-file', 'aws-block', 'azure-file', 'gcp-file', 'hw-file', 'hw-block'];
 
     @ViewChild("path") path: ElementRef;
     @ViewChild("cloud_aws") c_AWS: ElementRef;
@@ -132,6 +137,9 @@ export class HomeComponent implements OnInit {
         private BucketService: BucketService,
     ) {
         this.cloud_type = Consts.CLOUD_TYPE;
+        this.isAdmin = window['isAdmin'];
+        this.isUser = window['isUser'];
+        this.servicePlansEnabled = Consts.STORAGE_SERVICE_PLAN_ENABLED;
     }
     errorMessage = {
         "name": { required: "Name is required." ,isExisted:"Name is existing"},
@@ -197,8 +205,14 @@ export class HomeComponent implements OnInit {
             let moveX = e.pageX * disX / (winW-320)*0.5, moveY = e.pageY * disY / winH;
             that.scaleX = svgConW/240;
             that.scaleY = 5;
-
-            let clouds = [that.c_GCP.nativeElement, that.c_HWP.nativeElement, that.c_IBMCOS.nativeElement, that.c_AOS.nativeElement, that.c_HW.nativeElement, that.c_AWS.nativeElement];
+            let clouds = [];
+            if(!that.servicePlansEnabled){
+                clouds = [that.c_GCP.nativeElement, that.c_HWP.nativeElement, that.c_IBMCOS.nativeElement, that.c_AOS.nativeElement, that.c_HW.nativeElement, that.c_AWS.nativeElement];
+            } else if(that.servicePlansEnabled){
+                if(that.isAdmin){
+                    clouds = [that.c_GCP.nativeElement, that.c_HWP.nativeElement, that.c_IBMCOS.nativeElement, that.c_AOS.nativeElement, that.c_HW.nativeElement, that.c_AWS.nativeElement];
+                }
+            }
             clouds.forEach((item, index) => {
                 let totalLength = that.path.nativeElement.getTotalLength();
                 let point = totalLength/clouds.length * (index+1) + moveX + initPos;
@@ -211,7 +225,8 @@ export class HomeComponent implements OnInit {
                 item.style.display = "block";
             })
         });
-        this.initBucket2backendAnd2Type();
+        
+            this.initBucket2backendAnd2Type();
     }
     selectOption(){
         this.formItemCopy = []
@@ -349,10 +364,21 @@ export class HomeComponent implements OnInit {
         this.http.get(url).subscribe((res)=>{
             let all = res.json().types;
             all.forEach(element => {
-                this.allTypes.push({
-                    label: Consts.CLOUD_TYPE_NAME[element.name],
-                    value:element.name
-                });
+                
+                if(!this.servicePlansEnabled || (this.servicePlansEnabled && this.isAdmin)){
+                    this.allTypes.push({
+                        label: Consts.CLOUD_TYPE_NAME[element.name],
+                        value:element.name
+                    });
+                } else if(this.servicePlansEnabled && this.isUser){
+                    if(_.contains(this.fileOrBlockBackendTypes, element.name)){
+                        this.allTypes.push({
+                            label: Consts.CLOUD_TYPE_NAME[element.name],
+                            value:element.name
+                        });
+                    }
+                }
+                                
             });
         });
     }

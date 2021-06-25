@@ -1958,7 +1958,7 @@ a {
         padding-left: 20px;
         text-decoration: underline;
     }
-    .show-selected-backends{
+    .show-selected-backends, .show-selected-tenants{
         color: #fff;
     }
     .details-sidebar-labels{
@@ -1996,6 +1996,11 @@ a {
         font-weight: 700;
         color: #ccc !important;
     }
+}
+.show-selected-backends, .show-selected-tenants{
+    margin-top: 10px;
+    font-size: 14px;
+    max-width: 300px;
 }
 /* custom breadcrumb end */
 .uploading-title, .downloading-title{

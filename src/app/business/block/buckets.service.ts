@@ -146,6 +146,9 @@ export class BucketService {
     if(requestOptions.headers['X-Amz-Storage-Class']){
       options.headers.set('X-Amz-Storage-Class', requestOptions.headers['X-Amz-Storage-Class']);
     }
+    if(requestOptions.headers['tier']){
+      options.headers.set('tier', requestOptions.headers['tier']);
+    }
     return options;
   }
 }

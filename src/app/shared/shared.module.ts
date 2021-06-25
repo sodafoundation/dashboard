@@ -52,6 +52,7 @@ import { DataViewModule } from '../components/dataview/dataview';
 import { FieldsetModule } from '../components/fieldset/fieldset'
 import { XHRBackend, RequestOptions, Http } from '@angular/http';
 import { ClipboardModule } from 'ngx-clipboard';
+import { ServicePlanService } from 'app/business/service-plan/service-plan.service';
 
 export function httpFactory(backend: XHRBackend, options: RequestOptions, injector: Injector){
     options.headers.set("contentType", "application/json; charset=UTF-8");
@@ -85,7 +86,7 @@ export function httpFactory(backend: XHRBackend, options: RequestOptions, inject
         MultiSelectModule, 
         GrowlModule ,
         DropdownModule,
-        InputTextareaModule,
+        InputTextareaModule, 
         TooltipModule,
         TableModule,
         FieldsetModule,
@@ -125,6 +126,7 @@ export class SharedModule {
                 I18NService,
                 ParamStorService,
                 ConfirmationService,
+                ServicePlanService,
                 ExceptionService,
                 {
                     provide: Http,

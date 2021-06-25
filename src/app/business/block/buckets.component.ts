@@ -8,8 +8,10 @@ import { FormControl, FormGroup, FormBuilder, Validators, ValidatorFn, AbstractC
 import { MenuItem ,ConfirmationService, Message} from '../../components/common/api';
 import { BucketService} from './buckets.service';
 import { debug } from 'util';
+import { ServicePlanService } from '../service-plan/service-plan.service';
 import { MigrationService } from './../dataflow/migration.service';
 import { Http, Headers } from '@angular/http';
+
 declare let X2JS:any;
 @Component({
     selector: 'bucket-list',
@@ -43,6 +45,7 @@ declare let X2JS:any;
     ]
 })
 export class BucketsComponent implements OnInit{
+    showRightSidebar: boolean = false;
     listedBackends: any;
     selectedRegion: any;
     selectedBuckets=[];
@@ -57,6 +60,9 @@ export class BucketsComponent implements OnInit{
     lifeOperation1 = [];
     allBackends = [];
     allTypes = [];
+    allTiers = [];
+    tierOptions = [];
+    selectTier;
     excute = [];
     dataAnalysis = [];
     createMigrateShow = false;
@@ -85,7 +91,9 @@ export class BucketsComponent implements OnInit{
     isSSEC: boolean = false;
     msgs: Message[];
     showAKSKWarning: boolean;
-
+    servicePlansEnabled: boolean;
+    isAdmin: boolean;
+    isUser: boolean;
     constructor(
         public I18N: I18NService,
         private router: Router,
@@ -93,11 +101,15 @@ export class BucketsComponent implements OnInit{
         private confirmationService: ConfirmationService,
         private fb:FormBuilder,
         private BucketService: BucketService,
+        private servicePlanService: ServicePlanService,
         private MigrationService:MigrationService,
         private http:Http,
         private msg: MsgBoxService
     ){
         this.showAKSKWarning = window['akskWarning'];
+        this.servicePlansEnabled = Consts.STORAGE_SERVICE_PLAN_ENABLED;
+        this.isAdmin = window['isAdmin'];
+        this.isUser = window['isUser'];
         this.errorMessage = {
             "name": { 
                 required: "Name is required.", 
@@ -109,6 +121,7 @@ export class BucketsComponent implements OnInit{
             "backend_type": { required: "Type is required." },
             "backend":{ required: "Backend is required." },
             "destBucket":{ required: "Destination Bucket is required." },
+            "tier" : { required: "Service Plan is required." }
         };
         this.validRule = {
             'validName' : '^[a-z0-9][a-z0-9\.\-]{1,61}[a-z0-9]$'
@@ -160,6 +173,9 @@ export class BucketsComponent implements OnInit{
         this.allBackends = [];
         this.getBuckets();
         this.getMigrations();
+        if(this.servicePlansEnabled){
+            this.getTiers();
+        } 
         this.sseTypes = [
             {
                 label: "SSE",
@@ -174,19 +190,32 @@ export class BucketsComponent implements OnInit{
         this.showAnalysis = !this.showAnalysis;
     }
     configMigration(bucket){
+        this.showRightSidebar = true;
         this.availbucketOption = [];
         this.createMigrateShow=true;
         this.selectedBucket = bucket;
         this.migrationForm.controls['name'].setValidators([Validators.required,Utils.isExisted(this.allMigrationsName)]);
         this.selectTime = true;
-        this.bucketOption.forEach((value,index)=>{
-            if(Consts.BUCKET_BACKND.get(value.label) !== Consts.BUCKET_BACKND.get(bucket.name)){
-                this.availbucketOption.push({
-                    label:value.label,
-                    value:value.value
-                });
-            }
-        });
+        if(!this.servicePlansEnabled){
+            this.bucketOption.forEach((value,index)=>{
+                if(Consts.BUCKET_BACKND.get(value.label) !== Consts.BUCKET_BACKND.get(bucket.name)){
+                    this.availbucketOption.push({
+                        label:value.label,
+                        value:value.value
+                    });
+                }
+            });
+        } else{
+            this.bucketOption.forEach((value,index)=>{
+                if(bucket.name != value.label){
+                    this.availbucketOption.push({
+                        label:value.label,
+                        value:value.value
+                    });
+                }
+            });
+        }
+        
     }
     getBuckets() {
         this.allBuckets = [];
@@ -223,7 +252,9 @@ export class BucketsComponent implements OnInit{
                         item.encryptionEnabled = item.SSEConfiguration.SSE.enabled.toLowerCase() == "true" ? true : false;
                         item.versionEnabled = item.VersioningConfiguration.Status.toLowerCase() == "enabled" ? true : false;
                     });
-                    this.initBucket2backendAnd2Type();
+                    if(!this.servicePlansEnabled){
+                        this.initBucket2backendAnd2Type();
+                    }                    
                 });
             }else{
                 this.showCreateBucket = true;
@@ -279,13 +310,34 @@ export class BucketsComponent implements OnInit{
         });
     }
 
+    getTiers() {
+        this.tierOptions = [];
+        this.allTiers = [];
+        this.servicePlanService.getTierList().subscribe((response) =>{
+            this.allTiers = response.json().tiers;
+            this.allTiers.forEach(element => {
+                this.tierOptions.push({
+                    label: element.name,
+                    value: element.name
+                })
+            })
+        }, (error)=>{
+            console.log("Something went wrong. Service Plans could not be fetched.");
+        })
+        
+        
+    }
+
+
     getMigrations(){
         this.allMigrationsName = [];
         this.MigrationService.getMigrations().subscribe((res)=>{
             let migrations = res.json().plans;
-            migrations.forEach(element => {
-                this.allMigrationsName.push(element.name);
-            });
+            if(migrations && migrations.length){
+                migrations.forEach(element => {
+                    this.allMigrationsName.push(element.name);
+                });
+            }
         },(error)=>{
             console.log("Something went wrong. Could not fetch migrations.")
         });
@@ -319,11 +371,12 @@ export class BucketsComponent implements OnInit{
                 this.http.post(`v1/{project_id}/plans/${planId}/run`,{}).subscribe((res)=>{});
                 this.msgs.push({severity: 'success', summary: 'Migration initiated successfully', detail: 'Please check the dataflow section for migration progress.'});
                 this.resetMigrateForm();
-                
+                this.showRightSidebar = false;
             },(error)=>{
                 let errorMsg = "There was an error while initiating the migration. <br />Details: " + error.json().detail; 
                 this.msgs.push({severity: 'error', summary: "Error initiating migration", detail: errorMsg});
                 this.resetMigrateForm();
+                this.showRightSidebar = false;
             });
         }else{
             let date = new Date(this.migrationForm.value.excuteTime);
@@ -402,30 +455,51 @@ export class BucketsComponent implements OnInit{
         this.enableEncryption = this.createBucketForm.get('encryption').value;
     }
     creatBucket(){
+        
         if(!this.createBucketForm.valid){
             for(let i in this.createBucketForm.controls){
                 this.createBucketForm.controls[i].markAsTouched();
             }
             return;
         }
-        let param = {
-            name:this.createBucketForm.value.name,
-            backend_type:this.createBucketForm.value.backend_type,
-            backend:this.createBucketForm.value.backend
-        };
+        let param; 
+        if(!this.servicePlansEnabled){
+            param = {
+                name:this.createBucketForm.value.name,
+                backend_type:this.createBucketForm.value.backend_type,
+                backend:this.createBucketForm.value.backend,
+                locationConstraintValue: this.createBucketForm.value.backend
+            };
+
+        } else if(this.servicePlansEnabled){
+            param = {
+                name:this.createBucketForm.value.name,
+                tier:(this.createBucketForm.value.tier),
+                locationConstraintValue: (this.createBucketForm.value.tier)
+            };
+        }
+        
         let xmlStr = `<CreateBucketConfiguration xmlns=\"http://s3.amazonaws.com/doc/2006-03-01/\">
-                        <LocationConstraint>${this.createBucketForm.value.backend}</LocationConstraint>
+                        <LocationConstraint>${param.locationConstraintValue}</LocationConstraint>
                     </CreateBucketConfiguration>`
         window['getAkSkList'](()=>{
             let requestMethod = "PUT";
             let url = '/'+this.createBucketForm.value.name;
             let requestOptions: any;
             let options: any = {};
-            requestOptions = window['getSignatureKey'](requestMethod, url, '', encodeURIComponent(this.selectedRegion), '', xmlStr) ;
+            if(this.servicePlansEnabled){
+                let contentHeaders = {
+                    'tier' : "True"
+                };
+                requestOptions = window['getSignatureKey'](requestMethod, url, '', encodeURIComponent(this.selectedRegion), '', xmlStr, '', '', contentHeaders) ;
+            } else{
+                requestOptions = window['getSignatureKey'](requestMethod, url, '', encodeURIComponent(this.selectedRegion), '', xmlStr) ;
+            }
             options['headers'] = new Headers();
             options = this.BucketService.getSignatureOptions(requestOptions, options);
             this.BucketService.createBucket(this.createBucketForm.value.name,requestOptions.body,options).subscribe((res)=>{
             this.createBucketDisplay = false;
+            this.showRightSidebar = false;
             /* Add the PUT Encryption Call here before fetching the updated list of Buckets */
             if(this.enableEncryption){
                 this.bucketEncryption();
@@ -558,20 +632,46 @@ export class BucketsComponent implements OnInit{
         
     }
     showCreateForm(){
-        this.createBucketDisplay = true;
+        if(this.servicePlansEnabled){
+            
+            this.getTiers();
+            this.createBucketForm.removeControl('backend');
+            this.createBucketForm.removeControl('backend_type');
+            this.createBucketForm.addControl('tier', this.fb.control("", Validators.required));
+            
+            this.createBucketForm.reset(
+                {
+                    "name":"",
+                    "tier" : "",
+                    "version": false,
+                    "encryption": false
+                }
+            );
+            
+        } else{
+            this.createBucketForm.reset(
+                {
+                    "backend":"",
+                    "backend_type":"",
+                    "name":"",
+                    "version": false,
+                    "encryption": false
+                }
+            );
+            this.getTypes();
+        }
+        this.showRightSidebar = true;
+        this.createBucketDisplay = true;        
         this.enableEncryption = false;
         this.enableVersion = false;
-        this.createBucketForm.reset(
-            {
-                "backend":"",
-                "backend_type":"",
-                "name":"",
-                "version": false,
-                "encryption": false
-            }
-        );
         this.createBucketForm.controls['name'].setValidators([Validators.required, Validators.minLength(3), Validators.maxLength(63), Validators.pattern(this.validRule.validName), Utils.isExisted(this.allBucketNameForCheck)]);
-        this.getTypes();
+        
+    }
+    closeSidebar(){
+        this.showRightSidebar = false;
+        this.createBucketDisplay = false;
+        this.createMigrateShow = false;
+        this.resetMigrateForm();        
     }
     deleteBucket(bucket){
         window['getAkSkList'](()=>{
@@ -648,9 +748,15 @@ export class BucketsComponent implements OnInit{
                                                 options = this.BucketService.getSignatureOptions(requestOptions, options);
                                                 this.BucketService.deleteBucket(name,options).subscribe((res) => {
                                                     this.getBuckets();
-                                                },
-                                                error=>{
-                                                    this.getBuckets();
+                                                    this.msgs = [];
+                                                    this.msgs.push({severity: 'success', summary: 'Bucket deleted!', detail: 'Bucket ' + name + ' has been deleted successfully.'});
+                                                }, (error)=>{
+                                                    let str = error['_body'];
+                                                    let x2js = new X2JS();
+                                                    let jsonObj = x2js.xml_str2json(str);
+                                                    console.log("Something went wrong. Could not delete bucket.", jsonObj);
+                                                    this.msgs = [];
+                                                    this.msgs.push({severity: 'error', summary: "Error ", detail: 'Bucket ' + name + ' could not be deleted.' + '<br />' + 'Details: ' + jsonObj.Error.Message});
                                                 });
                                         })
                                         break;

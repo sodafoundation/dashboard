@@ -34,7 +34,10 @@
                 </div>
                 <div class="ui-grid-col-4 ui-text-adapt">
                     <div><span>Source Bucket:</span></div>
-                    <div><span>Backend:</span></div>
+                    <div>
+                        <span *ngIf="!servicePlansEnabled">Backend:</span>
+                        <span *ngIf="servicePlansEnabled">Service Plan:</span>
+                    </div>
                 </div>
                 <div class="ui-grid-col-6 ui-text-adapt">
                     <div><span>{{migrationInstance.srcBucket}}</span></div>
@@ -53,7 +56,10 @@
                 </div>
                 <div class="ui-grid-col-5 ui-text-adapt">
                     <div><span>Destination Bucket:</span></div>
-                    <div><span>Backend:</span></div>
+                    <div>
+                        <span *ngIf="!servicePlansEnabled">Backend:</span>
+                        <span *ngIf="servicePlansEnabled">Service Plan:</span>
+                    </div>
                 </div>
                 <div class="ui-grid-col-5 ui-text-adapt">
                     <div><span>{{migrationInstance.destBucket}}</span></div>
