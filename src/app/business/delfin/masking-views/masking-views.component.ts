@@ -49,7 +49,7 @@ export class MaskingViewsComponent implements OnInit {
         availabilityZones: "Availability Zones",
         initiators: "Initiators",
         storage_id: "Storage ID",
-        native_storage_host_id: "Native Storage Host ID"
+        native_storage_host_id: "Native Host ID"
   };
 
     constructor(
@@ -123,7 +123,7 @@ export class MaskingViewsComponent implements OnInit {
             case 'portsList': this.detailsLabels.heading = "Ports";
               
               break;
-            case 'initiatorsList': this.detailsLabels.heading = "Storage Host Initiators";
+            case 'maskingViewInitiatorsList': this.detailsLabels.heading = "Storage Host Initiators";
               
               break;
               
