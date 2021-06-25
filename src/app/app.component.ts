@@ -4,7 +4,7 @@ import { Router } from '@angular/router';
 import { I18NService, Consts, ParamStorService, MsgBoxService, Utils, HttpService } from 'app/shared/api';
 import { Button } from 'app/components/button/button';
 import { I18nPluralPipe } from '@angular/common';
-import { MenuItem, ConfirmationService, SelectItem} from './components/common/api';
+import { MenuItem, ConfirmationService, SelectItem, Message} from './components/common/api';
 import { akSkService } from './business/ak-sk/ak-sk.service';
 import { BucketService } from './business/block/buckets.service';
 import * as aws4 from "ngx-aws4";
@@ -22,6 +22,7 @@ let _ = require("underscore");
     styleUrls: []
 })
 export class AppComponent implements OnInit, AfterViewInit {
+    servicePlansEnabled: boolean = Consts.STORAGE_SERVICE_PLAN_ENABLED;
     selectFileName: string;
 
     progressValue: number = 0;
@@ -65,6 +66,7 @@ export class AppComponent implements OnInit, AfterViewInit {
     userId;
     SignatureKey = {};
     akSkRouterLink = "/akSkManagement";
+    servicePlanRouterLink = "/servicePlanManagement";
     Signature = "";
     kDate = "";
     stringToSign = "";
@@ -73,6 +75,8 @@ export class AppComponent implements OnInit, AfterViewInit {
     menuItems = [];
     tourSteps = [];
 
+    msgs: Message[];
+        
     menuItems_tenant = [
         {
             "title": "Home",
@@ -93,7 +97,30 @@ export class AppComponent implements OnInit, AfterViewInit {
             "description": "Volumes / Buckets / File Share / Hosts",
             "routerLink": "/block",
             "joyrideStep" : "menuResource",
-            "text" : "View and manage Buckets, Volumes, Volume Groups, File shares and Hosts that have been manually created or applied for through service templates."
+            "text" : "View and manage Buckets, Volumes, Volume Groups, File shares and Hosts that have been manually created or applied for through service templates.",
+            "group" : true,
+            "children" : [
+                {
+                    "title" : "Buckets",
+                    "routerLink": "/block"
+                },
+                {
+                    "title" : "Volumes",
+                    "routerLink": "/block/fromVolume"
+                },
+                {
+                    "title" : "Volume Group",
+                    "routerLink": "/block/fromGroup"
+                },
+                {
+                    "title" : "File Share",
+                    "routerLink": "/block/fromFileShare"
+                },
+                {
+                    "title" : "Hosts",
+                    "routerLink": "/block/fromHosts"
+                },
+            ]
         },
         {
             "title": "Dataflow",
@@ -252,8 +279,6 @@ export class AppComponent implements OnInit, AfterViewInit {
     ];
     activeItem: any;
 
-    private msgs: any = [{ severity: 'warn', summary: 'Warn Message', detail: 'There are unsaved changes' }];
-
     constructor(
         private el: ElementRef,
         private viewContainerRef: ViewContainerRef,
@@ -269,6 +294,7 @@ export class AppComponent implements OnInit, AfterViewInit {
         private readonly joyrideService: JoyrideService
     ) { 
         window['akskWarning'] = false;
+        window['servicePlansEnabled'] = Consts.STORAGE_SERVICE_PLAN_ENABLED;
     }
 
     // Wave params
@@ -285,6 +311,7 @@ export class AppComponent implements OnInit, AfterViewInit {
             window.sessionStorage['folderId'] = ""
             window.sessionStorage['headerTag'] = ""
         }
+        
         // Global upload function
         window['uploadPartArr'] = [];
         window['isUpload'] = false;
@@ -654,8 +681,15 @@ export class AppComponent implements OnInit, AfterViewInit {
                 let response = res.json();
                 if(!response.credentials.length){
                     window['akskWarning']=true;
-                    
+                } 
+                // Check if the user has generated AK/Sk and stored in credentials. 
+                
+                if(response.credentials.length && !(_.where(response.credentials, {'user_id':window['userId']})).length){
+                    window['akskWarning']=true;
                 }
+
+                //Display a warning if AK/SK is not generated and user tries to access bucket management or migration.
+
                 if(window['akskWarning'] && (this.router.url == '/block' || this.router.url == '/dataflow')){
                     let msg = "SODA Dashboard requires AK/SK authentication for all multi-cloud operations. The current system does not have an AK/SK. Click below to go to AK/SK management and add one."
                     let header = "AK/SK Not Found!";
@@ -762,11 +796,17 @@ export class AppComponent implements OnInit, AfterViewInit {
             if(headers && headers['X-Amz-Metadata-Directive']){
                 requestOptions.headers['X-Amz-Metadata-Directive'] = headers['X-Amz-Metadata-Directive'];
             }
+            //Header used for copy/paste object
             if(headers && headers['x-amz-copy-source']){
                 requestOptions.headers['x-amz-copy-source'] = headers['x-amz-copy-source'];
             }
+            // Header needed for archive
             if(headers && headers['X-Amz-Storage-Class']){
                 requestOptions.headers['X-Amz-Storage-Class'] = headers['X-Amz-Storage-Class'];
+            }            
+            // Header used to specify Service plans in create bucket.
+            if(headers && headers['tier']){
+                requestOptions.headers['tier'] = headers['tier'];
             }
             
             if(headers && headers['X-Amz-Content-Sha256'] == 'UNSIGNED-PAYLOAD'){
@@ -900,6 +940,8 @@ export class AppComponent implements OnInit, AfterViewInit {
 
             this.http.post("/v3/auth/tokens", req).subscribe((r) => {
                 this.paramStor.AUTH_TOKEN(r.headers.get('x-subject-token'));
+            }, (error)=>{
+                console.log("Something went wrong. Could not fetch token.", error);
             });
         },
             error => {
@@ -963,8 +1005,9 @@ export class AppComponent implements OnInit, AfterViewInit {
             this.AuthWithTokenScoped(user);
             this.showErrorMsg = false;
         },
-            error => {
-                switch (error.status) {
+            (error) => {
+                console.log("Error logging in", error.json());
+                switch (Number(error.json().error.code)) {
                     case 401:
                         this.errorMsg = this.I18N.keyID['sds_login_error_msg_401'];
                         break;
@@ -997,6 +1040,7 @@ export class AppComponent implements OnInit, AfterViewInit {
             this.tenantItems = [];
             window['userId'] = this.userId;
             window['projectItemId'] = this.projectItemId;
+            // Create the menu items for Swtich tenant.
             projects.map(item => {
                 let tenantItemObj = {};
                 tenantItemObj["label"] = item.name;
@@ -1004,6 +1048,9 @@ export class AppComponent implements OnInit, AfterViewInit {
                     let username = this.paramStor.CURRENT_USER().split("|")[0];
                     let userid = this.paramStor.CURRENT_USER().split("|")[1];
                     this.AuthWithTokenScoped({ 'name': username, 'id': userid }, item);
+                    this.isHomePage = true;
+                    this.msgs = [];
+                    this.msgs.push({severity: 'success', summary: 'Success', detail: 'Switched to tenant: ' + item.name });
                 };
                 this.tenantItems.push(tenantItemObj);
             })
@@ -1029,6 +1076,14 @@ export class AppComponent implements OnInit, AfterViewInit {
             }
 
             this.http.post("/v3/auth/tokens", req).subscribe((r) => {
+                let scopedToken = r.json().token
+                let roles = scopedToken['roles'];
+                // Check if the user is admin and assign to a window variable
+                window['isAdmin'] = (_.where(roles, {'name': "admin"})).length > 0;
+
+                // check if the user is a regular user of type Member and assign to window variable
+                window['isUser'] = (_.where(roles, {'name': "Member"})).length > 0;
+
                 this.paramStor.AUTH_TOKEN(r.headers.get('x-subject-token'));
                 this.paramStor.CURRENT_TENANT(project.name + "|" + project.id);
                 this.paramStor.CURRENT_USER(user.name + "|" + user.id);
@@ -1036,7 +1091,7 @@ export class AppComponent implements OnInit, AfterViewInit {
                 this.username = this.paramStor.CURRENT_USER().split("|")[0];
                 this.currentTenant = this.paramStor.CURRENT_TENANT().split("|")[0];
 
-                if (this.username == "admin") {
+                if (window['isAdmin']) {
                     this.menuItems = this.menuItems_admin;
                     this.tourSteps = this.tourSteps_admin;
                     this.dropMenuItems = [
@@ -1055,6 +1110,17 @@ export class AppComponent implements OnInit, AfterViewInit {
                             command: () => { this.logout() }
                         }
                     ];
+
+                    // Add link to service plan management in admin menu if servicePlansEnabled
+                    if(window['servicePlansEnabled']){
+                        this.dropMenuItems.splice(2, 0, {
+                            label: "Storage Service Plans",
+                            routerLink: this.servicePlanRouterLink,
+                            command: ()=>{
+                                this.isHomePage = false;
+                            }
+                        })
+                    }
                 } else {
                     this.menuItems = this.menuItems_tenant;
                     this.tourSteps = this.tourSteps_tenant;
@@ -1082,8 +1148,10 @@ export class AppComponent implements OnInit, AfterViewInit {
                 }
 
                 this.isLogin = true;
+                
                 this.router.navigateByUrl("/home");
                 this.activeItem = this.menuItems[0];
+                
 
                 // annimation for after login
                 this.showLoginAnimation = true;
@@ -1101,9 +1169,20 @@ export class AppComponent implements OnInit, AfterViewInit {
                 }, refreshTime);
             })
         },
-            error => {
-                this.logout();
-            })
+        (error) => {
+            switch (Number(error.json().error.code)) {
+                case 401:
+                    this.errorMsg = this.I18N.keyID['sds_login_error_msg_401'];
+                    break;
+                case 503:
+                    this.errorMsg = this.I18N.keyID['sds_login_error_msg_503'];
+                    break;
+                default:
+                    this.errorMsg = this.I18N.keyID['sds_login_error_msg_default'];
+            }
+            this.showErrorMsg = true;
+            this.logout();
+        })
     }
 
     logout() {
@@ -1129,7 +1208,7 @@ export class AppComponent implements OnInit, AfterViewInit {
             this.showPrompt = false;
             window['isUpload'] = false;
         }, 500);
-
+        this.router.navigate(['/']);
     }
 
     onKeyDown(e) {

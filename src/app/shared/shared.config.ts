@@ -26,6 +26,7 @@ export class SharedConfig{
                 Consts.SODA_PROMETHEUS_PORT = r.json().prometheusPort;
                 Consts.SODA_ALERTMANAGER_PORT = r.json().alertmanagerPort;
                 Consts.SODA_GRAFANA_PORT = r.json().grafanaPort;
+                Consts.STORAGE_SERVICE_PLAN_ENABLED = r.json().servicePlansEnabled;
                 resolve();
             })
         })

@@ -47,7 +47,8 @@
                     <p-column header="{{I18N.keyID['sds_block_volume_operation']}}" [style]="{'width': '200px'}">
                         <ng-template pTemplate="body" let-file="rowData" let-i="rowIndex">
                             <a (click)="downloadFile(file)" *ngIf="!file.newFolder">Download</a>
-                            <a (click)="showRestoreObject(file)" *ngIf="bucketBackendType!='gcp-s3'" [ngClass]="{'a-rep-disabled':file.StorageClass!='GLACIER'}">Restore</a>
+                            <a (click)="showRestoreObject(file)" *ngIf="file.StorageClass == 'GLACIER' && bucketBackendType!='gcp-s3'" [ngClass]="{'a-rep-disabled':file.StorageClass!='GLACIER'}">Restore</a>
+                            <!-- <a (click)="showRestoreObject(file)" *ngIf="servicePlansEnabled && file.StorageClass == 'GLACIER'" [ngClass]="{'a-rep-disabled':file.StorageClass!='GLACIER'}">Restore</a> -->
                             <a [ngClass]="{'a-rep-disabled':file['disabled']}" (click)="deleteFile(file)">Delete</a>
                         </ng-template>
                     </p-column>
@@ -66,12 +67,16 @@
                                 </span>
                             </div>
                         </div>
-                    <div *ngIf="archivalEnabled && archivalEnabled[bucketBackendType]" style="padding: 20px 0;">
+                    <div *ngIf="!servicePlansEnabled && archivalEnabled && archivalEnabled[bucketBackendType]" style="padding: 20px 0;">
                         <label>Archive object?</label>
                         <p-inputSwitch [(ngModel)]="enableArchival" onLabel="Yes" offLabel="No" (onChange)="archivalControl($event)"></p-inputSwitch>
                     </div>
-                    <form *ngIf="archivalEnabled && archivalEnabled[bucketBackendType] && enableArchival" [grid]="{label: 'ui-g-3', content:'ui-g-20'}" [formGroup]="uploadForm" [errorMessage]="errorMessage">
-                        <form-item label="Tier" [required]="true">
+                    <div *ngIf="servicePlansEnabled && archivalEnabled" style="padding: 20px 0;">
+                        <label>Archive object?</label>
+                        <p-inputSwitch [(ngModel)]="enableArchival" onLabel="Yes" offLabel="No" (onChange)="archivalControl($event)"></p-inputSwitch>
+                    </div>
+                    <form *ngIf="archivalEnabled && archivalEnabled[bucketBackendType] && enableArchival && !servicePlansEnabled" [grid]="{label: 'ui-g-3', content:'ui-g-20'}" [formGroup]="uploadForm" [errorMessage]="errorMessage">
+                        <form-item label="Archive Tier" [required]="true">
                             <p-dropdown [style]="{'min-width':'220px'}" placeholder="Please select" [options]="archiveTierOptions" name='selectArchiveTier' formControlName="archive_tier"></p-dropdown>
                         </form-item>
                     </form>
@@ -106,7 +111,7 @@
                 <p-confirmDialog></p-confirmDialog>     
             </div>
         </p-tabPanel>
-        <p-tabPanel header="lifeCycle" [selected]="fromLifeCycle">
+        <p-tabPanel *ngIf="!servicePlansEnabled" header="lifeCycle" [selected]="fromLifeCycle">
             <lifeCycle [bucketId]="bucketId"></lifeCycle>
         </p-tabPanel> 
         <p-tabPanel header="acl" [selected]="fromAcl">

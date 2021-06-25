@@ -1,3 +1,4 @@
+<p-growl [value]="msgs" [sticky]="false" [life]="6000"></p-growl>
 <div class="layout-wrapper" [style.display]="hideLoginForm ? 'none' : 'block'">
     <div class="login-bg" #loginBG style="background-position: center" [ngClass]="{'login-animation':showLoginAnimation, 'logout-animation':showLogoutAnimation}"></div>
     <div class="login-form ui-fluid" *ngIf="!isLogin">

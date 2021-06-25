@@ -80,6 +80,7 @@ export const Consts = {
     SODA_PROMETHEUS_PORT: '',
     S3_HOST_IP: '',
     S3_HOST_PORT: '',
+    STORAGE_SERVICE_PLAN_ENABLED: false,
     STORAGE_CLASSES: {
         'aws-s3' : [
             {

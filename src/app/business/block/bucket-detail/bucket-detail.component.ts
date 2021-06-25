@@ -37,7 +37,7 @@ export class BucketDetailComponent implements OnInit {
   enableArchival = false;
   buketName:string="";
   bucketId:string="";
-  bucketBackend: any;
+  bucketLocation: any;
   bucketBackendType: any;
   items = [{
     label:"Buckets",
@@ -69,6 +69,7 @@ export class BucketDetailComponent implements OnInit {
   allBackends: any[];
   archivalEnabled: any = {};
   isPasting: boolean = false;
+  servicePlansEnabled: boolean;
   errorMessage = {
     "backend_type": { required: "Type is required." },
     "backend": { required: "Backend is required." },
@@ -141,6 +142,7 @@ export class BucketDetailComponent implements OnInit {
       arr:['azure-blob']
     }
   ];
+  
   constructor(
     private ActivatedRoute: ActivatedRoute,
     public I18N:I18NService,
@@ -152,11 +154,12 @@ export class BucketDetailComponent implements OnInit {
     private httpClient:HttpClient
   ) 
   {
+    this.servicePlansEnabled = Consts.STORAGE_SERVICE_PLAN_ENABLED;
     this.createFolderForm = this.fb.group({
       "name": ["",{validators:[Validators.required,Utils.isExisted(this.allFolderNameForCheck),Validators.pattern(this.validRule.name)], updateOn:'change'}]
     });
     this.uploadForm = this.fb.group({
-        "archive_tier":[""]
+        
     });
     this.restoreObjectForm = this.fb.group({
       "days":new FormControl([]),
@@ -168,7 +171,7 @@ export class BucketDetailComponent implements OnInit {
   ngOnInit() {
     this.ActivatedRoute.params.subscribe((params) => {
       this.bucketId = params.bucketId;
-      this.bucketBackend = params.bucketBackend;
+      this.bucketLocation = params.bucketLocation;
       this.items.push({
         label: this.bucketId,
         url: ["/" + this.bucketId],
@@ -184,18 +187,24 @@ export class BucketDetailComponent implements OnInit {
     this.copySelectedDir = window.sessionStorage['searchIndex'] != "" ? JSON.parse(window.sessionStorage.getItem("searchIndex")) : [];
     
     this.allBackends = [];
-    this.BucketService.getBckends().subscribe((res) => {
-      this.allBackends = res.json().backends;
-        this.allBackends.forEach(element => {
-            if(element['name'] == this.bucketBackend){
-              this.bucketBackendType = element['type'];
-              if(Consts.STORAGE_CLASSES[this.bucketBackendType]){
-                this.archivalEnabled[this.bucketBackendType] = true;
-                this.restoreOptions = Consts.RETRIEVAL_OPTIONS[this.bucketBackendType];
+    if(this.servicePlansEnabled){
+      this.archivalEnabled = true;
+    }else{
+      this.BucketService.getBckends().subscribe((res) => {
+        this.allBackends = res.json().backends;
+          this.allBackends.forEach(element => {
+              if(element['name'] == this.bucketLocation){
+                this.bucketBackendType = element['type'];
+                if(Consts.STORAGE_CLASSES[this.bucketBackendType]){
+                  this.archivalEnabled[this.bucketBackendType] = true;
+                  this.restoreOptions = Consts.RETRIEVAL_OPTIONS[this.bucketBackendType];
+                }
               }
-            }
-        });
-    });
+          });
+      });
+      
+    }
+    
   }
 
   clickOperate(){
@@ -495,9 +504,14 @@ export class BucketDetailComponent implements OnInit {
 
   //Show Restore Form
   showRestoreObject(file){
-    this.restoreDisplay = true;
-    this.restoreFormCreate(this.bucketBackendType);
     this.selectFileName = file.Key;
+    if(!this.servicePlansEnabled){
+      this.restoreDisplay = true;
+      this.restoreFormCreate(this.bucketBackendType);
+    } else{
+      this.restoreObject();
+    }    
+    
   }
 
   restoreFormCreate(type){
@@ -534,23 +548,27 @@ export class BucketDetailComponent implements OnInit {
     
   }
   
-  restoreObject(value){
+  restoreObject(value?){
     let params = {};
-    switch (this.bucketBackendType) {
-      case 'aws-s3':
-        params = {
-          "days" : value.days,
-          "tier" : value.tier
-        };  
-        break;
-      case 'azure-blob':
-        params = {
-          "storageClass" : value.storageClass
-        };
-        break;
-      default:
-        break;
+    
+    if(!this.servicePlansEnabled){
+      switch (this.bucketBackendType) {
+        case 'aws-s3':
+          params = {
+            "days" : value.days,
+            "tier" : value.tier
+          };  
+          break;
+        case 'azure-blob':
+          params = {
+            "storageClass" : value.storageClass
+          };
+          break;
+        default:
+          break;
+      }
     }
+    
       
     window['getAkSkList'](()=>{
       let requestMethod = "POST";
@@ -569,17 +587,21 @@ export class BucketDetailComponent implements OnInit {
       
       this.BucketService.restoreObject(this.bucketId + '/' + this.selectFileName, params, options).subscribe((res)=>{
         this.restoreDisplay = false;
-        this.restoreObjectForm.reset({
-          "days" : 1
-        });
+        if(!this.servicePlansEnabled){
+          this.restoreObjectForm.reset({
+            "days" : 1
+          });
+        }        
         this.msgs = [];
         this.msgs.push({severity: 'success', summary: 'Success', detail: 'Object restoration has been initiated successfully. Object will be available for download shortly.'});
       },
       (error)=>{
         this.restoreDisplay = false;
-        this.restoreObjectForm.reset({
-          "days" : 1
-        });
+        if(!this.servicePlansEnabled){
+          this.restoreObjectForm.reset({
+            "days" : 1
+          });
+        }
         this.msgs = [];
         this.msgs.push({severity: 'error', summary: "Error", detail: error._body});
       })
@@ -618,7 +640,11 @@ export class BucketDetailComponent implements OnInit {
     let headers = new Headers();
     headers.append('Content-Type', 'application/xml');
     if(this.enableArchival){
-      headers.append('X-Amz-Storage-Class',this.uploadForm.value.archive_tier);
+      if(this.servicePlansEnabled){
+        headers.append('X-Amz-Storage-Class','Archive');
+      } else{
+        headers.append('X-Amz-Storage-Class',this.uploadForm.value.archive_tier);  
+      }
     }
     let options = {
       headers: headers,
@@ -640,20 +666,18 @@ export class BucketDetailComponent implements OnInit {
   }
 
   archivalControl(e){
-    if(e.checked){
-      this.uploadForm.controls['archive_tier'].setValidators([Validators.required]);
-      this.uploadForm.controls['archive_tier'].updateValueAndValidity();
+    if(e.checked && !this.servicePlansEnabled){
+      this.uploadForm.addControl('archive_tier', this.fb.control("", Validators.required));
     } else{
-      this.uploadForm.controls['archive_tier'].setValidators([]);
-      this.uploadForm.controls['archive_tier'].updateValueAndValidity();
+      if(this.uploadForm.controls['archive_tier']){
+        this.uploadForm.removeControl('archive_tier');
+      }      
     }
   }
 
   cancelUpload(){
     this.uploadDisplay = false;
     this.enableArchival = false;
-    this.uploadForm.controls['archive_tier'].setValidators([]);
-    this.uploadForm.controls['archive_tier'].updateValueAndValidity();
     this.uploadForm.reset();
   }
   downloadFile(file) {
