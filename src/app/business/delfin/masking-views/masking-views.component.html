@@ -47,20 +47,14 @@
                     <a [routerLink]="" (click)="showDetailsView(maskingView.storageHost, 'storageHost')"> {{ maskingView.storageHost && maskingView.storageHost.name ? maskingView.storageHost.name : '--'}} </a>
                 </ng-template>
             </p-column>
-            <p-column header="Volumes" [style]="{'width': '10%'}">
+            <p-column header="Volume" [style]="{'width': '10%'}">
                 <ng-template pTemplate="body" let-maskingView="rowData">
-                    <a [routerLink]="" (click)="showDetailsView(maskingView.volumes, 'volumesList')"> View </a>
+                    <a [routerLink]="" (click)="showDetailsView(maskingView.volume, 'volumesList')"> View </a>
                 </ng-template>
             </p-column>
-            <p-column header="Ports" [style]="{'width': '10%'}">
+            <p-column header="Port" [style]="{'width': '10%'}">
                 <ng-template pTemplate="body" let-maskingView="rowData">
-                    <a [routerLink]="" (click)="showDetailsView(maskingView.ports, 'portsList')"> View </a>
-                </ng-template>
-            </p-column>
-            <p-column header="Storage Host Initiators" [style]="{'width': '10%'}">
-                <ng-template pTemplate="body" let-maskingView="rowData">
-                    <a *ngIf="maskingView.storage_host_initiators && maskingView.storage_host_initiators.length" [routerLink]="" (click)="showDetailsView(maskingView.storage_host_initiators, 'maskingViewInitiatorsList')"> View </a>
-                    <span *ngIf="!maskingView.storage_host_initiators" >--</span>
+                    <a [routerLink]="" (click)="showDetailsView(maskingView.port, 'portsList')"> View </a>
                 </ng-template>
             </p-column>
         </p-dataTable>
@@ -72,90 +66,342 @@
             <h1 *ngIf="showDetails" style="font-weight:normal">{{ detailsLabels.heading }}</h1>
         </div>
         <div class="right-sidebar-body">
-            <!-- Show Volumes List -->
+            <!-- Show Volume Details -->
             <div *ngIf="detailSource=='volumesList'">
-                <app-delfin-volumes [selectedStorage]="selectedStorageId" [selectedVolumes]="detailsObj"></app-delfin-volumes>
+                <div class="details-basic-info">
+                    <div class="ui-grid ui-grid-responsive ui-grid-pad ui-fluid">
+                        <div class="ui-grid-col-12">
+                            <div class="ui-grid-row details-basic-item-class">
+                                <div class="ui-grid-col-2">
+                                    {{volumeLabel.name}}:
+                                </div>
+                                <div class="ui-grid-col-2 details-basic-item-value-color" *ngIf="detailsObj">
+                                    {{detailsObj.name}}
+                                </div>
+                                <div class="ui-grid-col-2">
+                                    {{volumeLabel.status}}:
+                                </div>
+                                <div class="ui-grid-col-2 details-basic-item-value-color" *ngIf="detailsObj">
+                                    <span class="storage-status-icon" [ngClass]="{normal: detailsObj.status=='normal', abnormal: detailsObj.status=='abnormal' || detailsObj.status=='offline'}"><i class="fa fa-circle"></i></span>
+                                    <span *ngIf="detailsObj.status=='normal'">Normal</span>
+                                    <span *ngIf="detailsObj.status=='abnormal'">Abnormal</span>
+                                    <span *ngIf="detailsObj.status=='offline'">Offline</span>
+                                </div>
+                                <div class="ui-grid-col-2">
+                                    {{volumeLabel.wwn}}:
+                                </div>
+                                <div class="ui-grid-col-3 details-basic-item-value-color" *ngIf="detailsObj">
+                                    {{detailsObj.wwn}}
+                                </div>
+                            
+                            </div>
+                            <div class="ui-grid-row details-basic-item-class">
+                                <div class="ui-grid-col-2">
+                                    {{volumeLabel.id}}:
+                                </div>
+                                <div class="ui-grid-col-2 details-basic-item-value-color" *ngIf="detailsObj">
+                                    {{detailsObj.id | slice:0:20}}
+                                    <a *ngIf="detailsObj && detailsObj.id.length > 20" pTooltip="{{detailsObj.id}}" tooltipPosition="top">
+                                        ...
+                                    </a>
+                                </div>
+                                <div class="ui-grid-col-2">
+                                    {{volumeLabel.native_volume_id}}:
+                                </div>
+                                <div class="ui-grid-col-2 details-basic-item-value-color" *ngIf="detailsObj">
+                                    {{detailsObj.native_volume_id | slice:0:20}}
+                                    <a *ngIf="detailsObj.native_volume_id.length > 20" pTooltip="{{detailsObj.native_volume_id}}" tooltipPosition="top">
+                                        ...
+                                    </a>
+                                </div>
+                                <div class="ui-grid-col-2">
+                                    {{volumeLabel.created_at}}:
+                                </div>
+                                <div class="ui-grid-col-3 details-basic-item-value-color" *ngIf="detailsObj">
+                                    {{detailsObj.created_at ? (detailsObj.created_at | date:'long') : '--'}}
+                                </div>
+                                
+                            </div>
+                            <div class="ui-grid-row details-basic-item-class">
+                                    <div class="ui-grid-col-2">
+                                        {{volumeLabel.compressed}}
+                                    </div>
+                                    <div class="ui-grid-col-2 details-basic-item-value-color" *ngIf="detailsObj">
+                                        {{detailsObj.compressed ? detailsObj.compressed : '--'}}
+                                    </div>
+                                    <div class="ui-grid-col-2">
+                                        {{volumeLabel.deduplicated}}:
+                                    </div>
+                                    <div class="ui-grid-col-2 details-basic-item-value-color" *ngIf="detailsObj">
+                                        {{ detailsObj.deduplicated ? detailsObj.deduplicated : '--'}}
+                                    </div>
+                                    
+                                    <div class="ui-grid-col-2">
+                                        {{volumeLabel.updated_at}}:
+                                    </div>
+                                    <div class="ui-grid-col-3 details-basic-item-value-color" *ngIf="detailsObj">
+                                        {{detailsObj.updated_at ? (detailsObj.updated_at | date:'long') : '--'}}
+                                    </div>
+                            </div>
+                            <div class="ui-grid-row details-basic-item-class">
+                                <div class="ui-grid-col-2">
+                                    {{volumeLabel.description}}:
+                                </div>
+                                <div class="ui-grid-col-2 details-basic-item-value-color" *ngIf="detailsObj">
+                                    {{ detailsObj.description | slice:0:20 }}
+                                    <a *ngIf="detailsObj.description.length > 20" pTooltip="{{detailsObj.description}}" tooltipPosition="top">
+                                        ...
+                                    </a>
+                                </div>
+                                <div class="ui-grid-col-2">
+                                    
+                                </div>
+                                <div class="ui-grid-col-2 details-basic-item-value-color" *ngIf="detailsObj">
+                                    
+                                </div>
+                                <div class="ui-grid-col-2">
+                                </div>
+                                <div class="ui-grid-col-3 details-basic-item-value-color" *ngIf="detailsObj">
+                                </div>
+                            </div>
+                            <div class="ui-grid-row details-basic-item-class">
+                                <div class="ui-grid-col-12">
+                                    <span>Capacity Summary</span>
+                                </div>
+                            </div>
+                            <div class="ui-grid-row details-basic-item-class">
+                                <div class="ui-grid-col-2">
+                                    {{volumeLabel.free_capacity}}:
+                                </div>
+                                <div class="ui-grid-col-2 details-basic-item-value-color" *ngIf="detailsObj">
+                                    {{ detailsObj.capacity.free}}
+                                </div>
+                                <div class="ui-grid-col-2">
+                                    {{volumeLabel.used_capacity}}:
+                                </div>
+                                <div class="ui-grid-col-2 details-basic-item-value-color" *ngIf="detailsObj">
+                                    {{ detailsObj.capacity.used}}
+                                </div>
+                                <div class="ui-grid-col-2">
+                                    {{volumeLabel.total_capacity}}:
+                                </div>
+                                <div class="ui-grid-col-3 details-basic-item-value-color" *ngIf="detailsObj">
+                                    {{ detailsObj.capacity.total}}
+                                </div>
+                            </div>
+                            
+                        </div>
+                    </div>
+                </div>
             </div>            
             
-            <!-- Show Ports List -->
+            <!-- Show Port Details -->
             <div *ngIf="detailSource=='portsList'">
-                <app-delfin-ports  [selectedStorage]="selectedStorageId" [selectedPorts]="detailsObj"></app-delfin-ports>
+                <div class="details-basic-info">
+                    <div class="ui-grid ui-grid-responsive ui-grid-pad ui-fluid">
+                        <div class="ui-grid-col-12">
+                            <div class="ui-grid-row details-basic-item-class">
+                                <div class="ui-grid-col-2">
+                                    {{portLabel.name}}:
+                                </div>
+                                <div class="ui-grid-col-2 details-basic-item-value-color" *ngIf="detailsObj">
+                                    {{detailsObj.name}}
+                                </div>
+                                <div class="ui-grid-col-2">
+                                    {{portLabel.health_status}}:
+                                </div>
+                                <div class="ui-grid-col-2 details-basic-item-value-color" *ngIf="detailsObj">
+                                    <span class="storage-status-icon" [ngClass]="{normal: detailsObj.health_status=='normal', abnormal: detailsObj.health_status=='abnormal' || detailsObj.health_status=='unknown' || detailsObj.health_status=='offline'}"><i class="fa fa-circle"></i></span>
+                                    <span *ngIf="detailsObj.health_status=='normal'">Normal</span>
+                                    <span *ngIf="detailsObj.health_status=='abnormal' || detailsObj.health_status=='unknown'">Unknown</span>
+                                    <span *ngIf="detailsObj.health_status=='offline'">Offline</span>
+                                </div>
+                                <div class="ui-grid-col-2">
+                                    {{portLabel.native_port_id}}:
+                                </div>
+                                <div class="ui-grid-col-3 details-basic-item-value-color" *ngIf="detailsObj">
+                                    {{detailsObj.native_port_id | slice:0:20}}
+                                    <a *ngIf="detailsObj.native_port_id.length > 20" pTooltip="{{detailsObj.native_port_id}}" tooltipPosition="top">
+                                        ...
+                                    </a>
+                                </div>
+                            
+                            </div>
+                            <div class="ui-grid-row details-basic-item-class">
+                                <div class="ui-grid-col-2">
+                                    {{portLabel.id}}:
+                                </div>
+                                <div class="ui-grid-col-2 details-basic-item-value-color" *ngIf="detailsObj">
+                                    {{detailsObj.id | slice:0:20}}
+                                    <a *ngIf="detailsObj && detailsObj.id.length > 20" pTooltip="{{detailsObj.id}}" tooltipPosition="top">
+                                        ...
+                                    </a>
+                                </div>
+                                <div class="ui-grid-col-2">
+                                    {{portLabel.connection_status}}:
+                                    
+                                </div>
+                                <div class="ui-grid-col-2 details-basic-item-value-color" *ngIf="detailsObj">
+                                    <span class="storage-status-icon" [ngClass]="{normal: detailsObj.connection_status=='connected', abnormal: detailsObj.connection_status=='unknown' || detailsObj.connection_status=='disconnected'}"><i class="fa fa-circle"></i></span>
+                                    <span *ngIf="detailsObj.connection_status=='connected'">Connected</span>
+                                    <span *ngIf="detailsObj.connection_status=='disconnected'">Disconnected</span>
+                                    <span *ngIf="detailsObj.connection_status=='unknown'">Unknown</span>
+                                    
+                                </div>
+                                <div class="ui-grid-col-2">
+                                    {{portLabel.native_parent_id}}:
+                                </div>
+                                <div class="ui-grid-col-3 details-basic-item-value-color" *ngIf="detailsObj">
+                                    {{detailsObj.native_parent_id | slice:0:20}}
+                                    <a *ngIf="detailsObj.native_parent_id.length > 20" pTooltip="{{detailsObj.native_parent_id}}" tooltipPosition="top">
+                                        ...
+                                    </a>
+                                </div>
+                                
+                            </div>
+                            <div class="ui-grid-row details-basic-item-class">
+                                    <div class="ui-grid-col-2">
+                                        {{portLabel.storage_id}}:
+                                    </div>
+                                    <div class="ui-grid-col-2 details-basic-item-value-color" *ngIf="detailsObj">
+                                        {{detailsObj.storage_id | slice:0:20}}
+                                        <a *ngIf="detailsObj.storage_id.length > 20" pTooltip="{{detailsObj.storage_id}}" tooltipPosition="top">
+                                            ...
+                                        </a>
+                                    </div>
+                                    <div class="ui-grid-col-2">
+                                        {{portLabel.ipv4}} / {{portLabel.ipv4_mask}}:
+                                    </div>
+                                    <div class="ui-grid-col-2 details-basic-item-value-color" *ngIf="detailsObj">
+                                        {{detailsObj.ipv4 ? detailsObj.ipv4 : '--'}} / {{detailsObj.ipv4_mask ? detailsObj.ipv4_mask : '--'}}
+                                    </div>
+                                    
+                                    <div class="ui-grid-col-2">
+                                        {{portLabel.ipv6}} / {{portLabel.ipv6_mask}}:
+                                    </div>
+                                    <div class="ui-grid-col-3 details-basic-item-value-color" *ngIf="detailsObj">
+                                        {{detailsObj.ipv6 ? detailsObj.ipv6 : '--'}} / {{detailsObj.ipv6_mask ? detailsObj.ipv6_mask : '--'}}
+                                    </div>
+                            </div>
+                            <div class="ui-grid-row details-basic-item-class">
+                                <div class="ui-grid-col-2">
+                                    {{portLabel.location}}:
+                                </div>
+                                <div class="ui-grid-col-2 details-basic-item-value-color" *ngIf="detailsObj">
+                                    {{detailsObj.location ? detailsObj.location : '--'}}
+                                </div>
+                                <div class="ui-grid-col-2">
+                                    {{portLabel.mac_address}}:
+                                </div>
+                                <div class="ui-grid-col-2 details-basic-item-value-color" *ngIf="detailsObj">
+                                    {{detailsObj.mac_address ? detailsObj.mac_address : '--'}}
+                                </div>
+                                <div class="ui-grid-col-2">
+                                    {{portLabel.type}} / {{portLabel.logical_type}}:
+                                </div>
+                                <div class="ui-grid-col-3 details-basic-item-value-color" *ngIf="detailsObj">
+                                    {{detailsObj.type ? detailsObj.type : '--'}} / {{detailsObj.logical_type ? detailsObj.logical_type : '--'}}
+                                </div>
+                            </div>
+                            <div class="ui-grid-row details-basic-item-class">
+                                <div class="ui-grid-col-2">
+                                    {{portLabel.speed}}:
+                                </div>
+                                <div class="ui-grid-col-2 details-basic-item-value-color" *ngIf="detailsObj">
+                                    {{detailsObj.speed ? detailsObj.speed : '--'}}
+                                </div>
+                                <div class="ui-grid-col-2">
+                                    {{portLabel.max_speed}}:
+                                </div>
+                                <div class="ui-grid-col-2 details-basic-item-value-color" *ngIf="detailsObj">
+                                    {{detailsObj.max_speed ? detailsObj.max_speed : '--'}}
+                                </div>
+                                <div class="ui-grid-col-2">
+                                    {{portLabel.wwn}}:
+                                </div>
+                                <div class="ui-grid-col-3 details-basic-item-value-color" *ngIf="detailsObj">
+                                    {{detailsObj.wwn ? detailsObj.wwn : '--'}}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>            
 
             <!-- Show Storage Host Details -->
-            <div *ngIf="detailSource=='storageHost'" class="ui-grid ui-grid-responsive ui-grid-pad ui-fluid">
-                <div class="ui-grid-row volume-basic-item-class">
-                    <div class="ui-grid-col-2 details-sidebar-label">
-                        {{label.name}}:
-                    </div>
-                    <div class="ui-grid-col-2 details-sidebar-value">
-                        {{detailsObj && detailsObj.name}}
-                    </div>
-                    <div class="ui-grid-col-2 details-sidebar-label">
-                        {{label.status}}:
-                    </div>
-                    <div class="ui-grid-col-2 details-sidebar-value">
-                        {{detailsObj && detailsObj.status? detailsObj.status : '--'}}
-                    </div>
-                    <div class="ui-grid-col-2 details-sidebar-label">
-                        {{label.createdAt}}:
-                    </div>
-                    <div class="ui-grid-col-3 details-sidebar-value">
-                        {{detailsObj && detailsObj.createdAt ? (detailsObj.createdAt | date:'long') : '--'}}
-                    </div>
-                        
-                </div>
-                <div class="ui-grid-row volume-basic-item-class">
-                    <div class="ui-grid-col-2 details-sidebar-label">
-                        {{label.ip}}:
-                    </div>
-                    <div class="ui-grid-col-2 details-sidebar-value">
-                        {{detailsObj && detailsObj.ip_address}}
-                    </div>
-                    <div class="ui-grid-col-2 details-sidebar-label">
-                        {{label.storage_id}}:
-                    </div>
-                    <div class="ui-grid-col-2 details-sidebar-value">
-                        {{detailsObj && detailsObj.storage_id}}
-                    </div>
-                    <div class="ui-grid-col-2 details-sidebar-label">
-                        {{label.updatedAt}}:
-                    </div>
-                    <div class="ui-grid-col-3 details-sidebar-value">
-                        {{detailsObj && detailsObj.updatedAt ? (detailsObj.updatedAt | date:'long') : '--'}}
-                    </div>
-                    
-                </div>
-                <div class="ui-grid-row volume-basic-item-class">
-                    <div class="ui-grid-col-2 details-sidebar-label">
-                        {{label.description}}:
-                    </div>
-                    <div class="ui-grid-col-2 details-sidebar-value">
-                        {{detailsObj && detailsObj.description ? detailsObj.description : '--'}}
-                    </div>
-                    <div class="ui-grid-col-2 details-sidebar-label">
-                        {{label.native_storage_host_id}}:
-                    </div>
-                    <div class="ui-grid-col-2 details-sidebar-value">
-                        {{detailsObj && detailsObj.native_storage_host_id}}
-                    </div>
-                    
-                    <div class="ui-grid-col-2 details-sidebar-label">
-                        {{label.osType}}:
-                    </div>
-                    <div class="ui-grid-col-3 details-sidebar-value">
-                        {{detailsObj &&detailsObj.os_type}}
+            <div *ngIf="detailSource=='storageHost'">
+                <div class="details-basic-info">
+                    <div class="ui-grid ui-grid-responsive ui-grid-pad ui-fluid">
+                        <div class="ui-grid-row volume-basic-item-class">
+                            <div class="ui-grid-col-2 details-sidebar-label">
+                                {{hostLabel.name}}:
+                            </div>
+                            <div class="ui-grid-col-2 details-sidebar-value">
+                                {{detailsObj && detailsObj.name}}
+                            </div>
+                            <div class="ui-grid-col-2 details-sidebar-label">
+                                {{hostLabel.status}}:
+                            </div>
+                            <div class="ui-grid-col-2 details-sidebar-value">
+                                {{detailsObj && detailsObj.status? detailsObj.status : '--'}}
+                            </div>
+                            <div class="ui-grid-col-2 details-sidebar-label">
+                                {{hostLabel.createdAt}}:
+                            </div>
+                            <div class="ui-grid-col-3 details-sidebar-value">
+                                {{detailsObj && detailsObj.createdAt ? (detailsObj.createdAt | date:'long') : '--'}}
+                            </div>
+                                
+                        </div>
+                        <div class="ui-grid-row volume-basic-item-class">
+                            <div class="ui-grid-col-2 details-sidebar-label">
+                                {{hostLabel.ip}}:
+                            </div>
+                            <div class="ui-grid-col-2 details-sidebar-value">
+                                {{detailsObj && detailsObj.ip_address}}
+                            </div>
+                            <div class="ui-grid-col-2 details-sidebar-label">
+                                {{hostLabel.storage_id}}:
+                            </div>
+                            <div class="ui-grid-col-2 details-sidebar-value">
+                                {{detailsObj && detailsObj.storage_id}}
+                            </div>
+                            <div class="ui-grid-col-2 details-sidebar-label">
+                                {{hostLabel.updatedAt}}:
+                            </div>
+                            <div class="ui-grid-col-3 details-sidebar-value">
+                                {{detailsObj && detailsObj.updatedAt ? (detailsObj.updatedAt | date:'long') : '--'}}
+                            </div>
+                            
+                        </div>
+                        <div class="ui-grid-row volume-basic-item-class">
+                            <div class="ui-grid-col-2 details-sidebar-label">
+                                {{hostLabel.description}}:
+                            </div>
+                            <div class="ui-grid-col-2 details-sidebar-value">
+                                {{detailsObj && detailsObj.description ? detailsObj.description : '--'}}
+                            </div>
+                            <div class="ui-grid-col-2 details-sidebar-label">
+                                {{hostLabel.native_storage_host_id}}:
+                            </div>
+                            <div class="ui-grid-col-2 details-sidebar-value">
+                                {{detailsObj && detailsObj.native_storage_host_id}}
+                            </div>
+                            
+                            <div class="ui-grid-col-2 details-sidebar-label">
+                                {{hostLabel.osType}}:
+                            </div>
+                            <div class="ui-grid-col-3 details-sidebar-value">
+                                {{detailsObj &&detailsObj.os_type}}
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Show Masking view Initiators List -->
+            <!-- Show Storage host Initiators List -->
             <div *ngIf="detailSource=='storageHost'">
                 <app-delfin-storage-host-initiators [selectedStorage]="selectedStorageId" [selectedInitiators]="detailsObj.storage_host_initiators"></app-delfin-storage-host-initiators>
-            </div>
-            <!-- Show Masking view Initiators List -->
-            <div *ngIf="detailSource=='maskingViewInitiatorsList'">
-                <app-delfin-storage-host-initiators [selectedStorage]="selectedStorageId" [selectedInitiators]="detailsObj"></app-delfin-storage-host-initiators>
             </div>
         </div>
         <div class="right-sidebar-footer">

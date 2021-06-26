@@ -422,7 +422,6 @@ export class StoragesComponent implements OnInit {
                         
                         // Get all the Ports associated with the Storage device
                         this.ds.getAllPorts(element['id']).subscribe((res)=>{
-                            console.log("Ports fetched")
                             ports = res.json().ports;
                             element['ports'] = ports;
                         }, (error)=>{
