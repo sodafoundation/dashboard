@@ -35,7 +35,7 @@ export class MaskingViewsComponent implements OnInit {
     }
     detailSource: any;
     detailsObj: any;
-    label = {
+    hostLabel = {
         name: "Name",
         description: "Description",
         createdAt: "Created At",
@@ -50,7 +50,48 @@ export class MaskingViewsComponent implements OnInit {
         initiators: "Initiators",
         storage_id: "Storage ID",
         native_storage_host_id: "Native Host ID"
-  };
+    };
+    volumeLabel = {
+        name: this.i18n.keyID["sds_block_volume_name"],
+        description: this.i18n.keyID["sds_block_volume_descri"],
+        wwn: "WWN",
+        native_volume_id: "Native Volume ID",
+        storage_id: "Storage ID",
+        compressed: "Compressed",
+        deduplicated: "Deduplicated",
+        status: "Status",
+        created_at: "Created At",
+        updated_at: "Updated At",
+        free_capacity: "Free Capacity",
+        used_capacity: "Used Capacity",
+        total_capacity: "Total Capacity",
+        id: "Delfin ID",
+    };
+    portLabel = {
+        name: this.i18n.keyID["sds_block_volume_name"],
+        native_port_id: "Native Port ID",
+        storage_id: "Storage ID",
+        cpu_info: "CPU Info",
+        soft_version: "Software Version",
+        connection_status: "Connection Status",
+        health_status: "Health Status",
+        type: "Type",
+        logical_type: "Logical Type",
+        speed: "Speed",
+        max_speed: "Max Speed",
+        native_parent_id: "Native parent ID",
+        wwn: "WWN",
+        mac_address: "MAC Address",
+        ipv4: "IPV4",
+        ipv4_mask: "IPV4 Mask",
+        ipv6: "IPV6",
+        ipv6_mask: "IPV6 Mask",
+        created_at: "Created At",
+        updated_at: "Updated At",
+        memory_size: "Memory Size",
+        location: "Location",
+        id: "Delfin ID",
+    };
 
     constructor(
         public i18n: I18NService,
@@ -89,13 +130,31 @@ export class MaskingViewsComponent implements OnInit {
 
 
                 if(view['native_volume_group_id']){
-                } else if(view['volumes'] && view['volumes'].length){
-                    view['volumesCount'] = view['volumes'].length;
+                } else if(view['native_volume_id']){
+                    //view['volumesCount'] = view['volumes'].length;
+                    this.ds.getAllVolumes(storageId, view['native_volume_id']).subscribe((res)=>{
+                        let volume = res.json().volumes[0];
+                        //Calculate the capacities 
+                        volume['capacity'] = {};
+                        let percentUsage = Math.ceil((volume['used_capacity']/volume['total_capacity']) * 100);
+                        volume['capacity'].used = Utils.formatBytes(volume['used_capacity']);
+                        volume['capacity'].free = Utils.formatBytes(volume['free_capacity']);
+                        volume['capacity'].total = Utils.formatBytes(volume['total_capacity']);
+                        volume['capacity'].usage = percentUsage;
+                        view['volume'] = volume;
+                    }, (error)=>{   
+                        console.log("Something went wrong. Could not fetch volume details.")
+                    })
                 }
 
                 if(view['native_port_group_id']){
-                } else if(view['ports'] && view['ports'].length){
-                    view['portsCount'] = view['ports'].length;
+                } else if(view['native_port_id']){
+                    this.ds.getAllPorts(storageId, view['native_port_id']).subscribe((res)=>{
+                        let port = res.json().ports[0];
+                        view['port'] = port;
+                    }, (error)=>{   
+                        console.log("Something went wrong. Could not fetch port details.")
+                    })
                 }
             });
             this.allMaskingViews = allViews;
@@ -117,10 +176,10 @@ export class MaskingViewsComponent implements OnInit {
             case 'storageHost': this.detailsLabels.heading = "Storage Host Details";
               
               break;
-            case 'volumesList': this.detailsLabels.heading = "Volumes";
+            case 'volumesList': this.detailsLabels.heading = "Volume Details";
               
               break;
-            case 'portsList': this.detailsLabels.heading = "Ports";
+            case 'portsList': this.detailsLabels.heading = "Port Details";
               
               break;
             case 'maskingViewInitiatorsList': this.detailsLabels.heading = "Storage Host Initiators";
@@ -139,7 +198,6 @@ export class MaskingViewsComponent implements OnInit {
     }
     closeSidebar(){
       this.showDetails = false;
-      this.detailsObj = [];
       this.showRightSidebar = false;
     }
     

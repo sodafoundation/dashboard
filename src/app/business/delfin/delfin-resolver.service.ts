@@ -155,7 +155,6 @@ export class DelfinResolver implements Resolve<any> {
                 if(element['quotasExist']){
                     // Get all the Quotas associated with the Storage device
                     this.ds.getAllQuotas(element['id']).subscribe((res)=>{
-                        console.log("Quotas fetched")
                         let quotas = res.json().quotas;
                         element['quotas'] = quotas;
                     }, (error)=>{

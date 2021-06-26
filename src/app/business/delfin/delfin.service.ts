@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { I18NService, HttpService, ParamStorService, Consts } from '../../shared/api';
+import { I18NService, HttpService, ParamStorService, Consts, Utils } from '../../shared/api';
 import { Observable } from 'rxjs';
 
 @Injectable()
@@ -61,31 +61,32 @@ export class DelfinService {
 
     //get all Volumes
     getAllVolumes(storageId?, nativeVolumeId?, nativeStoragePoolId?, name?, status?, limit?, offset?, sort?): Observable<any> {
-        let query = "";
+        let query = {};
         if(storageId){
-            query += "?storage_id=" + storageId;
+            query['storage_id'] = storageId;
         }
         if(nativeVolumeId){
-            query += "?native_volume_id=" + nativeVolumeId;
+            query['native_volume_id'] = nativeVolumeId;
         }
         if(nativeStoragePoolId){
-            query += "?native_storage_pool_id=" + nativeStoragePoolId;
+            query['native_storage_pool_id'] = nativeStoragePoolId;
         }
         if(name){
-            query += "?name=" + name;
+            query['name'] = name;
         }
         if(status){
-            query += "?status=" + status;
+            query['status'] = status;
         }
         if(limit){
-            query += "?limit=" + limit;
+            query['limit'] = limit;
         }
         if(offset){
-            query += "?offset=" + offset;
+            query['offset'] = offset;
         }
         if(sort){
-            query += "?sort=" + sort;
+            query['sort'] = sort;
         }
+        query = '?' + Utils.prePareQuery(query);
         let url =this.delfinVolumesUrl + query;
         return this.http.get(url);
     }
@@ -97,31 +98,32 @@ export class DelfinService {
 
     //get all Storage pools
     getAllStoragePools(storageId?, storagePoolId?, nativeStoragePoolId?, name?, status?, limit?, offset?, sort?): Observable<any> {
-        let query = "";
+        let query = {};
         if(storageId){
-            query += "?storage_id=" + storageId;
+            query['storage_id'] = storageId;
         }
         if(storagePoolId){
-            query += "?id=" + storagePoolId;
+            query['id'] = storagePoolId;
         }
         if(nativeStoragePoolId){
-            query += "?native_storage_pool_id=" + nativeStoragePoolId;
+            query['native_storage_pool_id'] = nativeStoragePoolId;
         }
         if(name){
-            query += "?name=" + name;
+            query['name'] = name;
         }
         if(status){
-            query += "?status=" + status;
+            query['status'] = status;
         }
         if(limit){
-            query += "?limit=" + limit;
+            query['limit'] = limit;
         }
         if(offset){
-            query += "?offset=" + offset;
+            query['offset'] = offset;
         }
         if(sort){
-            query += "?sort=" + sort;
+            query['sort'] = sort;
         }
+        query = '?' + Utils.prePareQuery(query);
         let url =this.delfinStoragePoolsUrl + query;
         return this.http.get(url);
     }
@@ -133,31 +135,32 @@ export class DelfinService {
 
 //get all Controllers
     getAllControllers(storageId?, controllerId?, nativeControllerId?, name?, status?, limit?, offset?, sort?): Observable<any> {
-        let query = "";
+        let query = {};
         if(storageId){
-            query += "?storage_id=" + storageId;
+            query['storage_id'] = storageId;
         }
         if(controllerId){
-            query += "?id=" + controllerId;
+            query['id'] = controllerId;
         }
         if(nativeControllerId){
-            query += "?native_controller_id=" + nativeControllerId;
+            query['native_controller_id'] = nativeControllerId;
         }
         if(name){
-            query += "?name=" + name;
+            query['name'] = name;
         }
         if(status){
-            query += "?status=" + status;
+            query['status'] = status;
         }
         if(limit){
-            query += "?limit=" + limit;
+            query['limit'] = limit;
         }
         if(offset){
-            query += "?offset=" + offset;
+            query['offset'] = offset;
         }
         if(sort){
-            query += "?sort=" + sort;
+            query['sort'] = sort;
         }
+        query = '?' + Utils.prePareQuery(query);
         let url =this.delfinControllersUrl + query;
         return this.http.get(url);
     }
@@ -168,32 +171,33 @@ export class DelfinService {
     }
 
     //get all Ports
-    getAllPorts(storageId?, portId?, nativePortId?, name?, status?, limit?, offset?, sort?): Observable<any> {
-        let query = "";
+    getAllPorts(storageId?, nativePortId?, portId?, name?, status?, limit?, offset?, sort?): Observable<any> {
+        let query = {};
         if(storageId){
-            query += "?storage_id=" + storageId;
-        }
-        if(portId){
-            query += "?id=" + portId;
+            query['storage_id'] = storageId;
         }
         if(nativePortId){
-            query += "?native_port_id=" + nativePortId;
+            query['native_port_id'] = nativePortId;
+        }
+        if(portId){
+            query['id'] = portId;
         }
         if(name){
-            query += "?name=" + name;
+            query['name'] = name;
         }
         if(status){
-            query += "?status=" + status;
+            query['status'] = status;
         }
         if(limit){
-            query += "?limit=" + limit;
+            query['limit'] = limit;
         }
         if(offset){
-            query += "?offset=" + offset;
+            query['offset'] = offset;
         }
         if(sort){
-            query += "?sort=" + sort;
+            query['sort'] = sort;
         }
+        query = '?' + Utils.prePareQuery(query);
         let url =this.delfinPortsUrl + query;
         return this.http.get(url);
     }
@@ -205,31 +209,32 @@ export class DelfinService {
 
     //get all Disks
     getAllDisks(storageId?, diskId?, nativeDiskId?, name?, status?, limit?, offset?, sort?): Observable<any> {
-        let query = "";
+        let query = {};
         if(storageId){
-            query += "?storage_id=" + storageId;
+            query['storage_id'] = storageId;
         }
         if(diskId){
-            query += "?id=" + diskId;
+            query['id'] = diskId;
         }
         if(nativeDiskId){
-            query += "?native_port_id=" + nativeDiskId;
+            query['native_port_id'] = nativeDiskId;
         }
         if(name){
-            query += "?name=" + name;
+            query['name'] = name;
         }
         if(status){
-            query += "?status=" + status;
+            query['status'] = status;
         }
         if(limit){
-            query += "?limit=" + limit;
+            query['limit'] = limit;
         }
         if(offset){
-            query += "?offset=" + offset;
+            query['offset'] = offset;
         }
         if(sort){
-            query += "?sort=" + sort;
+            query['sort'] = sort;
         }
+        query = '?' + Utils.prePareQuery(query);
         let url =this.delfinDisksUrl + query;
         return this.http.get(url);
     }
@@ -241,34 +246,35 @@ export class DelfinService {
 
     //get all Qtrees
     getAllQtrees(storageId?, qtreeId?, nativeFilesystemId?, id?, name?, status?, limit?, offset?, sort?): Observable<any> {
-        let query = "";
+        let query = {};
         if(storageId){
-            query += "?storage_id=" + storageId;
+            query['storage_id'] = storageId;
         }
         if(qtreeId){
-            query += "?native_qtree_id=" + qtreeId;
+            query['native_qtree_id'] = qtreeId;
         }
         if(nativeFilesystemId){
-            query += "?native_filesystem_id=" + nativeFilesystemId;
-        }
-        if(name){
-            query += "?name=" + name;
+            query['native_filesystem_id'] = nativeFilesystemId;
         }
         if(id){
-            query += "?id=" + id;
+            query['id'] = id;
+        }
+        if(name){
+            query['name'] = name;
         }
         if(status){
-            query += "?status=" + status;
+            query['status'] = status;
         }
         if(limit){
-            query += "?limit=" + limit;
+            query['limit'] = limit;
         }
         if(offset){
-            query += "?offset=" + offset;
+            query['offset'] = offset;
         }
         if(sort){
-            query += "?sort=" + sort;
+            query['sort'] = sort;
         }
+        query = '?' + Utils.prePareQuery(query);
         let url =this.delfinQtreesUrl + query;
         return this.http.get(url);
     }
@@ -280,37 +286,38 @@ export class DelfinService {
 
     //get all Filesystems
     getAllFilesystems(storageId?, nativeFilesystemId?, nativePoolId?, securityMode?, id?, name?, status?, limit?, offset?, sort?): Observable<any> {
-        let query = "";
+        let query = {};
         if(storageId){
-            query += "?storage_id=" + storageId;
+            query['storage_id'] = storageId;
         }
         if(nativeFilesystemId){
-            query += "?native_filesystem_id=" + nativeFilesystemId;
+            query['native_filesystem_id'] = nativeFilesystemId;
         }
         if(nativePoolId){
-            query += "?native_pool_id=" + nativePoolId;
+            query['native_pool_id'] = nativePoolId;
         }
         if(securityMode){
-            query += "?security_mode=" + securityMode;
+            query['security_mode'] = securityMode;
         }
         if(id){
-            query += "?id=" + id;
+            query['id'] = id;
         }
         if(name){
-            query += "?name=" + name;
+            query['name'] = name;
         }
         if(status){
-            query += "?status=" + status;
+            query['status'] = status;
         }
         if(limit){
-            query += "?limit=" + limit;
+            query['limit'] = limit;
         }
         if(offset){
-            query += "?offset=" + offset;
+            query['offset'] = offset;
         }
         if(sort){
-            query += "?sort=" + sort;
+            query['sort'] = sort;
         }
+        query = '?' + Utils.prePareQuery(query);
         let url =this.delfinFilesystemsUrl + query;
         return this.http.get(url);
     }
@@ -322,34 +329,35 @@ export class DelfinService {
 
     //get all Shares
     getAllShares(storageId?, shareId?, nativeFilesystemId?, qtreeId?, protocol?, name?, limit?, offset?, sort?): Observable<any> {
-        let query = "";
+        let query = {};
         if(storageId){
-            query += "?storage_id=" + storageId;
+            query['storage_id'] = storageId;
         }
         if(shareId){
-            query += "?native_share_id=" + shareId;
+            query['native_share_id'] = shareId;
         }
         if(nativeFilesystemId){
-            query += "?native_filesystem_id=" + nativeFilesystemId;
+            query['native_filesystem_id'] = nativeFilesystemId;
         }
         if(qtreeId){
-            query += "?qtree_id=" + qtreeId;
+            query['qtree_id'] = qtreeId;
         }
         if(protocol){
-            query += "?protocol=" + protocol;
+            query['protocol'] = protocol;
         }
-        if(name){
-            query += "?name=" + name;
+         if(name){
+            query['name'] = name;
         }
         if(limit){
-            query += "?limit=" + limit;
+            query['limit'] = limit;
         }
         if(offset){
-            query += "?offset=" + offset;
+            query['offset'] = offset;
         }
         if(sort){
-            query += "?sort=" + sort;
+            query['sort'] = sort;
         }
+        query = '?' + Utils.prePareQuery(query);
         let url =this.delfinSharesUrl + query;
         return this.http.get(url);
     }
@@ -361,7 +369,7 @@ export class DelfinService {
 
     //get all Quotas
     getAllQuotas(storageId?, nativeFilesystemId?, nativeQtreeId?, securityMode?, id?, name?, status?, limit?, offset?, sort?): Observable<any> {
-        let query = "";
+        let query = {};
         if(storageId){
             query += "?storage_id=" + storageId;
         }
@@ -375,23 +383,24 @@ export class DelfinService {
             query += "?security_mode=" + securityMode;
         }
         if(id){
-            query += "?id=" + id;
+            query['id'] = id;
         }
         if(name){
-            query += "?name=" + name;
+            query['name'] = name;
         }
         if(status){
-            query += "?status=" + status;
+            query['status'] = status;
         }
         if(limit){
-            query += "?limit=" + limit;
+            query['limit'] = limit;
         }
         if(offset){
-            query += "?offset=" + offset;
+            query['offset'] = offset;
         }
         if(sort){
-            query += "?sort=" + sort;
+            query['sort'] = sort;
         }
+        query = '?' + Utils.prePareQuery(query);
         let url =this.delfinQuotasUrl + query;
         return this.http.get(url);
     }
@@ -439,35 +448,36 @@ export class DelfinService {
     //Get All Masking Views
     
     getAllMaskingViews(storageId, nativeMaskingViewId?, nativeStorageHostId?, nativeStorageHostGroupId?, nativeStorageVolumeGroupId?, nativeStoragePortGroupId?, name?, limit?, offset?, sort?): Observable<any> {
-        let query = "";
+        let query = {};
         
         if(nativeMaskingViewId){
-            query += "?native_masking_view_id=" + nativeMaskingViewId;
+            query['native_masking_view_id'] = nativeMaskingViewId;
         }
         if(nativeStorageHostId){
-            query += "?native_storage_host_id=" + nativeStorageHostId;
+            query['native_storage_host_id'] = nativeStorageHostId;
         }
         if(nativeStorageHostGroupId){
-            query += "?native_storage_host_group_id=" + nativeStorageHostGroupId;
+            query['native_storage_host_group_id'] = nativeStorageHostGroupId;
         }
         if(nativeStorageVolumeGroupId){
-            query += "?native_volume_group_id=" + nativeStorageVolumeGroupId;
+            query['native_volume_group_id'] = nativeStorageVolumeGroupId;
         }
         if(nativeStoragePortGroupId){
-            query += "?native_port_group_id=" + nativeStoragePortGroupId;
+            query['native_port_group_id'] = nativeStoragePortGroupId;
         }
-        if(name){
-            query += "?name=" + name;
+         if(name){
+            query['name'] = name;
         }
         if(limit){
-            query += "?limit=" + limit;
+            query['limit'] = limit;
         }
         if(offset){
-            query += "?offset=" + offset;
+            query['offset'] = offset;
         }
         if(sort){
-            query += "?sort=" + sort;
+            query['sort'] = sort;
         }
+        query = '?' + Utils.prePareQuery(query);
         let url =this.delfinStoragesUrl + '/' + storageId + '/masking-views' + query;
         return this.http.get(url);
     }
@@ -479,45 +489,47 @@ export class DelfinService {
     }
 
     getAllStorageHostGroups(storageId, nativeStorageHostGroupId?, name?, limit?, offset?, sort?): Observable<any> {
-        let query = "";
+        let query = {};
         
         if(nativeStorageHostGroupId){
-            query += "?native_storage_host_group_id=" + nativeStorageHostGroupId;
+            query['native_storage_host_group_id'] = nativeStorageHostGroupId;
         }
-        if(name){
-            query += "?name=" + name;
+         if(name){
+            query['name'] = name;
         }
         if(limit){
-            query += "?limit=" + limit;
+            query['limit'] = limit;
         }
         if(offset){
-            query += "?offset=" + offset;
+            query['offset'] = offset;
         }
         if(sort){
-            query += "?sort=" + sort;
+            query['sort'] = sort;
         }
+        query = '?' + Utils.prePareQuery(query);
         let url =this.delfinStoragesUrl + '/' + storageId + '/storage-host-groups' + query;
         return this.http.get(url);
     }
 
     getAllStorageHosts(storageId, nativeStorageHostId?, name?, limit?, offset?, sort?): Observable<any> {
-        let query = "";
+        let query = {};
         
         if(nativeStorageHostId){
-            query += "?native_storage_host_id=" + nativeStorageHostId;
+            query['native_storage_host_id'] = nativeStorageHostId;
         }
-        if(name){
-            query += "?name=" + name;
+         if(name){
+            query['name'] = name;
         }
         if(limit){
-            query += "?limit=" + limit;
+            query['limit'] = limit;
         }
         if(offset){
-            query += "?offset=" + offset;
+            query['offset'] = offset;
         }
         if(sort){
-            query += "?sort=" + sort;
+            query['sort'] = sort;
         }
+        query = '?' + Utils.prePareQuery(query);
         let url =this.delfinStoragesUrl + '/' + storageId + '/storage-hosts' + query;
         return this.http.get(url);
     }
@@ -526,20 +538,21 @@ export class DelfinService {
         let query = "";
        
         if(native_storage_host_initiator_id){
-            query += "?native_storage_host_initiator_id=" + native_storage_host_initiator_id;
+            query['native_storage_host_initiator_id'] = native_storage_host_initiator_id;
         }
-        if(name){
-            query += "?name=" + name;
+         if(name){
+            query['name'] = name;
         }
         if(limit){
-            query += "?limit=" + limit;
+            query['limit'] = limit;
         }
         if(offset){
-            query += "?offset=" + offset;
+            query['offset'] = offset;
         }
         if(sort){
-            query += "?sort=" + sort;
+            query['sort'] = sort;
         }
+        query = '?' + Utils.prePareQuery(query);
         let url =this.delfinStoragesUrl + '/' + storageId + '/storage-host-initiators' + query;
         return this.http.get(url);
     }

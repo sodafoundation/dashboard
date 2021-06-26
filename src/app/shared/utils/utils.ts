@@ -200,4 +200,16 @@ export class Utils {
         }
     }
 
+    /**
+     * prepare a query param string from received object
+     * 
+     */
+    static prePareQuery(object){
+        let query = ""
+        for (let item in object)
+             query += encodeURIComponent(item) + '=' + 
+                encodeURIComponent(object[item]) + '&'
+        return query.slice(0, -1)
+    }
+
 }
