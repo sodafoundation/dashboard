@@ -31,7 +31,9 @@ export class PerformanceMonitorComponent implements OnInit{
     ){}
     
     ngOnInit() {
-      this.performanceMonitorURL = "http://" + Consts.SODA_HOST_IP + ":" + Consts.SODA_GRAFANA_PORT + "/d/y8JDvchGz/delfin-dashboard?orgId=1&refresh=30s&from=now-30m&to=now&var-filter=storage_id%7C%3D%7C&kiosk"
+      
+      this.performanceMonitorURL = "http://" + Consts.SODA_HOST_IP + ":" + Consts.SODA_GRAFANA_PORT + "/d/UnRt1zknk/performance-monitor-overall-dashboard?orgId=1&refresh=30s&from=now-24h&var-delfin_storage_id=&var-resource_type=&var-resource_id=&theme=light"
+
     }
     
 }
