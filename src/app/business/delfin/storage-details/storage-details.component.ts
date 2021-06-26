@@ -141,6 +141,12 @@ export class StorageDetailsComponent implements OnInit {
                 this.detailsTabIndex = 2;
                 this.getAllActiveAlerts(this.selectedStorageId);
                 break;
+            case 3:
+                this.detailsTabIndex = 3;
+                break;
+            case 4:
+                this.detailsTabIndex = 4;
+                break;
             default:
                 break;
         }

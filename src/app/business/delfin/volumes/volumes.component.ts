@@ -19,7 +19,8 @@ let _ = require("underscore");
     animations: []
 })
 export class StorageVolumesComponent implements OnInit {
-    @Input() selectedStorage;
+    @Input() selectedStorage: any;
+    @Input() selectedVolumes?: any;
     volumesArr = [];
     allVolumes: any = [];
     allStorages: any = [];
@@ -59,7 +60,18 @@ export class StorageVolumesComponent implements OnInit {
     ngOnInit() {
         this.getStorageById(this.selectedStorage);
         this.ds.getAllVolumes(this.selectedStorage).subscribe((res)=>{
-            this.dataSource = res.json().volumes;
+            let datasrc = res.json().volumes;
+            if(this.selectedVolumes && this.selectedVolumes.length){
+                this.selectedVolumes.forEach(element => {
+                    datasrc.forEach(volElement => {
+                        if(element == volElement['native_volume_id']){
+                            this.dataSource.push(volElement);
+                        }
+                    });
+                });
+            } else{
+                this.dataSource = datasrc;
+            }           
             
             this.dataSource.forEach((element, index) => {
                 //Calculate the capacities for the Widgets

@@ -12,48 +12,35 @@ import { OverlayPanel } from 'app/components/overlaypanel/overlaypanel';
 
 let _ = require("underscore");
 @Component({
-    selector: 'app-delfin-ports',
-    templateUrl: 'ports.component.html',
+    selector: 'app-delfin-storage-host-initiators',
+    templateUrl: 'initiators.component.html',
     providers: [ConfirmationService],
     styleUrls: [],
     animations: []
 })
-export class PortsComponent implements OnInit {
+export class StorageHostInitiatorsComponent implements OnInit {
     @Input() selectedStorage;
-    @Input() selectedPorts?: any;
-    portsArr = [];
+    @Input() selectedInitiators?: any;
+    initiatorsArr = [];
     allPools: any = [];
     allStorages: any = [];
     selectedStorageId: any;
     selectedStorageDetails: any;
     items: any;
-    capacityData: any;
     dataSource: any = [];
     totalRecords: number;
-    portOverview: any;
+    initiatorOverview: any;
     label = {
         name: this.i18n.keyID["sds_block_volume_name"],
-        native_port_id: "Native Port ID",
+        alias: "Alias",
+        description : "Description",
+        native_storage_host_initiator_id: "Native Host Initiator ID",
         storage_id: "Storage ID",
-        cpu_info: "CPU Info",
-        soft_version: "Software Version",
-        connection_status: "Connection Status",
-        health_status: "Health Status",
-        type: "Type",
-        logical_type: "Logical Type",
-        speed: "Speed",
-        max_speed: "Max Speed",
-        native_parent_id: "Native parent ID",
+        status: "Status",
+        native_storage_host_id: "Native Host ID",
         wwn: "WWN",
-        mac_address: "MAC Address",
-        ipv4: "IPV4",
-        ipv4_mask: "IPV4 Mask",
-        ipv6: "IPV6",
-        ipv6_mask: "IPV6 Mask",
         created_at: "Created At",
         updated_at: "Updated At",
-        memory_size: "Memory Size",
-        location: "Location",
         id: "Delfin ID",
     };
 
@@ -69,13 +56,13 @@ export class PortsComponent implements OnInit {
 
     ngOnInit() {
         this.getStorageById(this.selectedStorage);
-        this.ds.getAllPorts(this.selectedStorage).subscribe((res)=>{
-            let datasrc = res.json().ports;
-            if(this.selectedPorts && this.selectedPorts.length){
-                this.selectedPorts.forEach(element => {
-                    datasrc.forEach(portElement => {
-                        if(element == portElement['native_port_id']){
-                            this.dataSource.push(portElement);
+        this.ds.getAllStorageHostInitiators(this.selectedStorage).subscribe((res)=>{
+            let datasrc = res.json().storage_host_initiators;
+            if(this.selectedInitiators && this.selectedInitiators.length){
+                this.selectedInitiators.forEach(element => {
+                    datasrc.forEach(initiatorElement => {
+                        if(element == initiatorElement['native_storage_host_initiator_id']){
+                            this.dataSource.push(initiatorElement);
                         }
                     });
                 });
@@ -88,16 +75,16 @@ export class PortsComponent implements OnInit {
             });
             
             this.totalRecords = this.dataSource.length;
-            this.portsArr = this.dataSource.slice(0, 10);
+            this.initiatorsArr = this.dataSource.slice(0, 10);
             
         }, (error)=>{
-            console.log("Something went wrong. Could not fetch Ports.", error)
+            console.log("Something went wrong. Could not fetch Storage Host Initiators.", error)
         });
     }
 
-    loadPortsLazy(event: LazyLoadEvent){
+    loadInitiatorsLazy(event: LazyLoadEvent){
         if(this.dataSource){
-            this.portsArr = this.dataSource.slice(event.first, (event.first + event.rows));
+            this.initiatorsArr = this.dataSource.slice(event.first, (event.first + event.rows));
         }
     }
     
@@ -119,8 +106,8 @@ export class PortsComponent implements OnInit {
         })
     }
 
-    showPortOverview(event, port, overlaypanel: OverlayPanel){
-        this.portOverview = port;
+    showInitiatorOverview(event, initiator, overlaypanel: OverlayPanel){
+        this.initiatorOverview = initiator;
         overlaypanel.toggle(event);
     }
     
