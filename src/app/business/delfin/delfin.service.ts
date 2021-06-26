@@ -540,7 +540,7 @@ export class DelfinService {
         if(sort){
             query += "?sort=" + sort;
         }
-        let url =this.delfinStoragesUrl + '/' + storageId + '/storage-initiators/' + query;
+        let url =this.delfinStoragesUrl + '/' + storageId + '/storage-host-initiators' + query;
         return this.http.get(url);
     }
 
