@@ -88,19 +88,9 @@
             
         <div *ngIf="showTierDetailsFlag" class="right-sidebar-content-wrapper">
             <div class="right-sidebar-header">
-                <h1 style="font-weight:normal">Tier: {{ currentTier &&  currentTier.name }}</h1>
+                <h1 style="font-weight:normal">Service Plan: {{ currentTier &&  currentTier.name }}</h1>
             </div>
             <div class="right-sidebar-body">
-                <div class="ui-grid ui-grid-responsive ui-grid-pad ui-fluid">
-                    <div class="ui-grid-row volume-basic-item-class">
-                        <div class="ui-md-3">
-                            Service Plan Name: 
-                        </div>
-                        <div class="ui-md-3">
-                            {{ currentTier && currentTier.name }}
-                        </div>
-                    </div>
-                </div>
                 <p-tabView *ngIf="showTierDetailsFlag" styleClass="ui-tabview-large">
                     <p-tabPanel header="Backends">
                         <div class="table-toolbar" style="margin-top: 25px;">
