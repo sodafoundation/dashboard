@@ -383,7 +383,7 @@ export class ServicePlanComponent implements OnInit{
             tiers.forEach((item,index)=> {
                 arr.push(item.id);
             })
-            msg = "<div>Are you sure you want to delete the selected Service Plans?</div><h3>[ "+ tiers.length +" Tiers ]</h3>";
+            msg = "<div>Are you sure you want to delete the selected Service Plans?</div><h3>[ "+ tiers.length +" service plans ]</h3>";
         }else{
             arr.push(tiers.id);
             msg = "<div>Are you sure you want to delete the Service Plan?</div><h3>[ "+ tiers.name +" ]</h3>";
