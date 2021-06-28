@@ -151,7 +151,7 @@
                 <span>{{ currentTier && currentTier.name}}</span>
             </form-item>                
             <form-item label="Backend Type" [required]="true">
-                <p-dropdown [style]="{'min-width':'150px','width':'280px'}" placeholder="Please select" [options]="allTypes" (onChange)="getBackendsByTypeId('add')" name='selectedBackendType' [(ngModel)]='selectedBackendType' formControlName="backend_type"></p-dropdown>
+                <p-dropdown [style]="{'min-width':'150px','width':'280px'}" placeholder="Please select" [options]="allTypes" (onChange)="getBackendsByTypeId()" name='selectedBackendType' [(ngModel)]='selectedBackendType' formControlName="backend_type"></p-dropdown>
             </form-item>
             <form-item  label="Backend" [required]="true">
                 <p-multiSelect [style]="{'min-width':'150px','width':'280px'}"  [(ngModel)]="selectedBackends" displaySelectedLabel="false" [options]="backendsOption" formControlName="backend" defaultLabel="You can choose multiple"></p-multiSelect>
