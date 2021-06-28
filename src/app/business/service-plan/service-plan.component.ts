@@ -36,7 +36,7 @@ export class ServicePlanComponent implements OnInit{
     validRule: any;
     showRightSidebar: boolean = false;
     allTiers;
-    allTierNameForCheck;
+    allTierNameForCheck=[];
     createTierShow: boolean = false;
     updateTierShow: boolean = false;
     showTierDetailsFlag: boolean = false;
@@ -75,11 +75,11 @@ export class ServicePlanComponent implements OnInit{
     ){
         this.errorMessage = {
             "name": { 
-                required: "Name is required.", 
-                isExisted:"This name already exists.",
-                minlength: "The tier name should have minimum 3 characters.",
-                maxlength: "The tier name can have maximum 63 characters.",
-                pattern: "Please enter valid tier name."
+                required: "Service plan name is required.", 
+                isExisted:"This service plan name already exists.",
+                minlength: "The service plan name should have minimum 3 characters.",
+                maxlength: "The service plan name can have maximum 63 characters.",
+                pattern: "Please enter a valid service plan name."
             },
             "backend":{ required: "Backend is required." },
             "backend_type": { required: "Type is required." },
@@ -90,7 +90,7 @@ export class ServicePlanComponent implements OnInit{
         };
         this.createTierForm = this.fb.group({
             "name":["",{validators:[Validators.required, Validators.minLength(3), Validators.maxLength(63), Validators.pattern(this.validRule.validName), 
-                /* Utils.isExisted(this.allTierNameForCheck) */], updateOn:'change'}],
+                Utils.isExisted(this.allTierNameForCheck)], updateOn:'change'}],
             "backend":["",{updateOn:'change'}],
             "backend_type": ["",{updateOn:'change'}],
             "tenant":["",{updateOn:'change'}],
@@ -103,6 +103,7 @@ export class ServicePlanComponent implements OnInit{
        
     getAllLists(){
         this.allTiers = [];
+        this.allTierNameForCheck = [];
         let tenants = [], backends = [], tiers = [];
         this.getAllTiersTenantsBackends().subscribe((data)=>{
             tenants = data[0].json().projects;
@@ -128,30 +129,33 @@ export class ServicePlanComponent implements OnInit{
             });
 
             // Prepare Tiers List
-            tiers.forEach(tierItem => {
-                tierItem['displayBackends'] = [];
-                tierItem['displayTenants'] = [];
-                if(tierItem['backends'] && tierItem['backends'].length){
-                    tierItem['backends'].forEach(tierBackendItem => {
-                        this.allBackends.forEach(backElement => {
-                            if(backElement['value']==tierBackendItem){
-                                tierItem['displayBackends'].push(backElement);
-                            }
-                        });    
-                    });
-                }
-                if(tierItem['tenants'] && tierItem['tenants'].length){
-                    tierItem['tenants'].forEach(tierTenantItem => {
-                        this.allTenants.forEach(tenantElement => {
-                            if(tenantElement['value']==tierTenantItem){
-                                tierItem['displayTenants'].push(tenantElement);
-                            }
+            if(tiers && tiers.length){
+                tiers.forEach(tierItem => {
+                    this.allTierNameForCheck.push(tierItem['name']);
+                    tierItem['displayBackends'] = [];
+                    tierItem['displayTenants'] = [];
+                    if(tierItem['backends'] && tierItem['backends'].length){
+                        tierItem['backends'].forEach(tierBackendItem => {
+                            this.allBackends.forEach(backElement => {
+                                if(backElement['value']==tierBackendItem){
+                                    tierItem['displayBackends'].push(backElement);
+                                }
+                            });    
                         });
-                    });
-                }                                  
-                
-            });
-            this.allTiers = tiers;
+                    }
+                    if(tierItem['tenants'] && tierItem['tenants'].length){
+                        tierItem['tenants'].forEach(tierTenantItem => {
+                            this.allTenants.forEach(tenantElement => {
+                                if(tenantElement['value']==tierTenantItem){
+                                    tierItem['displayTenants'].push(tenantElement);
+                                }
+                            });
+                        });
+                    }                                  
+                    
+                });
+                this.allTiers = tiers;
+            }
         }, (error)=>{
             console.log("Error fetching all lists", error);
         })      
@@ -173,32 +177,36 @@ export class ServicePlanComponent implements OnInit{
     // Get all tiers
     getAllTiers(){
         this.allTiers = [];
+        this.allTierNameForCheck = [];
         this.servicePlanService.getTierList().subscribe((response) =>{
             let alltiers = response.json().tiers;
-            alltiers.forEach(tierItem => {
-                tierItem['displayBackends'] = [];
-                
-                if(tierItem['backends'] && tierItem['backends'].length){
-                    tierItem['backends'].forEach(tierBackendItem => {
-                        this.allBackends.forEach(backElement => {
-                            if(backElement['value']==tierBackendItem){
-                                tierItem['displayBackends'].push(backElement);
-                            }
-                        });    
-                    });
-                }
-                tierItem['displayTenants'] = [];
-                if(tierItem['tenants'] && tierItem['tenants'].length){
-                    tierItem['tenants'].forEach(tierTenantItem => {
-                        this.allTenants.forEach(tenElement => {
-                            if(tenElement['value']==tierTenantItem){
-                                tierItem['displayTenants'].push(tenElement);
-                            }
-                        });    
-                    });
-                }
-            });
-            this.allTiers = alltiers;
+            if(alltiers && alltiers.length){
+                alltiers.forEach(tierItem => {
+                    tierItem['displayBackends'] = [];
+                    this.allTierNameForCheck.push(tierItem['name']);
+                    if(tierItem['backends'] && tierItem['backends'].length){
+                        tierItem['backends'].forEach(tierBackendItem => {
+                            this.allBackends.forEach(backElement => {
+                                if(backElement['value']==tierBackendItem){
+                                    tierItem['displayBackends'].push(backElement);
+                                }
+                            });    
+                        });
+                    }
+                    tierItem['displayTenants'] = [];
+                    if(tierItem['tenants'] && tierItem['tenants'].length){
+                        tierItem['tenants'].forEach(tierTenantItem => {
+                            this.allTenants.forEach(tenElement => {
+                                if(tenElement['value']==tierTenantItem){
+                                    tierItem['displayTenants'].push(tenElement);
+                                }
+                            });    
+                        });
+                    }
+                });
+                this.allTiers = alltiers;
+            }
+            
         }, (error)=>{
             console.log("Something went wrong. Tiers could not be fetched.");
         });
@@ -245,10 +253,9 @@ export class ServicePlanComponent implements OnInit{
 
     // Show the create tier panel
     showCreateTier(){
+        this.getAllTiers();
         if(!this.createTierForm.controls['name']){
             this.createTierForm.addControl('name', this.fb.control(''));
-            this.createTierForm.controls['name'].setValidators([Validators.required, Validators.minLength(3), Validators.maxLength(63), Validators.pattern(this.validRule.validName)]);
-            this.createTierForm.controls['name'].updateValueAndValidity();
         }
         if(!this.createTierForm.controls['backend']){
             this.createTierForm.addControl('backend', this.fb.control(''));
@@ -262,6 +269,8 @@ export class ServicePlanComponent implements OnInit{
             this.createTierForm.addControl('tenant', this.fb.control(''));
             this.createTierForm.controls['tenant'].updateValueAndValidity();
         }
+        this.createTierForm.controls['name'].setValidators([Validators.required, Validators.minLength(3), Validators.maxLength(63), Validators.pattern(this.validRule.validName), Utils.isExisted(this.allTierNameForCheck)]);
+        this.createTierForm.controls['name'].updateValueAndValidity();
         this.getTypes();
         this.getTenants();
         this.createTierShow = true;
@@ -297,12 +306,12 @@ export class ServicePlanComponent implements OnInit{
         }
         this.servicePlanService.createTier(param).subscribe((res)=>{
             this.msgs = [];
-            let successMsg = "Tier " + res.json().name + " has been created successfully."
+            let successMsg = "Service Plan " + res.json().name + " has been created successfully."
             this.msgs.push({severity: 'success', summary: 'Success', detail: successMsg});
             this.closeSidebar();
         }, (error)=>{
             this.msgs = [];
-            this.msgs.push({severity: 'error', summary: "Error creating tier.", detail: error._body});
+            this.msgs.push({severity: 'error', summary: "Error creating service plan.", detail: error._body});
             this.closeSidebar();
         })
     }
@@ -333,10 +342,10 @@ export class ServicePlanComponent implements OnInit{
     // Show the tier details panel
     showTierDetails(tier){
         this.tenantsWithDetails = [];
-        let tenantsInTier = tier.tenants ? tier.tenants : [];
+        let tenantsInTier = tier && tier.tenants ? tier.tenants : [];
         this.getTenantDetailsById(tenantsInTier);
         this.currentTier = tier;
-        let backendsInTier = tier.backends ? tier.backends : [];
+        let backendsInTier = tier && tier.backends ? tier.backends : [];
         this.getBackendsDetailsById(backendsInTier);
         this.showTierDetailsFlag = true;
         this.showRightSidebar = true;
@@ -362,7 +371,7 @@ export class ServicePlanComponent implements OnInit{
     getTierDetailsById(tierId){
         this.servicePlanService.getTierDetails(tierId).subscribe((res)=>{
         }, (error)=>{
-            console.log("Something went wrong. Could not fetch tier details.")
+            console.log("Something went wrong. Could not fetch service plan details.")
         });
     }
 
@@ -374,10 +383,10 @@ export class ServicePlanComponent implements OnInit{
             tiers.forEach((item,index)=> {
                 arr.push(item.id);
             })
-            msg = "<div>Are you sure you want to delete the selected Tiers?</div><h3>[ "+ tiers.length +" Tiers ]</h3>";
+            msg = "<div>Are you sure you want to delete the selected Service Plans?</div><h3>[ "+ tiers.length +" service plans ]</h3>";
         }else{
             arr.push(tiers.id);
-            msg = "<div>Are you sure you want to delete the Tier?</div><h3>[ "+ tiers.name +" ]</h3>";
+            msg = "<div>Are you sure you want to delete the Service Plan?</div><h3>[ "+ tiers.name +" ]</h3>";
         }
         let header ="Delete";
         let acceptLabel = "Delete";
@@ -389,11 +398,11 @@ export class ServicePlanComponent implements OnInit{
     deleteTier(id){
         this.servicePlanService.deleteTier(id).subscribe((res)=>{
             this.msgs = [];
-            this.msgs.push({severity: 'success', summary: 'Success', detail: 'Tier Deleted Successfully.'});
+            this.msgs.push({severity: 'success', summary: 'Success', detail: 'Service Plan Deleted Successfully.'});
             this.getAllTiers();
         },(error)=>{
             this.msgs = [];
-            this.msgs.push({severity: 'error', summary: "Error deleting tier.", detail: error._body});
+            this.msgs.push({severity: 'error', summary: "Error deleting service plan.", detail: error._body});
         });   
     }
 
@@ -630,10 +639,12 @@ export class ServicePlanComponent implements OnInit{
                             });                            
                             this.servicePlanService.updateTier(tier.id, reqBody).subscribe((res)=>{
                                 this.getBackendsDetailsById(res.json().backends);
+                                this.selectedTierBackends = [];
                                 this.showRightSidebar = true;
                                 this.msgs = [];
                                 this.msgs.push({severity: 'success', summary: 'Success', detail: 'Backend removed Successfully.'});
                             }, (error)=>{
+                                this.selectedTierBackends = [];
                                 this.showRightSidebar = true;
                                 this.msgs = [];
                                 this.msgs.push({severity: 'error', summary: "Error removing backend.", detail: error._body});
@@ -649,10 +660,12 @@ export class ServicePlanComponent implements OnInit{
                                 });                            
                                 this.servicePlanService.updateTier(tier.id, reqestBody).subscribe((res)=>{
                                     this.getTenantDetailsById(res.json().tenants);
+                                    this.selectedTierTenants = [];
                                     this.showRightSidebar = true;
                                     this.msgs = [];
                                     this.msgs.push({severity: 'success', summary: 'Success', detail: 'Tenant removed Successfully.'});
                                 }, (error)=>{
+                                    this.selectedTierTenants = [];
                                     this.showRightSidebar = true;
                                     this.msgs = [];
                                     this.msgs.push({severity: 'error', summary: "Error removing tenant.", detail: error._body});
@@ -670,7 +683,27 @@ export class ServicePlanComponent implements OnInit{
                 finally {}
             },
             reject:()=>{
-                this.showTierDetails(this.currentTier);
+                
+                try {
+                    switch (func) {
+                        case "delete":
+                                                 
+                            break;
+                        case "removeBackend":
+                            this.showTierDetails(this.currentTier);
+                            break;
+                        case "removeTenant":
+                            this.showTierDetails(this.currentTier);
+                            break;
+                        default:
+                            break;
+                    }
+                    
+                }
+                catch (e) {
+                    console.log(e);
+                }
+                finally {}
             }
         })
     }
