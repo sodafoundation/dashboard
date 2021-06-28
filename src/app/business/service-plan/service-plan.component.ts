@@ -639,10 +639,12 @@ export class ServicePlanComponent implements OnInit{
                             });                            
                             this.servicePlanService.updateTier(tier.id, reqBody).subscribe((res)=>{
                                 this.getBackendsDetailsById(res.json().backends);
+                                this.selectedTierBackends = [];
                                 this.showRightSidebar = true;
                                 this.msgs = [];
                                 this.msgs.push({severity: 'success', summary: 'Success', detail: 'Backend removed Successfully.'});
                             }, (error)=>{
+                                this.selectedTierBackends = [];
                                 this.showRightSidebar = true;
                                 this.msgs = [];
                                 this.msgs.push({severity: 'error', summary: "Error removing backend.", detail: error._body});
@@ -658,10 +660,12 @@ export class ServicePlanComponent implements OnInit{
                                 });                            
                                 this.servicePlanService.updateTier(tier.id, reqestBody).subscribe((res)=>{
                                     this.getTenantDetailsById(res.json().tenants);
+                                    this.selectedTierTenants = [];
                                     this.showRightSidebar = true;
                                     this.msgs = [];
                                     this.msgs.push({severity: 'success', summary: 'Success', detail: 'Tenant removed Successfully.'});
                                 }, (error)=>{
+                                    this.selectedTierTenants = [];
                                     this.showRightSidebar = true;
                                     this.msgs = [];
                                     this.msgs.push({severity: 'error', summary: "Error removing tenant.", detail: error._body});
@@ -679,7 +683,27 @@ export class ServicePlanComponent implements OnInit{
                 finally {}
             },
             reject:()=>{
-                this.showTierDetails(this.currentTier);
+                
+                try {
+                    switch (func) {
+                        case "delete":
+                                                 
+                            break;
+                        case "removeBackend":
+                            this.showTierDetails(this.currentTier);
+                            break;
+                        case "removeTenant":
+                            this.showTierDetails(this.currentTier);
+                            break;
+                        default:
+                            break;
+                    }
+                    
+                }
+                catch (e) {
+                    console.log(e);
+                }
+                finally {}
             }
         })
     }
