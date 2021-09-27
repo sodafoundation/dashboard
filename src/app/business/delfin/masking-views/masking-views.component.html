@@ -29,17 +29,17 @@
             </p-column>
             <p-column header="Storage Host Group" [style]="{'width': '10%'}">
                 <ng-template pTemplate="body" let-maskingView="rowData">
-                    {{ maskingView.native_storage_host_group_id && maskingView.native_storage_host_group_id ? maskingView.native_storage_host_group_id : '--'}}
+                    <!-- <a [routerLink]="" (click)="showDetailsView(maskingView.storageHostGroup, 'storageHostGroup')"> -->{{ maskingView.native_storage_host_group_id && maskingView.native_storage_host_group_id ? maskingView.native_storage_host_group_id : '--'}}<!-- </a> -->
                 </ng-template>
             </p-column>
             <p-column header="Port Group" [style]="{'width': '10%'}">
                 <ng-template pTemplate="body" let-maskingView="rowData">
-                    {{ maskingView.native_port_group_id && maskingView.native_port_group_id ? maskingView.native_port_group_id : '--'}}
+                    <a [routerLink]="" (click)="showDetailsView(maskingView.portGroup, 'portGroup')"> {{ maskingView.native_port_group_id && maskingView.native_port_group_id ? maskingView.native_port_group_id : '--'}} </a>
                 </ng-template>
             </p-column>
             <p-column header="Volume Group" [style]="{'width': '10%'}">
                 <ng-template pTemplate="body" let-maskingView="rowData">
-                    {{ maskingView.native_volume_group_id && maskingView.native_volume_group_id ? maskingView.native_volume_group_id : '--'}}
+                    <a [routerLink]="" (click)="showDetailsView(maskingView.volumeGroup, 'volumeGroup')"> {{ maskingView.native_volume_group_id && maskingView.native_volume_group_id ? maskingView.native_volume_group_id : '--'}} </a>
                 </ng-template>
             </p-column>
             <p-column header="Storage Host" [style]="{'width': '10%'}">
@@ -66,6 +66,88 @@
             <h1 *ngIf="showDetails" style="font-weight:normal">{{ detailsLabels.heading }}</h1>
         </div>
         <div class="right-sidebar-body">
+            <!-- Show Volume Group Details -->
+            <div *ngIf="detailSource=='volumeGroup'">
+                <div class="details-basic-info">
+                    <div class="ui-grid ui-grid-responsive ui-grid-pad ui-fluid">
+                        <div class="ui-grid-col-12">
+                            <div class="ui-grid-row details-basic-item-class">
+                                <div class="ui-grid-col-2">
+                                    {{volumeLabel.name}}:
+                                </div>
+                                <div class="ui-grid-col-2 details-basic-item-value-color" *ngIf="detailsObj">
+                                    {{detailsObj.name}}
+                                </div>
+                                <div class="ui-grid-col-2">
+                                    {{volumeLabel.id}}:
+                                </div>
+                                <div class="ui-grid-col-2 details-basic-item-value-color" *ngIf="detailsObj">
+                                    {{detailsObj.id | slice:0:20}}
+                                    <a *ngIf="detailsObj && detailsObj.id.length > 20" pTooltip="{{detailsObj.id}}" tooltipPosition="top">
+                                        ...
+                                    </a>
+                                </div>
+                                <div class="ui-grid-col-2">
+                                    {{volumeLabel.created_at}}:
+                                </div>
+                                <div class="ui-grid-col-3 details-basic-item-value-color" *ngIf="detailsObj">
+                                    {{detailsObj.created_at ? (detailsObj.created_at | date:'long') : '--'}}
+                                </div>
+                            
+                            </div>
+                            <div class="ui-grid-row details-basic-item-class">
+                                <div class="ui-grid-col-2">
+                                    {{volumeLabel.storage_id}}:
+                                </div>
+                                <div class="ui-grid-col-2 details-basic-item-value-color" *ngIf="detailsObj">
+                                    {{detailsObj.storage_id | slice:0:20}}
+                                    <a *ngIf="detailsObj.storage_id.length > 20" pTooltip="{{detailsObj.storage_id}}" tooltipPosition="top">
+                                        ...
+                                    </a>
+                                </div>
+                                <div class="ui-grid-col-2">
+                                    {{volumeLabel.native_volume_group_id}}:
+                                </div>
+                                <div class="ui-grid-col-2 details-basic-item-value-color" *ngIf="detailsObj">
+                                    {{detailsObj.native_volume_group_id | slice:0:20}}
+                                    <a *ngIf="detailsObj.native_volume_group_id.length > 20" pTooltip="{{detailsObj.native_volume_group_id}}" tooltipPosition="top">
+                                        ...
+                                    </a>
+                                </div>
+                                <div class="ui-grid-col-2">
+                                    {{volumeLabel.updated_at}}:
+                                </div>
+                                <div class="ui-grid-col-3 details-basic-item-value-color" *ngIf="detailsObj">
+                                    {{detailsObj.updated_at ? (detailsObj.updated_at | date:'long') : '--'}}
+                                </div>
+                                
+                            </div>
+                            <div class="ui-grid-row details-basic-item-class">
+                                <div class="ui-grid-col-2">
+                                    {{volumeLabel.description}}:
+                                </div>
+                                <div class="ui-grid-col-2 details-basic-item-value-color" *ngIf="detailsObj">
+                                    {{ detailsObj.description | slice:0:20 }}
+                                    <a *ngIf="detailsObj.description.length > 20" pTooltip="{{detailsObj.description}}" tooltipPosition="top">
+                                        ...
+                                    </a>
+                                </div>
+                                <div class="ui-grid-col-2">
+                                    
+                                </div>
+                                <div class="ui-grid-col-2 details-basic-item-value-color" *ngIf="detailsObj">
+                                    
+                                </div>
+                                <div class="ui-grid-col-2">
+                                </div>
+                                <div class="ui-grid-col-3 details-basic-item-value-color" *ngIf="detailsObj">
+                                </div>
+                            </div>
+                            
+                        </div>
+                    </div>
+                </div>
+            </div> 
             <!-- Show Volume Details -->
             <div *ngIf="detailSource=='volumesList'">
                 <div class="details-basic-info">
@@ -195,6 +277,91 @@
                 </div>
             </div>            
             
+            <!-- Show Port Group Details -->
+            <div *ngIf="detailSource=='portGroup'">
+                <div class="details-basic-info">
+                    <div class="ui-grid ui-grid-responsive ui-grid-pad ui-fluid">
+                        <div class="ui-grid-col-12">
+                            <div class="ui-grid-row details-basic-item-class">
+                                <div class="ui-grid-col-2">
+                                    {{portLabel.name}}:
+                                </div>
+                                <div class="ui-grid-col-2 details-basic-item-value-color" *ngIf="detailsObj">
+                                    {{detailsObj.name}}
+                                </div>
+                                <div class="ui-grid-col-2">
+                                    {{portLabel.id}}:
+                                </div>
+                                <div class="ui-grid-col-2 details-basic-item-value-color" *ngIf="detailsObj">
+                                    {{detailsObj.id | slice:0:20}}
+                                    <a *ngIf="detailsObj && detailsObj.id.length > 20" pTooltip="{{detailsObj.id}}" tooltipPosition="top">
+                                        ...
+                                    </a>  
+                                </div>
+                                <div class="ui-grid-col-2">
+                                    {{portLabel.created_at}}:
+                                </div>
+                                <div class="ui-grid-col-3 details-basic-item-value-color" *ngIf="detailsObj">
+                                    {{detailsObj.created_at ? (detailsObj.created_at | date:'long') : '--'}}
+                                </div>
+                            
+                            </div>
+                            <div class="ui-grid-row details-basic-item-class">
+                                <div class="ui-grid-col-2">
+                                    {{portLabel.storage_id}}:
+                                </div>
+                                <div class="ui-grid-col-2 details-basic-item-value-color" *ngIf="detailsObj">
+                                    {{detailsObj.storage_id | slice:0:20}}
+                                    <a *ngIf="detailsObj.storage_id.length > 20" pTooltip="{{detailsObj.storage_id}}" tooltipPosition="top">
+                                        ...
+                                    </a>
+                                </div>
+                                <div class="ui-grid-col-2">
+                                    {{portLabel.native_port_group_id}}:
+                                </div>
+                                <div class="ui-grid-col-2 details-basic-item-value-color" *ngIf="detailsObj">
+                                    {{detailsObj.native_port_group_id | slice:0:20}}
+                                    <a *ngIf="detailsObj.native_port_group_id.length > 20" pTooltip="{{detailsObj.native_port_group_id}}" tooltipPosition="top">
+                                        ...
+                                    </a>                               
+                                </div>
+                                <div class="ui-grid-col-2">
+                                    {{portLabel.updated_at}}:
+                                </div>
+                                <div class="ui-grid-col-3 details-basic-item-value-color" *ngIf="detailsObj">
+                                    {{detailsObj.updated_at ? (detailsObj.updated_at | date:'long') : '--'}}
+                                </div>
+                                
+                            </div>
+                            <div class="ui-grid-row details-basic-item-class">
+                                <div class="ui-grid-col-2">
+                                    {{portLabel.description}}:
+                                </div>
+                                <div class="ui-grid-col-2 details-basic-item-value-color" *ngIf="detailsObj">
+                                    {{ detailsObj.description | slice:0:20 }}
+                                    <a *ngIf="detailsObj.description.length > 20" pTooltip="{{detailsObj.description}}" tooltipPosition="top">
+                                        ...
+                                    </a>
+                                </div>
+                                <div class="ui-grid-col-2">
+                                    
+                                </div>
+                                <div class="ui-grid-col-2 details-basic-item-value-color" *ngIf="detailsObj">
+                                    
+                                </div>
+                                
+                                <div class="ui-grid-col-2">
+                                    
+                                </div>
+                                <div class="ui-grid-col-3 details-basic-item-value-color" *ngIf="detailsObj">
+                                    
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div> 
+
             <!-- Show Port Details -->
             <div *ngIf="detailSource=='portsList'">
                 <div class="details-basic-info">
@@ -402,6 +569,16 @@
             <!-- Show Storage host Initiators List -->
             <div *ngIf="detailSource=='storageHost'">
                 <app-delfin-storage-host-initiators [selectedStorage]="selectedStorageId" [selectedInitiators]="detailsObj.storage_host_initiators"></app-delfin-storage-host-initiators>
+            </div>
+
+             <!-- Show Volumes List -->
+            <div *ngIf="detailSource=='volumeGroup' && detailsObj &&  detailsObj.volumes">
+                <app-delfin-volumes [selectedStorage]="selectedStorageId" [selectedVolumes]="detailsObj.volumes"></app-delfin-volumes>
+            </div>
+
+            <!-- Show Ports List -->
+            <div *ngIf="detailSource=='portGroup' && detailsObj && detailsObj.ports">
+                <app-delfin-ports  [selectedStorage]="selectedStorageId" [selectedPorts]="detailsObj.ports"></app-delfin-ports>
             </div>
         </div>
         <div class="right-sidebar-footer">
