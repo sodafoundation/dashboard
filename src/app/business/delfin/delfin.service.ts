@@ -511,6 +511,52 @@ export class DelfinService {
         return this.http.get(url);
     }
 
+    getAllVolumeGroups(storageId, nativeVolumeGroupId?, name?, limit?, offset?, sort?): Observable<any> {
+        let query = {};
+        
+        if(nativeVolumeGroupId){
+            query['native_volume_group_id'] = nativeVolumeGroupId;
+        }
+         if(name){
+            query['name'] = name;
+        }
+        if(limit){
+            query['limit'] = limit;
+        }
+        if(offset){
+            query['offset'] = offset;
+        }
+        if(sort){
+            query['sort'] = sort;
+        }
+        query = '?' + Utils.prePareQuery(query);
+        let url =this.delfinStoragesUrl + '/' + storageId + '/volume-groups' + query;
+        return this.http.get(url);
+    }
+
+    getAllPortGroups(storageId, nativePortGroupId?, name?, limit?, offset?, sort?): Observable<any> {
+        let query = {};
+        
+        if(nativePortGroupId){
+            query['native_port_group_id'] = nativePortGroupId;
+        }
+         if(name){
+            query['name'] = name;
+        }
+        if(limit){
+            query['limit'] = limit;
+        }
+        if(offset){
+            query['offset'] = offset;
+        }
+        if(sort){
+            query['sort'] = sort;
+        }
+        query = '?' + Utils.prePareQuery(query);
+        let url =this.delfinStoragesUrl + '/' + storageId + '/port-groups' + query;
+        return this.http.get(url);
+    }
+
     getAllStorageHosts(storageId, nativeStorageHostId?, name?, limit?, offset?, sort?): Observable<any> {
         let query = {};
         

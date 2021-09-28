@@ -49,13 +49,16 @@ export class MaskingViewsComponent implements OnInit {
         availabilityZones: "Availability Zones",
         initiators: "Initiators",
         storage_id: "Storage ID",
-        native_storage_host_id: "Native Host ID"
+        native_storage_host_id: "Native Host ID",
+        native_storage_host_group_id: "Native Storage Host Group ID",
+        id: "Delfin ID",
     };
     volumeLabel = {
         name: this.i18n.keyID["sds_block_volume_name"],
         description: this.i18n.keyID["sds_block_volume_descri"],
         wwn: "WWN",
         native_volume_id: "Native Volume ID",
+        native_volume_group_id: "Native Volume Group ID",
         storage_id: "Storage ID",
         compressed: "Compressed",
         deduplicated: "Deduplicated",
@@ -69,7 +72,9 @@ export class MaskingViewsComponent implements OnInit {
     };
     portLabel = {
         name: this.i18n.keyID["sds_block_volume_name"],
+        description: this.i18n.keyID["sds_block_volume_descri"],
         native_port_id: "Native Port ID",
+        native_port_group_id:"Native Port Group ID",
         storage_id: "Storage ID",
         cpu_info: "CPU Info",
         soft_version: "Software Version",
@@ -116,8 +121,18 @@ export class MaskingViewsComponent implements OnInit {
                 view['storageHostInitiatorsCount'] = 0;
                 view['volumesCount'] = 0;
                 view['storageHost'] = {};
-                if(view['native_storage_host_group_id']){
-                } else if(view['native_storage_host_id']){
+                if(view['native_storage_host_group_id'] && view['native_storage_host_group_id'] != ""){
+                    this.ds.getAllStorageHostGroups(storageId, view['native_storage_host_group_id']).subscribe((res)=>{
+                        let storageHostGroup = res.json().storage_host_groups;
+                        view['storageHostGroup'] = storageHostGroup[0];
+                        if(storageHostGroup && storageHostGroup.length){
+                            view['storageHostGroup'] = storageHostGroup[0];
+                            view['storage_hosts'] = storageHostGroup[0].storage_hosts ? storageHostGroup[0].storage_hosts : [];
+                        }  
+                    }, (error)=>{
+                        console.log("Something went wrong. Could not fetch storage host group.")
+                    })
+                } else if(view['native_storage_host_id'] && view['native_storage_host_id'] != ""){
                     this.ds.getAllStorageHosts(storageId, view['native_storage_host_id']).subscribe((res)=>{
                         let storageHost = res.json().storage_hosts;
                         view['storageHost'] = storageHost[0];
@@ -129,8 +144,17 @@ export class MaskingViewsComponent implements OnInit {
                 }
 
 
-                if(view['native_volume_group_id']){
-                } else if(view['native_volume_id']){
+                if(view['native_volume_group_id'] && view['native_volume_group_id'] != ""){
+                    this.ds.getAllVolumeGroups(storageId, view['native_volume_group_id']).subscribe((res)=>{
+                        let volumeGroup = res.json().volume_groups;
+                        if(volumeGroup && volumeGroup.length){
+                            view['volumeGroup'] = volumeGroup[0];
+                            view['volumes'] = volumeGroup[0].volumes ? volumeGroup[0].volumes : [];
+                        }                        
+                    }, (error)=>{
+                        console.log("Something went wrong. Could not fetch volume groups.")
+                    })
+                } else if(view['native_volume_id'] && view['native_volume_id'] != ""){
                     //view['volumesCount'] = view['volumes'].length;
                     this.ds.getAllVolumes(storageId, view['native_volume_id']).subscribe((res)=>{
                         let volume = res.json().volumes[0];
@@ -147,8 +171,17 @@ export class MaskingViewsComponent implements OnInit {
                     })
                 }
 
-                if(view['native_port_group_id']){
-                } else if(view['native_port_id']){
+                if(view['native_port_group_id'] && view['native_port_group_id'] != ""){
+                    this.ds.getAllPortGroups(storageId, view['native_port_group_id']).subscribe((res)=>{
+                        let portGroup = res.json().port_groups;
+                        if(portGroup && portGroup.length){
+                            view['portGroup'] = portGroup[0];
+                            view['ports'] = portGroup[0].ports ? portGroup[0].ports : [];
+                        }                        
+                    }, (error)=>{
+                        console.log("Something went wrong. Could not fetch port groups.")
+                    })
+                } else if(view['native_port_id'] && view['native_port_id'] != ""){
                     this.ds.getAllPorts(storageId, view['native_port_id']).subscribe((res)=>{
                         let port = res.json().ports[0];
                         view['port'] = port;
@@ -171,6 +204,15 @@ export class MaskingViewsComponent implements OnInit {
     showDetailsView(item, src?){
       switch (src) {
             case 'maskingView': this.detailsLabels.heading = "Masking View Details";
+              
+              break;
+            case 'storageHostGroup': this.detailsLabels.heading = "Storage Host Group Details";
+              
+              break;
+            case 'volumeGroup': this.detailsLabels.heading = "Volume Group Details";
+              
+              break;
+            case 'portGroup': this.detailsLabels.heading = "Port Group Details";
               
               break;
             case 'storageHost': this.detailsLabels.heading = "Storage Host Details";
