@@ -8,6 +8,7 @@ import { StoragePoolsComponent } from '../storage-pools/storage-pools.component'
 import { ControllersComponent } from '../controllers/controllers.component';
 import { PortsComponent } from '../ports/ports.component';
 import { StorageHostInitiatorsComponent } from '../storage-host-initiators/initiators.component';
+import { StorageHostsComponent } from '../storage-hosts/storage-hosts.component';
 import { DisksComponent } from '../disks/disks.component';
 import { QtreesComponent } from '../qtrees/qtrees.component';
 import { FilesystemsComponent } from '../filesystems/filesystems.component';
@@ -37,6 +38,7 @@ let routers = [{
     ControllersComponent, 
     PortsComponent, 
     StorageHostInitiatorsComponent,
+    StorageHostsComponent,
     DisksComponent, 
     QtreesComponent, 
     FilesystemsComponent,
@@ -50,6 +52,7 @@ let routers = [{
     ControllersComponent, 
     PortsComponent, 
     StorageHostInitiatorsComponent,
+    StorageHostsComponent,
     DisksComponent, 
     QtreesComponent, 
     FilesystemsComponent,
