@@ -211,7 +211,7 @@ export const Consts = {
             pools : ['vmax', 'unity', 'vnx_block', 'vplex', 'oceanstor', '3par', 'vsp', 'storwize_svc', 'cmode'],
             controllers : ['oceanstor', 'unity', 'vnx_block', 'vplex', '3par', 'vsp', 'storwize_svc', 'cmode', 'vmax'],
             ports : ['oceanstor', 'unity', 'vnx_block', 'vplex', '3par', 'vsp', 'storwize_svc', 'cmode', 'vmax'],
-            disks : ['oceanstor', 'unity', 'vnx_block', '3par', 'vsp', 'storwize_svc', 'cmode'],
+            disks : ['oceanstor', 'unity', 'vnx_block', '3par', 'vsp', 'storwize_svc', 'cmode', 'vmax'],
             qtrees : ['oceanstor', 'unity', 'cmode'],
             filesystems : ['oceanstor', 'unity', 'cmode'],
             shares: ['oceanstor', 'unity', 'cmode'],
