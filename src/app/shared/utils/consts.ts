@@ -208,14 +208,18 @@ export const Consts = {
             {
                 label: "Fujitsu",
                 value: 'fujitsu'
+            },
+            {
+                label: "Pure Storage",
+                value: 'pure'
             }
         ],
         resources:{
-            volumes : ['vmax', 'unity', 'vnx_block', 'vplex', 'oceanstor', '3par', 'vsp', 'storwize_svc', 'cmode', 'eternus'],
+            volumes : ['vmax', 'unity', 'vnx_block', 'vplex', 'oceanstor', '3par', 'vsp', 'storwize_svc', 'cmode', 'eternus', 'flasharray'],
             pools : ['vmax', 'unity', 'vnx_block', 'vplex', 'oceanstor', '3par', 'vsp', 'storwize_svc', 'cmode', 'eternus'],
-            controllers : ['oceanstor', 'unity', 'vnx_block', 'vplex', '3par', 'vsp', 'storwize_svc', 'cmode', 'vmax', 'eternus'],
-            ports : ['oceanstor', 'unity', 'vnx_block', 'vplex', '3par', 'vsp', 'storwize_svc', 'cmode', 'vmax', 'eternus'],
-            disks : ['oceanstor', 'unity', 'vnx_block', '3par', 'vsp', 'storwize_svc', 'cmode', 'vmax', 'eternus'],
+            controllers : ['oceanstor', 'unity', 'vnx_block', 'vplex', '3par', 'vsp', 'storwize_svc', 'cmode', 'vmax', 'eternus', 'flasharray'],
+            ports : ['oceanstor', 'unity', 'vnx_block', 'vplex', '3par', 'vsp', 'storwize_svc', 'cmode', 'vmax', 'eternus', 'flasharray'],
+            disks : ['oceanstor', 'unity', 'vnx_block', '3par', 'vsp', 'storwize_svc', 'cmode', 'vmax', 'eternus', 'flasharray'],
             qtrees : ['oceanstor', 'unity', 'cmode'],
             filesystems : ['oceanstor', 'unity', 'cmode'],
             shares: ['oceanstor', 'unity', 'cmode'],
@@ -340,6 +344,19 @@ export const Consts = {
                         name: 'eternus',
                         rest: false,
                         ssh: true,
+                        cli: false,
+                        smis: false,
+                        extra: false
+                    }
+                }
+            ],
+            'pure' : [
+                {
+                    label: "FlashArray",
+                    value: {
+                        name: 'flasharray',
+                        rest: true,
+                        ssh: false,
                         cli: false,
                         smis: false,
                         extra: false
