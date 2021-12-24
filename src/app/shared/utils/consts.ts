@@ -204,14 +204,18 @@ export const Consts = {
             {
                 label: "NetApp",
                 value: 'netapp'
+            },
+            {
+                label: "Fujitsu",
+                value: 'fujitsu'
             }
         ],
         resources:{
-            volumes : ['vmax', 'unity', 'vnx_block', 'vplex', 'oceanstor', '3par', 'vsp', 'storwize_svc', 'cmode'],
-            pools : ['vmax', 'unity', 'vnx_block', 'vplex', 'oceanstor', '3par', 'vsp', 'storwize_svc', 'cmode'],
-            controllers : ['oceanstor', 'unity', 'vnx_block', 'vplex', '3par', 'vsp', 'storwize_svc', 'cmode', 'vmax'],
-            ports : ['oceanstor', 'unity', 'vnx_block', 'vplex', '3par', 'vsp', 'storwize_svc', 'cmode', 'vmax'],
-            disks : ['oceanstor', 'unity', 'vnx_block', '3par', 'vsp', 'storwize_svc', 'cmode', 'vmax'],
+            volumes : ['vmax', 'unity', 'vnx_block', 'vplex', 'oceanstor', '3par', 'vsp', 'storwize_svc', 'cmode', 'eternus'],
+            pools : ['vmax', 'unity', 'vnx_block', 'vplex', 'oceanstor', '3par', 'vsp', 'storwize_svc', 'cmode', 'eternus'],
+            controllers : ['oceanstor', 'unity', 'vnx_block', 'vplex', '3par', 'vsp', 'storwize_svc', 'cmode', 'vmax', 'eternus'],
+            ports : ['oceanstor', 'unity', 'vnx_block', 'vplex', '3par', 'vsp', 'storwize_svc', 'cmode', 'vmax', 'eternus'],
+            disks : ['oceanstor', 'unity', 'vnx_block', '3par', 'vsp', 'storwize_svc', 'cmode', 'vmax', 'eternus'],
             qtrees : ['oceanstor', 'unity', 'cmode'],
             filesystems : ['oceanstor', 'unity', 'cmode'],
             shares: ['oceanstor', 'unity', 'cmode'],
@@ -321,6 +325,19 @@ export const Consts = {
                     label: "Cluster Mode",
                     value: {
                         name: 'cmode',
+                        rest: false,
+                        ssh: true,
+                        cli: false,
+                        smis: false,
+                        extra: false
+                    }
+                }
+            ],
+            'fujitsu' : [
+                {
+                    label: "ETERNUS",
+                    value: {
+                        name: 'eternus',
                         rest: false,
                         ssh: true,
                         cli: false,
