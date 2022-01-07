@@ -298,7 +298,7 @@ export class BucketDetailComponent implements OnInit {
   //Click on folder
   folderLink(file){
     let folderKey = file.Key;
-    if(this.folderId == ""){
+    if(this.folderId !== null && this.folderId !== ""){
       this.folderId = folderKey;
     }else{
       this.folderId = this.folderId + folderKey;
