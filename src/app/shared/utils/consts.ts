@@ -215,10 +215,10 @@ export const Consts = {
             }
         ],
         resources:{
-            volumes : ['vmax', 'unity', 'vnx_block', 'vplex', 'oceanstor', '3par', 'vsp', 'storwize_svc', 'cmode', 'eternus', 'flasharray', 'msa'],
-            pools : ['vmax', 'unity', 'vnx_block', 'vplex', 'oceanstor', '3par', 'vsp', 'storwize_svc', 'cmode', 'eternus', 'msa', 'hnas'],
-            controllers : ['oceanstor', 'unity', 'vnx_block', 'vplex', '3par', 'vsp', 'storwize_svc', 'cmode', 'vmax', 'eternus', 'flasharray', 'msa', 'hnas'],
-            ports : ['oceanstor', 'unity', 'vnx_block', 'vplex', '3par', 'vsp', 'storwize_svc', 'cmode', 'vmax', 'eternus', 'flasharray', 'msa', 'hnas'],
+            volumes : ['vmax', 'unity', 'vnx_block', 'vplex', 'oceanstor', '3par', 'vsp', 'storwize_svc', 'cmode', 'eternus', 'flasharray', 'msa', 'ds8k'],
+            pools : ['vmax', 'unity', 'vnx_block', 'vplex', 'oceanstor', '3par', 'vsp', 'storwize_svc', 'cmode', 'eternus', 'msa', 'hnas', 'ds8k'],
+            controllers : ['oceanstor', 'unity', 'vnx_block', 'vplex', '3par', 'vsp', 'storwize_svc', 'cmode', 'vmax', 'eternus', 'flasharray', 'msa', 'hnas', 'ds8k'],
+            ports : ['oceanstor', 'unity', 'vnx_block', 'vplex', '3par', 'vsp', 'storwize_svc', 'cmode', 'vmax', 'eternus', 'flasharray', 'msa', 'hnas', 'ds8k'],
             disks : ['oceanstor', 'unity', 'vnx_block', '3par', 'vsp', 'storwize_svc', 'cmode', 'vmax', 'eternus', 'flasharray', 'msa', 'hnas'],
             qtrees : ['oceanstor', 'unity', 'cmode', 'hnas'],
             filesystems : ['oceanstor', 'unity', 'cmode', 'hnas'],
@@ -340,6 +340,17 @@ export const Consts = {
                         name: 'storwize_svc',
                         rest: false,
                         ssh: true,
+                        cli: false,
+                        smis: false,
+                        extra: false
+                    }
+                },
+                {
+                    label: "DS8000",
+                    value: {
+                        name: 'ds8k',
+                        rest: true,
+                        ssh: false,
                         cli: false,
                         smis: false,
                         extra: false
