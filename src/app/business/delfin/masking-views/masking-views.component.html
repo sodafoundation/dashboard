@@ -52,11 +52,6 @@
                     <a [routerLink]="" (click)="showDetailsView(maskingView.volume, 'volumesList')"> {{ maskingView.volume ? 'View' : '--'}} </a>
                 </ng-template>
             </p-column>
-            <p-column header="Port" [style]="{'width': '10%'}">
-                <ng-template pTemplate="body" let-maskingView="rowData">
-                    <a [routerLink]="" (click)="showDetailsView(maskingView.port, 'portsList')"> {{ maskingView.port ? 'View' : '--'}} </a>
-                </ng-template>
-            </p-column>
         </p-dataTable>
     </div>
 </div>

@@ -17,6 +17,11 @@
     </p-column>
     <p-column field="wwn" header="WWN">
     </p-column>    
+    <p-column header="Type">
+        <ng-template pTemplate="body" let-initiator="rowData">
+            {{ initiator.type ? initiator.type : '--'}}
+        </ng-template>
+    </p-column>
     <p-column field="status" header="Status" [style]="{'width': '8%'}">
         <ng-template pTemplate="body" let-initiator="rowData">
             <span class="storage-status-icon" [ngClass]="{normal: initiator.status=='Normal', abnormal: initiator.status=='abnormal' || initiator.status=='unknown' || initiator.status=='offline'}"><i class="fa fa-circle"></i></span>
@@ -129,10 +134,10 @@
                             </a>
                         </div>
                         <div class="ui-grid-col-2">
-                            
+                            {{label.type}}:
                         </div>
                         <div class="ui-grid-col-3 details-basic-item-value-color" *ngIf="initiator">
-                            
+                            {{ initiator.type ? initiator.type : '--'}}
                         </div>
                     </div>
                 </div>

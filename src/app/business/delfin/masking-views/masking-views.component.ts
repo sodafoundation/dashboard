@@ -42,7 +42,6 @@ export class MaskingViewsComponent implements OnInit {
         updatedAt: "Updated At",
         hostName: "Name",
         ip: "IP Address",
-        port: "Port",
         status: "Status",
         osType: "OS",
         accessMode: "Access Mode",
@@ -181,14 +180,7 @@ export class MaskingViewsComponent implements OnInit {
                     }, (error)=>{
                         console.log("Something went wrong. Could not fetch port groups.")
                     })
-                } else if(view['native_port_id'] && view['native_port_id'] != ""){
-                    this.ds.getAllPorts(storageId, view['native_port_id']).subscribe((res)=>{
-                        let port = res.json().ports[0];
-                        view['port'] = port;
-                    }, (error)=>{   
-                        console.log("Something went wrong. Could not fetch port details.")
-                    })
-                }
+                } 
             });
             this.allMaskingViews = allViews;
             
