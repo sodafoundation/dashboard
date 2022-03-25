@@ -42,6 +42,7 @@ export class StorageHostInitiatorsComponent implements OnInit {
         created_at: "Created At",
         updated_at: "Updated At",
         id: "Delfin ID",
+        type: "Type"
     };
 
     constructor(
