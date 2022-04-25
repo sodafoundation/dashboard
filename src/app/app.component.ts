@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewContainerRef, ViewChild, Directive, ElementRef, HostBinding, HostListener } from '@angular/core';
+import { Component, OnInit, ViewContainerRef, ViewChild, Directive, ElementRef, HostBinding, HostListener,AfterViewInit } from '@angular/core';
 import { Http, Headers } from '@angular/http';
 import { Router } from '@angular/router';
 import { I18NService, Consts, ParamStorService, MsgBoxService, Utils, HttpService } from 'app/shared/api';
@@ -21,7 +21,7 @@ let _ = require("underscore");
     providers: [MsgBoxService, akSkService, ConfirmationService],
     styleUrls: []
 })
-export class AppComponent implements OnInit {
+export class AppComponent implements OnInit,AfterViewInit {
     servicePlansEnabled: boolean = Consts.STORAGE_SERVICE_PLAN_ENABLED;
     selectFileName: string;
 
@@ -118,6 +118,8 @@ export class AppComponent implements OnInit {
             this.dropMenuItems = userItems.dropMenuItems
             this.tenantItems = userItems.tenantItems
             this.tourSteps = userItems.tourSteps
+            window['isAdmin'] = (_.where(JSON.parse(this.paramStor.getParam('roles')), {'name': "admin"})).length > 0;
+            window['isUser'] = (_.where(JSON.parse(this.paramStor.getParam('roles')), {'name': "Member"})).length > 0;
             if (window.location.href.includes( '/home')){
                 this.isHomePage = true
             } else {
@@ -128,6 +130,7 @@ export class AppComponent implements OnInit {
             this.isLogin = false
             if (window.location.href.includes( '/home')){
                 this.isHomePage = true
+                this.router.navigate(['/home'])
             }else{
                 this.isHomePage = false
             }
@@ -820,6 +823,26 @@ export class AppComponent implements OnInit {
         var r = data.slice(1);
         r.push(data[0]);
         return r;
+    }
+    ngAfterViewInit() {
+        this.loginBgAnimation();
+    }
+
+    loginBgAnimation() {
+        let obj = this.el.nativeElement.querySelector(".login-bg");
+        if (obj) {
+            let obj_w = obj.clientWidth;
+            let obj_h = obj.clientHeight;
+            let dis = 50;
+            obj.addEventListener("mousemove", (e) => {
+                let MX = e.clientX;
+                let MY = e.clientY;
+                let offsetX = (obj_w - 2258) * 0.5 + (obj_w - MX) * dis / obj_w;
+                let offsetY = (obj_h - 1363) * 0.5 + (obj_h - MY) * dis / obj_h;
+                obj.style.backgroundPositionX = offsetX + "px";
+                obj.style.backgroundPositionY = offsetY + "px";
+            })
+        }
     }
 
 }
