@@ -1,11 +1,19 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { LoginComponent } from './login/login.component';
 
+import { LoginComponent } from './login/login.component';
+import { LogoutComponent } from './logout/logout.component';
+import { RouterModule } from '@angular/router';
+
+let routers = [{
+    path: 'logout',
+    component: LogoutComponent
+  }]
 @NgModule({
   imports: [
-    CommonModule
+    CommonModule,
+    RouterModule.forChild(routers)
   ],
-  declarations: [LoginComponent]
+  declarations: [LogoutComponent]
 })
 export class AuthModule { }

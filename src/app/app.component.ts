@@ -72,211 +72,15 @@ export class AppComponent implements OnInit, AfterViewInit {
     stringToSign = "";
     canonicalString = "";
 
-    menuItems = [];
+    menuItems = Consts.menuItems;
     tourSteps = [];
 
     msgs: Message[];
 
-    menuItems_tenant = [
-        {
-            "title": "Home",
-            "description": "Resource statistics",
-            "routerLink": "/home",
-            "joyrideStep" : "menuHome",
-            "text" : "This page shows you the overall view of the backends available, volumes provisioned, buckets created and object storage migrations performed."
-        },
-        {
-            "title": "Profile",
-            "description": "Profiles",
-            "routerLink": "/profile",
-            "joyrideStep" : "menuProfile",
-            "text" : "A profile is a set of configurations on service capabilities (including resource tuning, QoS) of storage resources. A profile must be specified when volume or fileshare is created."
-        },
-        {
-            "title": "Resource Manager",
-            "description": "Volumes / Buckets / File Share / Hosts",
-            "routerLink": "/block",
-            "joyrideStep" : "menuResource",
-            "text" : "View and manage Buckets, Volumes, Volume Groups, File shares and Hosts that have been manually created or applied for through service templates.",
-            "group" : true,
-            "children" : [
-                {
-                    "title" : "Buckets",
-                    "routerLink": "/block"
-                },
-                {
-                    "title" : "Volumes",
-                    "routerLink": "/block/fromVolume"
-                },
-                {
-                    "title" : "Volume Group",
-                    "routerLink": "/block/fromGroup"
-                },
-                {
-                    "title" : "File Share",
-                    "routerLink": "/block/fromFileShare"
-                },
-                {
-                    "title" : "Hosts",
-                    "routerLink": "/block/fromHosts"
-                },
-            ]
-        },
-        {
-            "title": "Dataflow",
-            "description": "Through migration / replication capability.",
-            "routerLink": "/dataflow",
-            "joyrideStep" : "menuDataflow",
-            "text" : "Data flow through buckets by migration / replication."
-        },
-        {
-            "title": "Services",
-            "description": "Orchestration services.",
-            "routerLink": "/services",
-            "joyrideStep" : "menuServices",
-            "text" : "This page demonstrates the Orchestration service that allows to Create and Manage Service Instances"
-        }
-    ]
-
-    menuItems_admin = [
-        {
-            "title": "Home",
-            "description": "Resource statistics",
-            "routerLink": "/home",
-            "joyrideStep" : "menuHome",
-            "text" : "This page shows you the overall view of the backends available, volumes provisioned, buckets created and object storage migrations performed."
-        },
-        {
-            "title": "Profile",
-            "description": "Profiles",
-            "routerLink": "/profile",
-            "joyrideStep" : "menuProfile",
-            "text" : "A profile is a set of configurations on service capabilities (including resource tuning, QoS) of storage resources. A profile must be specified when volume is created."
-        },
-        {
-            "title": "Resource Manager",
-            "description": "Volumes / Buckets / File Share / Hosts",
-            "routerLink": "/block",
-            "joyrideStep" : "menuResource",
-            "text" : "View and manage Buckets, Volumes, Volume Groups, File shares and Hosts that have been manually created or applied for through service templates.",
-            "group" : true,
-            "children" : [
-                {
-                    "title" : "Buckets",
-                    "routerLink": "/block"
-                },
-                {
-                    "title" : "Volumes",
-                    "routerLink": "/block/fromVolume"
-                },
-                {
-                    "title" : "Volume Group",
-                    "routerLink": "/block/fromGroup"
-                },
-                {
-                    "title" : "File Share",
-                    "routerLink": "/block/fromFileShare"
-                },
-                {
-                    "title" : "Hosts",
-                    "routerLink": "/block/fromHosts"
-                },
-            ]
-        },
-        {
-            "title": "Dataflow",
-            "description": "Through migration / replication capability.",
-            "routerLink": "/dataflow",
-            "joyrideStep" : "menuDataflow",
-            "text" : "Data flow through buckets by migration / replication."
-        },
-        {
-            "title": "Resource Monitor",
-            "description": "SODA Storage Infrastructure Manager",
-            "routerLink": "/resource-monitor",
-            "joyrideStep" : "menuDelfin",
-            "text" : "delfin is the SODA Infrastructure Manager project which provides unified, intelligent and scalable resource management, alert and performance monitoring",
-            "group" : true,
-            "children" : [
-                {
-                    "title" : "Storage Summary",
-                    "routerLink": "/resource-monitor"
-                },
-                {
-                    "title" : "Performance Monitor",
-                    "routerLink": "/performance-monitor"
-                },
-                {
-                    "title" : "Alert Manager",
-                    "is_external_link" : true,
-                    "link" : "http://" + Consts.SODA_HOST_IP + ":" + Consts.SODA_ALERTMANAGER_PORT
-                },
-            ]
-        },
-	    {
-            "title": "Services",
-            "description": "Orchestration services.",
-            "routerLink": "/services",
-            "joyrideStep" : "menuServices",
-            "text" : "This page demonstrates the Orchestration service that allows to Create and Manage Service Instances"
-        },
-        {
-            "title": "Infrastructure",
-            "description": "Regions, availability zones and storage",
-            "routerLink": "/resource",
-            "joyrideStep" : "menuInfrastructure",
-            "text" : "A quick overview of the block, Object and File infrastructure."
-        },
-        {
-            "title": "Identity",
-            "description": "Managing tenants and users",
-            "routerLink": "/identity",
-            "joyrideStep" : "menuIdentity",
-            "text" : "Managing Tenants and Users"
-        }
-    ];
-
-    tourSteps_admin = [
-        'homeWelcome',
-        'homeUserProfile',
-        'menuHome',
-        'menuProfile',
-        'menuResource',
-        'menuDataflow',
-        'menuDelfin',
-        'menuServices',
-        'menuInfrastructure',
-        'menuIdentity',
-        'homeResourceCard@/home',
-        'homeDataflowCard@/home',
-        'homeAddBackendBtn@/home',
-        'homeAWSBackends@/home',
-        'homeGCPBackends@/home',
-        'homeHuaweiBackends@/home',
-        'homeIBMBackends@/home',
-        'homeAlibabaBackends@/home',
-        'homeAzureBackends@/home',
-        'homeAllBackends@/home'
-    ];
-    tourSteps_tenant = [
-        'homeWelcome',
-        'homeUserProfile',
-        'menuHome',
-        'menuProfile',
-        'menuResource',
-        'menuDataflow',
-        'menuServices',
-        'homeResourceCard@/home',
-        'homeDataflowCard@/home',
-        'homeAddBackendBtn@/home',
-        'homeAWSBackends@/home',
-        'homeGCPBackends@/home',
-        'homeHuaweiBackends@/home',
-        'homeIBMBackends@/home',
-        'homeAlibabaBackends@/home',
-        'homeAzureBackends@/home',
-        'homeAllBackends@/home'
-    ];
+    menuItems_tenant = Consts.menuItems_tenant
+    menuItems_admin = Consts.menuItems_admin
+    tourSteps_admin = Consts.tourSteps_admin
+    tourSteps_tenant = Consts.tourSteps_tenant
     activeItem: any;
 
     constructor(
@@ -307,11 +111,19 @@ export class AppComponent implements OnInit, AfterViewInit {
     d;
 
     ngOnInit() {
-        if (this.paramStor.AUTH_TOKEN() && this.paramStor.CURRENT_USER() && 
+        debugger
+        if (this.paramStor.AUTH_TOKEN() && this.paramStor.CURRENT_USER() &&
         this.paramStor.CURRENT_TENANT() && this.paramStor.PASSWORD() && this.paramStor.TOKEN_PERIOD()){
             this.isLogin = true
             this.isHomePage = true
             this.hideLoginForm = true
+            this.showMenu = true
+            let userItems = JSON.parse(localStorage.getItem('userItems'))
+            this.menuItems = userItems.menuItems
+            this.dropMenuItems = userItems.dropMenuItems
+            this.tenantItems = userItems.tenantItems
+            this.tourSteps = userItems.tourSteps
+            this.tourSteps_admin = Consts.tourSteps_admin
         }
         else{
             this.isLogin = false
@@ -1236,16 +1048,19 @@ export class AppComponent implements OnInit, AfterViewInit {
         this.dropMenuItems = item.dropMenuItems
         this.tenantItems = item.tenantItems
         this.menuItems = item.menuItems
-        this.menuItems_admin=item.menuItems_admin,
-        this.menuItems_tenant=item.menuItems_tenant,
-        this.tourSteps_tenant=item.tourSteps_tenant,
-        this.tourSteps_admin=item.tourSteps_admin,
         this.tourSteps=item.tourSteps,
         this.showLogoutAnimation=item.showLogoutAnimation,
         this.showLoginAnimation=item.showLoginAnimation,
         this.isHomePage=item.isHomePage
         if(item.isLogin){
+            let temp = {
+                dropMenuItems : item.dropMenuItems,
+                menuItems : item.menuItems,
+                tourSteps:item.tourSteps,
+                tenantItems : item.tenantItems
+            }
         this.showMenu = true
+        localStorage.setItem('userItems',JSON.stringify(temp))
         }
         else{
         window['isUpload'] = false;

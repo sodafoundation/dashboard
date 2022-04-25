@@ -3,8 +3,8 @@
     <div class="login-bg" #loginBG style="background-position: center" [ngClass]="{'login-animation':showLoginAnimation, 'logout-animation':showLogoutAnimation}"></div>
     <div class="login-form ui-fluid" *ngIf="!isLogin">
     <app-login [(isHomePage)] = "isHomePage" [(menuItems)] = "menuItems" [(tourSteps)]="tourSteps"
-    [(dropMenuItems)] = "dropMenuItems" [(menuItems_admin)]= "menuItems_admin" [(tourSteps_admin)] ="tourSteps_admin"
-    [(activeItem)] = "activeItem" [(menuItems_tenant)] = "menuItems_tenant" [(tourSteps_tenant)] = "tourSteps_tenant"
+    [(dropMenuItems)] = "dropMenuItems"
+    [(activeItem)] = "activeItem"
     [(hideLoginForm)] = "hideLoginForm" [(showLogoutAnimation)] = "showLogoutAnimation" [(showPrompt)] ="showPrompt"
     [(isLogin)] = "isLogin" [(showLoginAnimation)] = "showLoginAnimation" (updateLogin) = "updateLogin($event)"></app-login>
     </div>

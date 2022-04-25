@@ -1,0 +1,39 @@
+import { Component, OnInit } from '@angular/core';
+import { ParamStorService,} from 'app/shared/api';
+import { Router } from '@angular/router';
+
+@Component({
+  selector: 'app-logout',
+  templateUrl: './logout.component.html',
+  styleUrls: ['./logout.component.css']
+})
+export class LogoutComponent implements OnInit {
+
+  constructor(
+    private router: Router,
+    private paramStor: ParamStorService,
+  ) { }
+
+  logout() {
+      debugger
+    new Promise<any>((resolve,reject) => {
+        this.paramStor.AUTH_TOKEN("");
+        this.paramStor.CURRENT_USER("");
+        this.paramStor.CURRENT_TENANT("");
+        this.paramStor.PASSWORD("");
+        this.paramStor.TOKEN_PERIOD("");
+        localStorage.removeItem('userItems')
+        resolve(true)
+    }).then((redirect) =>{
+        if (redirect){
+            this.router.navigate(['/']).then(()=>{
+                window.location.reload();
+            })
+        }
+    })
+}
+  ngOnInit() {
+    this.logout()
+  }
+
+}

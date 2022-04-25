@@ -1,12 +1,8 @@
 import { Component, OnInit, Input, Output, EventEmitter,ElementRef } from '@angular/core';
-import { Http, Headers } from '@angular/http';
+import { Http,} from '@angular/http';
 import { Router } from '@angular/router';
-import { I18NService, Consts, ParamStorService, MsgBoxService, Utils, HttpService } from 'app/shared/api';
-import { Button } from 'app/components/button/button';
-import { MenuItem, ConfirmationService, SelectItem, Message} from '../../../components/common/api';
-import { I18nPluralPipe } from '@angular/common';
-import * as aws4 from "ngx-aws4";
-import { JoyrideService } from 'ngx-joyride';
+import { I18NService, Consts, ParamStorService} from 'app/shared/api';
+import { Message} from '../../../components/common/api';
 
 let _ = require("underscore");
 
@@ -22,22 +18,15 @@ export class LoginComponent implements OnInit {
   constructor(
     private http: Http,
     private el: ElementRef,
-    private httpSvc: HttpService,
     private router: Router,
     private paramStor: ParamStorService,
-    private msg: MsgBoxService,
     public I18N: I18NService,
-    private readonly joyrideService: JoyrideService
   ) { }
   @Input() public isHomePage: any
   @Input() public menuItems: any
   @Input() public tourSteps: any
   @Input() public dropMenuItems: any
-  @Input() public menuItems_admin: any
-  @Input() public tourSteps_admin: any
   @Input() public activeItem :any
-  @Input() public menuItems_tenant :any
-  @Input() public tourSteps_tenant :any
   @Input() public hideLoginForm :any
   @Input() public showLogoutAnimation :any
   @Input() public showPrompt :any
@@ -56,6 +45,7 @@ export class LoginComponent implements OnInit {
   showErrorMsg:any
   msgs: Message[];
   akSkRouterLink = "/akSkManagement";
+  logoutLink = '/auth/logout'
   currentTenant: string = "";
   currentTime = new Date().getTime();
   defaultExpireTime = 10 * 60 * 1000;
@@ -73,7 +63,7 @@ export class LoginComponent implements OnInit {
     this.currentTime = new Date().getTime(); //update current time
     let timeout = this.paramStor.TOKEN_PERIOD() ? this.paramStor.TOKEN_PERIOD() : this.defaultExpireTime;
     if (this.currentTime - this.lastTime > timeout) { //check time out
-        this.logout();
+        this.router.navigate(['/auth/logout'])
     }
 }
 refreshLastTime() {
@@ -153,48 +143,45 @@ loginBgAnimation() {
     }
 }
 
-  logout() {
-    this.paramStor.AUTH_TOKEN("");
-    this.paramStor.CURRENT_USER("");
-    this.paramStor.CURRENT_TENANT("");
-    this.paramStor.PASSWORD("");
-    this.paramStor.TOKEN_PERIOD("");
-    if (this.interval) {
-        clearInterval(this.interval);
-    }
-    if (this.intervalRefreshToken) {
-        clearInterval(this.intervalRefreshToken);
-    }
-    debugger;
-    // annimation for after logout
-    this.hideLoginForm = false;
-    this.showLogoutAnimation = true;
-    setTimeout(() => {
-        this.showLogoutAnimation = false;
-        this.username = "";
-        this.password = "";
-        this.isLogin = false;
-        this.showPrompt = false;
-        window['isUpload'] = false;
-    }, 500);
-    this.updateLogin.emit({
-        isLogin:false,
-        menuItems:this.menuItems,
-        menuItems_admin:this.menuItems_admin,
-        menuItems_tenant:this.menuItems_tenant,
-        dropMenuItems:this.dropMenuItems,
-        tenantItems:this.tenantItems,
-        tourSteps_tenant:this.tourSteps_tenant,
-        tourSteps_admin:this.tourSteps_admin,
-        tourSteps:this.tourSteps,
-        username : this.username,
-        hideLoginForm:false,
-        showLogoutAnimation:this.showLogoutAnimation,
-        showLoginAnimation:this.showLoginAnimation,
-        isHomePage:false
-        })
-    this.router.navigate(['/']);
-}
+//   logout() {
+//     this.paramStor.AUTH_TOKEN("");
+//     this.paramStor.CURRENT_USER("");
+//     this.paramStor.CURRENT_TENANT("");
+//     this.paramStor.PASSWORD("");
+//     this.paramStor.TOKEN_PERIOD("");
+//     localStorage.removeItem('userItems')
+//     if (this.interval) {
+//         clearInterval(this.interval);
+//     }
+//     if (this.intervalRefreshToken) {
+//         clearInterval(this.intervalRefreshToken);
+//     }
+//     debugger;
+//     // annimation for after logout
+//     this.hideLoginForm = false;
+//     this.showLogoutAnimation = true;
+//     setTimeout(() => {
+//         this.showLogoutAnimation = false;
+//         this.username = "";
+//         this.password = "";
+//         this.isLogin = false;
+//         this.showPrompt = false;
+//         window['isUpload'] = false;
+//     }, 500);
+//     this.updateLogin.emit({
+//         isLogin:false,
+//         menuItems:this.menuItems,
+//         dropMenuItems:this.dropMenuItems,
+//         tenantItems:this.tenantItems,
+//         tourSteps:this.tourSteps,
+//         username : this.username,
+//         hideLoginForm:false,
+//         showLogoutAnimation:this.showLogoutAnimation,
+//         showLoginAnimation:this.showLoginAnimation,
+//         isHomePage:false
+//         })
+//     this.router.navigate(['/']);
+// }
 
   AuthWithTokenScoped(user, tenant?) {
     if (this.interval) {
@@ -267,8 +254,8 @@ loginBgAnimation() {
             this.currentTenant = this.paramStor.CURRENT_TENANT().split("|")[0];
 
             if (window['isAdmin']) {
-                this.menuItems = this.menuItems_admin;
-                this.tourSteps = this.tourSteps_admin;
+                this.menuItems = Consts.menuItems_admin;
+                this.tourSteps = Consts.tourSteps_admin;
                 this.dropMenuItems = [
                     {
                         label: "Switch Region",
@@ -282,7 +269,7 @@ loginBgAnimation() {
                     },
                     {
                         label: "Logout",
-                        command: () => { this.logout() }
+                        routerLink: this.logoutLink,
                     }
                 ];
 
@@ -297,8 +284,8 @@ loginBgAnimation() {
                     })
                 }
             } else {
-                this.menuItems = this.menuItems_tenant;
-                this.tourSteps = this.tourSteps_tenant;
+                this.menuItems = Consts.menuItems_tenant;
+                this.tourSteps = Consts.tourSteps_tenant;
                 this.dropMenuItems = [
                     {
                         label: "Switch Region",
@@ -317,7 +304,7 @@ loginBgAnimation() {
                     },
                     {
                         label: "Logout",
-                        command: () => { this.logout() }
+                        routerLink: this.logoutLink,
                     }
                 ];
             }
@@ -336,12 +323,8 @@ loginBgAnimation() {
                 this.updateLogin.emit({
                     isLogin:this.isLogin,
                     menuItems:this.menuItems,
-                    menuItems_admin:this.menuItems_admin,
-                    menuItems_tenant:this.menuItems_tenant,
                     dropMenuItems:this.dropMenuItems,
                     tenantItems:this.tenantItems,
-                    tourSteps_tenant:this.tourSteps_tenant,
-                    tourSteps_admin:this.tourSteps_admin,
                     tourSteps:this.tourSteps,
                     username : this.username,
                     hideLoginForm:this.isHomePage,
@@ -372,7 +355,7 @@ loginBgAnimation() {
                 this.errorMsg = this.I18N.keyID['sds_login_error_msg_default'];
         }
         this.showErrorMsg = true;
-        this.logout();
+        this.router.navigate(['/auth/logout'])
     })
 }
   login() {
