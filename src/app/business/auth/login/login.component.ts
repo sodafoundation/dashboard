@@ -1,5 +1,5 @@
-import { Component, OnInit, Input, Output, EventEmitter,ElementRef } from '@angular/core';
-import { Http,} from '@angular/http';
+import { Component, OnInit, Input, Output, EventEmitter,ElementRef,AfterViewInit } from '@angular/core';
+import { Http} from '@angular/http';
 import { Router } from '@angular/router';
 import { I18NService, Consts, ParamStorService} from 'app/shared/api';
 import { Message} from '../../../components/common/api';
@@ -12,7 +12,7 @@ let _ = require("underscore");
   styleUrls: ['./login.component.css']
 })
 
-export class LoginComponent implements OnInit {
+export class LoginComponent implements OnInit, AfterViewInit {
 
 
   constructor(
@@ -142,46 +142,6 @@ loginBgAnimation() {
         })
     }
 }
-
-//   logout() {
-//     this.paramStor.AUTH_TOKEN("");
-//     this.paramStor.CURRENT_USER("");
-//     this.paramStor.CURRENT_TENANT("");
-//     this.paramStor.PASSWORD("");
-//     this.paramStor.TOKEN_PERIOD("");
-//     localStorage.removeItem('userItems')
-//     if (this.interval) {
-//         clearInterval(this.interval);
-//     }
-//     if (this.intervalRefreshToken) {
-//         clearInterval(this.intervalRefreshToken);
-//     }
-//     debugger;
-//     // annimation for after logout
-//     this.hideLoginForm = false;
-//     this.showLogoutAnimation = true;
-//     setTimeout(() => {
-//         this.showLogoutAnimation = false;
-//         this.username = "";
-//         this.password = "";
-//         this.isLogin = false;
-//         this.showPrompt = false;
-//         window['isUpload'] = false;
-//     }, 500);
-//     this.updateLogin.emit({
-//         isLogin:false,
-//         menuItems:this.menuItems,
-//         dropMenuItems:this.dropMenuItems,
-//         tenantItems:this.tenantItems,
-//         tourSteps:this.tourSteps,
-//         username : this.username,
-//         hideLoginForm:false,
-//         showLogoutAnimation:this.showLogoutAnimation,
-//         showLoginAnimation:this.showLoginAnimation,
-//         isHomePage:false
-//         })
-//     this.router.navigate(['/']);
-// }
 
   AuthWithTokenScoped(user, tenant?) {
     if (this.interval) {
@@ -360,7 +320,6 @@ loginBgAnimation() {
 }
   login() {
     this.isHomePage = true;
-    debugger;
     let request: any = { auth: {} };
     request.auth = {
         "identity": {
