@@ -1,6 +1,8 @@
-let SODA_HOST_IP = '192.168.56.101'
-let SODA_ALERTMANAGER_PORT = '9093s'
 
+export const menuConst = {
+    SODA_HOST_IP:'',
+    SODA_ALERTMANAGER_PORT:''
+}
 export const Consts = {
 
     /**
@@ -77,12 +79,12 @@ export const Consts = {
         'alibaba-oss' : "Alibaba Object Storage",
         'sony-oda':"Sony Optical Disc Archive"
     },
-    SODA_HOST_IP: '192.168.56.101',
-    SODA_GRAFANA_PORT: '3000',
-    SODA_ALERTMANAGER_PORT: '9093',
-    SODA_PROMETHEUS_PORT: '9090',
-    S3_HOST_IP: '192.168.56.101',
-    S3_HOST_PORT: '8090',
+    SODA_HOST_IP: '',
+    SODA_GRAFANA_PORT: '',
+    SODA_ALERTMANAGER_PORT: '',
+    SODA_PROMETHEUS_PORT: '',
+    S3_HOST_IP: '',
+    S3_HOST_PORT: '',
     STORAGE_SERVICE_PLAN_ENABLED: false,
     STORAGE_CLASSES: {
         'aws-s3' : [
@@ -215,37 +217,20 @@ export const Consts = {
             {
                 label: "Pure Storage",
                 value: 'pure'
-            },
-            {
-                label: "Demo Storage",
-                value: 'fake_storage'
             }
         ],
         resources:{
-            volumes : ['vmax', 'unity', 'vnx_block', 'vplex', 'oceanstor', '3par', 'vsp', 'storwize_svc', 'cmode', 'fake_driver'],
-            pools : ['vmax', 'unity', 'vnx_block', 'vplex', 'oceanstor', '3par', 'vsp', 'storwize_svc', 'cmode', 'fake_driver'],
-            controllers : ['oceanstor', 'unity', 'vnx_block', 'vplex', '3par', 'vsp', 'storwize_svc', 'cmode', 'fake_driver'],
-            ports : ['oceanstor', 'unity', 'vnx_block', 'vplex', '3par', 'vsp', 'storwize_svc', 'cmode', 'fake_driver'],
-            disks : ['oceanstor', 'unity', 'vnx_block', '3par', 'vsp', 'storwize_svc', 'cmode', 'fake_driver'],
-            qtrees : ['oceanstor', 'unity', 'cmode', 'fake_driver'],
-            filesystems : ['oceanstor', 'unity', 'cmode', 'fake_driver'],
-            shares: ['oceanstor', 'unity', 'cmode', 'fake_driver'],
-            quotas: ['oceanstor', 'unity', 'cmode', 'fake_driver']
+            volumes : ['vmax', 'unity', 'vnx_block', 'vplex', 'oceanstor', '3par', 'vsp', 'storwize_svc', 'cmode', 'eternus', 'flasharray', 'msa', 'ds8k'],
+            pools : ['vmax', 'unity', 'vnx_block', 'vplex', 'oceanstor', '3par', 'vsp', 'storwize_svc', 'cmode', 'eternus', 'msa', 'hnas', 'ds8k'],
+            controllers : ['oceanstor', 'unity', 'vnx_block', 'vplex', '3par', 'vsp', 'storwize_svc', 'cmode', 'vmax', 'eternus', 'flasharray', 'msa', 'hnas', 'ds8k'],
+            ports : ['oceanstor', 'unity', 'vnx_block', 'vplex', '3par', 'vsp', 'storwize_svc', 'cmode', 'vmax', 'eternus', 'flasharray', 'msa', 'hnas', 'ds8k'],
+            disks : ['oceanstor', 'unity', 'vnx_block', '3par', 'vsp', 'storwize_svc', 'cmode', 'vmax', 'eternus', 'flasharray', 'msa', 'hnas'],
+            qtrees : ['oceanstor', 'unity', 'cmode', 'hnas'],
+            filesystems : ['oceanstor', 'unity', 'cmode', 'hnas'],
+            shares: ['oceanstor', 'unity', 'cmode', 'hnas'],
+            quotas: ['oceanstor', 'unity', 'cmode', 'hnas']
         },
         models: {
-            'fake_storage' : [
-                {
-                    label: "Demo Driver",
-                    value: {
-                        name: 'fake_driver',
-                        rest: true,
-                        ssh: false,
-                        cli: false,
-                        smis: false,
-                        extra: false
-                    }
-                }
-            ],
             'dellemc' : [
                 {
                     label: "VMAX",
@@ -653,7 +638,7 @@ export const Consts = {
                     {
                         "title" : "Alert Manager",
                         "is_external_link" : true,
-                        "link" : "http://" +SODA_HOST_IP + ":" + SODA_ALERTMANAGER_PORT
+                        "link" : "http://" +menuConst.SODA_HOST_IP + ":" + menuConst.SODA_ALERTMANAGER_PORT
                     },
                 ]
             },

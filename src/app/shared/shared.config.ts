@@ -1,4 +1,4 @@
-import{ Consts } from 'app/shared/api';
+import{ Consts,menuConst} from 'app/shared/api';
 import{ Http } from '@angular/http';
 import{ I18N } from 'app/components/common/api';
 
@@ -20,6 +20,8 @@ export class SharedConfig{
     static getEnvHostDetails(httpService) {
         return new Promise((resolve, reject) => {
             httpService.get("../../assets/data/runtime.json").subscribe((r) => {
+                menuConst.SODA_HOST_IP = r.json().hostIP;
+                menuConst.SODA_ALERTMANAGER_PORT = r.json().alertmanagerPort;
                 Consts.S3_HOST_IP = r.json().hostIP;
                 Consts.S3_HOST_PORT = r.json().hostPort;
                 Consts.SODA_HOST_IP = r.json().hostIP;
@@ -27,7 +29,7 @@ export class SharedConfig{
                 Consts.SODA_ALERTMANAGER_PORT = r.json().alertmanagerPort;
                 Consts.SODA_GRAFANA_PORT = r.json().grafanaPort;
                 if(r.json().servicePlansEnabled == true || r.json().servicePlansEnabled.toLowerCase() == "true"){
-                    Consts.STORAGE_SERVICE_PLAN_ENABLED = true;        
+                    Consts.STORAGE_SERVICE_PLAN_ENABLED = true;
                 } else if(!r.json().servicePlansEnabled || r.json().servicePlansEnabled == false || r.json().servicePlansEnabled.toLowerCase() == "false" || undefined == r.json().servicePlansEnabled || r.json().servicePlansEnabled == ""){
                     Consts.STORAGE_SERVICE_PLAN_ENABLED = false;
                 }
