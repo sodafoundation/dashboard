@@ -6,7 +6,7 @@ export class ParamStorService {
     setParam(key, value){
         localStorage[key] = value;
     }
-    
+
     // Get local storage
     getParam(key){
         return localStorage[key];
@@ -20,7 +20,14 @@ export class ParamStorService {
             this.setParam('current-user', param);
         }
     }
-
+    // current user role
+    CURRENT_ROLE(param?){
+        if(param === undefined){
+            return this.getParam('role');
+        } else {
+            this.setParam('role', param);
+        }
+    }
     // User auth token
     AUTH_TOKEN(param?){
         if(param === undefined){

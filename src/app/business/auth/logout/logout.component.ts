@@ -15,12 +15,12 @@ export class LogoutComponent implements OnInit {
   ) { }
 
   logout() {
-      debugger
     new Promise<any>((resolve,reject) => {
         this.paramStor.AUTH_TOKEN("");
         this.paramStor.CURRENT_USER("");
         this.paramStor.CURRENT_TENANT("");
         this.paramStor.PASSWORD("");
+        this.paramStor.CURRENT_ROLE("")
         this.paramStor.TOKEN_PERIOD("");
         localStorage.removeItem('userItems')
         resolve(true)

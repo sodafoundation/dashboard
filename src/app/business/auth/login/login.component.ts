@@ -189,7 +189,8 @@ export class LoginComponent implements OnInit {
                 this.paramStor.AUTH_TOKEN(r.headers.get('x-subject-token'));
                 this.paramStor.CURRENT_TENANT(project.name + "|" + project.id);
                 this.paramStor.CURRENT_USER(user.name + "|" + user.id);
-                this.paramStor.setParam('roles', JSON.stringify(roles))
+                this.paramStor.CURRENT_ROLE(JSON.stringify(roles))
+                window['isAdmin'] ? this.paramStor.CURRENT_ROLE('admin') : this.paramStor.CURRENT_ROLE('Member');
                 this.username = this.paramStor.CURRENT_USER().split("|")[0];
                 this.currentTenant = this.paramStor.CURRENT_TENANT().split("|")[0];
 

@@ -107,7 +107,7 @@ export class AppComponent implements OnInit,AfterViewInit {
     d;
 
     ngOnInit() {
-        if (this.paramStor.AUTH_TOKEN() && this.paramStor.CURRENT_USER() &&
+        if (this.paramStor.AUTH_TOKEN() && this.paramStor.CURRENT_USER() && this.paramStor.CURRENT_ROLE() &&
         this.paramStor.CURRENT_TENANT() && this.paramStor.PASSWORD() && this.paramStor.TOKEN_PERIOD()){
             this.isLogin = true
             this.hideLoginForm = true
@@ -118,8 +118,9 @@ export class AppComponent implements OnInit,AfterViewInit {
             this.dropMenuItems = userItems.dropMenuItems
             this.tenantItems = userItems.tenantItems
             this.tourSteps = userItems.tourSteps
-            window['isAdmin'] = (_.where(JSON.parse(this.paramStor.getParam('roles')), {'name': "admin"})).length > 0;
-            window['isUser'] = (_.where(JSON.parse(this.paramStor.getParam('roles')), {'name': "Member"})).length > 0;
+
+            window['isAdmin'] = this.paramStor.CURRENT_ROLE() == 'admin' ? true : false;
+            window['isUser'] = this.paramStor.CURRENT_ROLE() == 'Member' ? true : false;
             if (window.location.href.includes( '/home')){
                 this.isHomePage = true
             } else {
