@@ -115,11 +115,18 @@ export class AppComponent implements OnInit, AfterViewInit {
         if (this.paramStor.AUTH_TOKEN() && this.paramStor.CURRENT_USER() &&
         this.paramStor.CURRENT_TENANT() && this.paramStor.PASSWORD() && this.paramStor.TOKEN_PERIOD()){
             this.isLogin = true
-            this.isHomePage = true
+            debugger;
+            if (window.location.href.includes( '/home')){
+                debugger;
+                this.isHomePage = true
+            } else {
+                this.isHomePage = false
+            }
             this.hideLoginForm = true
             this.showMenu = true
             let userItems = JSON.parse(localStorage.getItem('userItems'))
             this.menuItems = userItems.menuItems
+            this.username = userItems.userName
             this.dropMenuItems = userItems.dropMenuItems
             this.tenantItems = userItems.tenantItems
             this.tourSteps = userItems.tourSteps
@@ -127,7 +134,11 @@ export class AppComponent implements OnInit, AfterViewInit {
         }
         else{
             this.isLogin = false
-            this.isHomePage = false
+            if (window.location.href.includes( '/home')){
+                this.isHomePage = true
+            }else{
+                this.isHomePage = false
+            }
             this.hideLoginForm = false
         }
         window.onbeforeunload = ()=>{
@@ -1057,7 +1068,8 @@ export class AppComponent implements OnInit, AfterViewInit {
                 dropMenuItems : item.dropMenuItems,
                 menuItems : item.menuItems,
                 tourSteps:item.tourSteps,
-                tenantItems : item.tenantItems
+                tenantItems : item.tenantItems,
+                userName: item.username
             }
         this.showMenu = true
         localStorage.setItem('userItems',JSON.stringify(temp))
