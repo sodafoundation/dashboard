@@ -71,7 +71,7 @@ export class AppComponent implements OnInit,AfterViewInit {
     stringToSign = "";
     canonicalString = "";
 
-    menuItems = Consts.menuItems;
+    menuItems = [];
     tourSteps = [];
 
     msgs: Message[];
