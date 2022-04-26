@@ -121,7 +121,7 @@ export class ServicePlanComponent implements OnInit{
             });
 
             // Prepare backends list
-            if(backends.length > 0){
+            if(backends && backends.length){
             backends.forEach(element => {
                 this.allBackends.push({
                     label: element.name,
