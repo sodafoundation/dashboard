@@ -21,6 +21,8 @@ export class LogoutComponent implements OnInit {
         this.paramStor.PASSWORD("");
         this.paramStor.CURRENT_ROLE("")
         this.paramStor.TOKEN_PERIOD("");
+        this.paramStor.CURRENT_PROJECTITEMID("")
+        this.paramStor.CURRENT_USERID("")
         localStorage.removeItem('userItems')
         resolve(true)
     }).then((redirect) =>{

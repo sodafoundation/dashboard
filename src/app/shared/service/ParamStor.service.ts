@@ -28,6 +28,22 @@ export class ParamStorService {
             this.setParam('role', param);
         }
     }
+
+    // current user ID
+    CURRENT_USERID(param?){
+        if(param === undefined){
+            return this.getParam('userID');
+        } else {
+            this.setParam('userId', param);
+        }
+    }    // current user project item ID
+    CURRENT_PROJECTITEMID(param?){
+        if(param === undefined){
+            return this.getParam('projectItemId');
+        } else {
+            this.setParam('projectItemId', param);
+        }
+    }
     // User auth token
     AUTH_TOKEN(param?){
         if(param === undefined){

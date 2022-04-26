@@ -145,6 +145,8 @@ export class LoginComponent implements OnInit {
             this.tenantItems = [];
             window['userId'] = this.userId;
             window['projectItemId'] = this.projectItemId;
+            this.paramStor.CURRENT_USERID(this.userId)
+            this.paramStor.CURRENT_PROJECTITEMID(this.projectItemId)
             // Create the menu items for Swtich tenant.
             projects.map(item => {
                 let tenantItemObj = {};
