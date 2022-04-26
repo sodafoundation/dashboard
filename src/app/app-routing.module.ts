@@ -34,7 +34,7 @@ const routes: Routes = [
     {path: 'bucketDetail/:bucketId', loadChildren: './business/block/bucket-detail/bucket-detail.module#BucketDetailModule'},
     {path: 'objectAcl/:bucketId/:key', loadChildren: './business/block/bucket-detail/object-acl/object-acl.module#ObjectAclModule'},
     {path: 'akSkManagement', loadChildren: './business/ak-sk/ak-sk.module#AkSkModule'},
-    
+
     {path: 'createFileShare', loadChildren: './business/block/create-file-share/create-file-share.module#CreateFileShareModule'},
     {path: 'createCloudFileShare', loadChildren: './business/block/cloud-file-share/create/cloud-file-share-create.module#CloudFileShareCreateModule'},
     {path: 'modifyCloudFileShare/:fileShareId', loadChildren: './business/block/cloud-file-share/modify/cloud-file-share-modify.module#CloudFileShareModifyModule'},
@@ -50,6 +50,7 @@ const routes: Routes = [
     {path: 'storageDetails/:storageId', loadChildren: './business/delfin/storage-details/storage-details.module#StorageDetailsModule'},
     {path: 'modifyStorage/:storageId', loadChildren: './business/delfin/modify-storage/modify-storage.module#ModifyStorageModule'},
     {path: 'servicePlanManagement', loadChildren: './business/service-plan/service-plan.module#ServicePlanModule'},
+    {path: '**', redirectTo: '/home'}
 ];
 
 @NgModule({
