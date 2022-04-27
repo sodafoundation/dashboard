@@ -76,7 +76,7 @@ export class AppComponent implements OnInit, AfterViewInit {
     tourSteps = [];
 
     msgs: Message[];
-        
+
     menuItems_tenant = [
         {
             "title": "Home",
@@ -204,7 +204,7 @@ export class AppComponent implements OnInit, AfterViewInit {
                 },
                 {
                     "title" : "Performance Monitor",
-                    "routerLink": "/performance-monitor"                    
+                    "routerLink": "/performance-monitor"
                 },
                 {
                     "title" : "Alert Manager",
@@ -292,7 +292,7 @@ export class AppComponent implements OnInit, AfterViewInit {
         public I18N: I18NService,
         private BucketService: BucketService,
         private readonly joyrideService: JoyrideService
-    ) { 
+    ) {
         window['akskWarning'] = false;
         window['servicePlansEnabled'] = Consts.STORAGE_SERVICE_PLAN_ENABLED;
     }
@@ -311,7 +311,7 @@ export class AppComponent implements OnInit, AfterViewInit {
             window.sessionStorage['folderId'] = ""
             window.sessionStorage['headerTag'] = ""
         }
-        
+
         // Global upload function
         window['uploadPartArr'] = [];
         window['isUpload'] = false;
@@ -337,10 +337,10 @@ export class AppComponent implements OnInit, AfterViewInit {
             if(folderId !== null && folderId !== ""){
                 this.selectFileName= folderId + selectFile.name;
             }else{
-                this.selectFileName = selectFile.name 
+                this.selectFileName = selectFile.name
             }
             this.fileName = selectFile.name;
-            let uploadUrl = this.BucketService.url + bucketId + '/' + this.selectFileName; 
+            let uploadUrl = this.BucketService.url + bucketId + '/' + this.selectFileName;
             if (selectFile['size'] > Consts.BYTES_PER_CHUNK) {
                 //first step get uploadId
                 window['getAkSkList'](()=>{
@@ -377,13 +377,13 @@ export class AppComponent implements OnInit, AfterViewInit {
                                 cb();
                             }
                         }
-                    });  
+                    });
                 })
             } else {
                 window['singleUpload'](selectFile, bucketId, uploadOptions, uploadUrl, cb);
             }
         }
-        
+
         window['singleUpload'] = (selectFile, bucketId, uploadOptions, uploadUrl, cb) => {
             let fileString: any;
             let fileContent: any;
@@ -410,8 +410,8 @@ export class AppComponent implements OnInit, AfterViewInit {
                     /* XHR Send */
                     var xhr = new XMLHttpRequest();
                     xhr.withCredentials = true;
-                    xhr.open('PUT', uploadUrl, true);    
-                    
+                    xhr.open('PUT', uploadUrl, true);
+
                     xhr.setRequestHeader('Content-Type', requestOptions.headers['Content-Type']);
                     xhr.setRequestHeader('X-Auth-Token', requestOptions.headers['X-Auth-Token']);
                     xhr.setRequestHeader('X-Amz-Content-Sha256', requestOptions.headers['X-Amz-Content-Sha256']);
@@ -450,7 +450,7 @@ export class AppComponent implements OnInit, AfterViewInit {
                             } else{
                                 errMessage.content="Upload failed. The network may be unstable. Please try again later.";
                             }
-                            
+
                             if(requestOptions.headers['X-Amz-Storage-Class']){
                                 errMessage.content+=". File ["+ selectFile.name +"] could not be archived."
                                 self.msg.error(errMessage);
@@ -493,7 +493,7 @@ export class AppComponent implements OnInit, AfterViewInit {
                             } else{
                                 errMessage.content="Upload failed. The network may be unstable. Please try again later.";
                             }
-                            
+
                             if(requestOptions.headers['X-Amz-Storage-Class']){
                                 errMessage.content+=". File ["+ selectFile.name +"] could not be archived."
                                 self.msg.error(errMessage);
@@ -544,7 +544,7 @@ export class AppComponent implements OnInit, AfterViewInit {
             let chunk = blob.slice(chunks[i].start, chunks[i].end);
             let uploadUrl = this.BucketService.url + bucketId + '/' + this.selectFileName;
             window['getAkSkList'](()=>{
-                
+
                 let requestMethod = "PUT";
                 let url = '/'+ bucketId + '/' + this.selectFileName + '?partNumber=' + (i + 1) + '&uploadId=' + uploadId;
                 let requestOptions: any;
@@ -561,7 +561,7 @@ export class AppComponent implements OnInit, AfterViewInit {
                     let header = data.headers['_headers']
                     let headerArr = header.entries()
                     let headerArr1= Array.from(headerArr)
-                    let ETag 
+                    let ETag
                     headerArr1.forEach((item)=>{
                         if(item[0] == 'etag'){
                             return ETag = item[1][0].replace(/\"/g,"")
@@ -600,7 +600,7 @@ export class AppComponent implements OnInit, AfterViewInit {
                         uploadNum = 0;
                         window['isUpload'] = false;
                         window['getAkSkList'](()=>{
-                            
+
                                 let requestMethod = "DELETE";
                                 let url = '/'+ bucketId + '/' + this.selectFileName + '?uploadId=' + uploadId;
                                 let requestOptions: any;
@@ -614,7 +614,7 @@ export class AppComponent implements OnInit, AfterViewInit {
                                     cb();
                                 }
                         })
-                    } 
+                    }
                 });
             })
         }
@@ -626,7 +626,7 @@ export class AppComponent implements OnInit, AfterViewInit {
                 let url = '/'+ bucketId + '/' + this.selectFileName + '?uploadId=' + uploadId;
                 let requestOptions: any;
                 let options: any = {};
-                
+
                 requestOptions = window['getSignatureKey'](requestMethod, url, '', '', '', completeMultipartStr) ;
                 options['headers'] = new Headers();
                 options = this.BucketService.getSignatureOptions(requestOptions, options);
@@ -660,7 +660,7 @@ export class AppComponent implements OnInit, AfterViewInit {
                     }
                 });
             })
-            
+
         }
         // Global upload end
 
@@ -674,16 +674,16 @@ export class AppComponent implements OnInit, AfterViewInit {
             let options = {
                 headers: {
                     'X-Auth-Token': localStorage['auth-token']
-                } 
+                }
             }
-            
+
             this.akSkService.getAkSkList(request,options).subscribe(res=>{
                 let response = res.json();
                 if(!response.credentials.length){
                     window['akskWarning']=true;
-                } 
-                // Check if the user has generated AK/Sk and stored in credentials. 
-                
+                }
+                // Check if the user has generated AK/Sk and stored in credentials.
+
                 if(response.credentials.length && !(_.where(response.credentials, {'user_id':window['userId']})).length){
                     window['akskWarning']=true;
                 }
@@ -706,7 +706,7 @@ export class AppComponent implements OnInit, AfterViewInit {
                 })
                 this.SignatureKey = [];
                 if(detailArr.length > 0){
-                    window['getParameters'](detailArr); 
+                    window['getParameters'](detailArr);
                     window['akskWarning'] = false;
                 }
                 if (cb) {
@@ -740,7 +740,7 @@ export class AppComponent implements OnInit, AfterViewInit {
         this.svg_paths.push(d3.select('#svg_wave_2'));
 
         this.renderWave();
-        
+
         window['getParameters'] = (detailArr)=>{
             let secretAccessKey = detailArr[Math.round(Math.random()*(detailArr.length-1))];
             this.SignatureKey['secretAccessKey'] = secretAccessKey.secret;
@@ -758,15 +758,15 @@ export class AppComponent implements OnInit, AfterViewInit {
         }
         //Calculation of the signature
         window['getSignatureKey'] = (method, canonicalUri, host?, region?, service?, body?, contentType?, queryString?, headers?)=>{
-            
+
             if(canonicalUri == 's3/'){
                 canonicalUri = '';
             }
-            
+
             if(body && (headers && headers['X-Amz-Content-Sha256'] == 'UNSIGNED-PAYLOAD')){
                 body = '';
             }
-            
+
             let requestOptions: any = {
                 host: host ? host : Consts.S3_HOST_IP + ':' + Consts.S3_HOST_PORT,
                 method: method,
@@ -783,13 +783,13 @@ export class AppComponent implements OnInit, AfterViewInit {
             if(region){
                 requestOptions['region'] = region;
             }
-            /****** 
-            ToDo: 
-            Currently we are checking for the known headers in our API requests and adding them to the signature generation. 
+            /******
+            ToDo:
+            Currently we are checking for the known headers in our API requests and adding them to the signature generation.
             This will not scale well. We have to iterate through the headers sent to the signature generation method and populate
             the requestOptions.headers with all the headers.
             *******/
-            
+
             if(headers && headers['x-amz-acl']){
                 requestOptions.headers['x-amz-acl'] = headers['x-amz-acl'];
             }
@@ -803,12 +803,12 @@ export class AppComponent implements OnInit, AfterViewInit {
             // Header needed for archive
             if(headers && headers['X-Amz-Storage-Class']){
                 requestOptions.headers['X-Amz-Storage-Class'] = headers['X-Amz-Storage-Class'];
-            }            
+            }
             // Header used to specify Service plans in create bucket.
             if(headers && headers['tier']){
                 requestOptions.headers['tier'] = headers['tier'];
             }
-            
+
             if(headers && headers['X-Amz-Content-Sha256'] == 'UNSIGNED-PAYLOAD'){
                 requestOptions.headers['X-Amz-Content-Sha256'] = 'UNSIGNED-PAYLOAD';
             }
@@ -848,11 +848,11 @@ export class AppComponent implements OnInit, AfterViewInit {
     stepDone() {
         setTimeout(() => {
             this.title = 'Tour Finished!';
-            
+
         }, 3000);
     }
     onPrev() {
-        
+
     }
     startTour() {
         const options = {
@@ -875,7 +875,7 @@ export class AppComponent implements OnInit, AfterViewInit {
             },
             () => {
                 this.stepDone();
-                
+
             }
         );
     }
@@ -1148,10 +1148,10 @@ export class AppComponent implements OnInit, AfterViewInit {
                 }
 
                 this.isLogin = true;
-                
+
                 this.router.navigateByUrl("/home");
                 this.activeItem = this.menuItems[0];
-                
+
 
                 // annimation for after login
                 this.showLoginAnimation = true;
@@ -1219,12 +1219,23 @@ export class AppComponent implements OnInit, AfterViewInit {
     }
 
     menuItemClick(event, item) {
-        this.activeItem = item;
-        if (item.routerLink == "/home") {
-            this.isHomePage = true;
-        } else {
-            this.isHomePage = false;
-        }
+        new Promise((resolve, reject)=>{
+            if (document.getElementById('routerOutlet').classList.contains('content-home'))
+            {
+                document.getElementById('Home').classList.remove('active-item')
+                document.getElementById('routerOutlet').classList.remove('content-home')
+                this.activeItem = this.menuItems[0];
+                resolve(true)
+            }
+            resolve(true)
+        }).then(()=>{
+            if (item.routerLink == "/home") {
+                this.isHomePage = true;
+            } else {
+                this.isHomePage = false;
+            }
+            this.activeItem = item;
+        })
     }
 
     supportCurrentBrowser() {

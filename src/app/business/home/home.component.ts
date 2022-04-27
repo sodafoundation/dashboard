@@ -197,6 +197,12 @@ export class HomeComponent implements OnInit {
         }
 
         let that = this;
+        if (!document.getElementById('routerOutlet').classList.contains('content-home'))
+        {
+            document.querySelector('.active-item').classList.remove('active-item')
+            document.getElementById('routerOutlet').classList.add('content-home')
+            document.getElementById('Home').classList.add('active-item')
+        }
         document.body.addEventListener('mousemove',function(e){
             let initPos = 350;
             let svgConW = that.svgCon.nativeElement.offsetWidth, svgConH = that.svgCon.nativeElement.offsetHeight;
@@ -225,7 +231,7 @@ export class HomeComponent implements OnInit {
                 item.style.display = "block";
             })
         });
-        
+
             this.initBucket2backendAnd2Type();
     }
     selectOption(){
@@ -364,7 +370,7 @@ export class HomeComponent implements OnInit {
         this.http.get(url).subscribe((res)=>{
             let all = res.json().types;
             all.forEach(element => {
-                
+
                 if(!this.servicePlansEnabled || (this.servicePlansEnabled && this.isAdmin)){
                     this.allTypes.push({
                         label: Consts.CLOUD_TYPE_NAME[element.name],
@@ -378,7 +384,7 @@ export class HomeComponent implements OnInit {
                         });
                     }
                 }
-                                
+
             });
         });
     }

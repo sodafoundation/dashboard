@@ -57,13 +57,13 @@
     </div>
     <div id="layout-sidebar">
         <p-scrollPanel [style]="{width: '100%', height: '900px'}" styleClass="sidebar-menu-container">
-        
+
         <ul class="sidebar-menu">
             <li *ngFor="let menuItem of menuItems">
-                <a *ngIf="!menuItem.group" href="#" [joyrideStep]="menuItem.joyrideStep" [text]="menuItem.text" stepPosition="right" [routerLink]="[menuItem.routerLink]" [ngClass]="{'active-item':menuItem==activeItem}" (click)="menuItemClick($event, menuItem)">
+                <a id = {{menuItem.title}} *ngIf="!menuItem.group" href="#" [joyrideStep]="menuItem.joyrideStep" [text]="menuItem.text" stepPosition="right" [routerLink]="[menuItem.routerLink]" [ngClass]="{'active-item':menuItem==activeItem}" (click)="menuItemClick($event, menuItem)" class="">
                     <h1>{{menuItem.title}}</h1>
                     <p>{{menuItem.description}}</p>
-                </a> 
+                </a>
                 <p-panel styleClass="menuGroup" *ngIf="menuItem.group" [joyrideStep]="menuItem.joyrideStep" [text]="menuItem.text" stepPosition="right" [toggleable]="true" [collapsed]="true" expandIcon="fa-chevron-down" collapseIcon="fa-chevron-up">
                     <p-header>
                         <h1>{{menuItem.title}}</h1>
@@ -91,7 +91,7 @@
     </div>
 
     <div id="layout-content">
-        <div [ngClass]="{'content-home':isHomePage}">
+        <div [ngClass]="{'content-home':isHomePage}" id="routerOutlet">
             <router-outlet></router-outlet>
         </div>
     </div>
@@ -108,7 +108,7 @@
     <svg width="100%" height="150">
         <path id="svg_wave_1" fill="rgba(90, 102, 140, 0.4)"></path>
         <path id="svg_wave_2" fill="rgba(60, 142, 225, 0.6)"></path>
-    </svg> 
+    </svg>
 </div>
 
 <div *ngIf="showPrompt" style="padding:15px 20px; z-index: 99999; line-height:18px;position: fixed;bottom: 10px;left:10px;background:rgba(255,255,255,0.75); border-radius: 5px; box-shadow:0 0 10px rgba(0,0,0,0.3);">
@@ -118,7 +118,7 @@
             <p-progressBar [value]="progressValue"></p-progressBar>
         </div>
     </div>
-</div> 
+</div>
 <ul style=" z-index: 99999; line-height:18px;position: fixed;bottom: 10px;left:10px;">
     <li *ngFor="let downfile of downLoadArr;index as i" style="display: inline-block;  padding:15px; background:rgba(255,255,255,0.75); border-radius: 5px; box-shadow:0 0 10px rgba(0,0,0,0.3);">
         <span class="downloading-title" *ngIf="i==0">downloading file [ {{downfile.name}} ]</span>
