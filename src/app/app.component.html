@@ -76,7 +76,7 @@
                                     {{child.title}}
                                 </h1>
                             </a>
-                            <a *ngIf="child.is_external_link" [href]="[child.link]" target="_blank" [ngClass]="{'active-item':child.routerLink==activeItem.routerLink}">
+                            <a *ngIf="child.is_external_link" [href]="[child.link]" target="_blank" [ngClass]="{'active-item':child==activeItem}">
                                 <h1>
                                     {{child.title}}
                                 </h1>
