@@ -746,9 +746,15 @@ export class AppComponent implements OnInit,AfterViewInit {
         window['isUpload'] = false;
         }
     }
-    menuItemClick(event, item) {
-        this.activeItem = item;
-        if (item.routerLink == "/home") {
+    menuItemClick(event, item?) {
+        this.currentItem = {};
+        if(item){
+            this.currentItem = item;
+        } else{
+            this.currentItem.routerLink = this.router.url;
+        }
+        this.activeItem = this.currentItem;
+        if (this.currentItem.routerLink == "/home") {
             this.isHomePage = true;
         } else {
             this.isHomePage = false;
