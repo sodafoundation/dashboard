@@ -51,6 +51,7 @@ const routes: Routes = [
     {path: 'storageDetails/:storageId', loadChildren: './business/delfin/storage-details/storage-details.module#StorageDetailsModule'},
     {path: 'modifyStorage/:storageId', loadChildren: './business/delfin/modify-storage/modify-storage.module#ModifyStorageModule'},
     {path: 'servicePlanManagement', loadChildren: './business/service-plan/service-plan.module#ServicePlanModule'},
+    {path: '**', redirectTo: '/home'}
 ];
 
 @NgModule({
