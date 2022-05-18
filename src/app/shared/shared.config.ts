@@ -27,7 +27,7 @@ export class SharedConfig{
                 Consts.SODA_ALERTMANAGER_PORT = r.json().alertmanagerPort;
                 Consts.SODA_GRAFANA_PORT = r.json().grafanaPort;
                 if(r.json().servicePlansEnabled == true || r.json().servicePlansEnabled.toLowerCase() == "true"){
-                    Consts.STORAGE_SERVICE_PLAN_ENABLED = true;        
+                    Consts.STORAGE_SERVICE_PLAN_ENABLED = true;
                 } else if(!r.json().servicePlansEnabled || r.json().servicePlansEnabled == false || r.json().servicePlansEnabled.toLowerCase() == "false" || undefined == r.json().servicePlansEnabled || r.json().servicePlansEnabled == ""){
                     Consts.STORAGE_SERVICE_PLAN_ENABLED = false;
                 }
