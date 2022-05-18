@@ -23,11 +23,11 @@ let _ = require("underscore");
     providers: [ConfirmationService, MsgBoxService]
 })
 export class ServicePlanComponent implements OnInit{
-    
+
     options = {
         headers: {
             'X-Auth-Token': localStorage['auth-token']
-        } 
+        }
     };
     selectedTiers = [];
     currentTier;
@@ -74,8 +74,8 @@ export class ServicePlanComponent implements OnInit{
         private fb:FormBuilder
     ){
         this.errorMessage = {
-            "name": { 
-                required: "Service plan name is required.", 
+            "name": {
+                required: "Service plan name is required.",
                 isExisted:"This service plan name already exists.",
                 minlength: "The service plan name should have minimum 3 characters.",
                 maxlength: "The service plan name can have maximum 63 characters.",
@@ -89,7 +89,7 @@ export class ServicePlanComponent implements OnInit{
             'validName' : '^[a-zA-Z0-9][a-zA-Z0-9\.\-\_]{1,61}[a-zA-Z0-9]$'
         };
         this.createTierForm = this.fb.group({
-            "name":["",{validators:[Validators.required, Validators.minLength(3), Validators.maxLength(63), Validators.pattern(this.validRule.validName), 
+            "name":["",{validators:[Validators.required, Validators.minLength(3), Validators.maxLength(63), Validators.pattern(this.validRule.validName),
                 Utils.isExisted(this.allTierNameForCheck)], updateOn:'change'}],
             "backend":["",{updateOn:'change'}],
             "backend_type": ["",{updateOn:'change'}],
@@ -100,7 +100,7 @@ export class ServicePlanComponent implements OnInit{
     ngOnInit() {
         this.getAllLists();
     }
-       
+
     getAllLists(){
         this.allTiers = [];
         this.allTierNameForCheck = [];
@@ -121,13 +121,14 @@ export class ServicePlanComponent implements OnInit{
             });
 
             // Prepare backends list
+            if(backends && backends.length){
             backends.forEach(element => {
                 this.allBackends.push({
                     label: element.name,
                     value: element.id
                 })
             });
-
+            }
             // Prepare Tiers List
             if(tiers && tiers.length){
                 tiers.forEach(tierItem => {
@@ -140,7 +141,7 @@ export class ServicePlanComponent implements OnInit{
                                 if(backElement['value']==tierBackendItem){
                                     tierItem['displayBackends'].push(backElement);
                                 }
-                            });    
+                            });
                         });
                     }
                     if(tierItem['tenants'] && tierItem['tenants'].length){
@@ -151,14 +152,14 @@ export class ServicePlanComponent implements OnInit{
                                 }
                             });
                         });
-                    }                                  
-                    
+                    }
+
                 });
                 this.allTiers = tiers;
             }
         }, (error)=>{
             console.log("Error fetching all lists", error);
-        })      
+        })
     }
 
     // Use the Rxjs operator to  join all API calls together
@@ -190,7 +191,7 @@ export class ServicePlanComponent implements OnInit{
                                 if(backElement['value']==tierBackendItem){
                                     tierItem['displayBackends'].push(backElement);
                                 }
-                            });    
+                            });
                         });
                     }
                     tierItem['displayTenants'] = [];
@@ -200,18 +201,18 @@ export class ServicePlanComponent implements OnInit{
                                 if(tenElement['value']==tierTenantItem){
                                     tierItem['displayTenants'].push(tenElement);
                                 }
-                            });    
+                            });
                         });
                     }
                 });
                 this.allTiers = alltiers;
             }
-            
+
         }, (error)=>{
             console.log("Something went wrong. Tiers could not be fetched.");
         });
     }
-    
+
     //Get all tenants
     getTenants(src?){
         this.tenantLists = [];
@@ -228,7 +229,7 @@ export class ServicePlanComponent implements OnInit{
                     tenant["label"] = item.name;
                     tenant["value"] = {
                         "name": item.name,
-                        "id" : item.id                        
+                        "id" : item.id
                     };
                     this.tenantLists.push(tenant);
                 }
@@ -297,7 +298,7 @@ export class ServicePlanComponent implements OnInit{
                 param.Backends.push(element.id);
             });
         }
-        
+
         let tenantsToAdd = this.createTierForm.value.tenant;
         if(tenantsToAdd && tenantsToAdd.length>0){
             tenantsToAdd.forEach(element => {
@@ -338,7 +339,7 @@ export class ServicePlanComponent implements OnInit{
         this.updateTierShow = true;
         this.showRightSidebar = true;
     }
-    
+
     // Show the tier details panel
     showTierDetails(tier){
         this.tenantsWithDetails = [];
@@ -364,7 +365,7 @@ export class ServicePlanComponent implements OnInit{
             });
         } else{
             this.tenantsWithDetails = [];
-        }        
+        }
     }
 
     // Get the details of a tier by id
@@ -378,7 +379,7 @@ export class ServicePlanComponent implements OnInit{
     // Batch delete tiers
     batchDeleteTiers(tiers){
         let arr=[], msg;
-        
+
         if(_.isArray(tiers)){
             tiers.forEach((item,index)=> {
                 arr.push(item.id);
@@ -394,7 +395,7 @@ export class ServicePlanComponent implements OnInit{
         this.confirmDialog([msg,header,acceptLabel,warming,"delete"], arr)
     }
 
-    // On confirming delete 
+    // On confirming delete
     deleteTier(id){
         this.servicePlanService.deleteTier(id).subscribe((res)=>{
             this.msgs = [];
@@ -403,7 +404,7 @@ export class ServicePlanComponent implements OnInit{
         },(error)=>{
             this.msgs = [];
             this.msgs.push({severity: 'error', summary: "Error deleting service plan.", detail: error._body});
-        });   
+        });
     }
 
     // get the backend types
@@ -433,7 +434,7 @@ export class ServicePlanComponent implements OnInit{
                                 label: element.name,
                                 value: {
                                     "name": element.name,
-                                    "id" : element.id                        
+                                    "id" : element.id
                                 }
                             })
                         }
@@ -443,7 +444,7 @@ export class ServicePlanComponent implements OnInit{
                         label: element.name,
                         value: {
                             "name": element.name,
-                            "id" : element.id                        
+                            "id" : element.id
                         }
                     })
                 }
@@ -472,11 +473,11 @@ export class ServicePlanComponent implements OnInit{
                         }
                     });
                 });
-            }); 
+            });
         } else{
             this.backendsWithDetails = [];
         }
-        
+
     }
 
     // Show the add Tenants dialog
@@ -484,20 +485,20 @@ export class ServicePlanComponent implements OnInit{
         this.getTenants();
         if(this.createTierForm.controls['name']){
             this.createTierForm.removeControl('name');
-        }        
+        }
         if(this.createTierForm.controls['backend']){
             this.createTierForm.removeControl('backend');
         }
         if(this.createTierForm.controls['backend_type']){
-            this.createTierForm.removeControl('backend_type');        
+            this.createTierForm.removeControl('backend_type');
         }
         if(!this.createTierForm.controls['tenant']){
             this.createTierForm.addControl('tenant', this.fb.control(''));
             this.createTierForm.controls['tenant'].updateValueAndValidity();
         }
-        this.showAddTenantsForm = true;        
+        this.showAddTenantsForm = true;
         this.selectedTenants = [];
-        
+
     }
 
     //Close the add tenants dialog
@@ -514,7 +515,7 @@ export class ServicePlanComponent implements OnInit{
         }
         tenants.forEach(element => {
             reqBody.AddTenants.push(element.id)
-        });                            
+        });
         this.servicePlanService.updateTier(this.currentTier.id, reqBody).subscribe((res)=>{
             this.getTenantDetailsById(res.json().tenants)
             this.msgs = [];
@@ -531,7 +532,7 @@ export class ServicePlanComponent implements OnInit{
     showAddBackends(){
         if(this.createTierForm.controls['name']){
             this.createTierForm.removeControl('name');
-        }        
+        }
         if(this.createTierForm.controls['tenant']){
             this.createTierForm.removeControl('tenant');
         }
@@ -543,14 +544,14 @@ export class ServicePlanComponent implements OnInit{
             this.createTierForm.addControl('backend_type', this.fb.control(''));
             this.createTierForm.controls['backend_type'].updateValueAndValidity();
         }
-        
+
         this.showAddBackendsForm = true;
-        
+
         this.selectedBackends = [];
         this.getTypes();
 
     }
-    
+
     // Close the add backends dialog
     closeAddBackends(){
         this.selectedBackends = [];
@@ -565,7 +566,7 @@ export class ServicePlanComponent implements OnInit{
         }
         backends.forEach(element => {
             reqBody.AddBackends.push(element.id)
-        });                            
+        });
         this.servicePlanService.updateTier(this.currentTier.id, reqBody).subscribe((res)=>{
             this.getBackendsDetailsById(res.json().backends);
             this.msgs = [];
@@ -626,8 +627,8 @@ export class ServicePlanComponent implements OnInit{
                     switch (func) {
                         case "delete":
                             param.forEach(element => {
-                                this.deleteTier(element)    
-                            });                            
+                                this.deleteTier(element)
+                            });
                             break;
                         case "removeBackend":
                             let reqBody = {
@@ -635,8 +636,8 @@ export class ServicePlanComponent implements OnInit{
                                 DeleteBackends: []
                             }
                             param.forEach(element => {
-                                reqBody.DeleteBackends.push(element)    
-                            });                            
+                                reqBody.DeleteBackends.push(element)
+                            });
                             this.servicePlanService.updateTier(tier.id, reqBody).subscribe((res)=>{
                                 this.getBackendsDetailsById(res.json().backends);
                                 this.selectedTierBackends = [];
@@ -656,8 +657,8 @@ export class ServicePlanComponent implements OnInit{
                                     DeleteTenants: []
                                 }
                                 param.forEach(element => {
-                                    reqestBody.DeleteTenants.push(element)    
-                                });                            
+                                    reqestBody.DeleteTenants.push(element)
+                                });
                                 this.servicePlanService.updateTier(tier.id, reqestBody).subscribe((res)=>{
                                     this.getTenantDetailsById(res.json().tenants);
                                     this.selectedTierTenants = [];
@@ -669,13 +670,13 @@ export class ServicePlanComponent implements OnInit{
                                     this.showRightSidebar = true;
                                     this.msgs = [];
                                     this.msgs.push({severity: 'error', summary: "Error removing tenant.", detail: error._body});
-    
+
                                 })
                                 break;
                         default:
                             break;
                     }
-                    
+
                 }
                 catch (e) {
                     console.log(e);
@@ -683,11 +684,11 @@ export class ServicePlanComponent implements OnInit{
                 finally {}
             },
             reject:()=>{
-                
+
                 try {
                     switch (func) {
                         case "delete":
-                                                 
+
                             break;
                         case "removeBackend":
                             this.showTierDetails(this.currentTier);
@@ -698,7 +699,7 @@ export class ServicePlanComponent implements OnInit{
                         default:
                             break;
                     }
-                    
+
                 }
                 catch (e) {
                     console.log(e);
