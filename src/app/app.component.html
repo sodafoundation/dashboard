@@ -2,20 +2,11 @@
 <div class="layout-wrapper" [style.display]="hideLoginForm ? 'none' : 'block'">
     <div class="login-bg" #loginBG style="background-position: center" [ngClass]="{'login-animation':showLoginAnimation, 'logout-animation':showLogoutAnimation}"></div>
     <div class="login-form ui-fluid" *ngIf="!isLogin">
-        <div class="logo"></div>
-        <div class="form-list">
-            <p><input id="username" placeholder="Username" type="text" pInputText [(ngModel)]="username" /></p>
-            <p><input id="password" placeholder="Password" type="Password" pInputText [(ngModel)]="password" (keydown)="onKeyDown($event)" /></p>
-            <div class="ui-message-container" *ngIf="showErrorMsg">
-                <div class="ui-message ui-message-error ui-corner-all">
-                    <i class="fa fa-exclamation-circle" ></i>
-                    <span class="ui-message-error-text">
-                        {{errorMsg}}
-                    </span>
-                </div>
-            </div>
-            <p><button pButton type="button" label="Login" (click)="login()" class="ui-button-secondary ui-button-large"></button></p>
-        </div>
+    <app-login [(isHomePage)] = "isHomePage" [(menuItems)] = "menuItems" [(tourSteps)]="tourSteps"
+    [(dropMenuItems)] = "dropMenuItems"
+    [(activeItem)] = "activeItem"
+    [(hideLoginForm)] = "hideLoginForm" [(showLogoutAnimation)] = "showLogoutAnimation" [(showPrompt)] ="showPrompt"
+    [(isLogin)] = "isLogin" [(showLoginAnimation)] = "showLoginAnimation" (updateLogin) = "updateLogin($event)"></app-login>
     </div>
 </div>
 
@@ -55,7 +46,7 @@
             </div>
         </div>
     </div>
-    <div id="layout-sidebar">
+    <div id="layout-sidebar" *ngIf = "showMenu">
         <p-scrollPanel [style]="{width: '100%', height: '900px'}" styleClass="sidebar-menu-container">
 
         <ul class="sidebar-menu">
