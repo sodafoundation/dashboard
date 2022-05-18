@@ -51,7 +51,7 @@
 
         <ul class="sidebar-menu">
             <li *ngFor="let menuItem of menuItems">
-                <a *ngIf="!menuItem.group" href="#" [joyrideStep]="menuItem.joyrideStep" [text]="menuItem.text" stepPosition="right" [routerLink]="[menuItem.routerLink]" [ngClass]="{'active-item':menuItem==activeItem}" (click)="menuItemClick($event, menuItem)">
+                <a *ngIf="!menuItem.group" href="#" [joyrideStep]="menuItem.joyrideStep" [text]="menuItem.text" stepPosition="right" [routerLink]="[menuItem.routerLink]" [ngClass]="{'active-item':menuItem.routerLink==activeItem.routerLink}" (click)="menuItemClick($event, menuItem)">
                     <h1>{{menuItem.title}}</h1>
                     <p>{{menuItem.description}}</p>
                 </a>
@@ -62,7 +62,7 @@
                     </p-header>
                     <ul class="menuGroup-list">
                         <li class="menuGroup-child" *ngFor="let child of menuItem.children">
-                            <a *ngIf="!child.is_external_link" href="#" [routerLink]="[child.routerLink]" [ngClass]="{'active-item':child==activeItem}" (click)="menuItemClick($event, child)">
+                            <a *ngIf="!child.is_external_link" href="#" [routerLink]="[child.routerLink]" [ngClass]="{'active-item':child.routerLink==activeItem.routerLink}" (click)="menuItemClick($event, child)">
                                 <h1>
                                     {{child.title}}
                                 </h1>
@@ -82,7 +82,7 @@
     </div>
 
     <div id="layout-content">
-        <div [ngClass]="{'content-home':isHomePage}">
+        <div [ngClass]="{'content-home':menuItemClick()}">
             <router-outlet></router-outlet>
         </div>
     </div>

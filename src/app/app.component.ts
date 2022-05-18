@@ -62,6 +62,7 @@ export class AppComponent implements OnInit,AfterViewInit {
     fileName: string = "";
     downLoadArr = [];
     tenantItems = [];
+    currentItem: any = {};
     projectItemId;
     userId;
     SignatureKey = {};
@@ -75,7 +76,6 @@ export class AppComponent implements OnInit,AfterViewInit {
     tourSteps = [];
 
     msgs: Message[];
-
 
     activeItem: any;
 
@@ -753,6 +753,7 @@ export class AppComponent implements OnInit,AfterViewInit {
         } else {
             this.isHomePage = false;
         }
+        return this.isHomePage;
     }
 
     supportCurrentBrowser() {
