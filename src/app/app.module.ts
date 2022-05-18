@@ -9,12 +9,13 @@ import { LocationStrategy, HashLocationStrategy } from '@angular/common';
 import { BucketService } from './business/block/buckets.service';
 import { HttpService } from './shared/service/Http.service';
 import { JoyrideModule } from 'ngx-joyride';
-
+import { LoginComponent } from './business/auth/login/login.component';
 import { MessagesModule } from './components/messages/messages';
 
 @NgModule({
   declarations: [
-    AppComponent
+    AppComponent,
+    LoginComponent
   ],
   imports: [
     BrowserModule,
