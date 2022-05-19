@@ -140,6 +140,15 @@ export class AppComponent implements OnInit,AfterViewInit {
             this.hideLoginForm = false
         }
         window.onbeforeunload = ()=>{
+            this.paramStor.AUTH_TOKEN("");
+            this.paramStor.CURRENT_USER("");
+            this.paramStor.CURRENT_TENANT("");
+            this.paramStor.PASSWORD("");
+            this.paramStor.CURRENT_ROLE("")
+            this.paramStor.TOKEN_PERIOD("");
+            this.paramStor.CURRENT_PROJECTITEMID("")
+            this.paramStor.CURRENT_USERID("")
+            localStorage.removeItem('userItems')
             window.sessionStorage['folderId'] = ""
             window.sessionStorage['headerTag'] = ""
         }
