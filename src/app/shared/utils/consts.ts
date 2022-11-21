@@ -198,6 +198,10 @@ export const Consts = {
                 value: 'hpe'
             },
             {
+                label: "H3C",
+                value: 'h3c'
+            },
+            {
                 label: "Hitachi",
                 value: 'hitachi'
             },
@@ -219,11 +223,11 @@ export const Consts = {
             }
         ],
         resources:{
-            volumes : ['fake_driver', 'vmax', 'pmax', 'unity', 'vnx_block', 'vplex', 'oceanstor', '3par', 'primera', 'vsp', 'storwize_svc', 'cmode', 'eternus', 'flasharray', 'msa', 'ds8k'],
-            pools : ['fake_driver', 'vmax', 'pmax', 'unity', 'vnx_block', 'vplex', 'oceanstor', '3par', 'primera', 'vsp', 'storwize_svc', 'cmode', 'eternus', 'msa', 'hnas', 'ds8k'],
-            controllers : ['fake_driver', 'oceanstor', 'unity', 'vnx_block', 'vplex', '3par', 'primera', 'vsp', 'storwize_svc', 'cmode', 'vmax', 'pmax', 'eternus', 'flasharray', 'msa', 'hnas', 'ds8k'],
-            ports : ['fake_driver', 'oceanstor', 'unity', 'vnx_block', 'vplex', '3par', 'primera', 'vsp', 'storwize_svc', 'cmode', 'vmax', 'pmax', 'eternus', 'flasharray', 'msa', 'hnas', 'ds8k'],
-            disks : ['fake_driver', 'oceanstor', 'unity', 'vnx_block', '3par', 'primera', 'vsp', 'storwize_svc', 'cmode', 'vmax', 'pmax', 'eternus', 'flasharray', 'msa', 'hnas'],
+            volumes : ['fake_driver', 'vmax', 'pmax', 'unity', 'vnx_block', 'vplex', 'oceanstor', '3par', 'unistor_cf', 'primera', 'vsp', 'storwize_svc', 'cmode', 'eternus', 'flasharray', 'msa', 'ds8k'],
+            pools : ['fake_driver', 'vmax', 'pmax', 'unity', 'vnx_block', 'vplex', 'oceanstor', '3par', 'unistor_cf', 'primera', 'vsp', 'storwize_svc', 'cmode', 'eternus', 'msa', 'hnas', 'ds8k'],
+            controllers : ['fake_driver', 'oceanstor', 'unity', 'vnx_block', 'vplex', '3par', 'unistor_cf', 'primera', 'vsp', 'storwize_svc', 'cmode', 'vmax', 'pmax', 'eternus', 'flasharray', 'msa', 'hnas', 'ds8k'],
+            ports : ['fake_driver', 'oceanstor', 'unity', 'vnx_block', 'vplex', '3par', 'unistor_cf', 'primera', 'vsp', 'storwize_svc', 'cmode', 'vmax', 'pmax', 'eternus', 'flasharray', 'msa', 'hnas', 'ds8k'],
+            disks : ['fake_driver', 'oceanstor', 'unity', 'vnx_block', '3par', 'unistor_cf', 'primera', 'vsp', 'storwize_svc', 'cmode', 'vmax', 'pmax', 'eternus', 'flasharray', 'msa', 'hnas'],
             qtrees : ['fake_driver', 'oceanstor', 'unity', 'cmode', 'hnas'],
             filesystems : ['fake_driver', 'oceanstor', 'unity', 'cmode', 'hnas'],
             shares: ['fake_driver', 'oceanstor', 'unity', 'cmode', 'hnas'],
@@ -307,6 +311,19 @@ export const Consts = {
                         name: 'oceanstor',
                         rest: true,
                         ssh: false,
+                        cli: false,
+                        smis: false,
+                        extra: false
+                    }
+                }
+            ],
+            'h3c' : [
+                {
+                    label: "H3C UniStor",
+                    value: {
+                        name: 'unistor_cf',
+                        rest: true,
+                        ssh: true,
                         cli: false,
                         smis: false,
                         extra: false
