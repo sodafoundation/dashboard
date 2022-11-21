@@ -219,11 +219,11 @@ export const Consts = {
             }
         ],
         resources:{
-            volumes : ['fake_driver', 'vmax', 'unity', 'vnx_block', 'vplex', 'oceanstor', '3par', 'vsp', 'storwize_svc', 'cmode', 'eternus', 'flasharray', 'msa', 'ds8k'],
-            pools : ['fake_driver', 'vmax', 'unity', 'vnx_block', 'vplex', 'oceanstor', '3par', 'vsp', 'storwize_svc', 'cmode', 'eternus', 'msa', 'hnas', 'ds8k'],
-            controllers : ['fake_driver', 'oceanstor', 'unity', 'vnx_block', 'vplex', '3par', 'vsp', 'storwize_svc', 'cmode', 'vmax', 'eternus', 'flasharray', 'msa', 'hnas', 'ds8k'],
-            ports : ['fake_driver', 'oceanstor', 'unity', 'vnx_block', 'vplex', '3par', 'vsp', 'storwize_svc', 'cmode', 'vmax', 'eternus', 'flasharray', 'msa', 'hnas', 'ds8k'],
-            disks : ['fake_driver', 'oceanstor', 'unity', 'vnx_block', '3par', 'vsp', 'storwize_svc', 'cmode', 'vmax', 'eternus', 'flasharray', 'msa', 'hnas'],
+            volumes : ['fake_driver', 'vmax', 'pmax', 'unity', 'vnx_block', 'vplex', 'oceanstor', '3par', 'vsp', 'storwize_svc', 'cmode', 'eternus', 'flasharray', 'msa', 'ds8k'],
+            pools : ['fake_driver', 'vmax', 'pmax', 'unity', 'vnx_block', 'vplex', 'oceanstor', '3par', 'vsp', 'storwize_svc', 'cmode', 'eternus', 'msa', 'hnas', 'ds8k'],
+            controllers : ['fake_driver', 'oceanstor', 'unity', 'vnx_block', 'vplex', '3par', 'vsp', 'storwize_svc', 'cmode', 'vmax', 'pmax', 'eternus', 'flasharray', 'msa', 'hnas', 'ds8k'],
+            ports : ['fake_driver', 'oceanstor', 'unity', 'vnx_block', 'vplex', '3par', 'vsp', 'storwize_svc', 'cmode', 'vmax', 'pmax', 'eternus', 'flasharray', 'msa', 'hnas', 'ds8k'],
+            disks : ['fake_driver', 'oceanstor', 'unity', 'vnx_block', '3par', 'vsp', 'storwize_svc', 'cmode', 'vmax', 'pmax', 'eternus', 'flasharray', 'msa', 'hnas'],
             qtrees : ['fake_driver', 'oceanstor', 'unity', 'cmode', 'hnas'],
             filesystems : ['fake_driver', 'oceanstor', 'unity', 'cmode', 'hnas'],
             shares: ['fake_driver', 'oceanstor', 'unity', 'cmode', 'hnas'],
@@ -286,6 +286,17 @@ export const Consts = {
                         cli: false,
                         smis: false,
                         extra: false
+                    }
+                },
+                {
+                    label: "PMAX",
+                    value: {
+                        name: 'pmax',
+                        rest: true,
+                        ssh: false,
+                        cli: false,
+                        smis: false,
+                        extra: true
                     }
                 }
             ],
