@@ -219,11 +219,11 @@ export const Consts = {
             }
         ],
         resources:{
-            volumes : ['fake_driver', 'vmax', 'pmax', 'unity', 'vnx_block', 'vplex', 'oceanstor', '3par', 'vsp', 'storwize_svc', 'cmode', 'eternus', 'flasharray', 'msa', 'ds8k'],
-            pools : ['fake_driver', 'vmax', 'pmax', 'unity', 'vnx_block', 'vplex', 'oceanstor', '3par', 'vsp', 'storwize_svc', 'cmode', 'eternus', 'msa', 'hnas', 'ds8k'],
-            controllers : ['fake_driver', 'oceanstor', 'unity', 'vnx_block', 'vplex', '3par', 'vsp', 'storwize_svc', 'cmode', 'vmax', 'pmax', 'eternus', 'flasharray', 'msa', 'hnas', 'ds8k'],
-            ports : ['fake_driver', 'oceanstor', 'unity', 'vnx_block', 'vplex', '3par', 'vsp', 'storwize_svc', 'cmode', 'vmax', 'pmax', 'eternus', 'flasharray', 'msa', 'hnas', 'ds8k'],
-            disks : ['fake_driver', 'oceanstor', 'unity', 'vnx_block', '3par', 'vsp', 'storwize_svc', 'cmode', 'vmax', 'pmax', 'eternus', 'flasharray', 'msa', 'hnas'],
+            volumes : ['fake_driver', 'vmax', 'pmax', 'unity', 'vnx_block', 'vplex', 'oceanstor', '3par', 'primera', 'vsp', 'storwize_svc', 'cmode', 'eternus', 'flasharray', 'msa', 'ds8k'],
+            pools : ['fake_driver', 'vmax', 'pmax', 'unity', 'vnx_block', 'vplex', 'oceanstor', '3par', 'primera', 'vsp', 'storwize_svc', 'cmode', 'eternus', 'msa', 'hnas', 'ds8k'],
+            controllers : ['fake_driver', 'oceanstor', 'unity', 'vnx_block', 'vplex', '3par', 'primera', 'vsp', 'storwize_svc', 'cmode', 'vmax', 'pmax', 'eternus', 'flasharray', 'msa', 'hnas', 'ds8k'],
+            ports : ['fake_driver', 'oceanstor', 'unity', 'vnx_block', 'vplex', '3par', 'primera', 'vsp', 'storwize_svc', 'cmode', 'vmax', 'pmax', 'eternus', 'flasharray', 'msa', 'hnas', 'ds8k'],
+            disks : ['fake_driver', 'oceanstor', 'unity', 'vnx_block', '3par', 'primera', 'vsp', 'storwize_svc', 'cmode', 'vmax', 'pmax', 'eternus', 'flasharray', 'msa', 'hnas'],
             qtrees : ['fake_driver', 'oceanstor', 'unity', 'cmode', 'hnas'],
             filesystems : ['fake_driver', 'oceanstor', 'unity', 'cmode', 'hnas'],
             shares: ['fake_driver', 'oceanstor', 'unity', 'cmode', 'hnas'],
@@ -318,6 +318,17 @@ export const Consts = {
                     label: "3PAR",
                     value: {
                         name: '3par',
+                        rest: true,
+                        ssh: true,
+                        cli: false,
+                        smis: false,
+                        extra: false
+                    }
+                },
+                {
+                    label: "PRIMERA",
+                    value: {
+                        name: 'primera',
                         rest: true,
                         ssh: true,
                         cli: false,
