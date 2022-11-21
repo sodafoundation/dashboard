@@ -210,6 +210,10 @@ export const Consts = {
                 value: 'ibm'
             },
             {
+                label: "INSPUR",
+                value: 'inspur'
+            },
+            {
                 label: "NetApp",
                 value: 'netapp'
             },
@@ -223,11 +227,11 @@ export const Consts = {
             }
         ],
         resources:{
-            volumes : ['fake_driver', 'vmax', 'pmax', 'unity', 'vnx_block', 'vplex', 'oceanstor', '3par', 'unistor_cf', 'primera', 'vsp', 'storwize_svc', 'cmode', 'eternus', 'flasharray', 'msa', 'ds8k'],
-            pools : ['fake_driver', 'vmax', 'pmax', 'unity', 'vnx_block', 'vplex', 'oceanstor', '3par', 'unistor_cf', 'primera', 'vsp', 'storwize_svc', 'cmode', 'eternus', 'msa', 'hnas', 'ds8k'],
-            controllers : ['fake_driver', 'oceanstor', 'unity', 'vnx_block', 'vplex', '3par', 'unistor_cf', 'primera', 'vsp', 'storwize_svc', 'cmode', 'vmax', 'pmax', 'eternus', 'flasharray', 'msa', 'hnas', 'ds8k'],
-            ports : ['fake_driver', 'oceanstor', 'unity', 'vnx_block', 'vplex', '3par', 'unistor_cf', 'primera', 'vsp', 'storwize_svc', 'cmode', 'vmax', 'pmax', 'eternus', 'flasharray', 'msa', 'hnas', 'ds8k'],
-            disks : ['fake_driver', 'oceanstor', 'unity', 'vnx_block', '3par', 'unistor_cf', 'primera', 'vsp', 'storwize_svc', 'cmode', 'vmax', 'pmax', 'eternus', 'flasharray', 'msa', 'hnas'],
+            volumes : ['fake_driver', 'vmax', 'pmax', 'unity', 'vnx_block', 'vplex', 'oceanstor', '3par', 'unistor_cf', 'primera', 'vsp', 'storwize_svc', 'as5500', 'cmode', 'eternus', 'flasharray', 'msa', 'ds8k'],
+            pools : ['fake_driver', 'vmax', 'pmax', 'unity', 'vnx_block', 'vplex', 'oceanstor', '3par', 'unistor_cf', 'primera', 'vsp', 'storwize_svc', 'as5500', 'cmode', 'eternus', 'msa', 'hnas', 'ds8k'],
+            controllers : ['fake_driver', 'oceanstor', 'unity', 'vnx_block', 'vplex', '3par', 'unistor_cf', 'primera', 'vsp', 'storwize_svc', 'as5500', 'cmode', 'vmax', 'pmax', 'eternus', 'flasharray', 'msa', 'hnas', 'ds8k'],
+            ports : ['fake_driver', 'oceanstor', 'unity', 'vnx_block', 'vplex', '3par', 'unistor_cf', 'primera', 'vsp', 'storwize_svc', 'as5500', 'cmode', 'vmax', 'pmax', 'eternus', 'flasharray', 'msa', 'hnas', 'ds8k'],
+            disks : ['fake_driver', 'oceanstor', 'unity', 'vnx_block', '3par', 'unistor_cf', 'primera', 'vsp', 'storwize_svc', 'as5500', 'cmode', 'vmax', 'pmax', 'eternus', 'flasharray', 'msa', 'hnas'],
             qtrees : ['fake_driver', 'oceanstor', 'unity', 'cmode', 'hnas'],
             filesystems : ['fake_driver', 'oceanstor', 'unity', 'cmode', 'hnas'],
             shares: ['fake_driver', 'oceanstor', 'unity', 'cmode', 'hnas'],
@@ -407,6 +411,19 @@ export const Consts = {
                         name: 'ds8k',
                         rest: true,
                         ssh: false,
+                        cli: false,
+                        smis: false,
+                        extra: false
+                    }
+                }
+            ],
+            'inspur' : [
+                {
+                    label: "AS5500/AS5300/AS2600/AS2200",
+                    value: {
+                        name: 'as5500',
+                        rest: false,
+                        ssh: true,
                         cli: false,
                         smis: false,
                         extra: false
