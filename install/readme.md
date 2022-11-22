@@ -21,8 +21,8 @@ echo $HOST_IP
 - Export the desired SODA Release version to the environment variable
 
 ```sh
-export SODA_RELEASE_VERSION=v1.7.0 # Replace with SODA release version or docker tag for dashboard.
-echo $SODA_RELEASE_VERSION
+export DASHBOARD_RELEASE_VERSION=v1.7.0 # Replace with SODA release version or docker tag for dashboard.
+echo $DASHBOARD_RELEASE_VERSION
 ```
 
 ## Usage
@@ -30,14 +30,14 @@ echo $SODA_RELEASE_VERSION
 - Download the latest release binaries.
 
 ```sh
-curl https://github.com/sodafoundation/dashboard/releases/download/$SODA_RELEASE_VERSION/soda-dashboard-$SODA_RELEASE_VERSION.tar.gz
+curl https://github.com/sodafoundation/dashboard/releases/download/$DASHBOARD_RELEASE_VERSION/soda-dashboard-$DASHBOARD_RELEASE_VERSION.tar.gz
 ```
 
 - Extract the scripts from the release package.
 
 ```sh
-tar -xvzf soda-dashboard-$SODA_RELEASE_VERSION.tar.gz
-cd soda-dashboard-$SODA_RELEASE_VERSION.tar.gz
+tar -xvzf soda-dashboard-$DASHBOARD_RELEASE_VERSION.tar.gz
+cd soda-dashboard-$DASHBOARD_RELEASE_VERSION.tar.gz
 ```
 - Change the permissions and provide execute privilege
 
@@ -51,10 +51,9 @@ chmod a+x ./install.sh ./ministone.py
 ./install.sh
 
 Usage: install.sh <install|uninstall|uninstall_purge>
-./install install : Install Auth and Dashboard.
-./install uninstall : Uninstall Keystone.
-./install uninstall_purge : Purge Uninstall.
-
+./install install : Install Keystone Authentication and Dashboard.
+./install uninstall : Uninstall Keystone Authentication and Dashboard.
+./install uninstall_purge : Uninstall and purge Keystone Authentication and Dashboard.
 ```
 
 - Run the install command

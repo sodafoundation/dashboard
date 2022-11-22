@@ -82,7 +82,7 @@ install_dashboard(){
     
     echo -e "\033[3;33m The HOST IP is $HOST_IP \033[m"
 
-    echo -e "\033[3;33m The SODA Release version is $SODA_RELEASE_VERSION \033[m"
+    echo -e "\033[3;33m The Dashboard Release version is $DASHBOARD_RELEASE_VERSION \033[m"
 
     docker run -d --net=host --restart=always --name soda-dashboard \
     -e OPENSDS_AUTH_URL=http://$HOST_IP/identity \
@@ -96,7 +96,7 @@ install_dashboard(){
     -e SODA_ALERTMANAGER_PORT=9093 \
     -e SODA_ALERTMANAGER_URL=http://$HOST_IP:9093 \
     -e SODA_GRAFANA_PORT=3000 \
-    -e STORAGE_SERVICE_PLAN_ENABLED=true sodafoundation/dashboard:$SODA_RELEASE_VERSION  > /dev/null
+    -e STORAGE_SERVICE_PLAN_ENABLED=true sodafoundation/dashboard:$DASHBOARD_RELEASE_VERSION  > /dev/null
 }
 uninstall(){
     echo -e "\033[3;33m Uninstalling keystone... \033[m"
@@ -145,11 +145,12 @@ uninstall_purge() {
         echo "Dashboard image is not available."        
     else
         echo -e "\e[1;31m Removing dashboard image. \e[0m" 
-        docker rmi sodafoundation/dashboard:$SODA_RELEASE_VERSION
+        docker rmi sodafoundation/dashboard:$DASHBOARD_RELEASE_VERSION
         echo -e "\033[32m Dashboard image has been removed. \033[m"
     fi
     echo -e "\033[32m Uninstall purge is completed. \033[m"
 }
+
 
 # ***************************
 
@@ -173,9 +174,9 @@ case "$# $1" in
     ;;
      *)
     echo "Usage: $(basename $0) <install|uninstall|uninstall_purge>"
-    echo "./install install : Install Auth and Dashboard."
-    echo "./install uninstall : Uninstall Keystone."
-    echo "./install uninstall_purge : Purge Uninstall."
+    echo "./install install : Install Keystone Authentication and Dashboard."
+    echo "./install uninstall : Uninstall Keystone Authentication and Dashboard."
+    echo "./install uninstall_purge : Uninstall and purge Keystone Authentication and Dashboard."
     exit 1
     ;;
 esac
