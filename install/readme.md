@@ -18,13 +18,23 @@ export HOST_IP=<your_host_ip> # Replace with your actual host IP
 echo $HOST_IP
 ```
 
-- Export the desired SODA Release version to the environment variable
+- Export the desired Dashboard Release version to the environment variable
 
 ```sh
 export DASHBOARD_RELEASE_VERSION=v1.7.0 # Replace with SODA release version or docker tag for dashboard.
 echo $DASHBOARD_RELEASE_VERSION
 ```
 
+- Export the following environement variables for SRM Toolchain
+
+```sh
+export PROMETHEUS_IMAGE_TAG=v2.23.0
+export SODA_PROMETHEUS_PORT=9090
+export ALERTMANAGER_IMAGE_TAG=v0.21.0
+export SODA_ALERTMANAGER_PORT=9093
+export GRAFANA_IMAGE_TAG=7.3.5
+export SODA_GRAFANA_PORT=3000
+```
 ## Usage
 
 - Download the latest release binaries.
@@ -52,22 +62,29 @@ chmod a+x ./install.sh ./ministone.py
 
 Usage: install.sh <install|uninstall|uninstall_purge>
 ./install install : Install Keystone Authentication and Dashboard.
-./install uninstall : Uninstall Keystone Authentication and Dashboard.
-./install uninstall_purge : Uninstall and purge Keystone Authentication and Dashboard.
+./install install_srm_toolchain : Install Keystone Authentication, Dashboard and SRM Toolchain.
+./install uninstall : Uninstall Keystone Authentication, Dashboard and SRM Toolchain.
+./install uninstall_purge : Uninstall and purge Keystone Authentication, Dashboard and SRM Toolchain.
 ```
 
-- Run the install command
+- To install the install Keystone Authentication and Dashboard.
 
 ```sh
 ./install.sh install
 ```
 
-- To uninstall dashboard and keystone run the uninstall command.
+- [Optional] To install Keystone Authentication, Dashboard and SRM Toolchain (Prometheus, Alertmanager, Grafana) required for the Delfin UI.
+
+```sh
+./install.sh install_srm_toolchain
+```
+
+- To uninstall Keystone Authentication, Dashboard and SRM Toolchain (Prometheus, Alertmanager, Grafana) run the uninstall command.
 
 ```sh
 ./install.sh uninstall
 ```
-- To uninstall and remove the dashboard and keystone images run the `uninstall_purge` command.
+- To uninstall and remove Keystone Authentication, Dashboard and SRM Toolchain (Prometheus, Alertmanager, Grafana) images run the `uninstall_purge` command.
 
 ```sh
 ./install.sh uninstall_purge
