@@ -5,6 +5,12 @@ The SODA Experience installer enables users to install the SODA Authentication m
 
 ## Pre-requisites
 
+- `root` user is REQUIRED before the installation work starts. Please ensure you are the `root` user.
+
+```sh
+sudo su
+```
+
 - This installer is currently tested and works on **Ubuntu 20.04**. 
 
 - Python  >= 3.8.10 ***(This installer may not work on Ubuntu 18.04 since the python3 version may not be supported.)***
