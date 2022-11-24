@@ -365,10 +365,10 @@ case "$# $1" in
     ;;
      *)
     echo "Usage: $(basename $0) <install|uninstall|uninstall_purge>"
-    echo "./install install : Install Keystone Authentication and Dashboard."
-    echo "./install install_srm_toolchain : Install Keystone Authentication, Dashboard and SRM Toolchain."
-    echo "./install uninstall : Uninstall Keystone Authentication, Dashboard and SRM Toolchain.."
-    echo "./install uninstall_purge : Uninstall and purge Keystone Authentication, Dashboard and SRM Toolchain."
+    echo "./install.sh install : Install Keystone Authentication and Dashboard."
+    echo "./install.sh install_srm_toolchain : Install Keystone Authentication, Dashboard and SRM Toolchain."
+    echo "./install.sh uninstall : Uninstall Keystone Authentication, Dashboard and SRM Toolchain.."
+    echo "./install.sh uninstall_purge : Uninstall and purge Keystone Authentication, Dashboard and SRM Toolchain."
     exit 1
     ;;
 esac

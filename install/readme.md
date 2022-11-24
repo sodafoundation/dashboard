@@ -61,10 +61,10 @@ chmod a+x ./install.sh ./ministone.py
 ./install.sh
 
 Usage: install.sh <install|uninstall|uninstall_purge>
-./install install : Install Keystone Authentication and Dashboard.
-./install install_srm_toolchain : Install Keystone Authentication, Dashboard and SRM Toolchain.
-./install uninstall : Uninstall Keystone Authentication, Dashboard and SRM Toolchain.
-./install uninstall_purge : Uninstall and purge Keystone Authentication, Dashboard and SRM Toolchain.
+./install.sh install : Install Keystone Authentication and Dashboard.
+./install.sh install_srm_toolchain : Install Keystone Authentication, Dashboard and SRM Toolchain.
+./install.sh uninstall : Uninstall Keystone Authentication, Dashboard and SRM Toolchain.
+./install.sh uninstall_purge : Uninstall and purge Keystone Authentication, Dashboard and SRM Toolchain.
 ```
 
 - To install the install Keystone Authentication and Dashboard.

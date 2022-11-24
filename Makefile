@@ -13,7 +13,7 @@
 # limitations under the License.
 
 IMAGE = sodafoundation/dashboard
-VERSION := latest
+VERSION := v1.7.1
 BASE_DIR := $(shell pwd)
 BUILD_DIR := $(BASE_DIR)/build
 DIST_DIR := $(BASE_DIR)/build/dist
@@ -24,7 +24,7 @@ BUILD_TGT := soda-dashboard-$(VERSION)
 
 all:build
 
-build:dist dashboard
+build:dist docker
 
 dashboard:
 	chmod +x ./image_builder.sh \
