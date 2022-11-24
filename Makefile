@@ -13,7 +13,7 @@
 # limitations under the License.
 
 IMAGE = sodafoundation/dashboard
-VERSION := v1.7.1
+VERSION := latest
 BASE_DIR := $(shell pwd)
 BUILD_DIR := $(BASE_DIR)/build
 DIST_DIR := $(BASE_DIR)/build/dist
