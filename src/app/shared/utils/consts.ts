@@ -182,6 +182,10 @@ export const Consts = {
     STORAGES: {
         vendors: [
             {
+                label: "Test Storage",
+                value: 'fake_storage'
+            },
+            {
                 label: "Dell EMC",
                 value: 'dellemc'
             },
@@ -215,17 +219,30 @@ export const Consts = {
             }
         ],
         resources:{
-            volumes : ['vmax', 'unity', 'vnx_block', 'vplex', 'oceanstor', '3par', 'vsp', 'storwize_svc', 'cmode', 'eternus', 'flasharray', 'msa', 'ds8k'],
-            pools : ['vmax', 'unity', 'vnx_block', 'vplex', 'oceanstor', '3par', 'vsp', 'storwize_svc', 'cmode', 'eternus', 'msa', 'hnas', 'ds8k'],
-            controllers : ['oceanstor', 'unity', 'vnx_block', 'vplex', '3par', 'vsp', 'storwize_svc', 'cmode', 'vmax', 'eternus', 'flasharray', 'msa', 'hnas', 'ds8k'],
-            ports : ['oceanstor', 'unity', 'vnx_block', 'vplex', '3par', 'vsp', 'storwize_svc', 'cmode', 'vmax', 'eternus', 'flasharray', 'msa', 'hnas', 'ds8k'],
-            disks : ['oceanstor', 'unity', 'vnx_block', '3par', 'vsp', 'storwize_svc', 'cmode', 'vmax', 'eternus', 'flasharray', 'msa', 'hnas'],
-            qtrees : ['oceanstor', 'unity', 'cmode', 'hnas'],
-            filesystems : ['oceanstor', 'unity', 'cmode', 'hnas'],
-            shares: ['oceanstor', 'unity', 'cmode', 'hnas'],
-            quotas: ['oceanstor', 'unity', 'cmode', 'hnas']
+            volumes : ['fake_driver', 'vmax', 'unity', 'vnx_block', 'vplex', 'oceanstor', '3par', 'vsp', 'storwize_svc', 'cmode', 'eternus', 'flasharray', 'msa', 'ds8k'],
+            pools : ['fake_driver', 'vmax', 'unity', 'vnx_block', 'vplex', 'oceanstor', '3par', 'vsp', 'storwize_svc', 'cmode', 'eternus', 'msa', 'hnas', 'ds8k'],
+            controllers : ['fake_driver', 'oceanstor', 'unity', 'vnx_block', 'vplex', '3par', 'vsp', 'storwize_svc', 'cmode', 'vmax', 'eternus', 'flasharray', 'msa', 'hnas', 'ds8k'],
+            ports : ['fake_driver', 'oceanstor', 'unity', 'vnx_block', 'vplex', '3par', 'vsp', 'storwize_svc', 'cmode', 'vmax', 'eternus', 'flasharray', 'msa', 'hnas', 'ds8k'],
+            disks : ['fake_driver', 'oceanstor', 'unity', 'vnx_block', '3par', 'vsp', 'storwize_svc', 'cmode', 'vmax', 'eternus', 'flasharray', 'msa', 'hnas'],
+            qtrees : ['fake_driver', 'oceanstor', 'unity', 'cmode', 'hnas'],
+            filesystems : ['fake_driver', 'oceanstor', 'unity', 'cmode', 'hnas'],
+            shares: ['fake_driver', 'oceanstor', 'unity', 'cmode', 'hnas'],
+            quotas: ['fake_driver', 'oceanstor', 'unity', 'cmode', 'hnas']
         },
         models: {
+            'fake_storage' : [
+                {
+                    label: "Test Storage",
+                    value: {
+                        name: 'fake_driver',
+                        rest: true,
+                        ssh: true,
+                        cli: true,
+                        smis: true,
+                        extra: true
+                    }
+                }
+            ],
             'dellemc' : [
                 {
                     label: "VMAX",
