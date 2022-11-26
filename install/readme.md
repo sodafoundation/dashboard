@@ -17,6 +17,15 @@ sudo su
 
 - Install Docker version > 20.10.21
 
+- Install docker-compose > 1.23.1
+
+```sh
+sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+sudo chmod +x /usr/local/bin/docker-compose
+docker-compose --version
+
+```
+
 - Export the IP address of the host machine to the environment variable
 
 ```sh
@@ -31,7 +40,7 @@ export DASHBOARD_RELEASE_VERSION=v1.7.0 # Replace with SODA release version or d
 echo $DASHBOARD_RELEASE_VERSION
 ```
 
-- Export the following environement variables for SRM Toolchain
+- Export the following environement variables for SRM Toolchain (Prometheus, ALertmanager and Grafana)
 
 ```sh
 export PROMETHEUS_IMAGE_TAG=v2.23.0
@@ -40,6 +49,12 @@ export ALERTMANAGER_IMAGE_TAG=v0.21.0
 export SODA_ALERTMANAGER_PORT=9093
 export GRAFANA_IMAGE_TAG=7.3.5
 export SODA_GRAFANA_PORT=3000
+```
+
+- Export the working directory location where the SRM Toolchain files will be copied.
+
+```sh
+export SRM_TOOLS_WORK_DIR=/opt/srm-toolchain
 ```
 ## Usage
 
@@ -58,7 +73,7 @@ cd soda-dashboard-$DASHBOARD_RELEASE_VERSION.tar.gz
 - Change the permissions and provide execute privilege
 
 ```sh
-chmod a+x ./install.sh ./ministone.py
+chmod a+x ./install.sh ./conf/keystone/ministone.py
 ```
 
 - Run the install script

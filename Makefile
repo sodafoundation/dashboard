@@ -48,7 +48,6 @@ dist:
 	rm -fr $(DIST_DIR) && mkdir -p $(DIST_DIR)/$(BUILD_TGT)/
 	cd $(DIST_DIR) && \
 	cp ../../install/install.sh $(BUILD_TGT)/ && \
-	cp ../../install/ministone.py $(BUILD_TGT)/ && \
 	cp -R ../../install/conf $(BUILD_TGT)/ && \
 	cp $(BASE_DIR)/LICENSE.md $(BUILD_TGT) && \
 	zip -r $(DIST_DIR)/$(BUILD_TGT).zip $(BUILD_TGT) && \

@@ -35,7 +35,7 @@ wait_for_keystone () {
     do
         # get a token to check if keystone is working correctly or not.
         # keystone credentials such as OS_USERNAME must be set before.
-        python3 ./ministone.py token_issue  > /dev/null
+        python3 ./conf/keystone/ministone.py token_issue  > /dev/null
         if [ "$?" == "0" ]; then
             return
         fi
@@ -62,14 +62,14 @@ install(){
     docker run -d --privileged=true --restart=always --net=host --name=opensds-authchecker opensdsio/opensds-authchecker:latest > /dev/null
 
     echo -e "\033[3;33m Copying the keystone configuration files... \033[m"
-    docker cp "./conf/keystone.policy.json" opensds-authchecker:/etc/keystone/policy.json
+    docker cp "./conf/keystone/keystone.policy.json" opensds-authchecker:/etc/keystone/policy.json
 
     echo -e "\033[3;33m Setting the keystone credentials... \033[m"
     keystone_credentials
 
     echo -e "\033[3;33m Waiting for Keystone service to come up... \033[m"
     wait_for_keystone
-    python3 ./ministone.py endpoint_bulk_update keystone "http://${HOST_IP}/identity"  > /dev/null
+    python3 ./conf/keystone/ministone.py endpoint_bulk_update keystone "http://${HOST_IP}/identity"  > /dev/null
 
     if [ ! "$(docker ps -a | grep opensds-authchecker)" ]
     then
@@ -117,9 +117,9 @@ install_dashboard(){
 
 install_srm_toolchain() {
     install $@
-    mkdir -p /opt/srm-toolchain
-    srm_toolchain_work_dir=/opt/srm-toolchain
-    cp -a ./conf/srm-toolchain/. $srm_toolchain_work_dir
+    srm_toolchain_work_dir="${SRM_TOOLS_WORK_DIR:=/opt/srm-toolchain}"
+    mkdir -p $srm_toolchain_work_dir
+    cp -a ./conf/delfin/srm-toolchain/. $srm_toolchain_work_dir
     
     prometheus_image_tag="${PROMETHEUS_IMAGE_TAG:=v2.23.0}"
     prometheus_port="${SODA_PROMETHEUS_PORT:=9090}"
@@ -266,6 +266,7 @@ uninstall(){
 }
 
 uninstall_purge() {
+    srm_toolchain_work_dir="${SRM_TOOLS_WORK_DIR:=/opt/srm-toolchain}"
     prometheus_image_tag="${PROMETHEUS_IMAGE_TAG:=v2.23.0}"
     prometheus_port="${SODA_PROMETHEUS_PORT:=9090}"
     alertmanager_image_tag="${ALERTMANAGER_IMAGE_TAG:=v0.21.0}"
@@ -347,7 +348,7 @@ uninstall_purge() {
 
     # Deleting the SRM Toolchain work folder
     echo -e "\e[1;31m Deleting the SRM toolchain workfolder. \e[0m" 
-    rm -Rf /opt/srm-toolchain/
+    rm -Rf $srm_toolchain_work_dir
 
     echo -e "\033[32m Uninstall purge is completed. \033[m"
 }
