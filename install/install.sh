@@ -99,7 +99,9 @@ install_dashboard(){
     echo -e "\033[3;33m The HOST IP is $HOST_IP \033[m"
 
     echo -e "\033[3;33m The Dashboard Release version is $DASHBOARD_RELEASE_VERSION \033[m"
-
+    
+    # FIXME: Can these environment variables and endpoints be taken from any configuration that SOD installer can provide?
+    
     docker run -d --net=host --restart=always --name soda-dashboard \
     -e OPENSDS_AUTH_URL=http://$HOST_IP/identity \
     -e OPENSDS_HOTPOT_URL=http://$HOST_IP:50040 \
