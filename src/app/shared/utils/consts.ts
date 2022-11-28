@@ -198,12 +198,24 @@ export const Consts = {
                 value: 'hpe'
             },
             {
+                label: "H3C",
+                value: 'h3c'
+            },
+            {
                 label: "Hitachi",
                 value: 'hitachi'
             },
             {
                 label: "IBM",
                 value: 'ibm'
+            },
+            {
+                label: "INSPUR",
+                value: 'inspur'
+            },
+            {
+                label: "MacroSAN",
+                value: 'macrosan'
             },
             {
                 label: "NetApp",
@@ -219,11 +231,11 @@ export const Consts = {
             }
         ],
         resources:{
-            volumes : ['fake_driver', 'vmax', 'unity', 'vnx_block', 'vplex', 'oceanstor', '3par', 'vsp', 'storwize_svc', 'cmode', 'eternus', 'flasharray', 'msa', 'ds8k'],
-            pools : ['fake_driver', 'vmax', 'unity', 'vnx_block', 'vplex', 'oceanstor', '3par', 'vsp', 'storwize_svc', 'cmode', 'eternus', 'msa', 'hnas', 'ds8k'],
-            controllers : ['fake_driver', 'oceanstor', 'unity', 'vnx_block', 'vplex', '3par', 'vsp', 'storwize_svc', 'cmode', 'vmax', 'eternus', 'flasharray', 'msa', 'hnas', 'ds8k'],
-            ports : ['fake_driver', 'oceanstor', 'unity', 'vnx_block', 'vplex', '3par', 'vsp', 'storwize_svc', 'cmode', 'vmax', 'eternus', 'flasharray', 'msa', 'hnas', 'ds8k'],
-            disks : ['fake_driver', 'oceanstor', 'unity', 'vnx_block', '3par', 'vsp', 'storwize_svc', 'cmode', 'vmax', 'eternus', 'flasharray', 'msa', 'hnas'],
+            volumes : ['fake_driver', 'vmax', 'pmax', 'scaleio', 'unity', 'vnx_block', 'vplex', 'oceanstor', '3par', 'unistor_cf', 'primera', 'vsp', 'storwize_svc', 'as5500', 'cmode', 'eternus', 'flasharray', 'msa', 'ds8k', 'macrosan'],
+            pools : ['fake_driver', 'vmax', 'pmax', 'scaleio', 'unity', 'vnx_block', 'vplex', 'oceanstor', '3par', 'unistor_cf', 'primera', 'vsp', 'storwize_svc', 'as5500', 'cmode', 'eternus', 'msa', 'hnas', 'ds8k', 'macrosan',],
+            controllers : ['fake_driver', 'oceanstor', 'unity', 'vnx_block', 'vplex', '3par', 'unistor_cf', 'primera', 'vsp', 'storwize_svc', 'as5500', 'cmode', 'vmax', 'pmax', 'scaleio', 'eternus', 'flasharray', 'msa', 'hnas', 'ds8k', 'macrosan'],
+            ports : ['fake_driver', 'oceanstor', 'unity', 'vnx_block', 'vplex', '3par', 'unistor_cf', 'primera', 'vsp', 'storwize_svc', 'as5500', 'cmode', 'vmax', 'pmax', 'scaleio', 'eternus', 'flasharray', 'msa', 'hnas', 'ds8k', 'macrosan'],
+            disks : ['fake_driver', 'oceanstor', 'unity', 'vnx_block', '3par', 'unistor_cf', 'primera', 'vsp', 'storwize_svc', 'as5500', 'cmode', 'vmax', 'pmax', 'scaleio', 'eternus', 'flasharray', 'msa', 'hnas', 'macrosan'],
             qtrees : ['fake_driver', 'oceanstor', 'unity', 'cmode', 'hnas'],
             filesystems : ['fake_driver', 'oceanstor', 'unity', 'cmode', 'hnas'],
             shares: ['fake_driver', 'oceanstor', 'unity', 'cmode', 'hnas'],
@@ -248,6 +260,28 @@ export const Consts = {
                     label: "VMAX",
                     value: {
                         name: 'vmax',
+                        rest: true,
+                        ssh: false,
+                        cli: false,
+                        smis: false,
+                        extra: true
+                    }
+                },
+                {
+                    label: "PowerMAX",
+                    value: {
+                        name: 'pmax',
+                        rest: true,
+                        ssh: false,
+                        cli: false,
+                        smis: false,
+                        extra: true
+                    }
+                },
+                {
+                    label: "ScaleIO",
+                    value: {
+                        name: 'scaleio',
                         rest: true,
                         ssh: false,
                         cli: false,
@@ -302,11 +336,35 @@ export const Consts = {
                     }
                 }
             ],
+            'h3c' : [
+                {
+                    label: "H3C UniStor",
+                    value: {
+                        name: 'unistor_cf',
+                        rest: true,
+                        ssh: true,
+                        cli: false,
+                        smis: false,
+                        extra: false
+                    }
+                }
+            ],
             'hpe' : [
                 {
                     label: "3PAR",
                     value: {
                         name: '3par',
+                        rest: true,
+                        ssh: true,
+                        cli: false,
+                        smis: false,
+                        extra: false
+                    }
+                },
+                {
+                    label: "PRIMERA",
+                    value: {
+                        name: 'primera',
                         rest: true,
                         ssh: true,
                         cli: false,
@@ -368,6 +426,32 @@ export const Consts = {
                         name: 'ds8k',
                         rest: true,
                         ssh: false,
+                        cli: false,
+                        smis: false,
+                        extra: false
+                    }
+                }
+            ],
+            'inspur' : [
+                {
+                    label: "AS5500/AS5300/AS2600/AS2200",
+                    value: {
+                        name: 'as5500',
+                        rest: false,
+                        ssh: true,
+                        cli: false,
+                        smis: false,
+                        extra: false
+                    }
+                }
+            ],
+            'macrosan' : [
+                {
+                    label: "MacroSAN",
+                    value: {
+                        name: 'macrosan',
+                        rest: false,
+                        ssh: true,
                         cli: false,
                         smis: false,
                         extra: false
