@@ -37,9 +37,7 @@
     state: absent
     force: yes
   with_items:
-    - "{{ opensds_config_dir }}"
     - "{{ opensds_log_dir }}"
     - "{{ opensds_certs_dir }}"
-    - "{{ delfin_config_dir }}"
   ignore_errors: yes
 
