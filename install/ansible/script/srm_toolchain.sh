@@ -1,6 +1,6 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
-# Copyright 2022 The SODA Authors.
+# Copyright 2020 The SODA Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,9 +14,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-BASE_DIR=`pwd`
-pwd
-apt-get update && apt-get install -y make curl sudo
-curl -sL https://deb.nodesource.com/setup_8.x | bash -
-apt-get install -y nodejs
-make docker
+
+uninstall(){
+    echo "Entered uninstall"
+    if [ "docker" == "$1" ]
+    then
+        echo "Entered if condition"
+        docker stop monitoring_prometheus
+        docker rm monitoring_prometheus
+        docker stop monitoring_alertmanager
+        docker rm monitoring_alertmanager
+        docker stop monitoring_grafana
+        docker rm monitoring_grafana
+        docker ps -a | grep prometheus
+    fi
+    
+}

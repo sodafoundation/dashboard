@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Copyright 2022 The SODA Authors.
 #
@@ -14,9 +14,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-BASE_DIR=`pwd`
-pwd
-apt-get update && apt-get install -y make curl sudo
-curl -sL https://deb.nodesource.com/setup_8.x | bash -
-apt-get install -y nodejs
-make docker
+ansiblever=$(ansible --version |grep -Eow '^ansible [^ ]+' |gawk '{ print $2 }')
+echo "The actual version of ansible is $ansiblever"
+
+if [[ "$ansiblever" < '2.4.2' ]]; then
+  echo "Ansible version 2.4.2 or higher is required"
+  exit 1
+fi
+
+exit 0
