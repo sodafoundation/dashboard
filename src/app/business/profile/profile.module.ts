@@ -1,15 +1,12 @@
-import { CommonModule } from '@angular/common';
 import { NgModule, APP_INITIALIZER } from '@angular/core';
-import { ProfileComponent } from './profile.component';
 import { RouterModule } from '@angular/router';
-import { ReactiveFormsModule, FormsModule } from '@angular/forms';
-
 import { ProfileCardComponent } from './profileCard/profile-card.component';
-import { ButtonModule,CardModule,ChartModule,MessageModule,OverlayPanelModule,DialogModule ,ConfirmationService,ConfirmDialogModule, FormModule, DropMenuModule, GrowlModule} from '../../components/common/api';
-import { ProfileService, PoolService } from './profile.service';
+import { ProfileComponent } from './profile.component';
+import { ProfileService } from './profile.service';
+import { PoolService } from './pool.service';
 import { HttpService } from '../../shared/api';
 import { SuspensionFrameComponent } from './profileCard/suspension-frame/suspension-frame.component';
-
+import { SharedModule } from '../../shared/shared.module';
 let routers = [{
   path: '',
   component: ProfileComponent
@@ -23,24 +20,11 @@ let routers = [{
   ],
   imports: [
     RouterModule.forChild(routers),
-    ReactiveFormsModule,
-    FormsModule,
-    ButtonModule,
-    CommonModule,
-    CardModule,
-    ChartModule,
-    MessageModule,
-    OverlayPanelModule,
-    DialogModule,
-    ConfirmDialogModule,
-    FormModule,
-    DropMenuModule,
-    GrowlModule
+    SharedModule
   ],
   providers: [
     HttpService,
     ProfileService,
-    ConfirmationService,
     PoolService
   ]
 })

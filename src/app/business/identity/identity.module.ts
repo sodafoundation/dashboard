@@ -1,7 +1,7 @@
 import { NgModule, APP_INITIALIZER } from '@angular/core';
-import { IdentityComponent } from './identity.component';
 import { RouterModule } from '@angular/router';
-import { TabViewModule } from '../../components/common/api';
+import { SharedModule } from 'app/shared/shared.module';
+import { IdentityComponent } from './identity.component';
 import { TenantListModule } from './tenantList.module';
 import { UserListModule } from './userList.module';
 
@@ -16,9 +16,9 @@ let routers = [{
   ],
   imports: [
     RouterModule.forChild(routers),
+    SharedModule,
     TenantListModule,
-    UserListModule,
-    TabViewModule
+    UserListModule
   ],
   providers: []
 })

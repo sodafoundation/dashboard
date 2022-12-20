@@ -70,11 +70,11 @@
     </form>
 
     <p-footer *ngIf="!isEditUser">
-        <button type="button" pButton (click)="createUser()" label="OK"></button>
+        <button type="button" [disabled]="myFormGroup.invalid" pButton (click)="createUser()" label="OK"></button>
         <button type="button" pButton (click)="createUserDisplay=false" label="Cancel"></button>
     </p-footer>
     <p-footer *ngIf="isEditUser">
-        <button type="button" pButton (click)="updateUser()" label="OK"></button>
+        <button type="button" [disabled]="myFormGroup.invalid" pButton (click)="updateUser()" label="OK"></button>
         <button type="button" pButton (click)="createUserDisplay=false" label="Cancel"></button>
     </p-footer>
 </p-dialog>

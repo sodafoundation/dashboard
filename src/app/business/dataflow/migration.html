@@ -1,3 +1,4 @@
+<p-growl [value]="msgs" [sticky]="false" [life]="6000"></p-growl>
 <div class="table-toolbar">
     <div class="left">
         <button class="ui-button-secondary" [disabled] = "showAKSKWarning" pButton type="button" label="{{I18N.keyID['sds_block_volume_create']}}" (click)="configCreateMigration()" ></button>
@@ -19,7 +20,7 @@
 </div>
 <p-dataTable [value]="allMigrations" [globalFilter]="searchByName" [(selection)]="selectedMigrations"  [showHeaderCheckbox]="true" resizableColumns="true" expandableRows="true" rowExpandMode="single" [rows]="10" [paginator]="true" [pageLinks]="3" (onRowExpand)="onRowExpand($event)" [rowsPerPageOptions]="[10,20,50,100]">
     <p-column expander="true" styleClass="table-col-expander"></p-column>
-    <p-column header="Migration" [style]="{'width': '170px'}">
+    <p-column *ngIf="!servicePlansEnabled" header="Migration" [style]="{'width': '170px'}">
         <ng-template pTemplate="body" let-mig="rowData">
             <div style="display:inline-block;">
                 <img style="height:28px;display:inline-block;margin-right:10px;" src="assets/business/images/common/{{mig.srctype}}" >
@@ -43,52 +44,63 @@
         <migration-detail [plan]="plan"></migration-detail>
     </ng-template>
 </p-dataTable>
-<p-dialog styleClass="create-migrate-dialog" header="Migrate" [(visible)]="createMigrateShow" [width]="650" modal="modal">
-    <form [grid]="{label: 'ui-g-3', content:'ui-g-20'}" [formGroup]="createMigrationForm" [errorMessage]="errorMessage">
-        <div style="margin-bottom: 18px;"><span style="font-size: 16px;font-style: normal">Basic Information</span></div>
-        <form-item label="Plan Name" >
-            <input type="text" name="migrationName" formControlName="name" pInputText style="width: 150px;" />
-        </form-item>
-        <form-item label="Source Bucket" >
-            <p-dropdown [style]="{'min-width':'220px'}" formControlName="srcBucket" [options]="bucketOption" placeholder="Please select" name="srcBucket" (onChange)="changeSrcBucket();"></p-dropdown>
-        </form-item>
-        <form-item label="Destination Bucket" >
-            <p-dropdown [style]="{'min-width':'220px'}" formControlName="destBucket" [options]="destBuckets" placeholder="Please select" name="destBucket" ></p-dropdown>
-        </form-item>
-        <form-item label="Execution Time" >
-            <p-calendar [disabled]="selectTime" [showTime]="true" name="excutingTime" formControlName="excuteTime"></p-calendar>
-            <p-checkbox binary="true" (onChange)="showcalendar()" name="excuteTime" formControlName="excute"  label="Immediately"></p-checkbox>
-        </form-item>
-        <div *ngIf= "false" style="margin-bottom: 10px;"><span style="font-size: 16px;font-style: normal">Rule</span></div>
-        <span *ngIf= "false" style="display:inline-block;margin-bottom: 10px;color: rgb(136, 147, 166);">Without a rule, all objects in the source bucket will be migrated; otherwise only objects selected based on the rule will be migrated.</span>
-        <textarea *ngIf= "false" [rows]="2" [cols]="78" pInputTextarea name="rule" formControlName="rule"></textarea>
-        <div *ngIf= "false" style="margin:10px 0">
-            <p-checkbox (onChange)="showDetail()" name="analysis"  value="true" [(ngModel)]="dataAnalysis" label="Config Data analysis"></p-checkbox>
+
+<p-sidebar [(visible)]="showRightSidebar" (onHide)="closeSidebar()" position="right" styleClass="details-sidebar-panel ui-sidebar-lg" [autoZIndex]="true" [baseZIndex]="1000">
+    <div *ngIf="createMigrateShow"  class="right-sidebar-content-wrapper">
+        <div class="right-sidebar-header">
+            <h1 style="font-weight:normal">Create Migration Plan</h1>
         </div>
-        <form *ngIf="false" [grid]="{label: 'ui-g-3', content:'ui-g-20'}"  >
-            <form-item label="Analysis Cluster" >
-                <input type="text" name="analysisCluster" pInputText [(ngModel)]="analysisCluster" />
-            </form-item>
-            <form-item label="AK" [style]="{'display':'inline-block'}" >
-                <input type="text" name="ak" pInputText [(ngModel)]="ak" />
-            </form-item>
-            <form-item label="SK" [style]="{'display':'inline-block'}">
-                <input type="text" name="sk" pInputText [(ngModel)]="sk" />
-            </form-item>
-            <form-item label="Analysis Engine" [style]="{'display':'inline-block'}">
-                <p-dropdown [style]="{'min-width':'220px'}" [options]="engineOption" placeholder="Please select" [(ngModel)]="jarParam" name="jar" ></p-dropdown>
-            </form-item>
-            <div style="margin-bottom: 10px;"><span style="font-size: 16px;font-style: normal">Analysis Param</span></div>
-            <textarea [rows]="2" [cols]="78" pInputTextarea name="anaParam" [(ngModel)]="anaParam"></textarea>
-        </form>
-        <div style="margin-top:10px;">
-            <p-checkbox binary="true" name="deleteSrcObject"  value="true" formControlName="deleteSrcObject"  label="Delete the source objects after the migration is completed."></p-checkbox>
+        <div class="right-sidebar-body">
+            <form [grid]="{label: 'ui-g-3', content:'ui-g-20'}" [formGroup]="createMigrationForm" [errorMessage]="errorMessage">
+                <div style="margin-bottom: 18px;"><span style="font-size: 16px;font-style: normal">Basic Information</span></div>
+                <form-item label="Plan Name" >
+                    <input type="text" name="migrationName" formControlName="name" pInputText style="width: 150px;" />
+                </form-item>
+                <form-item label="Source Bucket" >
+                    <p-dropdown [style]="{'min-width':'220px'}" formControlName="srcBucket" [options]="bucketOption" placeholder="Please select" name="srcBucket" (onChange)="changeSrcBucket();"></p-dropdown>
+                </form-item>
+                <form-item label="Destination Bucket" >
+                    <p-dropdown [style]="{'min-width':'220px'}" formControlName="destBucket" [options]="destBuckets" placeholder="Please select" name="destBucket" ></p-dropdown>
+                </form-item>
+                <form-item label="Execution Time" >
+                    <p-calendar [disabled]="selectTime" [showTime]="true" name="excutingTime" formControlName="excuteTime"></p-calendar>
+                    <p-checkbox binary="true" (onChange)="showcalendar()" name="excuteTime" formControlName="excute"  label="Immediately"></p-checkbox>
+                </form-item>
+                <div *ngIf= "false" style="margin-bottom: 10px;"><span style="font-size: 16px;font-style: normal">Rule</span></div>
+                <span *ngIf= "false" style="display:inline-block;margin-bottom: 10px;color: rgb(136, 147, 166);">Without a rule, all objects in the source bucket will be migrated; otherwise only objects selected based on the rule will be migrated.</span>
+                <textarea *ngIf= "false" [rows]="2" [cols]="78" pInputTextarea name="rule" formControlName="rule"></textarea>
+                <div *ngIf= "false" style="margin:10px 0">
+                    <p-checkbox (onChange)="showDetail()" name="analysis"  value="true" [(ngModel)]="dataAnalysis" label="Config Data analysis"></p-checkbox>
+                </div>
+                <form *ngIf="false" [grid]="{label: 'ui-g-3', content:'ui-g-20'}"  >
+                    <form-item label="Analysis Cluster" >
+                        <input type="text" name="analysisCluster" pInputText [(ngModel)]="analysisCluster" />
+                    </form-item>
+                    <form-item label="AK" [style]="{'display':'inline-block'}" >
+                        <input type="text" name="ak" pInputText [(ngModel)]="ak" />
+                    </form-item>
+                    <form-item label="SK" [style]="{'display':'inline-block'}">
+                        <input type="text" name="sk" pInputText [(ngModel)]="sk" />
+                    </form-item>
+                    <form-item label="Analysis Engine" [style]="{'display':'inline-block'}">
+                        <p-dropdown [style]="{'min-width':'220px'}" [options]="engineOption" placeholder="Please select" [(ngModel)]="jarParam" name="jar" ></p-dropdown>
+                    </form-item>
+                    <div style="margin-bottom: 10px;"><span style="font-size: 16px;font-style: normal">Analysis Param</span></div>
+                    <textarea [rows]="2" [cols]="78" pInputTextarea name="anaParam" [(ngModel)]="anaParam"></textarea>
+                </form>
+                <div style="margin-top:10px;">
+                    <p-checkbox binary="true" name="deleteSrcObject"  value="true" formControlName="deleteSrcObject"  label="Delete the source objects after the migration is completed."></p-checkbox>
+                </div>
+            </form>
         </div>
-    </form>
+        <div class="right-sidebar-footer">
+            <div style="margin-top:100px;">
+                <button type="button" [disabled]="createMigrationForm.invalid" class="ui-button-secondary" pButton (click)="createMigration()" label="{{I18N.keyID['ok']}}" ></button>
+                <button type="button" pButton (click)="closeSidebar()" label="{{I18N.keyID['cancel']}}"></button>                
+                <!-- <button type="button" pButton (click)="resetMigrateForm()" label="{{I18N.keyID['cancel']}}"></button> -->
+            </div>
+        </div>
+    </div>
     
-    <p-footer>
-        <button type="button" class="ui-button-secondary" pButton (click)="createMigration()" label="{{I18N.keyID['ok']}}" ></button>
-        <button type="button" pButton (click)="createMigrateShow=false" label="{{I18N.keyID['cancel']}}"></button>
-    </p-footer>
-</p-dialog>
+</p-sidebar>
 <p-confirmDialog></p-confirmDialog>

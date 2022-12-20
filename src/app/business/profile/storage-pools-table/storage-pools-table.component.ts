@@ -1,5 +1,5 @@
 import { Component, OnInit,Input } from '@angular/core';
-import { PoolService } from './../profile.service';
+import { PoolService } from './../pool.service';
 import { Utils } from '../../../shared/api';
 
 @Component({

@@ -54,8 +54,8 @@ export class VolumeDetailComponent implements OnInit {
       this.ProfileService.getProfileById(this.volume.profileId).subscribe((res)=>{
           this.volume.profileName = res.json().name;
       })
-
-      if(this.volume.snapshotId != ""){
+      
+      if(this.volume.snapshotId && this.volume.snapshotId != ""){
         this.showVolumeSource = true;
         this.volumeSource = this.i18n.keyID['sds_block_volume_source'].replace("{{}}", this.volume.snapshotId);
       }

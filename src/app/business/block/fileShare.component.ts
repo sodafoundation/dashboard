@@ -236,22 +236,34 @@ export class FileShareComponent implements OnInit{
             }
             return;
         };
-        let dataArr = value;
+        let dataArr = {
+            name: '',
+            description: ''
+        };
+
+        dataArr['name'] = value['name'];
+        dataArr['description'] = value['description'] ? value['description'] : '';
+        
         this.FileShareService.updateFileShare(this.selectedFileShare.id,dataArr).subscribe((res)=>{
             this.getFileShares();
             this.modifyFileShareShow = false;
-        })
+            this.msgs = [];
+            this.msgs.push({severity: 'success', summary: 'Success', detail: "Fileshare " + dataArr['name'] + " updated successfully."});
+        }, (err)=>{
+            this.msgs = [];
+            this.msgs.push({severity: 'error', summary: 'Error', detail: "Fileshare " + dataArr['name'] + " could not be updated." + err.message ? err.message : err.json().message});
+        });
     }
     batchDelete(fileShare){
         if(fileShare){
             let  msg, arr = [];
             if(_.isArray(fileShare)){
                 fileShare.forEach((item,index)=> {
-                    arr.push(item.id);
+                    arr.push(item);
                 })
                 msg = "<div>Are you sure you want to delete the selected FileShare?</div><h3>[ "+ fileShare.length +" FileShare ]</h3>";
             }else{
-                arr.push(fileShare.id)
+                arr.push(fileShare)
                 msg = "<div>Are you sure you want to delete the selected FileShare?</div><h3>[ "+ fileShare.name +" ]</h3>"; 
             }
             this.confirmationService.confirm({
@@ -260,6 +272,7 @@ export class FileShareComponent implements OnInit{
                 acceptLabel: this.I18N.keyID['sds_block_volume_delete'],
                 isWarning: true,
                 accept: ()=>{
+                    this.msgs = [];
                     arr.forEach((item,index)=> {
                         this.deleteFileShare(item)
                     })
@@ -272,25 +285,26 @@ export class FileShareComponent implements OnInit{
         this.SnapshotService.getSnapshot().subscribe(res=>{
             let snapShot = res.json();
             snapShot = snapShot.filter(item=>{
-                return item.fileshareId == fileShare;
+                return item.fileshareId == fileShare.id;
             })
             if(snapShot.length != 0){
-                let overHeadMsg = "<div>Fileshare contains snapshot. To remove fileshare, please remove snapshot first</div>";
-                this.msgs = [];
+                let overHeadMsg = "<div>Fileshare " + fileShare.name +  " contains one or more snapshots. To remove fileshare, please remove snapshot(s) first</div>";
                 this.msgs.push({severity: 'error', summary: 'Error', detail: overHeadMsg});
             }else{
                 this.FileShareAclService.getFileShareAcl().subscribe(res=>{
                     let acls = res.json();
                     acls = acls.filter(item=>{
-                        return item.fileshareId == fileShare;
+                        return item.fileshareId == fileShare.id;
                     })
                     if(acls.length != 0){
-                        let  overHeadMsg = "<div>Fileshare contains access. To remove fileshare, please remove access first</div>";
-                        this.msgs = [];
+                        let overHeadMsg = "<div>Fileshare " + fileShare.name +  " contains one or more access. To remove fileshare, please remove access first</div>";
                         this.msgs.push({severity: 'error', summary: 'Error', detail: overHeadMsg});
                     }else{
-                        this.FileShareService.deleteFileShare(fileShare).subscribe(res=>{
+                        this.FileShareService.deleteFileShare(fileShare.id).subscribe(res=>{
                             this.getFileShares();
+                            this.msgs.push({severity: 'success', summary: 'Success', detail: "Fileshare " + fileShare.name +  " will be deleted shortly."});
+                        }, (err)=>{
+                            this.msgs.push({severity: 'error', summary: 'Error', detail: err.message ? err.message : err.json().message});
                         })
                     }
                 })
@@ -305,13 +319,15 @@ export class FileShareComponent implements OnInit{
             return;
         }
         let value = this.createSnapshotForm.value;
-        value.description = value.description != "" ? value.description: "--";
+        value.description = value.description != "" ? value.description: "-";
         value.fileshareId = this.selectedFileShare.id;
         
         this.SnapshotService.createSnapshot(value).subscribe((res)=>{
             this.createSnapshotShow = false;
             this.getProfile();
             this.showCreateSnapshot = false;
+            this.msgs = [];
+            this.msgs.push({severity: 'success', summary: 'Success', detail: "Fileshare snapshot " + value['name'] +  " created successfully."});
         },
         err=>{
           this.msgs = [];
@@ -355,6 +371,8 @@ export class FileShareComponent implements OnInit{
         this.FileShareAclService.createFileShareAcl(param,this.selectedFileShare.id).subscribe((res)=>{
             this.getProfile();
             this.aclCreateShow = false;
+            this.msgs = [];
+            this.msgs.push({severity: 'success', summary: 'Success', detail: "Fileshare access " + param['accessTo'] + " with level " + param['accessCapability'] +" created successfully."});
         },
         err=>{
           this.msgs = [];

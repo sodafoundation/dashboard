@@ -1,12 +1,10 @@
-import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { VolumeGroupDetailComponent } from './volume-group-detail.component';
+import { NgModule, APP_INITIALIZER } from '@angular/core';
 import { RouterModule } from '@angular/router';
-import { ReactiveFormsModule, FormsModule } from '@angular/forms';
-import { TabViewModule,ButtonModule, DataTableModule, DropMenuModule, DialogModule, FormModule, InputTextModule, InputTextareaModule, ConfirmDialogModule ,ConfirmationService} from './../../../components/common/api';
+import { SharedModule } from '../../../shared/shared.module';
 import { HttpService } from './../../../shared/service/Http.service';
 import { VolumeService,VolumeGroupService} from './../volume.service';
 import { ProfileService } from './../../profile/profile.service';
+import { VolumeGroupDetailComponent } from './volume-group-detail.component';
 
 let routers = [{
   path: '',
@@ -14,24 +12,13 @@ let routers = [{
 }]
 @NgModule({
   imports: [
-    CommonModule,
     RouterModule.forChild(routers),
-    ReactiveFormsModule,
-    FormsModule,
-    InputTextModule,
-    InputTextareaModule,
-    TabViewModule,
-    ButtonModule,
-    DataTableModule,
-    DialogModule,
-    FormModule,
-    ConfirmDialogModule
+    SharedModule
   ],
   declarations: [VolumeGroupDetailComponent],
   providers: [
     HttpService,
     VolumeService,
-    ConfirmationService,
     ProfileService,
     VolumeGroupService
   ]

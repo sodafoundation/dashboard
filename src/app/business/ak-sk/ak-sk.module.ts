@@ -1,9 +1,7 @@
 import { NgModule, APP_INITIALIZER } from '@angular/core';
 import { AkSkComponent } from './ak-sk.component';
 import { RouterModule } from '@angular/router';
-import { TabViewModule, ButtonModule, ConfirmDialogModule , DialogModule, DataTableModule } from '../../components/common/api';
-import { ReactiveFormsModule, FormsModule } from '@angular/forms';
-import { CommonModule } from '@angular/common';
+import { SharedModule } from '../../shared/shared.module';
 import { akSkService } from './ak-sk.service';
 
 let routers = [{
@@ -17,14 +15,7 @@ let routers = [{
   ],
   imports: [
     RouterModule.forChild(routers),
-    TabViewModule,
-    ButtonModule,
-    ReactiveFormsModule,
-    FormsModule,
-    CommonModule,
-    ConfirmDialogModule,
-    DialogModule,
-    DataTableModule
+    SharedModule
   ],
   providers: [akSkService]
 })

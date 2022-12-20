@@ -1,22 +1,22 @@
 import { NgModule, APP_INITIALIZER } from '@angular/core';
 import { VolumeGroupComponent } from './volumeGroup.component';
-import { ButtonModule, DataTableModule, InputTextModule, DialogModule,FormModule,MultiSelectModule ,DropdownModule,InputTextareaModule} from '../../components/common/api';
-import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { HttpService } from './../../shared/service/Http.service';
 import { VolumeService ,VolumeGroupService} from './volume.service';
 import { AvailabilityZonesService } from './../resource/resource.service';
-import { ConfirmationService,ConfirmDialogModule} from '../../components/common/api';
 import { RouterModule } from '@angular/router';
+import { SharedModule } from '../../shared/shared.module';
 
 @NgModule({
   declarations: [ VolumeGroupComponent ],
-  imports: [ ButtonModule, DataTableModule, InputTextModule, DialogModule,FormModule,MultiSelectModule,DropdownModule,ReactiveFormsModule,FormsModule,ConfirmDialogModule,InputTextareaModule,RouterModule],
+  imports: [ 
+    RouterModule,
+    SharedModule
+  ],
   exports: [ VolumeGroupComponent ],
   providers: [
     HttpService,
     VolumeService,
     VolumeGroupService,
-    ConfirmationService,
     AvailabilityZonesService
   ]
 })

@@ -1,0 +1,190 @@
+<p-growl [value]="msgs" [sticky]="false" [life]="6000" [autoZIndex]="true" [baseZIndex]="1001"></p-growl>
+<div class="content-header">
+    <div class="ui-g">
+        <div class="ui-g-8">
+            <div style="font-size: 0.3rem;line-height: 50px;color: #657D95;">Storage Service Plans</div>
+            <div style="color: #657D95;line-height: 20px;">Create custom storage service plans and Add / Remove backends and tenants.</div>
+        </div>
+    </div>
+    
+    <div class="table-toolbar" style="margin-top: 25px;">
+        <div class="left">
+            <button type="button" class="ui-button-secondary" pButton (click)="showCreateTier()" label="Create Service Plan" ></button>
+            <button pButton type="button" label="Delete Service Plans" (click)="batchDeleteTiers(selectedTiers)" [disabled]="selectedTiers && selectedTiers.length == 0"></button>
+        </div>
+        <div class="right">
+            <div class="ui-inputsearch">
+                <input type="text" #searchByName pInputText placeholder="{{I18N.keyID['sds_block_volume_search']}}">
+                <button pButton type="button" icon="fa-search"></button>
+            </div>
+            <button class="" pButton type="button" (click)="getAllTiers()" icon="fa-refresh"></button>
+        </div>
+    </div>
+    <p-dataTable [value]="allTiers" [globalFilter]="searchByName" [(selection)]="selectedTiers" [showHeaderCheckbox]="true" [showHeaderCheckbox]="true" [rows]="10" [paginator]="true" [pageLinks]="3" [rowsPerPageOptions]="[10,20,50,100]">
+        <p-column selectionMode="multiple" [style]="{'width': '60px'}"></p-column>
+        <p-column field="Name" header="Name" >
+            <ng-template pTemplate="body" let-tier="rowData">
+                <a (click)="showTierDetails(tier)" title="{{tier.name}}">{{tier.name}}</a>
+            </ng-template>
+        </p-column>
+        <p-column field="tenants" header="Tenants">
+            <ng-template pTemplate="body" let-tier="rowData">
+                <div *ngIf="tier.displayTenants && tier.displayTenants.length">
+                    <span *ngFor="let item of tier.displayTenants; let last = last">{{ item.label }} <span *ngIf="!last">, </span></span>
+                </div>                
+                <span *ngIf="tenants && tenants.length < 1">--</span>
+            </ng-template>
+        </p-column>
+        <p-column field="backends" header="Backends">
+            <ng-template pTemplate="body" let-tier="rowData">
+                <div *ngIf="tier.displayBackends && tier.displayBackends.length">
+                    <span *ngFor="let item of tier.displayBackends; let last = last">{{ item.label }} <span *ngIf="!last">, </span></span>
+                </div>                
+                <span *ngIf="backends && backends.length < 1">--</span>
+            </ng-template>
+        </p-column>
+        <p-column header="{{I18N.keyID['sds_block_volume_operation']}}" [style]="{'width':'300px'}">
+            <ng-template pTemplate="body" let-tier="rowData" let-i="rowIndex">
+                <a (click)="showTierDetails(tier)">Update</a>
+                <a (click)="batchDeleteTiers(tier)">Delete</a>                
+            </ng-template>
+        </p-column>
+    </p-dataTable>
+    <p-sidebar [(visible)]="showRightSidebar" (onHide)="closeSidebar()" position="right" styleClass="details-sidebar-panel ui-sidebar-lg" [autoZIndex]="true">
+        <div *ngIf="createTierShow" class="right-sidebar-content-wrapper">
+            <div class="right-sidebar-header">
+                <h1 style="font-weight:normal">Create Service Plan</h1>
+            </div>
+            <div class="right-sidebar-body">
+                <form [grid]="{label: 'ui-g-3', content:'ui-g-20'}" [formGroup]="createTierForm" [errorMessage]="errorMessage">
+                    <form-item label="Name" [required]="true">
+                        <input type="text" pInputText formControlName="name" />
+                    </form-item>
+                    <form-item label="Backend Type">
+                        <p-dropdown [style]="{'min-width':'150px','width':'280px'}" placeholder="Please select" [showClear]="true" [options]="allTypes" (onChange)="getBackendsByTypeId()" name='selectedBackendType' [(ngModel)]='selectedBackendType' formControlName="backend_type"></p-dropdown>
+                    </form-item>
+                    <form-item  label="Backend">
+                        <p-multiSelect [style]="{'min-width':'150px','width':'280px'}"  [(ngModel)]="selectedBackends" displaySelectedLabel="false" [options]="backendsOption" formControlName="backend" defaultLabel="You can choose multiple"></p-multiSelect>
+                        <div class="show-selected-backends" *ngIf="selectedBackends && selectedBackends.length">
+                            Selected Backends ({{ selectedBackends.length }}): <span *ngFor="let item of selectedBackends; let last = last"> {{item.name}}<span *ngIf="!last">, </span></span>
+                        </div>
+                    </form-item>  
+                    <form-item label="Tenant">
+                        <p-multiSelect [style]="{'min-width':'150px','width':'280px'}" [(ngModel)]="selectedTenants" displaySelectedLabel="false" [options]="tenantLists" formControlName="tenant"></p-multiSelect>
+                        <div class="show-selected-tenants" *ngIf="selectedTenants && selectedTenants.length">
+                            Selected Tenants ({{ selectedTenants.length }}): <span *ngFor="let item of selectedTenants; let last = last"> {{item.name}} <span *ngIf="!last">, </span> </span>
+                        </div>
+                    </form-item>                  
+                </form>
+            </div>
+            
+            <div class="right-sidebar-footer">
+                <div style="margin-top:100px;">
+                    <button type="submit" class="ui-button-secondary" pButton [disabled]="createTierForm.invalid" (click)="createTier()"  label="{{I18N.keyID['ok']}}"></button>
+                    <button type="button" pButton (click)="closeSidebar()"  label="{{I18N.keyID['cancel']}}"></button>
+                </div>
+            </div>
+        </div>
+            
+        <div *ngIf="showTierDetailsFlag" class="right-sidebar-content-wrapper">
+            <div class="right-sidebar-header">
+                <h1 style="font-weight:normal">Service Plan: {{ currentTier &&  currentTier.name }}</h1>
+            </div>
+            <div class="right-sidebar-body">
+                <p-tabView *ngIf="showTierDetailsFlag" styleClass="ui-tabview-large">
+                    <p-tabPanel header="Backends">
+                        <div class="table-toolbar" style="margin-top: 25px;">
+                            <div class="left">
+                                <button type="button" class="ui-button-secondary" pButton (click)="showAddBackends()" label="Add Backends" ></button>
+                                <button pButton type="button" label="Remove Backends" (click)="batchRemoveBackends(selectedTierBackends)" [disabled]="selectedTierBackends && selectedTierBackends.length == 0"></button>
+                            </div>
+                            <div class="right">
+                                
+                            </div>
+                        </div>
+                        <p-dataTable [(selection)]="selectedTierBackends" [showHeaderCheckbox]="true" [value]="backendsWithDetails" [immutable]=false [rows]="5" [paginator]="true" [pageLinks]="3" [rowsPerPageOptions]="[5,10,15]">
+                            <p-column selectionMode="multiple" [style]="{'width': '60px'}"></p-column>
+                            <p-column field="name" header="Backend Name"></p-column>
+                            <p-column field="type" header="Type"></p-column>
+                            <p-column header="{{I18N.keyID['sds_block_volume_operation']}}" [style]="{'width':'300px'}">
+                                <ng-template pTemplate="body" let-tierBackend="rowData" let-i="rowIndex">
+                                    <a (click)="batchRemoveBackends(tierBackend)">Remove</a>
+                                </ng-template>
+                            </p-column>
+                        </p-dataTable>
+                    </p-tabPanel>
+                    <p-tabPanel header="Tenants">
+                        <div class="table-toolbar" style="margin-top: 25px;">
+                            <div class="left">
+                                <button type="button" class="ui-button-secondary" pButton (click)="showAddTenants()" label="Add Tenants" ></button>
+                                <button pButton type="button" label="Remove Tenants" (click)="batchRemoveTenants(selectedTierTenants)" [disabled]="selectedTierTenants && selectedTierTenants.length == 0"></button>
+                            </div>
+                            <div class="right">
+                                
+                            </div>
+                        </div>
+                        <p-dataTable [(selection)]="selectedTierTenants" [showHeaderCheckbox]="true" [value]="tenantsWithDetails" [immutable]=false [rows]="5" [paginator]="true" [pageLinks]="3" [rowsPerPageOptions]="[5,10,15]">
+                            <p-column selectionMode="multiple" [style]="{'width': '60px'}"></p-column>
+                            <p-column field="label" header="Tenant Name"></p-column>
+                            
+                            <p-column header="{{I18N.keyID['sds_block_volume_operation']}}" [style]="{'width':'300px'}">
+                                <ng-template pTemplate="body" let-tierTenant="rowData" let-i="rowIndex">
+                                    <a (click)="batchRemoveTenants(tierTenant)">Remove</a>
+                                </ng-template>
+                            </p-column>
+                        </p-dataTable>
+                    </p-tabPanel>
+                </p-tabView>
+                
+            </div>
+            
+            <div class="right-sidebar-footer">
+                <div style="margin-top:100px;">
+                    <button type="button" pButton (click)="closeSidebar()"  label="Close"></button>
+                </div>
+            </div>
+        </div>
+    </p-sidebar>
+    <p-dialog *ngIf="showAddBackendsForm" header="Add Backends" [(visible)]="showAddBackendsForm" [width]="600" [contentStyle]="{'overflow':'visible'}" modal="modal">
+        <form [grid]="{label: 'ui-g-3', content:'ui-g-20'}" [formGroup]="createTierForm" [errorMessage]="errorMessage">
+            <form-item label="Name" >
+                <span>{{ currentTier && currentTier.name}}</span>
+            </form-item>                
+            <form-item label="Backend Type" [required]="true">
+                <p-dropdown [style]="{'min-width':'150px','width':'280px'}" placeholder="Please select" [options]="allTypes" (onChange)="getBackendsByTypeId()" name='selectedBackendType' [(ngModel)]='selectedBackendType' formControlName="backend_type"></p-dropdown>
+            </form-item>
+            <form-item  label="Backend" [required]="true">
+                <p-multiSelect [style]="{'min-width':'150px','width':'280px'}"  [(ngModel)]="selectedBackends" displaySelectedLabel="false" [options]="backendsOption" formControlName="backend" defaultLabel="You can choose multiple"></p-multiSelect>
+                <div class="show-selected-backends" *ngIf="selectedBackends && selectedBackends.length">
+                    Selected Backends ({{ selectedBackends.length }}): <span *ngFor="let item of selectedBackends; let last = last"> {{item.name}}<span *ngIf="!last">, </span></span>
+                </div>
+            </form-item> 
+            
+        </form>
+    
+        <p-footer>
+            <button type="button" pButton (click)="addBackends(createTierForm.value.backend)" label="{{I18N.keyID['ok']}}"></button>
+            <button type="button" pButton (click)="closeAddBackends()" label="{{I18N.keyID['cancel']}}"></button>
+        </p-footer>
+    </p-dialog>
+    <p-dialog *ngIf="showAddTenantsForm" header="Add Tenants" [(visible)]="showAddTenantsForm" [width]="600" [contentStyle]="{'overflow':'visible'}" modal="modal">
+        <form [grid]="{label: 'ui-g-3', content:'ui-g-20'}" [formGroup]="createTierForm" [errorMessage]="errorMessage">
+            <form-item label="Name" >
+                <span>{{ currentTier && currentTier.name}}</span>
+            </form-item>
+            <form-item label="Tenant" [required]="true">
+                <p-multiSelect [style]="{'min-width':'150px','width':'280px'}" [(ngModel)]="selectedTenants" displaySelectedLabel="false" [options]="tenantLists" formControlName="tenant"></p-multiSelect>
+                <div class="show-selected-tenants" *ngIf="selectedTenants && selectedTenants.length">
+                    Selected Tenants ({{ selectedTenants.length }}): <span *ngFor="let item of selectedTenants; let last = last"> {{item.name}} <span *ngIf="!last">, </span> </span>
+                </div>
+            </form-item>    
+            
+        </form>
+    
+        <p-footer>
+            <button type="button" pButton (click)="addTenants(createTierForm.value.tenant)" label="{{I18N.keyID['ok']}}"></button>
+            <button type="button" pButton (click)="closeAddTenants()" label="{{I18N.keyID['cancel']}}"></button>
+        </p-footer>
+    </p-dialog>
+    <p-confirmDialog></p-confirmDialog>  
+</div>

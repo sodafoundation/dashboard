@@ -36,12 +36,16 @@ export class MigrationDetailComponent implements OnInit {
     "percent":'0'
   }
 
+  servicePlansEnabled: boolean;
+
   constructor(
     private ActivatedRoute: ActivatedRoute,
     public I18N: I18NService,
     private MigrationService: MigrationService,
     private http: Http
-  ) { }
+  ) { 
+    this.servicePlansEnabled = Consts.STORAGE_SERVICE_PLAN_ENABLED;
+  }
 
 
   ngOnInit() {

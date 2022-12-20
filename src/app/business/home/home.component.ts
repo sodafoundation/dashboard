@@ -4,10 +4,12 @@ import { ProfileService } from 'app/business/profile/profile.service';
 import { Observable } from "rxjs/Rx";
 import { I18NService ,HttpService, MsgBoxService, Consts} from 'app/shared/api';
 import { ReactiveFormsModule, FormsModule,FormControl, FormGroup, FormBuilder,Validators,ValidatorFn, AbstractControl } from '@angular/forms';
-import { MenuItem ,ConfirmationService,ConfirmDialogModule} from '../../components/common/api';
+import { MenuItem ,ConfirmationService,ConfirmDialogModule, Message} from '../../components/common/api';
 import { Router } from '@angular/router';
 import { Headers } from '@angular/http';
 import { BucketService} from '../block/buckets.service';
+
+let _ = require("underscore");
 
 declare let X2JS:any;
 @Component({
@@ -48,6 +50,10 @@ export class HomeComponent implements OnInit {
     cloud_type = [];
     allBackendNameForCheck=[];
     formItemCopy = [];
+    msgs: Message[];
+    servicePlansEnabled: boolean;
+    isAdmin;
+    isUser;
     formItems = [
         {
             label: 'Region',
@@ -56,7 +62,7 @@ export class HomeComponent implements OnInit {
             type: 'text',
             name: 'region',
             formControlName: 'region',
-            arr:['aws-s3','azure-blob','hw-obs','fusionstorage-object', 'gcp-s3','ibm-cos', 'alibaba-oss', 'aws-file', 'aws-block', 'azure-file']
+            arr:['aws-s3','azure-blob','hw-obs','fusionstorage-object', 'gcp-s3','ibm-cos', 'alibaba-oss', 'aws-file', 'aws-block', 'azure-file', 'hw-file', 'hw-block','sony-oda']
         },
         {
             label: 'Project',
@@ -74,7 +80,7 @@ export class HomeComponent implements OnInit {
             type: 'text',
             name: 'endpoint',
             formControlName: 'endpoint',
-            arr:['aws-s3','azure-blob','hw-obs','fusionstorage-object','ceph-s3','gcp-s3','ibm-cos','yig', 'alibaba-oss']
+            arr:['aws-s3','azure-blob','hw-obs','fusionstorage-object','ceph-s3','gcp-s3','ibm-cos','yig', 'alibaba-oss','sony-oda']
         },
         {
             label: 'Bucket',
@@ -83,7 +89,7 @@ export class HomeComponent implements OnInit {
             type: 'text',
             name: 'bucket',
             formControlName: 'bucket',
-            arr:['aws-s3','azure-blob','hw-obs','fusionstorage-object','ceph-s3','gcp-s3','ibm-cos', 'alibaba-oss']
+            arr:['fusionstorage-object']
         },
         {
             label: 'Access Key',
@@ -92,7 +98,7 @@ export class HomeComponent implements OnInit {
             type: 'text',
             name: 'accessKey',
             formControlName: 'ak',
-            arr:['aws-s3','azure-blob','hw-obs','fusionstorage-object','ceph-s3','gcp-s3','ibm-cos', 'alibaba-oss', 'aws-file', 'aws-block', 'azure-file', 'gcp-file']
+            arr:['aws-s3','azure-blob','hw-obs','fusionstorage-object','ceph-s3','gcp-s3','ibm-cos', 'alibaba-oss', 'aws-file', 'aws-block', 'azure-file', 'gcp-file', 'hw-file', 'hw-block','sony-oda']
         },
         {
             label: 'Secret Key',
@@ -101,11 +107,11 @@ export class HomeComponent implements OnInit {
             type: 'password',
             name: 'secretKey',
             formControlName: 'sk',
-            arr:['aws-s3','azure-blob','hw-obs','fusionstorage-object','ceph-s3','gcp-s3','ibm-cos','alibaba-oss', 'aws-file', 'aws-block', 'azure-file', 'gcp-file']
+            arr:['aws-s3','azure-blob','hw-obs','fusionstorage-object','ceph-s3','gcp-s3','ibm-cos','alibaba-oss', 'aws-file', 'aws-block', 'azure-file', 'gcp-file', 'hw-file', 'hw-block','sony-oda']
         },
-        
-    ]
 
+    ]
+    fileOrBlockBackendTypes = ['aws-file', 'aws-block', 'azure-file', 'gcp-file', 'hw-file', 'hw-block'];
 
     @ViewChild("path") path: ElementRef;
     @ViewChild("cloud_aws") c_AWS: ElementRef;
@@ -115,7 +121,7 @@ export class HomeComponent implements OnInit {
     @ViewChild("svgCon") svgCon: ElementRef;
     @ViewChild("cloud_gcp") c_GCP: ElementRef;
     @ViewChild("cloud_alibaba") c_AOS: ElementRef;
-    
+
     scaleX = 1;
     scaleY = 1;
 
@@ -129,8 +135,11 @@ export class HomeComponent implements OnInit {
         private router: Router,
         private msg: MsgBoxService,
         private BucketService: BucketService,
-    ) { 
+    ) {
         this.cloud_type = Consts.CLOUD_TYPE;
+        this.isAdmin = window['isAdmin'];
+        this.isUser = window['isUser'];
+        this.servicePlansEnabled = Consts.STORAGE_SERVICE_PLAN_ENABLED;
     }
     errorMessage = {
         "name": { required: "Name is required." ,isExisted:"Name is existing"},
@@ -142,10 +151,10 @@ export class HomeComponent implements OnInit {
         "sk":{required: "Secret Key is required."}
     };
     ngOnInit() {
-        
+
         this.getCounts();
         this.getType();
-        
+
         this.backendForm = this.fb.group({
             "name":['', {validators:[Validators.required,Utils.isExisted(this.allBackendNameForCheck)]}],
             "type":['',{validators:[Validators.required]}],
@@ -159,7 +168,7 @@ export class HomeComponent implements OnInit {
             "ak":['',{validators:[Validators.required], updateOn:'change'}],
             "sk":['',{validators:[Validators.required], updateOn:'change'}],
         });
-        
+
 
         this.lineOption = {
             title: {
@@ -194,23 +203,30 @@ export class HomeComponent implements OnInit {
             let winW = document.documentElement.offsetWidth, winH = document.documentElement.offsetHeight;
             let disX = 10, disY = 1;
             let moveX = e.pageX * disX / (winW-320)*0.5, moveY = e.pageY * disY / winH;
-            that.scaleX = svgConW/240; 
+            that.scaleX = svgConW/240;
             that.scaleY = 5;
-
-            let clouds = [that.c_GCP.nativeElement, that.c_HWP.nativeElement, that.c_IBMCOS.nativeElement, that.c_AOS.nativeElement, that.c_HW.nativeElement, that.c_AWS.nativeElement];
+            let clouds = [];
+            if(!that.servicePlansEnabled){
+                clouds = [that.c_GCP.nativeElement, that.c_HWP.nativeElement, that.c_IBMCOS.nativeElement, that.c_AOS.nativeElement, that.c_HW.nativeElement, that.c_AWS.nativeElement];
+            } else if(that.servicePlansEnabled){
+                if(that.isAdmin){
+                    clouds = [that.c_GCP.nativeElement, that.c_HWP.nativeElement, that.c_IBMCOS.nativeElement, that.c_AOS.nativeElement, that.c_HW.nativeElement, that.c_AWS.nativeElement];
+                }
+            }
             clouds.forEach((item, index) => {
                 let totalLength = that.path.nativeElement.getTotalLength();
                 let point = totalLength/clouds.length * (index+1) + moveX + initPos;
                     if(point > totalLength) point = point - totalLength;
                     if(point < 0) point = totalLength - point;
-                
+
                 let pos = that.path.nativeElement.getPointAtLength(point);
                 item.style.left = (pos.x*that.scaleX - item.offsetWidth*0.5) +"px";
                 item.style.top = (pos.y*that.scaleY + svgConH*(1 - that.scaleY)*0.5 - item.offsetHeight*0.6) +"px";
                 item.style.display = "block";
-            }) 
+            })
         });
-        this.initBucket2backendAnd2Type();
+        
+            this.initBucket2backendAnd2Type();
     }
     selectOption(){
         this.formItemCopy = []
@@ -250,14 +266,14 @@ export class HomeComponent implements OnInit {
                         allBuckets = [buckets];
                     }
                     this.getBuckend(allBuckets);
-                }); 
+                });
             }else{
                 let allBuckets = [];
                 this.getBuckend(allBuckets);
             }
         }, (error)=>{
             console.log("Could not fetch AK/SK", error);
-        }) 
+        })
     }
     getBuckend(allBuckets){
         this.counts.bucketsCount = allBuckets.length;
@@ -283,7 +299,7 @@ export class HomeComponent implements OnInit {
             let requestObject = this.BucketService.getSignatureOptions(SignatureObjectwindow,options);
             options = requestObject['options'];
             return options;
-        } 
+        }
     }
     initBackendsAndNum(backends){
         let backendArr = Array.from(Consts.BUCKET_BACKND.values());
@@ -330,6 +346,12 @@ export class HomeComponent implements OnInit {
         if( this.Allbackends['gcp-file']){
             this.allBackends_count.localBKD += this.Allbackends['gcp-file'].length;
         }
+        if( this.Allbackends['hw-file']){
+            this.allBackends_count.localBKD += this.Allbackends['hw-file'].length;
+        }
+        if( this.Allbackends['hw-block']){
+            this.allBackends_count.localBKD += this.Allbackends['hw-block'].length;
+        }
 
         this.allBackends_count.ibmcos = this.Allbackends['ibm-cos'] ? this.Allbackends['ibm-cos'].length :0;
         this.allBackends_count.gcp = this.Allbackends['gcp-s3'] ? this.Allbackends['gcp-s3'].length :0;
@@ -342,20 +364,31 @@ export class HomeComponent implements OnInit {
         this.http.get(url).subscribe((res)=>{
             let all = res.json().types;
             all.forEach(element => {
-                this.allTypes.push({
-                    label: Consts.CLOUD_TYPE_NAME[element.name],
-                    value:element.name
-                });
+                
+                if(!this.servicePlansEnabled || (this.servicePlansEnabled && this.isAdmin)){
+                    this.allTypes.push({
+                        label: Consts.CLOUD_TYPE_NAME[element.name],
+                        value:element.name
+                    });
+                } else if(this.servicePlansEnabled && this.isUser){
+                    if(_.contains(this.fileOrBlockBackendTypes, element.name)){
+                        this.allTypes.push({
+                            label: Consts.CLOUD_TYPE_NAME[element.name],
+                            value:element.name
+                        });
+                    }
+                }
+                                
             });
         });
     }
 
     closeSidebar(){
         this.showRightSidebar = false;
-        
+
         this.showRegisterFlag = false;
         this.showBackends = false;
-        
+
     }
 
     configModify(backend){
@@ -375,7 +408,7 @@ export class HomeComponent implements OnInit {
         this.showBackends = true;
     }
     modifyBackend(){
-        
+
         if(!this.modifyBackendForm.valid){
             for(let i in this.modifyBackendForm.controls){
                 this.modifyBackendForm.controls[i].markAsTouched();
@@ -390,15 +423,19 @@ export class HomeComponent implements OnInit {
             this.modifyBackendshow = false;
             this.showRightSidebar = true;
             this.showBackends = true;
+            this.msgs = [];
+            this.msgs.push({severity: 'success', summary: 'Success', detail: 'AK/SK updated successfully.'});
         }, (error)=>{
             console.log("Something went wrong. Could not modify the AK/SK.")
+            this.msgs = [];
+            this.msgs.push({severity: 'error', summary: "Error", detail: "Could not modify the AK/SK." + error._body});
         });
     }
 
     showBackendsDetail(type?){
         this.showRightSidebar = true;
         this.showBackends = true;
-        
+
         if(type){
             this.selectedType = type;
             this.typeDetail = this.Allbackends[type] ? this.Allbackends[type]:[];
@@ -411,7 +448,9 @@ export class HomeComponent implements OnInit {
             let aws_bs_arr = this.Allbackends['aws-block'] ? this.Allbackends['aws-block'] : [];
             let azure_fs_arr = this.Allbackends['azure-file'] ? this.Allbackends['azure-file'] : [];
             let gcp_fs_arr = this.Allbackends['gcp-file'] ? this.Allbackends['gcp-file'] : [];
-            this.typeDetail = fs_arr.concat(ceph_arr,yig_arr,aws_fs_arr,aws_bs_arr,azure_fs_arr, gcp_fs_arr);
+            let hw_fs_arr = this.Allbackends['hw-file'] ? this.Allbackends['hw-file'] : [];
+            let hw_bs_arr = this.Allbackends['hw-block'] ? this.Allbackends['hw-block'] : [];
+            this.typeDetail = fs_arr.concat(ceph_arr,yig_arr,aws_fs_arr,aws_bs_arr,azure_fs_arr, gcp_fs_arr, hw_fs_arr, hw_bs_arr);
         }
     }
 
@@ -447,6 +486,11 @@ export class HomeComponent implements OnInit {
                                 this.initBackendsAndNum(backends);
                                 this.showBackendsDetail(this.selectedType);
                             });
+                            this.msgs = [];
+                            this.msgs.push({severity: 'success', summary: 'Success', detail: 'Backend has been deleted successfully.'});
+                        }, (error)=>{
+                            this.msgs = [];
+                            this.msgs.push({severity: 'error', summary: "Error", detail: "Could not delete the backend." + error._body});
                         });
                     }
                 }
@@ -454,7 +498,7 @@ export class HomeComponent implements OnInit {
                     console.log(e);
                 }
                 finally {
-                    
+
                 }
             },
             reject:()=>{
@@ -463,7 +507,7 @@ export class HomeComponent implements OnInit {
             }
         })
     }
-                            
+
     getCounts(){
         let url1 = 'v1beta/{project_id}/block/volumes';
         let url3 = 'v1/{project_id}/plans';
@@ -474,7 +518,7 @@ export class HomeComponent implements OnInit {
             this.counts.migrationCount = res.json().plans ? res.json().plans.length : 0;
         });
     }
-    
+
     createBackend(){
         if(!this.backendForm.valid){
             for(let i in this.backendForm.controls){
@@ -502,17 +546,20 @@ export class HomeComponent implements OnInit {
                 this.initBackendsAndNum(backends);
                 this.formItemCopy = []
             });
-            
+            this.msgs = [];
+            this.msgs.push({severity: 'success', summary: 'Success', detail: 'Backend has been registered successfully.'});
         },(error)=>{
-            console.log("Something went wrong. Could not register the backend.")
+            console.log("Something went wrong. Could not register the backend.", error);
+            this.msgs = [];
+            this.msgs.push({severity: 'error', summary: "Error", detail: "Backend registration failed." + error._body});
         });
     }
     showRegister(){
         this.formItemCopy = []
         this.showRightSidebar = true;
         this.showRegisterFlag = true;
-        
-        
+
+
         this.backendForm.reset();
         this.backendForm.controls['name'].setValidators([Validators.required,Utils.isExisted(this.allBackendNameForCheck)]);
     }

@@ -1,3 +1,4 @@
+<p-growl [value]="msgs" [sticky]="false" [life]="6000" [baseZIndex]="9999"></p-growl>
 <div class="home-font-color-class ui-home-container" >
     <div class="ui-home-backend-container">
         <div #svgCon>
@@ -133,7 +134,7 @@
     </p-footer>
 </p-dialog>
 <p-confirmDialog></p-confirmDialog>
-<p-sidebar [(visible)]="showRightSidebar" (onHide)="closeSidebar()" position="right" styleClass="home-sidebar-panel ui-sidebar-lg" [baseZIndex]="10000">
+<p-sidebar [(visible)]="showRightSidebar" (onHide)="closeSidebar()" position="right" styleClass="home-sidebar-panel ui-sidebar-lg" [autoZIndex]="true" [baseZIndex]="1000">
     <div *ngIf="showRegisterFlag" class="right-sidebar-content-wrapper">
         <div class="right-sidebar-header">
             <h1 style="font-weight:normal">Register Backend</h1>
@@ -144,7 +145,7 @@
                     <input id="name" type="text" name="name" formControlName="name"  pInputText />
                 </form-item>
                 <form-item label="Type" [required]="true">
-                    <p-dropdown [style]="{'min-width':'220px'}" (onChange)="selectOption()" placeholder="Please select" formControlName="type" [options]="allTypes"  ></p-dropdown>
+                    <p-dropdown [style]="{'min-width':'220px'}" (onChange)="selectOption()" placeholder="Please select" formControlName="type" [options]="allTypes" filter="true"  ></p-dropdown>
                 </form-item>
                 <form-item *ngFor="let item of formItemCopy" [label]="item.label" [required]="item.required">
                     <input [id]="item.id" [type]="item.type" [name]="item.name"  [formControlName]="item.formControlName"  pInputText />

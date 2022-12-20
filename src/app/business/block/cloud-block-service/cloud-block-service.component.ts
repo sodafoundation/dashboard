@@ -77,28 +77,7 @@ export class CloudBlockServiceComponent implements OnInit{
 
     ngOnInit(){
         
-        this.volumeTypeOptions = [
-            {
-                label: 'General Purpose',
-                value: 'gp2'
-            },
-            {
-                label: 'Provisioned IOPS',
-                value: 'io1'
-            },
-            {
-                label: 'Cold HDD',
-                value: 'sc1'
-            },
-            {
-                label: 'Throughput Optimized',
-                value: 'st1'
-            },
-            {
-                label: 'Magnetic(Standard)',
-                value: 'standard'
-            }
-        ];
+        this.volumeTypeOptions = this.volumeTypeOptions.concat(Consts.AWS_VOLUME_TYPES, Consts.HW_VOLUME_TYPES);
         this.getTypes();
         this.getBackends();
         
@@ -124,7 +103,7 @@ export class CloudBlockServiceComponent implements OnInit{
         this.allTypes = [];
         this.BucketService.getTypes().subscribe((res) => {
             res.json().types.forEach(element => {
-            if( element.name=='aws-block'){
+            if( element.name=='aws-block' || element.name=='hw-block'){
                 this.allTypes.push({
                     label: Consts.CLOUD_TYPE_NAME[element.name],
                     value: element.name
@@ -142,7 +121,7 @@ export class CloudBlockServiceComponent implements OnInit{
         this.http.get('v1/{project_id}/backends').subscribe((res)=>{
             this.allBackends = res.json().backends ? res.json().backends :[];
             this.allBackends.forEach(element => {
-                if(element.type == 'aws-block'){
+                if(element.type == 'aws-block' || element.type == 'hw-block'){
                     this.selectedBackends.push(element);
                 }
             });
@@ -163,8 +142,10 @@ export class CloudBlockServiceComponent implements OnInit{
             this.allAWSVolumes = vols;
             
             this.allAWSVolumes.forEach(volElement => {
-                this.volumeTypeOptions.forEach(typeEle => {
+                if(volElement['size'] && volElement['size'] > 0){
                     volElement['displaySize'] = Utils.formatBytes([volElement['size']]);
+                }
+                this.volumeTypeOptions.forEach(typeEle => {
                     if(typeEle['value'] == volElement['type']){
                         volElement['volType'] = typeEle['label'];
                     }
@@ -233,12 +214,12 @@ export class CloudBlockServiceComponent implements OnInit{
             let  msg, arr = [], selectedNames=[];
             if(_.isArray(volumes)){
                 volumes.forEach((item,index)=> {
-                    arr.push(item.id);
+                    arr.push(item);
                     selectedNames.push(item['name']);
                 })
                 msg = "<h3>Are you sure you want to delete the selected " + volumes.length + " volume(s)?</h3><h4>[ "+ selectedNames.join(',') +" Volume(s) ]</h4>";
             }else{
-                arr.push(volumes.id)
+                arr.push(volumes)
                 msg = "<h3>Are you sure you want to delete the selected Volume?</h3><h4>[ "+ volumes.name +" ]</h4>"; 
             }
             this.confirmationService.confirm({
@@ -257,13 +238,12 @@ export class CloudBlockServiceComponent implements OnInit{
     }
 
     deleteVolume(volume){
-        this.cloudBS.deleteVolume(volume).subscribe(res=>{
-            this.msgs = [];
-            this.msgs.push({severity: 'success', summary: 'Success', detail: 'Volume deleted successfully.'});
+        this.msgs = [];
+        this.cloudBS.deleteVolume(volume.id).subscribe(res=>{
+            this.msgs.push({severity: 'success', summary: 'Success', detail: 'Volume ' + volume.name  + ' deleted successfully.'});
             this.getBackends();
         }, (error)=>{
-            this.msgs = [];
-            this.msgs.push({severity: 'error', summary: 'Error', detail: 'Error deleting volume'});
+            this.msgs.push({severity: 'error', summary: 'Error', detail: 'Error deleting volume ' + volume.name + '.'});
             console.log("Something went wrong. Could not delete volume", error);
         });
     }

@@ -1,7 +1,7 @@
 import { NgModule, APP_INITIALIZER } from '@angular/core';
-import { DataflowComponent } from './dataflow.component';
 import { RouterModule } from '@angular/router';
-import { TabViewModule, ButtonModule } from '../../components/common/api';
+import { SharedModule } from 'app/shared/shared.module';
+import { DataflowComponent } from './dataflow.component';
 import { MigrationModule } from './migration.module';
 import { ReplicationModule } from './replication.module';
 import { MigrationService } from './migration.service';
@@ -17,9 +17,8 @@ let routers = [{
   ],
   imports: [
     RouterModule.forChild(routers),
+    SharedModule,
     MigrationModule,
-    TabViewModule,
-    ButtonModule,
     ReplicationModule
   ],
   providers: [MigrationService]

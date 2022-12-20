@@ -1,20 +1,12 @@
+<p-growl [value]="msgs" [sticky]="false" [life]="6000"></p-growl>
 <div class="layout-wrapper" [style.display]="hideLoginForm ? 'none' : 'block'">
     <div class="login-bg" #loginBG style="background-position: center" [ngClass]="{'login-animation':showLoginAnimation, 'logout-animation':showLogoutAnimation}"></div>
     <div class="login-form ui-fluid" *ngIf="!isLogin">
-        <div class="logo"></div>
-        <div class="form-list">
-            <p><input id="username" placeholder="Username" type="text" pInputText [(ngModel)]="username" /></p>
-            <p><input id="password" placeholder="Password" type="Password" pInputText [(ngModel)]="password" (keydown)="onKeyDown($event)" /></p>
-            <div class="ui-message-container" *ngIf="showErrorMsg">
-                <div class="ui-message ui-message-error ui-corner-all">
-                    <i class="fa fa-exclamation-circle" ></i>
-                    <span class="ui-message-error-text">
-                        {{errorMsg}}
-                    </span>
-                </div>
-            </div>
-            <p><button pButton type="button" label="Login" (click)="login()" class="ui-button-secondary ui-button-large"></button></p>
-        </div>
+    <app-login [(isHomePage)] = "isHomePage" [(menuItems)] = "menuItems" [(tourSteps)]="tourSteps"
+    [(dropMenuItems)] = "dropMenuItems"
+    [(activeItem)] = "activeItem"
+    [(hideLoginForm)] = "hideLoginForm" [(showLogoutAnimation)] = "showLogoutAnimation" [(showPrompt)] ="showPrompt"
+    [(isLogin)] = "isLogin" [(showLoginAnimation)] = "showLoginAnimation" (updateLogin) = "updateLogin($event)"></app-login>
     </div>
 </div>
 
@@ -54,15 +46,15 @@
             </div>
         </div>
     </div>
-    <div id="layout-sidebar">
+    <div id="layout-sidebar" *ngIf = "showMenu">
         <p-scrollPanel [style]="{width: '100%', height: '900px'}" styleClass="sidebar-menu-container">
-        
+
         <ul class="sidebar-menu">
             <li *ngFor="let menuItem of menuItems">
-                <a *ngIf="!menuItem.group" href="#" [joyrideStep]="menuItem.joyrideStep" [text]="menuItem.text" stepPosition="right" [routerLink]="[menuItem.routerLink]" [ngClass]="{'active-item':menuItem==activeItem}" (click)="menuItemClick($event, menuItem)">
+                <a *ngIf="!menuItem.group" href="#" [joyrideStep]="menuItem.joyrideStep" [text]="menuItem.text" stepPosition="right" [routerLink]="[menuItem.routerLink]" [ngClass]="{'active-item':menuItem.routerLink==activeItem.routerLink}" (click)="menuItemClick($event, menuItem)">
                     <h1>{{menuItem.title}}</h1>
                     <p>{{menuItem.description}}</p>
-                </a> 
+                </a>
                 <p-panel styleClass="menuGroup" *ngIf="menuItem.group" [joyrideStep]="menuItem.joyrideStep" [text]="menuItem.text" stepPosition="right" [toggleable]="true" [collapsed]="true" expandIcon="fa-chevron-down" collapseIcon="fa-chevron-up">
                     <p-header>
                         <h1>{{menuItem.title}}</h1>
@@ -70,7 +62,12 @@
                     </p-header>
                     <ul class="menuGroup-list">
                         <li class="menuGroup-child" *ngFor="let child of menuItem.children">
-                            <a href="#" [routerLink]="[child.routerLink]" [ngClass]="{'active-item':child==activeItem}" (click)="menuItemClick($event, child)">
+                            <a *ngIf="!child.is_external_link" href="#" [routerLink]="[child.routerLink]" [ngClass]="{'active-item':child.routerLink==activeItem.routerLink}" (click)="menuItemClick($event, child)">
+                                <h1>
+                                    {{child.title}}
+                                </h1>
+                            </a>
+                            <a *ngIf="child.is_external_link" [href]="[child.link]" target="_blank" [ngClass]="{'active-item':child==activeItem}">
                                 <h1>
                                     {{child.title}}
                                 </h1>
@@ -85,7 +82,7 @@
     </div>
 
     <div id="layout-content">
-        <div [ngClass]="{'content-home':isHomePage}">
+        <div [ngClass]="{'content-home':menuItemClick()}">
             <router-outlet></router-outlet>
         </div>
     </div>
@@ -102,7 +99,7 @@
     <svg width="100%" height="150">
         <path id="svg_wave_1" fill="rgba(90, 102, 140, 0.4)"></path>
         <path id="svg_wave_2" fill="rgba(60, 142, 225, 0.6)"></path>
-    </svg> 
+    </svg>
 </div>
 
 <div *ngIf="showPrompt" style="padding:15px 20px; z-index: 99999; line-height:18px;position: fixed;bottom: 10px;left:10px;background:rgba(255,255,255,0.75); border-radius: 5px; box-shadow:0 0 10px rgba(0,0,0,0.3);">
@@ -112,7 +109,7 @@
             <p-progressBar [value]="progressValue"></p-progressBar>
         </div>
     </div>
-</div> 
+</div>
 <ul style=" z-index: 99999; line-height:18px;position: fixed;bottom: 10px;left:10px;">
     <li *ngFor="let downfile of downLoadArr;index as i" style="display: inline-block;  padding:15px; background:rgba(255,255,255,0.75); border-radius: 5px; box-shadow:0 0 10px rgba(0,0,0,0.3);">
         <span class="downloading-title" *ngIf="i==0">downloading file [ {{downfile.name}} ]</span>

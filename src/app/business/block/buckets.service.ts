@@ -129,6 +129,12 @@ export class BucketService {
     let url = this.url + name + '/?acl';
     return this.http.put(url,param,options);
   }
+
+  //Restore Object
+  restoreObject(name, param?, options?){
+    let url = this.url + name + "?restore"
+    return this.http.post(url, param, options);
+  }
   
   // Rquest header with AK/SK authentication added
   getSignatureOptions(requestOptions, options){
@@ -137,6 +143,12 @@ export class BucketService {
     options.headers.set('Authorization', requestOptions.headers['Authorization']);
     options.headers.set('X-Auth-Token', requestOptions.headers['X-Auth-Token']);
     options.headers.set('Content-Type', requestOptions.headers['Content-Type']);
+    if(requestOptions.headers['X-Amz-Storage-Class']){
+      options.headers.set('X-Amz-Storage-Class', requestOptions.headers['X-Amz-Storage-Class']);
+    }
+    if(requestOptions.headers['tier']){
+      options.headers.set('tier', requestOptions.headers['tier']);
+    }
     return options;
   }
 }

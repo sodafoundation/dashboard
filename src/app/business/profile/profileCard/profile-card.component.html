@@ -1,11 +1,32 @@
-<div>
-    <div class="ui-g-12 ui-md-7">
+<div class="ui-g">
+    <div class="ui-g-12 ui-md-6">
         <div class="font-primary">
-            <h2>{{data.name}}</h2>
+            <h2>{{ data.name ? (data.name | slice:0:20) : '--' }} 
+                <span *ngIf="data.name && data.name.length > 20" pTooltip="{{data.name}}" tooltipPosition="top" tooltipStyleClass="profile-name-tooltip">
+                    ...
+                </span>
+            </h2>
         </div>
         <div class="padding-class">
             <div style="float:left;margin-right:2px" class="label-class">{{I18N.keyID['sds_block_volume_descri']}}:</div>
-            <div style="overflow: hidden; text-overflow:ellipsis; white-space: nowrap;" title="{{data && data.description ?data.description :'--'}}">{{data && data.description ?data.description :"--"}}</div>
+            <div title="{{data && data.description ?data.description :'--'}}">{{ data.description ? (data.description | slice:0:30) : '--' }} 
+                <span  *ngIf="data.description && data.description.length > 20" pTooltip="{{data.description}}" tooltipPosition="top" tooltipStyleClass="profile-desc-tooltip">
+                    ...
+                </span>
+            </div>
+        </div>
+        <div class="padding-class"style="clear:both;">
+            <span class="label-class">Profile ID:</span>
+            <span title="{{data && data.id ?data.id :'--'}}">{{ data.id ? (data.id | slice:0:25) : '--' }} 
+                <span  *ngIf="data.id && data.id.length > 20" pTooltip="{{data.id}}" tooltipPosition="top" tooltipStyleClass="profile-desc-tooltip">
+                    ...
+                </span>
+            </span>
+            <button pButton ngxClipboard 
+                [cbContent]="data.id"
+                (cbOnSuccess)="copyProfileSuccess(data.id)"
+                (cbOnError)="copyProfileError(data.id)"
+                type="button" icon="fa fa-copy" iconPos="right"></button>
         </div>
         <div class="padding-class"style="clear:both;">
             <span class="label-class">Storage Type:</span>
@@ -39,14 +60,13 @@
             </div>
         </div>
     </div>
-    <div class="ui-g-12 ui-md-4">
+    <div class="ui-g-12 ui-md-5 profile-capacity-chart">
         <p-chart [options]="option" type="doughnut" [data]="chartDatas"></p-chart>
     </div>
     <div class="ui-g-12 ui-md-1" *ngIf="isAdministrator">
         <p-dropmenu icon="fa-ellipsis-v" [model]="dropMenuItems" styleClass="ui-dropmenu-large"></p-dropmenu>
     </div>
     <div class="ui-helper-clearfix"></div>
-
     <p-dialog *ngIf="showModifyProfile" styleClass="create-bucket-dialog"  header="Modify Profile" [(visible)]="showModifyProfile" [width]="600" modal="modal">
         <form [grid]="{label: 'ui-g-3', content:'ui-g-20'}" [formGroup]="modifyProfileForm" [errorMessage]="errorMessage">
             <form-item label="Name">

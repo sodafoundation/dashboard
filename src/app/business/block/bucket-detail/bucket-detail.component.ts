@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Router,ActivatedRoute} from '@angular/router';
 import { I18NService, Utils, MsgBoxService, HttpService, Consts} from 'app/shared/api';
 import { BucketService} from '../buckets.service';
-import { MenuItem ,ConfirmationService} from '../../../components/common/api';
+import { MenuItem ,ConfirmationService, Message} from '../../../components/common/api';
 import { HttpClient } from '@angular/common/http';
 import {XHRBackend, RequestOptions, Request, RequestOptionsArgs, Response, Headers, BaseRequestOptions } from '@angular/http';
 import { FormControl, FormGroup, FormBuilder, Validators, ValidatorFn, AbstractControl } from '@angular/forms';
@@ -34,8 +34,11 @@ export class BucketDetailComponent implements OnInit {
   selectFileName;
   label;
   uploadFileDispaly:boolean = false;
+  enableArchival = false;
   buketName:string="";
   bucketId:string="";
+  bucketLocation: any;
+  bucketBackendType: any;
   items = [{
     label:"Buckets",
     url:["/block","fromBuckets"]
@@ -51,12 +54,22 @@ export class BucketDetailComponent implements OnInit {
   bucket;
   showCreateFolder = false;
   createFolderForm:FormGroup;
+  archiveTierOptions: any[];
+  restoreObjectForm: FormGroup;
+  restoreDisplay = false;
+  restoreOptions: any = [];
+  selectRestoreOptions: any;
   showErrorMsg = false;
   isReadyCopy = true;
   isReadyPast = true;
   UPLOAD_UPPER_LIMIT = 1024 * 1024 * 1024 * 2;
   moreItems = [];
   copySelectedDir = [];
+  msgs: Message[];
+  allBackends: any[];
+  archivalEnabled: any = {};
+  isPasting: boolean = false;
+  servicePlansEnabled: boolean;
   errorMessage = {
     "backend_type": { required: "Type is required." },
     "backend": { required: "Backend is required." },
@@ -64,6 +77,9 @@ export class BucketDetailComponent implements OnInit {
       required: "name is required.",
       isExisted:"Name is existing",
       pattern: "Folder names cannot contain the following names/:"
+    },
+    "archive_tier" : {
+      required: "Tier is required"
     }
   };
   validRule= {
@@ -75,6 +91,58 @@ export class BucketDetailComponent implements OnInit {
 
   progressValue: number = 0;
 
+  restoreObjectFormLabel = {
+    "days" : "Days",
+    "tier" : "Retrieval Tier",
+    "storageClass" : "Storage Class"
+  }
+
+  restoreObjectErrorMsg = {
+    "days": {
+      required: "Days are requried"
+    },
+    "tier":{
+      required: "Retrieval tier is required"
+    },
+    "storageClass":{
+      required: "Storage Class is required"
+    }
+  };
+  restoreFormItemsCopy = [];
+  restoreFormItems = [
+    {
+      label: 'Days',
+      required: 'true',
+      id: 'days',
+      type: 'number',
+      options: [],
+      name: 'days',
+      formControlName: 'days',
+      value: 1,
+      arr:['aws-s3']
+    },
+    {
+      label: 'Tier',
+      required: 'true',
+      id: 'tier',
+      type: 'select',
+      options: [],
+      name: 'tier',
+      formControlName: 'tier',
+      arr:['aws-s3']
+    },
+    {
+      label: 'Storage Class',
+      required: 'true',
+      id: 'storage-class',
+      type: 'select',
+      options: [],
+      name: 'storage-class',
+      formControlName: 'storageClass',
+      arr:['azure-blob']
+    }
+  ];
+  
   constructor(
     private ActivatedRoute: ActivatedRoute,
     public I18N:I18NService,
@@ -86,18 +154,24 @@ export class BucketDetailComponent implements OnInit {
     private httpClient:HttpClient
   ) 
   {
+    this.servicePlansEnabled = Consts.STORAGE_SERVICE_PLAN_ENABLED;
     this.createFolderForm = this.fb.group({
       "name": ["",{validators:[Validators.required,Utils.isExisted(this.allFolderNameForCheck),Validators.pattern(this.validRule.name)], updateOn:'change'}]
     });
     this.uploadForm = this.fb.group({
-        "backend":["",{validators:[Validators.required], updateOn:'change'}],
-        "backend_type":["",{validators:[Validators.required], updateOn:'change'}],
+        
     });
+    this.restoreObjectForm = this.fb.group({
+      "days":new FormControl([]),
+      "tier":new FormControl([]),
+      "storageClass": new FormControl([])
+  });
   }
 
   ngOnInit() {
     this.ActivatedRoute.params.subscribe((params) => {
       this.bucketId = params.bucketId;
+      this.bucketLocation = params.bucketLocation;
       this.items.push({
         label: this.bucketId,
         url: ["/" + this.bucketId],
@@ -111,7 +185,28 @@ export class BucketDetailComponent implements OnInit {
     }
     );
     this.copySelectedDir = window.sessionStorage['searchIndex'] != "" ? JSON.parse(window.sessionStorage.getItem("searchIndex")) : [];
+    
+    this.allBackends = [];
+    if(this.servicePlansEnabled){
+      this.archivalEnabled = true;
+    }else{
+      this.BucketService.getBckends().subscribe((res) => {
+        this.allBackends = res.json().backends;
+          this.allBackends.forEach(element => {
+              if(element['name'] == this.bucketLocation){
+                this.bucketBackendType = element['type'];
+                if(Consts.STORAGE_CLASSES[this.bucketBackendType]){
+                  this.archivalEnabled[this.bucketBackendType] = true;
+                  this.restoreOptions = Consts.RETRIEVAL_OPTIONS[this.bucketBackendType];
+                }
+              }
+          });
+      });
+      
+    }
+    
   }
+
   clickOperate(){
     if(this.selectedDir.length >0){
       this.isReadyCopy = false;
@@ -147,6 +242,8 @@ export class BucketDetailComponent implements OnInit {
   }
   //paste object
   pasteObject() {
+    this.isPasting = true;
+    this.msgs = [];
     this.copySelectedDir.forEach(item=>{
       let key = this.folderId != "" ? this.folderId + item.Key : item.Key;
       let copySource = item.folderId != "" ? item.source + '/' + item.folderId + item.Key : 
@@ -181,14 +278,19 @@ export class BucketDetailComponent implements OnInit {
             //Copy in the same bucket
             options.headers.set('X-Amz-Metadata-Directive', 'REPLACE');
           }
-          
+          let pastedObjectTitle = key + ' pasted.';
+          let pastedObjectMessage = key + ' will be available in the destination bucket shortly.';
+          this.msgs.push({severity: 'success', summary: pastedObjectTitle, detail: pastedObjectMessage});
           this.BucketService.copyObject(this.bucketId + '/' + key, '', options).subscribe((res) => {
             this.isReadyPast = true;
             window.sessionStorage['searchIndex'] = "";
             this.getAlldir();
-            res
+            this.isPasting = false;
           }, (error)=>{
             window.sessionStorage['searchIndex'] = "";
+            this.isPasting = false;
+            let pastedObjectMessage = 'Object' + key + 'could not be pasted. ' + error._body;
+            this.msgs.push({severity: 'error', summary: 'Error', detail: pastedObjectMessage});
           });
       })
     })
@@ -196,7 +298,7 @@ export class BucketDetailComponent implements OnInit {
   //Click on folder
   folderLink(file){
     let folderKey = file.Key;
-    if(this.folderId == ""){
+    if(this.folderId !== null && this.folderId !== ""){
       this.folderId = folderKey;
     }else{
       this.folderId = this.folderId + folderKey;
@@ -400,6 +502,113 @@ export class BucketDetailComponent implements OnInit {
     }
   }
 
+  //Show Restore Form
+  showRestoreObject(file){
+    this.selectFileName = file.Key;
+    if(!this.servicePlansEnabled){
+      this.restoreDisplay = true;
+      this.restoreFormCreate(this.bucketBackendType);
+    } else{
+      this.restoreObject();
+    }    
+    
+  }
+
+  restoreFormCreate(type){
+    this.restoreFormItemsCopy = []
+    this.restoreFormItems.forEach((item)=>{
+      if(item.type=='select'){
+        item.options = this.restoreOptions;
+      }
+      item.arr.forEach((it)=>{
+          if(it == type){
+              this.restoreFormItemsCopy.push(item)
+              this.restoreObjectForm.controls[`${item.formControlName}`].setValidators(Validators.required);
+          }else{
+              this.restoreObjectForm.controls[`${item.formControlName}`].setValidators([]);
+          }
+      })
+    })
+    this.restoreObjectForm.updateValueAndValidity();
+  }
+  cancelRestore(){
+    this.restoreDisplay = false;
+    switch (this.bucketBackendType) {
+      case 'aws-s3':
+          this.restoreObjectForm.reset({
+            "days" : 1
+          });  
+          break;
+      case 'azure-blob':
+          this.restoreObjectForm.reset(); 
+          break;
+      default:
+        break;
+    }
+    
+  }
+  
+  restoreObject(value?){
+    let params = {};
+    
+    if(!this.servicePlansEnabled){
+      switch (this.bucketBackendType) {
+        case 'aws-s3':
+          params = {
+            "days" : value.days,
+            "tier" : value.tier
+          };  
+          break;
+        case 'azure-blob':
+          params = {
+            "storageClass" : value.storageClass
+          };
+          break;
+        default:
+          break;
+      }
+    }
+    
+      
+    window['getAkSkList'](()=>{
+      let requestMethod = "POST";
+      let url = '/' + this.bucketId + '/' + this.selectFileName + '?restore';
+      let requestOptions: any;
+      let options: any = {};
+      let contentHeaders = {
+        'Content-Type' : 'application/json',
+        'X-Amz-Content-Sha256': 'UNSIGNED-PAYLOAD'
+      };
+      requestOptions = window['getSignatureKey'](requestMethod, url, '', '', '', '', '', '', contentHeaders);
+      
+      options['headers'] = new Headers();
+      
+      options = this.BucketService.getSignatureOptions(requestOptions, options);
+      
+      this.BucketService.restoreObject(this.bucketId + '/' + this.selectFileName, params, options).subscribe((res)=>{
+        this.restoreDisplay = false;
+        if(!this.servicePlansEnabled){
+          this.restoreObjectForm.reset({
+            "days" : 1
+          });
+        }        
+        this.msgs = [];
+        this.msgs.push({severity: 'success', summary: 'Success', detail: 'Object restoration has been initiated successfully. Object will be available for download shortly.'});
+      },
+      (error)=>{
+        this.restoreDisplay = false;
+        if(!this.servicePlansEnabled){
+          this.restoreObjectForm.reset({
+            "days" : 1
+          });
+        }
+        this.msgs = [];
+        this.msgs.push({severity: 'error', summary: "Error", detail: error._body});
+      })
+  })
+
+    
+  }
   configUpload(from){
     switch(from){
       case 'fromFolder':
@@ -417,6 +626,7 @@ export class BucketDetailComponent implements OnInit {
         this.files = '';
         this.selectFile = '';
         this.selectFileName = '';
+        this.archiveTierOptions = Consts.STORAGE_CLASSES[this.bucketBackendType];
       break;
     }
     
@@ -429,20 +639,17 @@ export class BucketDetailComponent implements OnInit {
     }
     let headers = new Headers();
     headers.append('Content-Type', 'application/xml');
-    if(this.showBackend){
-      if(!this.uploadForm.valid){
-          for(let i in this.uploadForm.controls){
-              this.uploadForm.controls[i].markAsTouched();
-          }
-          return;
+    if(this.enableArchival){
+      if(this.servicePlansEnabled){
+        headers.append('X-Amz-Storage-Class','Archive');
+      } else{
+        headers.append('X-Amz-Storage-Class',this.uploadForm.value.archive_tier);  
       }
-      headers.append('x-amz-storage-class',this.uploadForm.value.backend);
     }
     let options = {
       headers: headers,
       timeout:Consts.TIMEOUT
     };
-
     this.uploadDisplay = false;
     this.isUpload = true;
     if(this.selectFile['size'] > this.UPLOAD_UPPER_LIMIT){
@@ -451,11 +658,28 @@ export class BucketDetailComponent implements OnInit {
     }else{
       window['startUpload'](this.selectFile, this.bucketId, options,this.folderId, ()=>{
         this.isUpload = false;
+        this.enableArchival = false;
+        this.uploadForm.reset();
         this.getAlldir();
       });
     }
   }
 
+  archivalControl(e){
+    if(e.checked && !this.servicePlansEnabled){
+      this.uploadForm.addControl('archive_tier', this.fb.control("", Validators.required));
+    } else{
+      if(this.uploadForm.controls['archive_tier']){
+        this.uploadForm.removeControl('archive_tier');
+      }      
+    }
+  }
+
+  cancelUpload(){
+    this.uploadDisplay = false;
+    this.enableArchival = false;
+    this.uploadForm.reset();
+  }
   downloadFile(file) {
     let fileObjectKey;
     let fileString: any;
@@ -623,11 +847,17 @@ export class BucketDetailComponent implements OnInit {
                         options = this.BucketService.getSignatureOptions(requestOptions, options);
                         this.BucketService.deleteFile(`${this.bucketId}/${objectKey}`,options).subscribe((res) => {
                           this.getAlldir();
+                          this.msgs = [];
+                          this.msgs.push({severity: 'success', summary: 'Success', detail: file.Key + ' has been deleted successfully.'});
+                        }, (error)=>{
+                          this.msgs = [];
+                          this.msgs.push({severity: 'error', summary: "Error deleting " + file.Key, detail: error._body});
                         });
                     })
                     
                     break;
                   case "deleteMilti":
+                    this.msgs = [];
                    file.forEach(element => {
                       let objectKey = element.Key;
                       //If you want to delete files from a folder, you must include the name of the folder
@@ -644,8 +874,11 @@ export class BucketDetailComponent implements OnInit {
                         options['headers'] = new Headers();
                         options = this.BucketService.getSignatureOptions(requestOptions, options);
                           this.BucketService.deleteFile(`${this.bucketId}/${objectKey}`,options).subscribe((res) => {
-                            this.getAlldir();
-                          });
+                          this.getAlldir();
+                          this.msgs.push({severity: 'success', summary: 'Success', detail: element.Key + ' has been deleted successfully.'});
+                        }, (error)=>{
+                          this.msgs.push({severity: 'error', summary: "Error deleting " + element.Key, detail: error._body});
+                        });
                       })
                    });
                     break;

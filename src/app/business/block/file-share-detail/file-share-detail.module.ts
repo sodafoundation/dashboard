@@ -1,11 +1,7 @@
 import { NgModule, APP_INITIALIZER } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule, FormsModule } from '@angular/forms';
-
-import { FileShareDetailComponent } from './file-share-detail.component';
-
 import { RouterModule } from '@angular/router';
-import { TabViewModule, ButtonModule, DataTableModule, DropMenuModule, DialogModule, FormModule, InputTextModule, InputTextareaModule, DropdownModule , ConfirmationService,ConfirmDialogModule, MultiSelectModule, GrowlModule } from '../../../components/common/api';
+import { SharedModule } from 'app/shared/shared.module';
+import { FileShareDetailComponent } from './file-share-detail.component';
 import { HttpService } from '../../../shared/service/Http.service';
 import { FileShareService, SnapshotService ,FileShareAclService } from '../fileShare.service';
 import { ProfileService } from '../../profile/profile.service';
@@ -20,28 +16,12 @@ let routers = [{
     FileShareDetailComponent
   ],
   imports: [
-    TabViewModule,
-    ButtonModule,
-    CommonModule,
-    ReactiveFormsModule,
-    FormsModule,
-    ButtonModule,
-    InputTextModule,
-    InputTextareaModule,
-    DataTableModule,
-    DropdownModule,
-    DropMenuModule,
-    DialogModule,
-    FormModule,
-    ConfirmDialogModule,
     RouterModule.forChild(routers),
-    MultiSelectModule,
-    GrowlModule
+    SharedModule
   ],
   exports: [ FileShareDetailComponent ],
   providers: [
     HttpService,
-    ConfirmationService,
     FileShareService,
     SnapshotService,
     ProfileService,
