@@ -72,6 +72,6 @@
         "ngx-clipboard": "^10.0.0",
         "ngx-joyride": "^2.2.11",
         "rxjs-compat": "6.0.0",
-        "underscore": "^1.9.0"
+        "underscore": "^1.12.1"
     }
 }
