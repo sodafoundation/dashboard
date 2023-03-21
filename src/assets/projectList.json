@@ -1,0 +1,71 @@
+[
+    {
+        "name": "DELFIN",
+        "logo": "assets/delfin/delfin-title.svg",
+        "shortDescription": "Delfin: Heterogeneous Storage Monitoring",
+        "description": "Delfin is an open source storage monitoring and alerting toolkit.",
+        "useCases": [
+            "Performance-Monitoring : Monitor storage metrics such as IOP's, r/w throughput, latencies",
+            "Predictive-Analytics : Identify anomalies, forecast resource usage, and fix problems using storage automation capabilities",
+            "Automated-Remediation : Speed up the process of problem solving with alerts"
+        ],
+        "features": [
+            "Support performance monitoring and alerting across heterogeneous storage with CM and Host Mapping",
+            "Unified, intelligent and scalable resource management",
+            "Exporter framework to add custom clients from data processing and visualization. Prometheus supported out of the box",
+            "Support monitoring for EMC, IBM, NetApp, PureStorage, Huawei, etc"
+        ]
+    },
+    {
+        "name": "STRATO",
+        "logo": "assets/strato/strato-title.svg",
+        "shortDescription": "Strato - Multicloud Data Management",
+        "description": "Strato is an open source tool to control data in multicloud IT environments.",
+        "useCases": [
+            "Cloud Backup: replicate snapshots to multiple clouds for high availability backup",
+            "Cloud Switching: easily move data from one cloud to another",
+            "Multicloud Content Distribution: distribute content from data center across different clouds"
+        ],
+        "features":[
+            "Provides a cloud vendor agnostic data management for hybrid cloud, intercloud, or intracloud.",
+            "Unified interface for file and object services across multiple cloud vendors.",
+            "S3 compatible APIs for object data management on cloud or on premise",
+            "Deploy on-premise or in the cloud"
+        ]
+    },
+    {
+        "name": "KAHU",
+        "logo": "assets/kahu/kahu-title.svg",
+        "shortDescription": "Kahu: Container Data Protection",
+        "description": "Kahu is a cloud native tool to backup and restore, perform disaster recovery, and migrate Kubernetes cluster resources and persistent volumes.",
+        "useCases": [
+            "Data Migration: enable cluster portability by easily migrating K8s resources from one cluster to another on-prem and across clouds",
+            "Data Protection: schedule backups, retention schedules, etc.",
+            "Disaster Recovery: reduce time to recovery in case of catastrophic failures"
+        ],
+        "features":[
+            "Snapshot CSI PVC’s",
+            "Backup to any storage (EMC, NetApp, IBM, Huawei, etc.)",
+            "Backup to any cloud storage (AWS S3, Azure Blob, GCP Object Store)",
+            "Multi Cluster",
+            "Global Controller and Meta Data Management"
+        ]
+    },
+    {
+        "name": "TERRA",
+        "logo": "assets/terra/terra-title.svg",
+        "shortDescription": "Terra - SDS Controller",
+        "description": "Terra is an open source storage management and automation project.",
+        "useCases": [
+            "Storage Provisioning: automate block and file storage provisioning",
+            "Data Protection: schedule snapshots and backups",
+            "Storage-as-a-Service (STaaS): self-service catalog empowers users and reduces OPEX"
+
+        ],
+        "features":[
+            "Standardized API, Controller for metadata and Dock for Drivers to provide seamless data management across various storage vendors",
+            "Supports to connect different platforms like Kubernetes, Open Stack, VMware through plugins",
+            "Supports custom vendors drivers and CSI plugins for heterogeneous storages"
+        ]
+    }
+]
