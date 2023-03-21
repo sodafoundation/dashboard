@@ -30,7 +30,8 @@ import { ProjectDetailsComponent } from './project-details/project-details.compo
     MatProgressSpinnerModule,
     HttpClientModule,
     MatGridListModule,
-    MatCardModule
+    MatCardModule,
+    MatButtonModule
   ],
   providers: [
     { 
