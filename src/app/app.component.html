@@ -1,0 +1,20 @@
+<!-- Loading spinner -->
+<div *ngIf="loading" class="loading-container flex-content-center">
+  <div class="spin"></div>
+</div>
+<splash-screen></splash-screen>
+<div class="header">
+  <div class="logo">
+    <img src="../assets/soda-foundation-logo-white.svg">
+  </div>
+  <div class="release">
+    Latest Release - {{siteDetails.release}}
+  </div>
+</div>
+<div class="main-container">
+  <router-outlet></router-outlet>
+</div>
+<div class="footer">
+  <p>{{siteDetails.footerText}}</p>
+</div>
+

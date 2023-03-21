@@ -1,0 +1,24 @@
+.project-list{
+    width: 100%;
+    padding: 12px;
+    float:left
+}
+.even{
+    float: left;
+    width: 47%;
+    clear: both;
+    margin-bottom: 30px;
+}
+.odd{
+    float: right;
+    width: 47%;
+    margin-bottom: 30px;
+}
+.inline-text{
+    padding: 12px;
+    font-size: 18px;
+}
+.project-list ul li {
+    list-style: none;
+    padding: 12px 0 0 12px;
+}
