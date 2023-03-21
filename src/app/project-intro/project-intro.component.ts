@@ -5,7 +5,7 @@ import { Router } from '@angular/router';
 @Component({
   selector: 'app-project-intro',
   templateUrl: './project-intro.component.html',
-  styleUrls: ['./project-intro.component.css']
+  styleUrls: ['./project-intro.component.scss']
 })
 export class ProjectIntroComponent implements OnInit {
   projects: any;
