@@ -17,6 +17,8 @@ The dashboard is mainly for providing the first hand experience for SODA Solutio
 
 SODA Dashboard project is maintained by SODA Foundation directly.
 
+can i know how we should run this soda dashboard project to locally in my system.
+
 ## Documentation
 
 [https://docs.sodafoundation.io](https://docs.sodafoundation.io/)
