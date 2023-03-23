@@ -23,6 +23,10 @@ can i know how we should run this soda dashboard project to locally in my system
 
 [https://docs.sodafoundation.io](https://docs.sodafoundation.io/)
 
+## Learn Git and Github
+
+[Learn Git and Github First To implement](https://www.digitalocean.com/community/tutorials/how-to-create-a-pull-request-on-github)
+
 ## Quick Start - To Use/Experience
 
 [https://docs.sodafoundation.io](https://docs.sodafoundation.io/)
