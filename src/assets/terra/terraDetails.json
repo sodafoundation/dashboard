@@ -1,0 +1,28 @@
+{
+    "name": "TERRA",
+    "slackLink": "",
+    "useCases": [
+        "Storage Provisioning: automate block and file storage provisioning",
+        "Data Protection: schedule snapshots and backups",
+        "Storage-as-a-Service (STaaS): self-service catalog empowers users and reduces OPEX"
+
+    ],
+    "features":[
+        "Standardized API, Controller for metadata and Dock for Drivers to provide seamless data management across various storage vendors",
+        "Supports to connect different platforms like Kubernetes, Open Stack, VMware through plugins",
+        "Supports custom vendors drivers and CSI plugins for heterogeneous storages"
+    ],
+    "architectureImages": [
+        {
+            "imgUrl": "assets/terra/arch1.jpeg",
+            "description": "Some description about the above image"
+        }
+    ],
+    "demo": [
+        {
+            "demoUrl": "assets/terra/demo.avi",
+            "description": "Some description about the above video"
+        }
+    ]
+
+}

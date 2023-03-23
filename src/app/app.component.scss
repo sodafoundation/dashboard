@@ -10,31 +10,18 @@ $border-bottom-color_1: #1c87c9;
 		transform: translate3d(-50%, -50%, 0) rotate(360deg);
 	}
 }
-.header {
-	width: 100%;
-	height: 40px;
-	background: #1c87c9;
-	padding: 12px;
-	margin-bottom: 12px;
+
+.example-spacer {
+	flex: 1 1 auto;
 }
-.logo {
-	padding-left: 12px;
-	float: left;
-}
-.release {
-	float: right;
-	color: $color_1;
-	padding-right: 24px;
-}
-.main-container {
-	padding: 12px;
-}
+
 .footer {
-	float: left;
+	position: fixed;
+	bottom: 0;
+	left: 0;
 	width: 100%;
 	height: 20px;
-	background: #1c87c9;
-	margin-top: 12px;
+	background: #3f51b5;
 	padding: 8px;
 	color: $color_1;
 	text-align: center;

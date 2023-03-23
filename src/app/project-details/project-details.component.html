@@ -1,1 +1,24 @@
-<p>project-details works!</p>
+<div class="project-details-container">
+    <div class="details-top">
+        <span class="p-name">{{projectDetails.name}}</span>
+        <button mat-raised-button color="primary" (click)="returnBack()" class="right">
+            <mat-icon>arrow_back</mat-icon>
+        </button>
+    </div>
+    <div class="details-container">
+        <div class="project-details-list">
+            <p>Use Cases</p>
+            <mat-list role="list">
+                <mat-list-item role="listitem" *ngFor="let useCase of projectDetails.useCases">
+                    {{useCase}}
+                </mat-list-item>
+            </mat-list>
+            <p>Features</p>
+            <mat-list role="list">
+                <mat-list-item role="listitem" *ngFor="let feature of projectDetails.features">
+                    {{feature}}
+                </mat-list-item>
+            </mat-list>
+        </div>
+    </div>
+</div>

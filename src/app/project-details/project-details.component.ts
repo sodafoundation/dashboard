@@ -1,4 +1,7 @@
 import { Component, OnInit } from '@angular/core';
+import { HttpService } from '../services/http.service';
+import { ActivatedRoute } from '@angular/router';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-project-details',
@@ -7,9 +10,29 @@ import { Component, OnInit } from '@angular/core';
 })
 export class ProjectDetailsComponent implements OnInit {
 
-  constructor() { }
+  constructor(
+    private api: HttpService,
+    private route: ActivatedRoute,
+    private router: Router
+  ) { }
+  
+  projectName: any;
+  projectDetails: any;
 
   ngOnInit(): void {
+    this.projectName = this.route.snapshot.paramMap.get('projectName')?.toLowerCase();
+    this.getProjectDetails();
+  }
+
+  getProjectDetails(){
+    this.api.getProjectDetails(this.projectName).subscribe(resp => {
+      console.log(resp);
+      this.projectDetails = resp;
+    });
+  }
+
+  returnBack(){
+    this.router.navigateByUrl('projects');
   }
 
 }

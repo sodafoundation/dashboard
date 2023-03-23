@@ -1,36 +1,24 @@
-<mat-card class="project-list" *ngFor="let project of projects; let index=index; let odd=odd; let even=even;" [ngClass]="{ odd: odd, even: even }">
-    <mat-card-header>
-      <mat-card-title>
-        <img width="100%" src="{{project.logo}}">
-      </mat-card-title>
-      <mat-card-subtitle></mat-card-subtitle>
-    </mat-card-header>
-    <mat-card-content>
-        <div class="inline-text">
-            {{project.shortDescription}}
-        </div>
-        <div class="inline-text">
-            {{project.description}}
-        </div>
-        <div class="inline-text">
-            <p><b>Use Cases</b></p>
-            <ul>
-                <li *ngFor="let useCase of project.useCases">
-                    {{useCase}}
-                </li>
-            </ul>
-        </div>
-        <div class="inline-text">
-            <p><b>Features</b></p>
-            <ul>
-                <li *ngFor="let feature of project.features">
-                    {{feature}}
-                </li>
-            </ul>
-        </div>
-    </mat-card-content>
-    <mat-card-actions>
-        <button style="float:right;" mat-raised-button color="primary" (click)="navigateTo(project.name)">Architecture and Demo</button>
-        <button style="float:right;" mat-raised-button color="primary">Install {{project.name}}</button>
-    </mat-card-actions>
-</mat-card>
+<mat-grid-list cols="2" rowHeight="3:1">
+    <mat-grid-tile *ngFor="let project of projects;">
+        <mat-card class="project-list">
+            <mat-card-header>
+              <mat-card-title>
+                <img width="100%" src="{{project.logo}}">
+              </mat-card-title>
+              <mat-card-subtitle></mat-card-subtitle>
+            </mat-card-header>
+            <mat-card-content>
+                <div class="inline-text">
+                    {{project.shortDescription}}
+                </div>
+                <div class="inline-text">
+                    {{project.description}}
+                </div>
+            </mat-card-content>
+            <mat-card-actions>
+                <button style="float:right;" mat-raised-button color="primary" (click)="navigateTo(project.name)">Architecture and Demo</button>
+                <button style="float:right;" mat-raised-button color="primary">Install {{project.name}}</button>
+            </mat-card-actions>
+        </mat-card>
+    </mat-grid-tile>
+</mat-grid-list>
