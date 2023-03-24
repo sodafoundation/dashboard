@@ -18,4 +18,8 @@ export class HttpService {
     return this.http.get('assets/siteBasics.json');
   }
 
+  getProjectDetails(projectName: any){
+    return this.http.get('assets/'+projectName+'/'+projectName+'Details.json');
+  }
+
 }

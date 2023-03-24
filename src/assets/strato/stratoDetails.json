@@ -1,0 +1,28 @@
+{
+    "name": "STRATO",
+    "slackLink": "",
+    "useCases": [
+        "Cloud Backup: replicate snapshots to multiple clouds for high availability backup",
+        "Cloud Switching: easily move data from one cloud to another",
+        "Multicloud Content Distribution: distribute content from data center across different clouds"
+    ],
+    "features":[
+        "Provides a cloud vendor agnostic data management for hybrid cloud, intercloud, or intracloud.",
+        "Unified interface for file and object services across multiple cloud vendors.",
+        "S3 compatible APIs for object data management on cloud or on premise",
+        "Deploy on-premise or in the cloud"
+    ],
+    "architectureImages": [
+        {
+            "imgUrl": "assets/strato/arch1.jpeg",
+            "description": "Some description about the above image"
+        }
+    ],
+    "demo": [
+        {
+            "demoUrl": "assets/strato/demo.avi",
+            "description": "Some description about the above video"
+        }
+    ]
+
+}

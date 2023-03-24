@@ -1,7 +1,17 @@
 {
     "name": "Delfin",
     "slackLink": "",
-
+    "useCases": [
+        "Performance-Monitoring : Monitor storage metrics such as IOP's, r/w throughput, latencies",
+        "Predictive-Analytics : Identify anomalies, forecast resource usage, and fix problems using storage automation capabilities",
+        "Automated-Remediation : Speed up the process of problem solving with alerts"
+    ],
+    "features": [
+        "Support performance monitoring and alerting across heterogeneous storage with CM and Host Mapping",
+        "Unified, intelligent and scalable resource management",
+        "Exporter framework to add custom clients from data processing and visualization. Prometheus supported out of the box",
+        "Support monitoring for EMC, IBM, NetApp, PureStorage, Huawei, etc"
+    ],
     "architectureImages": [
         {
             "imgUrl": "assets/delfin/arch1.jpeg",
