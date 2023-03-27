@@ -20,7 +20,8 @@
             </mat-card-content>
             <mat-card-actions>
                 <button style="float:right;" mat-raised-button color="primary" (click)="navigateTo(project.name)">Architecture and Demo</button>
-                <button style="float:right;" mat-raised-button color="primary">Install {{project.name}}</button>
+                <button disabled title="Install {{project.name}}" style="float:right;" mat-raised-button color="primary"><mat-icon aria-hidden="false" aria-label="Install Project" >install_desktop</mat-icon></button>
+                <button title="View {{project.name}} Dashboard" style="float:right;" mat-raised-button color="primary"><mat-icon aria-hidden="false" aria-label="View Dashboard" >open_in_new</mat-icon></button>
             </mat-card-actions>
         </mat-card>
     </div>
