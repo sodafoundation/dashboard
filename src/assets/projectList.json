@@ -1,26 +1,32 @@
 [
     {
         "name": "DELFIN",
-        "logo": "assets/delfin/delfin-title.svg",
-        "shortDescription": "Delfin: Heterogeneous Storage Monitoring",
+        "logo": "assets/delfin/delfin.png",
+        "shortDescription": "Heterogeneous Storage Monitoring",
         "description": "Delfin is an open source storage monitoring and alerting toolkit."
     },
     {
         "name": "STRATO",
-        "logo": "assets/strato/strato-title.svg",
-        "shortDescription": "Strato - Multicloud Data Management",
+        "logo": "assets/strato/strato.png",
+        "shortDescription": "Multicloud Data Management",
         "description": "Strato is an open source tool to control data in multicloud IT environments."        
     },
     {
         "name": "KAHU",
-        "logo": "assets/kahu/kahu-title.svg",
-        "shortDescription": "Kahu: Container Data Protection",
+        "logo": "assets/kahu/kahu.png",
+        "shortDescription": "Container Data Protection",
         "description": "Kahu is a cloud native tool to backup and restore, perform disaster recovery, and migrate Kubernetes cluster resources and persistent volumes."
     },
     {
         "name": "TERRA",
-        "logo": "assets/terra/terra-title.svg",
-        "shortDescription": "Terra - SDS Controller",
+        "logo": "assets/terra/terra.png",
+        "shortDescription": "SDS Controller",
         "description": "Terra is an open source storage management and automation project."
+    },
+    {
+        "name": "COMO",
+        "logo": "assets/como/como.png",
+        "shortDescription": "Multicloud Data Management for Data Lake Solutions",
+        "description": "SODA COMO is a new SODA Framework project for Multicloud Data Management for Data Lake Solutions."        
     }
 ]

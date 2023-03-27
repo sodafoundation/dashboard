@@ -11,6 +11,7 @@ export class ProjectIntroComponent implements OnInit {
   projects: any;
   col: string = '2';
   row: string = '1';
+  gridColumns = 3;
 
   constructor(
     private api: HttpService,
@@ -26,6 +27,10 @@ export class ProjectIntroComponent implements OnInit {
       this.projects = data;
       console.log(this.projects);
     });
+  }
+
+  toggleGridColumns() {
+    this.gridColumns = this.gridColumns === 3 ? 4 : 3;
   }
 
   navigateTo(project: any){
