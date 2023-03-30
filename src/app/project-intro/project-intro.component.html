@@ -19,9 +19,15 @@
                 </p>
             </mat-card-content>
             <mat-card-actions>
-                <button style="float:right;" mat-raised-button color="primary" (click)="navigateTo(project.name)">Architecture and Demo</button>
-                <button disabled title="Install {{project.name}}" style="float:right;" mat-raised-button color="primary"><mat-icon aria-hidden="false" aria-label="Install Project" >install_desktop</mat-icon></button>
-                <button title="View {{project.name}} Dashboard" style="float:right;" mat-raised-button color="primary"><mat-icon aria-hidden="false" aria-label="View Dashboard" >open_in_new</mat-icon></button>
+                <button style="float:right;" mat-raised-button color="primary" (click)="navigateTo(project.name)">Project Details</button>
+                <button *ngIf="!project.installed" (click)="installProject(project)" title="Install {{project.name}}" style="float:right;" mat-raised-button color="primary">
+                    <mat-icon aria-hidden="false" aria-label="Install Project" >install_desktop</mat-icon>
+                    Install
+                </button>
+                <button *ngIf="project.installed" (click)="navigateToDashboard(project)" title="View {{project.name}} Dashboard" style="float:right;" mat-raised-button color="primary">
+                    <mat-icon aria-hidden="false" aria-label="View Dashboard" >open_in_new</mat-icon>
+                    {{project.name}} Dashboard
+                </button>
             </mat-card-actions>
         </mat-card>
     </div>

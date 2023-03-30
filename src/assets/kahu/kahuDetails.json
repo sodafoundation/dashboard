@@ -1,29 +1,31 @@
 {
     "name": "KAHU",
     "slackLink": "",
-    "useCases": [
-        "Data Migration: enable cluster portability by easily migrating K8s resources from one cluster to another on-prem and across clouds",
-        "Data Protection: schedule backups, retention schedules, etc.",
-        "Disaster Recovery: reduce time to recovery in case of catastrophic failures"
-    ],
-    "features":[
-        "Snapshot CSI PVC’s",
-        "Backup to any storage (EMC, NetApp, IBM, Huawei, etc.)",
-        "Backup to any cloud storage (AWS S3, Azure Blob, GCP Object Store)",
-        "Multi Cluster",
-        "Global Controller and Meta Data Management"
-    ],
-    "architectureImages": [
+    "details" : [
         {
-            "imgUrl": "assets/kahu/arch1.jpeg",
-            "description": "Some description about the above image"
-        }
-    ],
-    "demo": [
+            "tabName" : "Use Cases",
+            "type": "array",
+            "content" : [
+                "Data Migration: enable cluster portability by easily migrating K8s resources from one cluster to another on-prem and across clouds",
+                "Data Protection: schedule backups, retention schedules, etc.",
+                "Disaster Recovery: reduce time to recovery in case of catastrophic failures"
+            ]
+        },
         {
-            "demoUrl": "assets/kahu/demo.avi",
-            "description": "Some description about the above video"
+            "tabName": "Features",
+            "type": "array-object",
+            "content": [
+                {
+                    "title": "Basic Kahu Features",
+                    "content": [
+                        "Snapshot CSI PVC’s",
+                        "Backup to any storage (EMC, NetApp, IBM, Huawei, etc.)",
+                        "Backup to any cloud storage (AWS S3, Azure Blob, GCP Object Store)",
+                        "Multi Cluster",
+                        "Global Controller and Meta Data Management"
+                    ]
+                }
+            ]
         }
     ]
-
 }

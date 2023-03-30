@@ -1,24 +1,68 @@
-<div class="project-details-container">
+<div *ngIf="projectDetails" class="project-details-container">
     <div class="details-top">
-        <span class="p-name">{{projectDetails.name}}</span>
-        <button mat-raised-button color="primary" (click)="returnBack()" class="right">
-            <mat-icon>arrow_back</mat-icon>
-        </button>
+        <mat-toolbar>
+            <mat-toolbar-row>
+                <div class="p-name">Project - {{projectDetails.name}}</div>
+                <span class="example-spacer"></span>
+                <button mat-raised-button color="accent" (click)="returnBack()">
+                    <mat-icon>arrow_back</mat-icon>
+                </button>
+            </mat-toolbar-row>
+        </mat-toolbar>
     </div>
     <div class="details-container">
-        <div class="project-details-list">
-            <p>Use Cases</p>
-            <mat-list role="list">
-                <mat-list-item role="listitem" *ngFor="let useCase of projectDetails.useCases">
-                    {{useCase}}
-                </mat-list-item>
-            </mat-list>
-            <p>Features</p>
-            <mat-list role="list">
-                <mat-list-item role="listitem" *ngFor="let feature of projectDetails.features">
-                    {{feature}}
-                </mat-list-item>
-            </mat-list>
-        </div>
+        <mat-tab-group>
+            <mat-tab *ngFor="let tab of projectDetails.details">
+              <ng-template mat-tab-label>{{tab.tabName}}</ng-template>
+              <div *ngIf="tab.type == 'array'" class="tab-content">
+                <ul>
+                    <li *ngFor="let item of tab.content">
+                        {{item}}
+                    </li>
+                </ul>
+              </div>
+              <div *ngIf="tab.type == 'array-object'" class="tab-content">
+                <ng-container *ngFor="let object of tab.content">
+                    <div class="title">
+                        {{object.title}}
+                    </div>
+                    <div class="line-items">
+                        <ul>
+                            <li *ngFor="let item of object.content">
+                                {{item}}
+                            </li>
+                        </ul>
+                    </div>
+                </ng-container>
+              </div>
+              <div *ngIf="tab.type == 'object'">
+                <ng-container *ngFor="let object of tab.content">
+                    <div *ngIf="object.type == 'image'" class="tab-content">
+                        <div class="arch-images">
+                            <img src="{{object.url}}">
+                        </div>                        
+                        <div class="arch-desc">
+                            {{object.description}}
+                        </div>
+                    </div>
+                    <div *ngIf="object.type=='url'" class="tab-content">
+                        <ul>
+                            <li>
+                                <a href="{{object.url}}" target="_blank">
+                                    {{object.description}}
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div *ngIf="object.type == 'video'" class="tab-content-video">
+                        <div class="video-content">
+                            <p>{{object.description}}</p>
+                            <iframe [src]="object.url | safe" width="640" height="480" allow="autoplay"></iframe>
+                        </div>
+                    </div>
+                </ng-container>
+              </div>
+            </mat-tab>
+        </mat-tab-group>
     </div>
 </div>

@@ -18,6 +18,8 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatIconModule } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
 import { FlexLayoutModule } from "@angular/flex-layout";
+import { MatTabsModule } from '@angular/material/tabs';
+import { SafePipe } from './common/safePipe';
 
 @NgModule({
   declarations: [
@@ -25,6 +27,7 @@ import { FlexLayoutModule } from "@angular/flex-layout";
     SplashScreenComponent,
     ProjectIntroComponent,
     ProjectDetailsComponent,
+    SafePipe
   ],
   imports: [
     BrowserModule,
@@ -38,7 +41,8 @@ import { FlexLayoutModule } from "@angular/flex-layout";
     MatToolbarModule,
     MatIconModule,
     MatListModule,
-    FlexLayoutModule
+    FlexLayoutModule,
+    MatTabsModule
   ],
   providers: [
     { 

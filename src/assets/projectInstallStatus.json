@@ -1,0 +1,22 @@
+[
+    {
+        "project": "DELFIN",
+        "installed": true
+    },
+    {
+        "project": "STRATO",
+        "installed": false
+    },
+    {
+        "project": "KAHU",
+        "installed": true
+    },
+    {
+        "project": "COMO",
+        "installed": false
+    },
+    {
+        "project": "TERRA",
+        "installed": false
+    }
+]

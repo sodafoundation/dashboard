@@ -18,6 +18,7 @@ export class ProjectDetailsComponent implements OnInit {
   
   projectName: any;
   projectDetails: any;
+  tabs: any = [];
 
   ngOnInit(): void {
     this.projectName = this.route.snapshot.paramMap.get('projectName')?.toLowerCase();
@@ -26,7 +27,6 @@ export class ProjectDetailsComponent implements OnInit {
 
   getProjectDetails(){
     this.api.getProjectDetails(this.projectName).subscribe(resp => {
-      console.log(resp);
       this.projectDetails = resp;
     });
   }

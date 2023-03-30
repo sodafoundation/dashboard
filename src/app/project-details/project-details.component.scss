@@ -4,10 +4,52 @@
         font-weight: bold;
         font-size: 18px;
     }
-    .right{
-        float: right;
+    .example-spacer{
+        flex: 1 1 auto;
     }
-    .details-container{
+    .tab-content{
         clear: both;
+        .title{
+            font-weight: bold;
+            font-size: 16px;
+            margin: 12px 0;
+        }
+        ul li {
+            list-style: none;
+            font-size: 16px;
+            padding-bottom: 12px;
+            list-style-type: disclosure-closed;
+            a {
+                color: #314b78;
+                text-decoration: none;
+            }
+            a:hover{
+                color: blue;
+            }
+        }
+        .arch-images{
+            max-width: 60%;
+            max-height: 40%;
+            margin: 24px;
+            float: left;
+            img{
+                height: 100%;
+                box-sizing: border-box;
+                max-width: 100%;
+                max-height: 100%;
+                width: 100%;
+            }
+        }
+        .arch-desc{
+            padding: 24px;
+            font-size: 16px;
+        }
+    }
+    .tab-content-video{
+        float: left;
+        width: 48%;
+        padding: 1%;
+        font-size: 16px;
+        font-weight: bold;
     }
 }

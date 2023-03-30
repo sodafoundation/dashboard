@@ -1,17 +1,12 @@
-<div
-  class="app-splash-screen"
-  [ngStyle]="{ left: windowWidth }"
-  *ngIf="showSplash"
->
-<div class="app-splash-inner">
-  <div class="app-logo"></div>
-  <div class="">
-    <mat-spinner></mat-spinner>
-  </div>
-  <div class="app-label">
-    <p class="animate-charcter">Loading The SODA Experience</p>
-  </div>
-  <div class="app-loader">
+<div class="app-splash-screen" [ngStyle]="{ left: windowWidth }" *ngIf="showSplash">
+  <div class="app-splash-inner">
+    <div class="app-logo"></div>
+    <div class="app-loader">
+      <mat-spinner></mat-spinner>
+    </div>
+    <div class="app-label">
+      <p class="animate-charcter">Loading The SODA Experience</p>
+    </div>
     
   </div>
 </div>
