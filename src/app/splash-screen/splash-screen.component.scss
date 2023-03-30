@@ -12,28 +12,29 @@
   height: 100%;
   z-index: 100;
   transition: left 0.5s;
+  .app-splash-inner {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+  .app-label {
+    margin-top: 32px;
+    color: #fff;
+    font-size: 2.5em;
+    font-family: "Pacifico", cursive;
+  }
+  .app-logo {
+    background: url("../../assets/soda-foundation-logo-white.svg");
+    background-repeat: no-repeat;
+    max-width: 100%;
+    background-position: center;
+    background-size: contain;
+    width: 600px;
+    height: 400px;
+  }
 }
 
-.app-label {
-  margin-top: 32px;
-  color: #fff;
-  font-size: 2.5em;
-  font-family: "Pacifico", cursive;
-}
 
-.app-splash-inner {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-}
 
-.app-logo {
-  background: url("../../assets/soda-foundation-logo-white.svg");
-  background-repeat: no-repeat;
-  max-width: 100%;
-  background-position: center;
-  background-size: contain;
-  width: 600px;
-  height: 400px;
-}
+

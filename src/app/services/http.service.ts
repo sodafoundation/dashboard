@@ -22,4 +22,12 @@ export class HttpService {
     return this.http.get('assets/'+projectName+'/'+projectName+'Details.json');
   }
 
+  /*
+    * The below API should be pointing to an API on the NodeJS server 
+    * This is a mock API implementation to implement the UI functonality 
+  */
+  checkProjectInstallation(url: any){
+    return this.http.get('assets/projectInstallStatus.json');
+  }
+
 }

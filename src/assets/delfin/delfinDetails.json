@@ -1,28 +1,136 @@
 {
     "name": "Delfin",
-    "slackLink": "",
-    "useCases": [
-        "Performance-Monitoring : Monitor storage metrics such as IOP's, r/w throughput, latencies",
-        "Predictive-Analytics : Identify anomalies, forecast resource usage, and fix problems using storage automation capabilities",
-        "Automated-Remediation : Speed up the process of problem solving with alerts"
-    ],
-    "features": [
-        "Support performance monitoring and alerting across heterogeneous storage with CM and Host Mapping",
-        "Unified, intelligent and scalable resource management",
-        "Exporter framework to add custom clients from data processing and visualization. Prometheus supported out of the box",
-        "Support monitoring for EMC, IBM, NetApp, PureStorage, Huawei, etc"
-    ],
-    "architectureImages": [
+    "details" : [
         {
-            "imgUrl": "assets/delfin/arch1.jpeg",
-            "description": "Some description about the above image"
-        }
-    ],
-    "demo": [
+            "tabName" : "Use Cases",
+            "type": "array",
+            "content" : [
+                "Performance-Monitoring : Monitor storage metrics such as IOP's, r/w throughput, latencies",
+                "Predictive-Analytics : Identify anomalies, forecast resource usage, and fix problems using storage automation capabilities",
+                "Automated-Remediation : Speed up the process of problem solving with alerts"
+            ]
+        },
         {
-            "demoUrl": "assets/delfin/demo.avi",
-            "description": "Some description about the above video"
+            "tabName": "Features",
+            "type": "array-object",
+            "content": [
+                {
+                    "title": "Storage Device Monitoring",
+                    "content": [
+                        "Registering a storage device for monitoring",
+                        "Updating a storage device access information",
+                        "Removing a storage device from monitoring",
+                        "Provide storage devices attributes",
+                        "Synchronize storage devices information periodically and on user request"
+                    ]
+                },
+                {
+                    "title": "Storage Resources Monitoring",
+                    "content": [
+                        "Provide storage resources attributes such as pool, LUN, port, etc Details.",
+                        "Synchronize storage resources attributes periodically and on user request"
+                    ]
+                },
+                {
+                    "title": "Performance Monitoring",
+                    "content": [
+                        "Register storage for performance monitoring",
+                        "Report key performance indicators periodically"
+                    ]
+                },
+                {
+                    "title": "Alert Monitoring",
+                    "content": [
+                        "Real time reporting of events/alerts.",
+                        "Pull alerts from back end on user request.",
+                        "Clear Alert on user request."
+                    ]
+                }
+            ]
+        },
+        {
+            "tabName": "Documentation",
+            "type": "object",
+            "content" : [
+                {
+                    "type": "url",
+                    "url": "https://docs.sodafoundation.io",
+                    "description" : "SODA Foundation Documentation."
+                },
+                {
+                    "type": "url",
+                    "url": "https://docs.sodafoundation.io/guides/user-guides/delfin",
+                    "description" : "DELFIN Dashboard quick preview"
+                },
+                {
+                    "type": "url",
+                    "url": "https://docs.sodafoundation.io/guides/developer-guides/delfin",
+                    "description" : "Developer documentation for DELFIN"
+                }
+            ]
+        },
+        {
+            "tabName": "Architecture",
+            "type": "object",
+            "content": [
+                {
+                    "type": "image",
+                    "url": "assets/delfin/completeMonitoringSystem.jpg",
+                    "description": "Delfin as complete monitoring system"
+                },
+                {
+                    "type": "image",
+                    "url": "assets/delfin/heterogeneousMetrics.jpg",
+                    "description": "Delfin as a heterogeneous metrics collection framework for existing monitoring platforms"
+                }
+            ]
+        },
+        {
+            "tabName": "Demo",
+            "type": "object",
+            "content": [
+                {
+                    "type": "video",
+                    "url": "https://drive.google.com/file/d/1CI8rNeuvPRuWf2qrX_wAfIKwHSkZQRQX/preview",
+                    "description": "Registering a new storage with Delfin for monitoring"
+                },
+                {
+                    "type": "video",
+                    "url": "https://drive.google.com/file/d/1CI8rNeuvPRuWf2qrX_wAfIKwHSkZQRQX/preview",
+                    "description": "How to enable and configure performance metrics"
+                }
+            ]
+        },
+        {
+            "tabName" : "Social Links",
+            "type": "object",
+            "content": [
+                {
+                    "type": "url",
+                    "url": "https://github.com/sodafoundation/delfin",
+                    "description": "SODA Delfin GITHUB"
+                },
+                {
+                    "type" : "url",
+                    "url": "https://www.sodafoundation.io/slack/",
+                    "description": "Join the Delfin Slack Channel"
+                },
+                {
+                    "type" : "url",
+                    "url": " https://twitter.com/sodafoundation",
+                    "description": "Join anf follow us on Twitter"
+                },
+                {
+                    "type" : "url",
+                    "url": "https://www.meetup.com/sodafoundationindia",
+                    "description": "Join the SODA Community for all updates"
+                },
+                {
+                    "type": "url",
+                    "url": "https://bit.ly/soda-linkedin",
+                    "description": "Join us on LinkedIn"
+                }
+            ]
         }
     ]
-
 }

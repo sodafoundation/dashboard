@@ -22,10 +22,26 @@ export class ProjectIntroComponent implements OnInit {
     this.getData();
   }
 
+  /*
+    * getData() needs to be rewritten after the NodeJS Express server is implemented 
+    * Making a call to check the project installation will create a CORS issue 
+    * Every project installation status can be checked on the server 
+  */
+
   getData() {
     this.api.getData().subscribe(data => {
       this.projects = data;
-      console.log(this.projects);
+      this.projects.forEach((project: any) => {
+        let url = 'http://localhost:' + project.installedPort;
+        this.api.checkProjectInstallation(url).subscribe((resp: any) => {
+          const projectStatus = resp;
+          projectStatus.forEach((status: any) => {
+            if(project.name === status.project){
+              project['installed'] = status.installed;
+            }
+          });
+        });
+      });
     });
   }
 
@@ -35,6 +51,15 @@ export class ProjectIntroComponent implements OnInit {
 
   navigateTo(project: any){
     this.route.navigateByUrl('/project-details/' + project);
+  }
+
+  navigateToDashboard(project: any){
+    window.open('http://localhost:' + project.installedPort);
+  }
+
+  installProject(project: any){
+    // To be implemented once the NodeJS serveris implemented
+    console.log(project);
   }
 
 }
