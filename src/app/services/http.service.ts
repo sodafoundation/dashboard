@@ -10,6 +10,8 @@ export class HttpService {
     private http: HttpClient
   ) { }
 
+  serverPort = window.sessionStorage.getItem('serverPort');
+
   getData() {
     return this.http.get('assets/projectList.json');
   }
@@ -22,12 +24,12 @@ export class HttpService {
     return this.http.get('assets/'+projectName+'/'+projectName+'Details.json');
   }
 
-  /*
-    * The below API should be pointing to an API on the NodeJS server 
-    * This is a mock API implementation to implement the UI functonality 
-  */
   checkProjectInstallation(url: any){
-    return this.http.get('assets/projectInstallStatus.json');
+    return this.http.post('http://localhost:'+ this.serverPort +'/api/checkDashboardStatus', url);
+  }
+
+  checkSystemRequirements(systemRequirements: any){
+    return this.http.post('http://localhost:'+ this.serverPort +'/api/checkSystemRequirements', systemRequirements);
   }
 
 }

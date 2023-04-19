@@ -1,4 +1,5 @@
 {
     "release": "Navarino (v1.8.0)",
-    "footerText": "SODA Expereince Dashboard. Explore SODA framework projects"
+    "footerText": "SODA Expereince Dashboard. Explore SODA framework projects",
+    "serverPort": 3000
 }

@@ -1,0 +1,37 @@
+[
+    {
+        "name": "DELFIN",
+        "logo": "assets/delfin/delfin.png",
+        "shortDescription": "Heterogeneous Storage Monitoring",
+        "description": "Delfin is an open source storage monitoring and alerting toolkit.",
+        "installedPort": "4200"
+    },
+    {
+        "name": "STRATO",
+        "logo": "assets/strato/strato.png",
+        "shortDescription": "Multicloud Data Management",
+        "description": "Strato is an open source tool to control data in multicloud IT environments."   ,
+        "installedPort": "9081"  
+    },
+    {
+        "name": "KAHU",
+        "logo": "assets/kahu/kahu.png",
+        "shortDescription": "Container Data Protection",
+        "description": "Kahu is a cloud native tool to backup and restore, perform disaster recovery, and migrate Kubernetes cluster resources and persistent volumes.",
+        "installedPort": "9082"
+    },
+    {
+        "name": "TERRA",
+        "logo": "assets/terra/terra.png",
+        "shortDescription": "SDS Controller",
+        "description": "Terra is an open source storage management and automation project.",
+        "installedPort": "9083"
+    },
+    {
+        "name": "COMO",
+        "logo": "assets/como/como.png",
+        "shortDescription": "Multicloud Data Management for Data Lake Solutions",
+        "description": "SODA COMO is a new SODA Framework project for Multicloud Data Management for Data Lake Solutions.",
+        "installedPort": "9084"
+    }
+]

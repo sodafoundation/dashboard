@@ -1,36 +1,6 @@
 {
     "name": "TERRA",
     "slackLink": "",
-    "systemRequirements": [
-        {
-            "type": "OS",
-            "requirement" : {
-                "name": "UBUNTU",
-                "version": "20.04"
-            }
-        },
-        {
-            "type": "software",
-            "requirement": {
-                "name": "PYTHON",
-                "version": "3.6"
-            }
-        },
-        {
-            "type": "software",
-            "requirement": {
-                "name": "DOCKER",
-                "version": "20.10.21"
-            }
-        },
-        {
-            "type": "software",
-            "requirement":{
-                "name": "ansible",
-                "version": "5.10.0"
-            }
-        }
-    ],
     "details" : [
         {
             "tabName" : "Use Cases",

@@ -1,36 +1,6 @@
 {
-    "name": "COMO",
+    "name": "STRATO",
     "slackLink": "",
-    "systemRequirements": [
-        {
-            "type": "OS",
-            "requirement" : {
-                "name": "UBUNTU",
-                "version": "20.04"
-            }
-        },
-        {
-            "type": "software",
-            "requirement": {
-                "name": "PYTHON",
-                "version": "3.6"
-            }
-        },
-        {
-            "type": "software",
-            "requirement": {
-                "name": "DOCKER",
-                "version": "20.10.21"
-            }
-        },
-        {
-            "type": "software",
-            "requirement":{
-                "name": "ansible",
-                "version": "5.10.0"
-            }
-        }
-    ],
     "details" : [
         {
             "tabName" : "Use Cases",
@@ -46,7 +16,7 @@
             "type": "array-object",
             "content": [
                 {
-                    "title": "Basic Como Features",
+                    "title": "Strato Basic Features",
                     "content": [
                         "Provides a cloud vendor agnostic data management for hybrid cloud, intercloud, or intracloud.",
                         "Unified interface for file and object services across multiple cloud vendors.",
