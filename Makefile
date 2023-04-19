@@ -14,25 +14,42 @@
 
 IMAGE = sodafoundation/dashboard
 VERSION := latest
+BASE_DIR := $(shell pwd)
+BUILD_DIR := $(BASE_DIR)/build
+DIST_DIR := $(BASE_DIR)/build/dist
+BUILD_TGT := soda-dashboard-$(VERSION)
+
+
+.PHONY: all build dashboard docker clean
 
 all:build
-.PHONY: all
 
-build:dashboard
-.PHONY: build
+build:dist docker
 
 dashboard:
 	chmod +x ./image_builder.sh \
 	  && ./image_builder.sh
-.PHONY: dashboard
 
 docker: dashboard
 	docker build . -t $(IMAGE):$(VERSION)
-.PHONY: docker
 
 clean:
+	sudo rm -Rf ./build
 	service nginx stop
 	sudo rm -rf /etc/nginx/sites-available/default /var/www/html/* ./dist warn=False
 	npm uninstall --unsafe-perm
 	npm uninstall --unsafe-perm -g @angular/cli@1.7.4
-.PHONY: clean
+
+version:
+	@echo ${VERSION}
+
+.PHONY: dist
+dist:
+	rm -fr $(DIST_DIR) && mkdir -p $(DIST_DIR)/$(BUILD_TGT)/
+	cd $(DIST_DIR) && \
+	cp ../../install/install.sh $(BUILD_TGT)/ && \
+	cp -R ../../install/conf $(BUILD_TGT)/ && \
+	cp $(BASE_DIR)/LICENSE.md $(BUILD_TGT) && \
+	zip -r $(DIST_DIR)/$(BUILD_TGT).zip $(BUILD_TGT) && \
+	tar zcvf $(DIST_DIR)/$(BUILD_TGT).tar.gz $(BUILD_TGT)
+	tree $(DIST_DIR)
