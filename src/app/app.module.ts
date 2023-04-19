@@ -20,6 +20,7 @@ import { MatListModule } from '@angular/material/list';
 import { FlexLayoutModule } from "@angular/flex-layout";
 import { MatTabsModule } from '@angular/material/tabs';
 import { SafePipe } from './common/safePipe';
+import { InstallProjectComponent } from './install-project/install-project.component';
 
 @NgModule({
   declarations: [
@@ -27,7 +28,8 @@ import { SafePipe } from './common/safePipe';
     SplashScreenComponent,
     ProjectIntroComponent,
     ProjectDetailsComponent,
-    SafePipe
+    SafePipe,
+    InstallProjectComponent
   ],
   imports: [
     BrowserModule,

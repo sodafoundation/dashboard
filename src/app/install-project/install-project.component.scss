@@ -1,0 +1,34 @@
+.content {
+    padding: 16px;
+  }
+  
+  .content > mat-card {
+    margin-bottom: 16px;
+  }
+  
+  .content > mat-card {
+    width: 200px;
+    min-height: 250px;
+  }
+  
+  .mat-card.project-list {
+    min-height: 250px;
+  }
+
+  .mat-card.project-list > mat-card-content{
+    min-height: 40px;
+  }
+
+  .mat-card.project-list .mat-card-title-group{
+    width: 100%;
+  }
+.details-top{
+  padding: 12px;
+  .p-name{
+    font-weight: bold;
+    font-size: 18px;
+  }
+  .example-spacer{
+    flex: 1 1 auto;
+  }
+}

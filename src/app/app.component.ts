@@ -33,6 +33,7 @@ export class AppComponent implements OnInit {
   getBaseData(){
     this.api.getBaseData().subscribe(data => {
       this.siteDetails = data;
+      window.sessionStorage.setItem('serverPort', this.siteDetails.serverPort);
     });
   }
 
