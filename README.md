@@ -7,6 +7,20 @@
 <p align="center"><img src="https://user-images.githubusercontent.com/19162717/215458960-3c24f4bc-809a-45d0-bddc-62833b3cdcd3.png" width="200" height="200">
 </p>
 
+## Table of Contents  
+
+* [Introduction](#introduction)  
+* [Documentation](#documentation)  
+* [Quick Start - For Users](#quick-start---to-useexperience)
+* [Quick Start - For Developers](#quick-start---to-develop)
+* [Latest Releases](#latest-releases)  
+* [Support and Issues](#support-and-issues)  
+* [Project Community](#project-community)
+* [How to Contribute to this Project](#how-to-contribute-to-this-project)
+* [Project Roadmap](#project-roadmap)  
+* [Join SODA Foundation](#join-soda-foundation)  
+
+
 ## Introduction
 
 SODA Dashboard provides a GUI interface through which the users can experience various features and capabilities added to each SODA Release. It provides an easy user setup and experience of all the key features integrated.
